@@ -3,8 +3,8 @@ package eventBridge
 import (
 	"fmt"
 
-	aws "github.com/DamienPace15/anvil/provider/aws"
-	provider "github.com/DamienPace15/anvil/provider/internal/shared"
+	aws "github.com/anvil-cloud/anvil/provider/aws"
+	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 

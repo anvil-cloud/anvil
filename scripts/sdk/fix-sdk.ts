@@ -243,7 +243,7 @@ anvil.run(anvil.AppConfig(run=main))
 
 - [GitHub](https://github.com/anvil-cloud/anvil)
 - [npm (Node SDK)](https://www.npmjs.com/package/@anvil-cloud/sdk)
-- [Go SDK](https://pkg.go.dev/github.com/DamienPace15/anvil/sdk/go/anvil)
+- [Go SDK](https://pkg.go.dev/github.com/anvil-cloud/anvil/sdk/go/anvil)
 
 ## License
 

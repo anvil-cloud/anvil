@@ -7,24 +7,24 @@ import (
 	"os"
 
 	"github.com/pulumi/pulumi-go-provider/infer"
-	awsbucket "github.com/DamienPace15/anvil/provider/aws/bucket"
-	awscognitoAuth "github.com/DamienPace15/anvil/provider/aws/cognitoAuth"
-	awscognitoUserPool "github.com/DamienPace15/anvil/provider/aws/cognitoUserPool"
-	awscomplianceScanner "github.com/DamienPace15/anvil/provider/aws/complianceScanner"
-	awsdsql "github.com/DamienPace15/anvil/provider/aws/dsql"
-	awsdsqlgrant "github.com/DamienPace15/anvil/provider/aws/dsqlgrant"
-	awsdynamo "github.com/DamienPace15/anvil/provider/aws/dynamo"
-	awseventBridge "github.com/DamienPace15/anvil/provider/aws/eventBridge"
-	awshttpapi "github.com/DamienPace15/anvil/provider/aws/httpapi"
-	awslambda "github.com/DamienPace15/anvil/provider/aws/lambda"
-	awsoauthauthorizer "github.com/DamienPace15/anvil/provider/aws/oauthauthorizer"
-	awsqueue "github.com/DamienPace15/anvil/provider/aws/queue"
-	awssveltekitsite "github.com/DamienPace15/anvil/provider/aws/sveltekitsite"
-	awsvpc "github.com/DamienPace15/anvil/provider/aws/vpc"
-	awsvpcEndpoint "github.com/DamienPace15/anvil/provider/aws/vpcEndpoint"
-	awswaf "github.com/DamienPace15/anvil/provider/aws/waf"
-	gcpbucket "github.com/DamienPace15/anvil/provider/gcp/bucket"
-	gcpfunction "github.com/DamienPace15/anvil/provider/gcp/function"
+	awsbucket "github.com/anvil-cloud/anvil/provider/aws/bucket"
+	awscognitoAuth "github.com/anvil-cloud/anvil/provider/aws/cognitoAuth"
+	awscognitoUserPool "github.com/anvil-cloud/anvil/provider/aws/cognitoUserPool"
+	awscomplianceScanner "github.com/anvil-cloud/anvil/provider/aws/complianceScanner"
+	awsdsql "github.com/anvil-cloud/anvil/provider/aws/dsql"
+	awsdsqlgrant "github.com/anvil-cloud/anvil/provider/aws/dsqlgrant"
+	awsdynamo "github.com/anvil-cloud/anvil/provider/aws/dynamo"
+	awseventBridge "github.com/anvil-cloud/anvil/provider/aws/eventBridge"
+	awshttpapi "github.com/anvil-cloud/anvil/provider/aws/httpapi"
+	awslambda "github.com/anvil-cloud/anvil/provider/aws/lambda"
+	awsoauthauthorizer "github.com/anvil-cloud/anvil/provider/aws/oauthauthorizer"
+	awsqueue "github.com/anvil-cloud/anvil/provider/aws/queue"
+	awssveltekitsite "github.com/anvil-cloud/anvil/provider/aws/sveltekitsite"
+	awsvpc "github.com/anvil-cloud/anvil/provider/aws/vpc"
+	awsvpcEndpoint "github.com/anvil-cloud/anvil/provider/aws/vpcEndpoint"
+	awswaf "github.com/anvil-cloud/anvil/provider/aws/waf"
+	gcpbucket "github.com/anvil-cloud/anvil/provider/gcp/bucket"
+	gcpfunction "github.com/anvil-cloud/anvil/provider/gcp/function"
 )
 
 func main() {
@@ -54,5 +54,5 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	p.Run(context.Background(), "anvil", "0.1.10")
+	p.Run(context.Background(), "anvil", "0.1.12")
 }

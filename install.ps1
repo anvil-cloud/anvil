@@ -1,9 +1,9 @@
 # ── Anvil Installer (Windows) ────────────────────────────────
-# Usage: irm https://raw.githubusercontent.com/DamienPace15/anvil/master/install.ps1 | iex
+# Usage: irm https://raw.githubusercontent.com/anvil-cloud/anvil/master/install.ps1 | iex
 
 $ErrorActionPreference = "Stop"
 
-$Repo = "DamienPace15/anvil"
+$Repo = "anvil-cloud/anvil"
 $InstallDir = if ($env:ANVIL_INSTALL_DIR) { $env:ANVIL_INSTALL_DIR } else { "$env:LOCALAPPDATA\anvil\bin" }
 $BinaryName = "anvil.exe"
 $ProviderName = "pulumi-resource-anvil.exe"

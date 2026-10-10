@@ -2,9 +2,9 @@
 set -e
 
 # ── Anvil Installer ─────────────────────────────────────────
-# Usage: curl -fsSL https://raw.githubusercontent.com/DamienPace15/anvil/master/install.sh | sh
+# Usage: curl -fsSL https://raw.githubusercontent.com/anvil-cloud/anvil/master/install.sh | sh
 
-REPO="DamienPace15/anvil"
+REPO="anvil-cloud/anvil"
 INSTALL_DIR="${ANVIL_INSTALL_DIR:-/usr/local/bin}"
 BINARY_NAME="anvil"
 PROVIDER_NAME="pulumi-resource-anvil"

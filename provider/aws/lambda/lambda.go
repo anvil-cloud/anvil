@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	provider "github.com/DamienPace15/anvil/provider/internal/shared"
-	"github.com/DamienPace15/anvil/provider/internal/transform"
-	"github.com/DamienPace15/anvil/provider/internal/vpcsg"
+	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
+	"github.com/anvil-cloud/anvil/provider/internal/transform"
+	"github.com/anvil-cloud/anvil/provider/internal/vpcsg"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/cloudwatch"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/lambda"

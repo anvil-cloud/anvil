@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	provider "github.com/DamienPace15/anvil/provider/internal/shared"
-	"github.com/DamienPace15/anvil/provider/internal/transform"
+	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
+	"github.com/anvil-cloud/anvil/provider/internal/transform"
 	awsdynamodb "github.com/pulumi/pulumi-aws/sdk/v7/go/aws/dynamodb"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"
 	awslambda "github.com/pulumi/pulumi-aws/sdk/v7/go/aws/lambda"

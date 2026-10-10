@@ -1,4 +1,4 @@
-module github.com/DamienPace15/anvil/provider
+module github.com/anvil-cloud/anvil/provider
 
 go 1.25.8
 
@@ -133,4 +133,4 @@ require (
 	lukechampine.com/frand v1.5.1 // indirect
 )
 
-replace github.com/DamienPace15/anvil/sdk/go/anvil => ../sdk/go/anvil
+replace github.com/anvil-cloud/anvil/sdk/go/anvil => ../sdk/go/anvil

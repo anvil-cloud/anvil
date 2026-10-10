@@ -3,7 +3,7 @@ package vpc
 import (
 	"fmt"
 
-	provider "github.com/DamienPace15/anvil/provider/internal/shared"
+	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/cloudwatch"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/ec2"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"

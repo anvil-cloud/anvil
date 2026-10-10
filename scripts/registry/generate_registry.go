@@ -14,7 +14,7 @@ import (
 
 // Runs from provider/ directory (cd provider && go run ../scripts/registry/generate_registry.go [version])
 
-const moduleName = "github.com/DamienPace15/anvil/provider"
+const moduleName = "github.com/anvil-cloud/anvil/provider"
 
 // resolveVersion returns the provider version to bake into main.go. It prefers
 // the version passed by build.go (os.Args[1]) and falls back to reading

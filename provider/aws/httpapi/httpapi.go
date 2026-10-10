@@ -3,8 +3,8 @@ package httpapi
 import (
 	"fmt"
 
-	"github.com/DamienPace15/anvil/provider/internal/apigateway"
-	provider "github.com/DamienPace15/anvil/provider/internal/shared"
+	"github.com/anvil-cloud/anvil/provider/internal/apigateway"
+	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/apigatewayv2"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"
 	awslambda "github.com/pulumi/pulumi-aws/sdk/v7/go/aws/lambda"

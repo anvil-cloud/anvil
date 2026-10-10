@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	provider "github.com/DamienPace15/anvil/provider/internal/shared"
+	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )

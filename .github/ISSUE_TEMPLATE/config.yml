@@ -1,7 +1,7 @@
 blank_issues_enabled: true
 contact_links:
   - name: Questions and ideas
-    url: https://github.com/DamienPace15/anvil/discussions
+    url: https://github.com/anvil-cloud/anvil/discussions
     about: Ask a question or share an idea in Discussions
   - name: Documentation
     url: https://anvilcloud.dev/docs/introduction

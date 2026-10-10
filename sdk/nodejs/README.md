@@ -137,9 +137,9 @@ const bucket = new anvil.aws.Bucket('custom', {
 ## Links
 
 - [Docs](https://anvilcloud.dev)
-- [GitHub](https://github.com/DamienPace15/anvil)
+- [GitHub](https://github.com/anvil-cloud/anvil)
 - [Python SDK](https://pypi.org/project/anvil-cloud/)
-- [Go SDK](https://pkg.go.dev/github.com/DamienPace15/anvil/sdk/go/anvil)
+- [Go SDK](https://pkg.go.dev/github.com/anvil-cloud/anvil/sdk/go/anvil)
 
 ## License
 

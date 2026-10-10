@@ -1,4 +1,4 @@
-module github.com/DamienPace15/anvil/sdk/go/anvil
+module github.com/anvil-cloud/anvil/sdk/go/anvil
 
 go 1.25.8
 

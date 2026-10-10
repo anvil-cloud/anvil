@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	provider "github.com/DamienPace15/anvil/provider/internal/shared"
-	"github.com/DamienPace15/anvil/provider/internal/transform"
+	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
+	"github.com/anvil-cloud/anvil/provider/internal/transform"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/cognito"
 	awsconfig "github.com/pulumi/pulumi-aws/sdk/v7/go/aws/config"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"

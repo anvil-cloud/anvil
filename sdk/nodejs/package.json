@@ -3,7 +3,7 @@
   "version": "0.1.10",
   "description": "Anvil — secure-by-default cloud infrastructure components",
   "homepage": "https://github.com/anvil-cloud/anvil",
-  "repository": "https://github.com/DamienPace15/anvil",
+  "repository": "https://github.com/anvil-cloud/anvil",
   "license": "Apache-2.0",
   "scripts": {
     "build": "tsc && cp package.json bin/"

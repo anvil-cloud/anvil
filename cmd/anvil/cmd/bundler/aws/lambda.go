@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/DamienPace15/anvil/cmd/anvil/cmd/bundler"
+	"github.com/anvil-cloud/anvil/cmd/anvil/cmd/bundler"
 )
 
 // BuildResult holds the outcome of building a single Lambda function.

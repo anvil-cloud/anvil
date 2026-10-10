@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/DamienPace15/anvil/provider/sites"
+	"github.com/anvil-cloud/anvil/provider/sites"
 )
 
 func TestSecurityHeaderDefaults(t *testing.T) {

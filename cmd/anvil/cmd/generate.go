@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/DamienPace15/anvil/codegen"
+	"github.com/anvil-cloud/anvil/codegen"
 	"github.com/spf13/cobra"
 )
 

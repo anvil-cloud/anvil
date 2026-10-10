@@ -3,8 +3,8 @@ package cognitoauth
 import (
 	"fmt"
 
-	"github.com/DamienPace15/anvil/provider/internal/apigateway"
-	provider "github.com/DamienPace15/anvil/provider/internal/shared"
+	"github.com/anvil-cloud/anvil/provider/internal/apigateway"
+	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
 	awsconfig "github.com/pulumi/pulumi-aws/sdk/v7/go/aws/config"
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"

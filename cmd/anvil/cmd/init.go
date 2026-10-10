@@ -466,7 +466,7 @@ func goEntryPoint(clouds []string, region string) string {
 	hasGCP := containsCloud(clouds, "gcp")
 	_ = hasGCP // suppress unused warning when only AWS
 
-	imports := `"github.com/DamienPace15/anvil/sdk/go/anvil"
+	imports := `"github.com/anvil-cloud/anvil/sdk/go/anvil"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"`
 
 	providers := ""
@@ -515,7 +515,7 @@ func goMod(modulePath string, clouds []string) string {
 go 1.22
 
 require (
-	github.com/DamienPace15/anvil/sdk/go/anvil v0.0.4
+	github.com/anvil-cloud/anvil/sdk/go/anvil v0.0.4
 	github.com/pulumi/pulumi/sdk/v3 v3.145.0
 )
 `, modulePath)

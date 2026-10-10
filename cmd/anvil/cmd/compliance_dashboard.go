@@ -21,7 +21,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/spf13/cobra"
 
-	"github.com/DamienPace15/anvil/cmd/anvil/compliance"
+	"github.com/anvil-cloud/anvil/cmd/anvil/compliance"
 )
 
 var (
