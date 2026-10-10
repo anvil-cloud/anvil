@@ -5,8 +5,8 @@ Thanks for wanting to help. Bug reports, docs fixes, new components and ideas ar
 ## Before you start
 
 - **Small fixes** (typos, docs, obvious bugs): open a PR directly.
-- **Larger changes** (new components, API changes, new CLI commands): open an issue or a [Discussion](https://github.com/DamienPace15/anvil/discussions) first so we can agree on the shape before you write the code.
-- Looking for somewhere to start? Try a [good first issue](https://github.com/DamienPace15/anvil/labels/good%20first%20issue).
+- **Larger changes** (new components, API changes, new CLI commands): open an issue or a [Discussion](https://github.com/anvil-cloud/anvil/discussions) first so we can agree on the shape before you write the code.
+- Looking for somewhere to start? Try a [good first issue](https://github.com/anvil-cloud/anvil/labels/good%20first%20issue).
 
 ## Setup
 
@@ -15,7 +15,7 @@ Thanks for wanting to help. Bug reports, docs fixes, new components and ideas ar
 From wherever you keep your code:
 
 ```sh
-git clone https://github.com/DamienPace15/anvil.git
+git clone https://github.com/anvil-cloud/anvil.git
 cd anvil
 go run ./build build
 export PATH="$PATH:$(pwd)/bin"

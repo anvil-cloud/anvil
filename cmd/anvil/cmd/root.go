@@ -8,7 +8,7 @@ import (
 )
 
 // Build-time variables injected via ldflags.
-// Example: go build -ldflags "-X github.com/DamienPace15/anvil/cmd/anvil/cmd.version=0.1.0"
+// Example: go build -ldflags "-X github.com/anvil-cloud/anvil/cmd/anvil/cmd.version=0.1.0"
 var (
 	version = "dev"
 	commit  = "none"

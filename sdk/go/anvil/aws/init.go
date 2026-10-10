@@ -6,7 +6,7 @@ package aws
 import (
 	"fmt"
 
-	"github.com/DamienPace15/anvil/sdk/go/anvil/internal"
+	"github.com/anvil-cloud/anvil/sdk/go/anvil/internal"
 	"github.com/blang/semver"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )

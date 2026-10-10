@@ -7,7 +7,7 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/DamienPace15/anvil/sdk/go/anvil/internal"
+	"github.com/anvil-cloud/anvil/sdk/go/anvil/internal"
 	"github.com/pulumi/pulumi-gcp/sdk/v9/go/gcp/cloudfunctionsv2"
 	"github.com/pulumi/pulumi-gcp/sdk/v9/go/gcp/storage"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"

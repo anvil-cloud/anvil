@@ -74,7 +74,7 @@ Create `provider/<cloud>/<resource>/<resource>.go`:
 package <resource>
 
 import (
-    "github.com/DamienPace15/anvil/provider/internal/transform"
+    "github.com/anvil-cloud/anvil/provider/internal/transform"
     p "github.com/pulumi/pulumi-go-provider"
     "github.com/pulumi/pulumi-go-provider/infer"
     "github.com/pulumi/pulumi/sdk/v3/go/pulumi"

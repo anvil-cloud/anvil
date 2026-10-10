@@ -1,7 +1,7 @@
 package function
 
 import (
-	"github.com/DamienPace15/anvil/provider/internal/transform"
+	"github.com/anvil-cloud/anvil/provider/internal/transform"
 	"github.com/pulumi/pulumi-gcp/sdk/v8/go/gcp/cloudfunctionsv2"
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"

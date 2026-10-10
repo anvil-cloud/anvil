@@ -3,8 +3,8 @@ package awssite
 import (
 	"fmt"
 
-	"github.com/DamienPace15/anvil/provider/internal/transform"
-	"github.com/DamienPace15/anvil/provider/sites"
+	"github.com/anvil-cloud/anvil/provider/internal/transform"
+	"github.com/anvil-cloud/anvil/provider/sites"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/cloudfront"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )

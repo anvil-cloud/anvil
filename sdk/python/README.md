@@ -132,14 +132,14 @@ bucket = anvil.aws.Bucket("custom",
 
 - Python >= 3.8
 - Pulumi >= 3.0.0
-- Anvil CLI: `curl -fsSL https://raw.githubusercontent.com/DamienPace15/anvil/master/install.sh | sh`
+- Anvil CLI: `curl -fsSL https://raw.githubusercontent.com/anvil-cloud/anvil/master/install.sh | sh`
 
 ## Links
 
 - [Docs](https://anvilcloud.dev)
-- [GitHub](https://github.com/DamienPace15/anvil)
+- [GitHub](https://github.com/anvil-cloud/anvil)
 - [npm SDK](https://www.npmjs.com/package/@anvil-cloud/sdk)
-- [Go SDK](https://pkg.go.dev/github.com/DamienPace15/anvil/sdk/go/anvil)
+- [Go SDK](https://pkg.go.dev/github.com/anvil-cloud/anvil/sdk/go/anvil)
 
 ## License
 

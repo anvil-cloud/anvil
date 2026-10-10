@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	awsbundler "github.com/DamienPace15/anvil/cmd/anvil/cmd/bundler/aws"
+	awsbundler "github.com/anvil-cloud/anvil/cmd/anvil/cmd/bundler/aws"
 	"github.com/pulumi/pulumi/sdk/v3/go/auto"
 	"github.com/pulumi/pulumi/sdk/v3/go/auto/optpreview"
 )

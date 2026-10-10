@@ -1,4 +1,4 @@
-module github.com/DamienPace15/anvil/cmd/anvil/dsql-lambda
+module github.com/anvil-cloud/anvil/cmd/anvil/dsql-lambda
 
 go 1.24
 

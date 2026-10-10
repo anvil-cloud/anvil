@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/DamienPace15/anvil/releases"><img alt="Release" src="https://img.shields.io/github/v/release/DamienPace15/anvil?style=flat-square&color=FF6A1A"></a>
+  <a href="https://github.com/anvil-cloud/anvil/releases"><img alt="Release" src="https://img.shields.io/github/v/release/anvil-cloud/anvil?style=flat-square&color=FF6A1A"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache--2.0-17181A?style=flat-square"></a>
   <a href="https://anvilcloud.dev/docs/introduction"><img alt="Docs" src="https://img.shields.io/badge/docs-anvilcloud.dev-FF6A1A?style=flat-square"></a>
 </p>
@@ -45,13 +45,13 @@ Components start from the secure configuration and let you opt out or override, 
 **macOS / Linux**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/DamienPace15/anvil/master/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/anvil-cloud/anvil/master/install.sh | sh
 ```
 
 **Windows (PowerShell)**
 
 ```powershell
-irm https://raw.githubusercontent.com/DamienPace15/anvil/master/install.ps1 | iex
+irm https://raw.githubusercontent.com/anvil-cloud/anvil/master/install.ps1 | iex
 ```
 
 Installs `anvil` and the provider to `/usr/local/bin`. Works on Apple Silicon and Intel.
@@ -151,7 +151,7 @@ Every component behaves identically across all three SDKs.
 | ---------- | --------------------------------------------------- | ----------- |
 | TypeScript | `npm install @anvil-cloud/sdk`                      | Node.js 18+ |
 | Python     | `pip install anvil-cloud`                           | Python 3.9+ |
-| Go         | `go get github.com/DamienPace15/anvil/sdk/go/anvil` | Go 1.25+    |
+| Go         | `go get github.com/anvil-cloud/anvil/sdk/go/anvil` | Go 1.25+    |
 
 ## Comparing Anvil
 
@@ -189,7 +189,7 @@ Full arguments, outputs, and examples for each are in the [component docs](https
 **Prerequisites:** Go 1.25+, Node.js 18+, Python 3.9+, Pulumi CLI
 
 ```sh
-git clone https://github.com/DamienPace15/anvil.git
+git clone https://github.com/anvil-cloud/anvil.git
 cd anvil
 go run ./build build
 ```
@@ -216,8 +216,8 @@ export PATH="$PATH:$(pwd)/bin"
 
 Contributions are welcome, from typo fixes to new components.
 
-- Start with a [good first issue](https://github.com/DamienPace15/anvil/labels/good%20first%20issue)
-- Ask questions or share ideas in [Discussions](https://github.com/DamienPace15/anvil/discussions)
+- Start with a [good first issue](https://github.com/anvil-cloud/anvil/labels/good%20first%20issue)
+- Ask questions or share ideas in [Discussions](https://github.com/anvil-cloud/anvil/discussions)
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) for setup and how a component is put together
 
 If Anvil saves you time, a ⭐ helps other people find it.

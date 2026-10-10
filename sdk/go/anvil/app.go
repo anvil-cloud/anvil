@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	anvilaws "github.com/DamienPace15/anvil/sdk/go/anvil/aws"
+	anvilaws "github.com/anvil-cloud/anvil/sdk/go/anvil/aws"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws"
 	"github.com/pulumi/pulumi-gcp/sdk/v9/go/gcp"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/DamienPace15/anvil/cmd/anvil/cmd"
+	"github.com/anvil-cloud/anvil/cmd/anvil/cmd"
 )
 
 func main() {

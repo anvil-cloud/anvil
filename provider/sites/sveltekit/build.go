@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/DamienPace15/anvil/provider/sites"
+	"github.com/anvil-cloud/anvil/provider/sites"
 )
 
 // BuildOptions configures the SvelteKit build process.

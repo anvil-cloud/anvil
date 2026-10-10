@@ -9,7 +9,7 @@ Built on [Pulumi](https://www.pulumi.com/).
 ## Install
 
 ```bash
-go get github.com/DamienPace15/anvil/sdk/go/anvil
+go get github.com/anvil-cloud/anvil/sdk/go/anvil
 ```
 
 ## Secure by default
@@ -35,8 +35,8 @@ A Lambda reading from a Bucket:
 package main
 
 import (
-    "github.com/DamienPace15/anvil/sdk/go/anvil"
-    anvilaws "github.com/DamienPace15/anvil/sdk/go/anvil/aws"
+    "github.com/anvil-cloud/anvil/sdk/go/anvil"
+    anvilaws "github.com/anvil-cloud/anvil/sdk/go/anvil/aws"
     "github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -120,12 +120,12 @@ bucket, err := anvilaws.NewBucket(ctx.PulumiCtx(), "custom", &anvilaws.BucketArg
 
 - Go 1.22+
 - Pulumi >= 3.0.0
-- Anvil CLI: `curl -fsSL https://raw.githubusercontent.com/DamienPace15/anvil/master/install.sh | sh`
+- Anvil CLI: `curl -fsSL https://raw.githubusercontent.com/anvil-cloud/anvil/master/install.sh | sh`
 
 ## Links
 
 - [Docs](https://anvilcloud.dev)
-- [GitHub](https://github.com/DamienPace15/anvil)
+- [GitHub](https://github.com/anvil-cloud/anvil)
 - [npm SDK](https://www.npmjs.com/package/@anvil-cloud/sdk)
 - [PyPI SDK](https://pypi.org/project/anvil-cloud/)
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/DamienPace15/anvil/provider/sites"
+	"github.com/anvil-cloud/anvil/provider/sites"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/cloudfront"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/lambda"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"

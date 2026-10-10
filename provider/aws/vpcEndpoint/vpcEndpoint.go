@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	provider "github.com/DamienPace15/anvil/provider/internal/shared"
-	"github.com/DamienPace15/anvil/provider/internal/vpcsg"
+	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
+	"github.com/anvil-cloud/anvil/provider/internal/vpcsg"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/ec2"
 	p "github.com/pulumi/pulumi-go-provider"

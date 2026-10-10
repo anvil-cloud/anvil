@@ -3,7 +3,7 @@ package aws
 import (
 	"testing"
 
-	"github.com/DamienPace15/anvil/provider/sites"
+	"github.com/anvil-cloud/anvil/provider/sites"
 )
 
 // Every site component must expose the shared hosting inputs so every
