@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/pulumi/pulumi-go-provider/infer"
 	awsbucket "github.com/anvil-cloud/anvil/provider/aws/bucket"
 	awscognitoAuth "github.com/anvil-cloud/anvil/provider/aws/cognitoAuth"
 	awscognitoUserPool "github.com/anvil-cloud/anvil/provider/aws/cognitoUserPool"
@@ -24,7 +25,6 @@ import (
 	awswaf "github.com/anvil-cloud/anvil/provider/aws/waf"
 	gcpbucket "github.com/anvil-cloud/anvil/provider/gcp/bucket"
 	gcpfunction "github.com/anvil-cloud/anvil/provider/gcp/function"
-	"github.com/pulumi/pulumi-go-provider/infer"
 )
 
 func main() {
@@ -54,5 +54,5 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	p.Run(context.Background(), "anvil", "0.1.10")
+	p.Run(context.Background(), "anvil", "0.1.12")
 }
