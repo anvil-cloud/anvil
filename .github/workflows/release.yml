@@ -96,9 +96,10 @@ jobs:
 
   # Publishes anvil_cloud to PyPI via OIDC trusted publishing — no stored
   # token. One-time setup required on PyPI: project settings → Publishing →
-  # Trusted Publisher → GitHub → this repo. PyPI matches the top-level
-  # workflow, so register both "tag-on-merge.yml" (which calls this file)
-  # and "release.yml" (manual release: published path).
+  # Trusted Publisher → GitHub → this repo, workflow file "release.yml".
+  # PyPI matches the job_workflow_ref claim (the file this job lives in),
+  # so "release.yml" covers both the tag-on-merge.yml call and the manual
+  # release: published path.
   publish-pypi-sdk:
     needs: release
     runs-on: ubuntu-latest
