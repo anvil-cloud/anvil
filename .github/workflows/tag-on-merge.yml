@@ -2,20 +2,18 @@ name: tag-on-merge
 
 # Fires when a version bump (see bump-version.yml) lands on master via a
 # reviewed PR merge. Detects the new version, tags it, publishes a GitHub
-# Release, and calls straight into release.yml to build/publish everything.
+# Release, and dispatches release.yml to build/publish everything.
 #
 # Releases created by the default GITHUB_TOKEN don't cascade-trigger the
 # `release: published` event (GitHub blocks that to prevent recursive runs),
-# so this calls release.yml directly via workflow_call instead of relying on
-# that event.
+# so this dispatches release.yml with `gh workflow run` instead —
+# workflow_dispatch is exempt from that rule. It is dispatched rather than
+# called via workflow_call because PyPI trusted publishing rejects
+# attestations from reusable workflows (see the header of release.yml).
 #
-# NOTE: the `tag` job hard-fails if the version's tag already exists, rather
-# than setting a "should_release" output for `publish` to check. A job that
-# calls a reusable workflow (`uses:`) conditioned on needs.<job>.outputs was
-# observed to get skipped even with `always() &&` and a confirmed-true output
-# — see https://github.com/orgs/community/discussions/26945. Failing loudly
-# here is also more honest than a silent skip: re-pushing an already-tagged
-# version is not an expected flow (bump-version.yml always computes a new one).
+# NOTE: the job hard-fails if the version's tag already exists. Re-pushing an
+# already-tagged version is not an expected flow (bump-version.yml always
+# computes a new one).
 on:
   push:
     branches: [master]
@@ -24,6 +22,7 @@ on:
 
 permissions:
   contents: write
+  actions: write # gh workflow run release.yml
 
 jobs:
   tag:
@@ -57,12 +56,10 @@ jobs:
             --title "Anvil ${{ steps.check.outputs.tag }}" \
             --generate-notes
 
-  publish:
-    needs: tag
-    permissions:
-      contents: write
-      id-token: write
-    uses: ./.github/workflows/release.yml
-    with:
-      tag_name: ${{ needs.tag.outputs.tag }}
-    secrets: inherit
+      - name: Dispatch release workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run release.yml \
+            --ref master \
+            -f tag_name="${{ steps.check.outputs.tag }}"

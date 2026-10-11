@@ -2,21 +2,26 @@ name: release
 
 # Runs two ways:
 #   1. `release: published` — someone publishes a GitHub Release by hand.
-#   2. `workflow_call` — invoked directly by tag-on-merge.yml. This path exists
-#      because releases created by the default GITHUB_TOKEN do NOT cascade-
-#      trigger the `release: published` event (GitHub blocks that to prevent
-#      recursive runs), so tag-on-merge.yml calls straight in instead.
+#   2. `workflow_dispatch` — triggered by tag-on-merge.yml via `gh workflow
+#      run`. Releases created by the default GITHUB_TOKEN do NOT cascade-
+#      trigger `release: published` (GitHub blocks that to prevent recursive
+#      runs), but workflow_dispatch is exempt from that rule.
 #
-# Each job below gates on `inputs.tag_name != ''` rather than
-# `github.event_name == 'workflow_call'` — inside a called reusable workflow,
-# github.event_name reflects the CALLER's triggering event (e.g. "push"), not
-# "workflow_call". See https://github.com/orgs/community/discussions/174203
+# This must stay a top-level workflow, not a reusable one (workflow_call):
+# PyPI authenticates trusted publishing on job_workflow_ref (this file) but
+# verifies attestations against the Sigstore certificate's Build Config URI,
+# which is the top-level workflow. Under workflow_call those two differ and
+# the upload is rejected.
+#
+# Dispatch is limited to github-actions[bot] (tag-on-merge.yml) and the
+# maintainer, so a collaborator can't publish an arbitrary tag by hand.
 on:
   release:
     types: [published]
-  workflow_call:
+  workflow_dispatch:
     inputs:
       tag_name:
+        description: Release tag to build and publish (e.g. v0.1.17)
         required: true
         type: string
 
@@ -28,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    if: inputs.tag_name != '' || github.event.release.author.login == github.repository_owner || contains(fromJSON('["DamienPace15"]'), github.event.release.author.login)
+    if: (github.event_name == 'workflow_dispatch' && contains(fromJSON('["github-actions[bot]", "DamienPace15"]'), github.actor)) || (github.event_name == 'release' && (github.event.release.author.login == github.repository_owner || github.event.release.author.login == 'DamienPace15'))
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -57,7 +62,7 @@ jobs:
   publish-npm-sdk:
     needs: release
     runs-on: ubuntu-latest
-    if: inputs.tag_name != '' || github.event.release.author.login == github.repository_owner || contains(fromJSON('["DamienPace15"]'), github.event.release.author.login)
+    if: (github.event_name == 'workflow_dispatch' && contains(fromJSON('["github-actions[bot]", "DamienPace15"]'), github.actor)) || (github.event_name == 'release' && (github.event.release.author.login == github.repository_owner || github.event.release.author.login == 'DamienPace15'))
     permissions:
       id-token: write
     steps:
@@ -103,7 +108,7 @@ jobs:
   publish-pypi-sdk:
     needs: release
     runs-on: ubuntu-latest
-    if: inputs.tag_name != '' || github.event.release.author.login == github.repository_owner || contains(fromJSON('["DamienPace15"]'), github.event.release.author.login)
+    if: (github.event_name == 'workflow_dispatch' && contains(fromJSON('["github-actions[bot]", "DamienPace15"]'), github.actor)) || (github.event_name == 'release' && (github.event.release.author.login == github.repository_owner || github.event.release.author.login == 'DamienPace15'))
     permissions:
       id-token: write
     steps:
@@ -145,7 +150,7 @@ jobs:
   publish-go-sdk:
     needs: release
     runs-on: ubuntu-latest
-    if: inputs.tag_name != '' || github.event.release.author.login == github.repository_owner || contains(fromJSON('["DamienPace15"]'), github.event.release.author.login)
+    if: (github.event_name == 'workflow_dispatch' && contains(fromJSON('["github-actions[bot]", "DamienPace15"]'), github.actor)) || (github.event_name == 'release' && (github.event.release.author.login == github.repository_owner || github.event.release.author.login == 'DamienPace15'))
     permissions:
       contents: write
     steps:
