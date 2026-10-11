@@ -96,7 +96,9 @@ jobs:
 
   # Publishes anvil_cloud to PyPI via OIDC trusted publishing — no stored
   # token. One-time setup required on PyPI: project settings → Publishing →
-  # Trusted Publisher → GitHub → this repo, workflow file "release.yml".
+  # Trusted Publisher → GitHub → this repo. PyPI matches the top-level
+  # workflow, so register both "tag-on-merge.yml" (which calls this file)
+  # and "release.yml" (manual release: published path).
   publish-pypi-sdk:
     needs: release
     runs-on: ubuntu-latest
@@ -133,7 +135,6 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: sdk/python/dist
-          password: ${{ secrets.PYPI_API_TOKEN }}
 
   # "Publishes" the Go SDK the way Go modules are published: by pushing a tag
   # (sdk/go/anvil/vX.X.X) at the release commit. The generated code must
