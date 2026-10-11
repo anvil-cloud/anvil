@@ -1,6 +1,6 @@
 {
   "name": "anvil",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "Anvil \u2014 secure-by-default cloud infrastructure components",
   "license": "Apache-2.0",
   "homepage": "https://github.com/anvil-cloud/anvil",
