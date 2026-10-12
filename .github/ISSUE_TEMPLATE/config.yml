@@ -1,5 +1,8 @@
 blank_issues_enabled: true
 contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/anvil-cloud/anvil/security/advisories/new
+    about: Please report security issues privately, not as a public issue
   - name: Questions and ideas
     url: https://github.com/anvil-cloud/anvil/discussions
     about: Ask a question or share an idea in Discussions
