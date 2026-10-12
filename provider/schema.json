@@ -1,6 +1,6 @@
 {
   "description": "Anvil — secure-by-default cloud infrastructure components",
-  "homepage": "https://github.com/anvil-cloud/anvil",
+  "homepage": "https://anvilcloud.dev",
   "language": {
     "csharp": {
       "packageReferences": {

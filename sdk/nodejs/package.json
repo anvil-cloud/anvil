@@ -2,7 +2,7 @@
   "name": "@anvil-cloud/sdk",
   "version": "0.1.10",
   "description": "Anvil — secure-by-default cloud infrastructure components",
-  "homepage": "https://github.com/anvil-cloud/anvil",
+  "homepage": "https://anvilcloud.dev",
   "repository": "https://github.com/anvil-cloud/anvil",
   "license": "Apache-2.0",
   "scripts": {
