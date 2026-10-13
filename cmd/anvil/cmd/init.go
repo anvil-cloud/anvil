@@ -394,7 +394,7 @@ func tsConfig() string {
 	return `{
   "compilerOptions": {
     "target": "ES2020",
-    "module": "commonjs",
+    "module": "nodenext",
     "lib": ["ES2020"],
     "strict": true,
     "esModuleInterop": true,
