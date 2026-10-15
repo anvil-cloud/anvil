@@ -41,6 +41,8 @@ export PATH="$PATH:$(pwd)/bin"
 3. Run `go run ./build build` to regenerate the merged schema and all three SDKs.
 4. If the resource can be granted access to, add its grants (see `provider/aws/grant.go` and an existing `grants.go`, such as `provider/aws/queue/grants.go`).
 
+Adding a **site framework** (Astro, Nuxt, Next.js…)? Follow [docs/design/adding-a-site-framework.md](docs/design/adding-a-site-framework.md) as well. It covers two traps that only show up after a real deploy: static files disappearing when they're edited, and server dependencies missing from the Lambda package.
+
 Anvil's defaults are **secure first**. New components should start from the locked-down configuration and let users opt out. Anything that adds ongoing cost should be opt-in, with the cost noted in its description.
 
 ## Tests

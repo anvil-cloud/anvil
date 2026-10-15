@@ -325,6 +325,10 @@ func NewSvelteKitSite(ctx *pulumi.Context, name string, args SvelteKitSiteArgs, 
 
 // createSvelteKitServerArchive packages the adapter-node build output into a
 // temp directory ready for Lambda deployment.
+//
+// Only build/ is copied (no node_modules). That works because adapter-node bundles
+// devDependencies into build/; packages a user lists under dependencies stay runtime
+// imports and are missing in Lambda. See docs/design/adding-a-site-framework.md.
 func createSvelteKitServerArchive(serverDir string) (string, error) {
 	tmpDir, err := os.MkdirTemp("", "anvil-sveltekit-lambda-*")
 	if err != nil {

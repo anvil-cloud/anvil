@@ -1,6 +1,9 @@
 // Package sites defines the shared types used across all framework build pipelines.
 // Framework-specific build logic lives in subdirectories (sveltekit/, astro/, etc).
 // Provider-specific infra wiring lives in provider/internal/awssite, provider/internal/gcpsite, etc.
+//
+// Adding a framework? Read docs/design/adding-a-site-framework.md first: upload static files
+// with awssite.UploadSiteAssets, and make sure the server package carries its dependencies.
 package sites
 
 import (
