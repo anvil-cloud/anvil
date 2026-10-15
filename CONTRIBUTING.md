@@ -21,7 +21,19 @@ go run ./build build
 export PATH="$PATH:$(pwd)/bin"
 ```
 
-`go run ./build build` runs the full pipeline (generate → merge → registry → compile → SDKs). For CLI-only changes, `go run ./build binary` is much faster. See the build command table in the [README](README.md#build-commands).
+`go run ./build build` runs the full pipeline. For CLI-only changes, `go run ./build binary` is much faster.
+
+### Build commands
+
+| Command                         | What it does                                                 |
+| ------------------------------- | ------------------------------------------------------------ |
+| `go run ./build build`          | Full pipeline: generate → merge → registry → compile → SDKs  |
+| `go run ./build binary`         | CLI binary only (fast, for CLI-only changes)                 |
+| `go run ./build build-provider` | Compile the provider binary                                  |
+| `go run ./build install`        | Build and install `anvil` + the provider to `/usr/local/bin` |
+| `go run ./build build-sdk`      | Generate + build the Node.js SDK                             |
+| `go run ./build gen-python-sdk` | Generate Python SDK                                          |
+| `go run ./build clean`          | Remove build artifacts                                       |
 
 ## How the repo is laid out
 
