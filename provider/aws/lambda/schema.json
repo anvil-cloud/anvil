@@ -10,10 +10,6 @@
           "description": "Upgrade environment variable encryption to SSE-KMS. Set to \"kms\" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch[\"lambda\"].",
           "type": "string"
         },
-        "entry": {
-          "description": "Path to the function's code, relative to the project root. Node: the entry file, e.g. \"functions/api/index.ts\"; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. \"functions/api\".",
-          "type": "string"
-        },
         "environment": {
           "additionalProperties": {
             "type": "string"
@@ -22,7 +18,7 @@
           "type": "object"
         },
         "handler": {
-          "description": "Node only: the handler in the bundled index.js. Default: \"index.handler\". Ignored for Rust (always \"bootstrap\").",
+          "description": "Where the function's code is, relative to the project root, in the usual Lambda form. Node: \u003cfile without extension\u003e.\u003cexport\u003e, e.g. \"functions/api/index.handler\" for `export const handler` in functions/api/index.ts; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. \"functions/api\".",
           "type": "string"
         },
         "hatch": {

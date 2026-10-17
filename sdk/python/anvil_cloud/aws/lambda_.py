@@ -25,7 +25,6 @@ class LambdaArgs:
                  runtime: pulumi.Input['LambdaRuntime'],
                  architecture: Optional[pulumi.Input['LambdaArchitecture']] = None,
                  encryption: Optional[pulumi.Input[_builtins.str]] = None,
-                 entry: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  handler: Optional[pulumi.Input[_builtins.str]] = None,
                  hatch: Optional[pulumi.Input['LambdaHatchArgsArgs']] = None,
@@ -42,9 +41,8 @@ class LambdaArgs:
         :param pulumi.Input['LambdaRuntime'] runtime: The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
         :param pulumi.Input['LambdaArchitecture'] architecture: CPU architecture. Default: arm64 (Graviton).
         :param pulumi.Input[_builtins.str] encryption: Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
-        :param pulumi.Input[_builtins.str] entry: Path to the function's code, relative to the project root. Node: the entry file, e.g. "functions/api/index.ts"; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment: Environment variables available to the function at runtime. Supports plain strings and Pulumi outputs.
-        :param pulumi.Input[_builtins.str] handler: Node only: the handler in the bundled index.js. Default: "index.handler". Ignored for Rust (always "bootstrap").
+        :param pulumi.Input[_builtins.str] handler: Where the function's code is, relative to the project root, in the usual Lambda form. Node: <file without extension>.<export>, e.g. "functions/api/index.handler" for `export const handler` in functions/api/index.ts; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
         :param pulumi.Input['LambdaLogRetention'] log_retention: CloudWatch log group retention period. Default: "1y" (satisfies SOC 2, ISO 27001, PCI-DSS baseline).
         :param pulumi.Input[_builtins.int] memory: Memory in MB. Valid: 128 to 32768 in 1MB increments. Default: 1024.
         :param pulumi.Input[Sequence[pulumi.Input['LambdaPermissionArgs']]] permissions: Inline IAM permissions added to the execution role. Use for ad-hoc access not covered by the grant system.
@@ -58,8 +56,6 @@ class LambdaArgs:
             pulumi.set(__self__, "architecture", architecture)
         if encryption is not None:
             pulumi.set(__self__, "encryption", encryption)
-        if entry is not None:
-            pulumi.set(__self__, "entry", entry)
         if environment is not None:
             pulumi.set(__self__, "environment", environment)
         if handler is not None:
@@ -119,18 +115,6 @@ class LambdaArgs:
 
     @_builtins.property
     @pulumi.getter
-    def entry(self) -> Optional[pulumi.Input[_builtins.str]]:
-        """
-        Path to the function's code, relative to the project root. Node: the entry file, e.g. "functions/api/index.ts"; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
-        """
-        return pulumi.get(self, "entry")
-
-    @entry.setter
-    def entry(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "entry", value)
-
-    @_builtins.property
-    @pulumi.getter
     def environment(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
         """
         Environment variables available to the function at runtime. Supports plain strings and Pulumi outputs.
@@ -145,7 +129,7 @@ class LambdaArgs:
     @pulumi.getter
     def handler(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Node only: the handler in the bundled index.js. Default: "index.handler". Ignored for Rust (always "bootstrap").
+        Where the function's code is, relative to the project root, in the usual Lambda form. Node: <file without extension>.<export>, e.g. "functions/api/index.handler" for `export const handler` in functions/api/index.ts; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
         """
         return pulumi.get(self, "handler")
 
@@ -255,7 +239,6 @@ class Lambda(pulumi.ComponentResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  architecture: Optional[pulumi.Input['LambdaArchitecture']] = None,
                  encryption: Optional[pulumi.Input[_builtins.str]] = None,
-                 entry: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  handler: Optional[pulumi.Input[_builtins.str]] = None,
                  hatch: Optional[pulumi.Input[Union['LambdaHatchArgsArgs', 'LambdaHatchArgsArgsDict']]] = None,
@@ -275,9 +258,8 @@ class Lambda(pulumi.ComponentResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input['LambdaArchitecture'] architecture: CPU architecture. Default: arm64 (Graviton).
         :param pulumi.Input[_builtins.str] encryption: Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
-        :param pulumi.Input[_builtins.str] entry: Path to the function's code, relative to the project root. Node: the entry file, e.g. "functions/api/index.ts"; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment: Environment variables available to the function at runtime. Supports plain strings and Pulumi outputs.
-        :param pulumi.Input[_builtins.str] handler: Node only: the handler in the bundled index.js. Default: "index.handler". Ignored for Rust (always "bootstrap").
+        :param pulumi.Input[_builtins.str] handler: Where the function's code is, relative to the project root, in the usual Lambda form. Node: <file without extension>.<export>, e.g. "functions/api/index.handler" for `export const handler` in functions/api/index.ts; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
         :param pulumi.Input['LambdaLogRetention'] log_retention: CloudWatch log group retention period. Default: "1y" (satisfies SOC 2, ISO 27001, PCI-DSS baseline).
         :param pulumi.Input[_builtins.int] memory: Memory in MB. Valid: 128 to 32768 in 1MB increments. Default: 1024.
         :param pulumi.Input[Sequence[pulumi.Input[Union['LambdaPermissionArgs', 'LambdaPermissionArgsDict']]]] permissions: Inline IAM permissions added to the execution role. Use for ad-hoc access not covered by the grant system.
@@ -313,7 +295,6 @@ class Lambda(pulumi.ComponentResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  architecture: Optional[pulumi.Input['LambdaArchitecture']] = None,
                  encryption: Optional[pulumi.Input[_builtins.str]] = None,
-                 entry: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  handler: Optional[pulumi.Input[_builtins.str]] = None,
                  hatch: Optional[pulumi.Input[Union['LambdaHatchArgsArgs', 'LambdaHatchArgsArgsDict']]] = None,
@@ -338,7 +319,6 @@ class Lambda(pulumi.ComponentResource):
 
             __props__.__dict__["architecture"] = architecture
             __props__.__dict__["encryption"] = encryption
-            __props__.__dict__["entry"] = entry
             __props__.__dict__["environment"] = environment
             __props__.__dict__["handler"] = handler
             __props__.__dict__["hatch"] = hatch

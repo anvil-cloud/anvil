@@ -11,8 +11,8 @@ builds it with `cargo lambda`, and deploys it. The user never creates a file by
 hand.
 
 ```ts
-new anvil.aws.Lambda('api', { runtime: 'rust', entry: 'functions/api' });
-new anvil.aws.Lambda('worker', { runtime: 'rust', entry: 'functions/worker' });
+new anvil.aws.Lambda('api', { runtime: 'rust', handler: 'functions/api' });
+new anvil.aws.Lambda('worker', { runtime: 'rust', handler: 'functions/worker' });
 ```
 
 ```
@@ -35,8 +35,9 @@ package, editing the workspace `members`, and wiring dependencies yourself.
 | Decision | Choice | Why |
 |---|---|---|
 | Runtime value | **`runtime: "rust"`** → `provided.al2023`, handler `bootstrap` | AWS has no managed Rust runtime; Rust runs on the OS-only runtime as an executable named `bootstrap`. `"rust"` reads better and tells the CLI which builder to use |
-| `entry` | **Required** for Rust | No placeholder deploy for Rust, and scaffolding needs a location. Node keeps its optional `entry` + placeholder |
-| What `entry` points at | **A package directory or a `.rs` file** | Same mental model as Node's `entry` (a file path). `cargo metadata` maps a `.rs` file to its exact bin target, including renamed `[[bin]]` targets. No `binaryName` field |
+| `handler` | **The one code setting, for every runtime**, in the usual Lambda form | The industry-standard name (SST, SAM). Node: `"functions/api/index.handler"`, the file without extension plus the export, so custom export names work. Rust: a path. No separate `entry` |
+| `handler` for Rust | **Required** | No placeholder deploy for Rust, and scaffolding needs a location. Node keeps an optional `handler` + placeholder |
+| What a Rust `handler` points at | **A package directory or a `.rs` file** | `cargo metadata` maps a `.rs` file to its exact bin target, including renamed `[[bin]]` targets. No `binaryName` field |
 | Build tool | **`cargo lambda build`** | The standard tool: cross-compiles from macOS via Zig, names the output `bootstrap`, handles workspaces |
 | Missing cargo-lambda | **Build in Docker** (`ghcr.io/cargo-lambda/cargo-lambda`, pinned by digest); error only if neither is available | Both CDK Rust constructs fall back to Docker the same way. Only the build runs in the container; a local Rust toolchain is required for `cargo metadata` and scaffolding |
 | Release profile | **None generated**; cargo-lambda's `--release` defaults apply | It already sets `strip`, `lto = "thin"`, `codegen-units = 1`, `panic = "abort"`. A generated profile would only override them |
@@ -44,33 +45,39 @@ package, editing the workspace `members`, and wiring dependencies yourself.
 | Toolchain | **Generated `rust-toolchain.toml`, pinned version** + the Lambda targets | Consistent compiler between laptop and CI; rustup installs the cross-compile target automatically. User-owned, so editing it is the override |
 | Architecture | **`arm64`** (unchanged Lambda default) | Graviton; `x86_64` still allowed |
 | Change detection | **Always run cargo; Pulumi compares the zip** | Cargo's incremental build is near-instant when nothing changed and understands shared crates. No Anvil source hash for Rust |
-| Workspace location | **Project root** (next to `anvil.config.*`) | Cargo convention: one workspace per repo, virtual manifest at the root. One lockfile and one `target/` regardless of where entries live; rust-analyzer finds it without setup |
+| Workspace location | **Project root** (next to `anvil.config.*`) | Cargo convention: one workspace per repo, virtual manifest at the root. One lockfile and one `target/` regardless of where functions live; rust-analyzer finds it without setup |
 | Scaffolding command | **Part of `anvil generate`**, also run by `anvil deploy` before building | Generate already means "make generated code match my infrastructure" and already runs discovery. A `cargo anvil` subcommand would only wrap Anvil, since the input is the Anvil config |
 | Handler template | **One blank async handler**, with logging set up and a marked spot for clients | No trigger-specific templates; the user picks the event types. AWS recommends initialising logging and SDK clients once, outside the handler |
 | DSQL client for Rust | **An Anvil-owned crate at `gen/db`**, in v1, **only when the project has a DSQL component with schemas** (and Rust Lambdas, or `--lang rust`) | Replaces today's loose `mod.rs` + "add these to your Cargo.toml" comment. Pre-release, so no migration. No schemas, no crate, and no `db` dependency on new Lambdas |
 
 ## Component changes (`provider/aws/lambda`)
 
-- `runtime: "rust"` → `runtime: "provided.al2023"`, `handler: "bootstrap"`. A
-  user-set `handler` is ignored for Rust.
-- `runtime: "rust"` with no `entry` is an error, raised during discovery so it
+- `runtime: "rust"` → `runtime: "provided.al2023"`, Lambda handler `bootstrap`.
+- **`handler` is the only code setting.** For Node it is
+  `"<file without extension>.<export>"`. The component passes `index.<export>`
+  to Lambda (the bundle is always `index.js`), and the build manifest carries
+  the path part to the CLI, which finds the file's extension: exactly one of
+  `.ts`, `.js`, … must exist. A Node handler written as a file path
+  (`"functions/api/index.ts"`) is an error suggesting `index.handler`. For Rust
+  the handler is the path as-is.
+- `runtime: "rust"` with no `handler` is an error, raised during discovery so it
   surfaces in `anvil generate` / `anvil deploy` before any build or AWS call:
 
   ```
-  lambda "api": runtime "rust" requires entry, e.g. entry: "functions/api"
+  lambda "api": runtime "rust" requires handler, e.g. handler: "functions/api"
   ```
 
 - Nothing else changes. IAM role, log group, function URL, VPC wiring, grants
   and `hatch` are all runtime-agnostic.
-- The build manifest entry already carries `runtime`, `entry` and
+- The build manifest carries `runtime`, `handler`, the code path and
   `architecture`, which is everything the CLI needs.
 
-## Entry resolution
+## Resolving a Rust handler
 
-The CLI runs `cargo metadata --format-version 1` from the entry's location and
+The CLI runs `cargo metadata --format-version 1` from the handler's location and
 matches against the packages' bin targets:
 
-| `entry` | Resolves to |
+| `handler` | Resolves to |
 |---|---|
 | `functions/api` (package with one bin) | that bin |
 | `functions/api/src/main.rs` | the bin whose `src_path` is that file |
@@ -79,7 +86,7 @@ matches against the packages' bin targets:
 
 ```
 lambda "api": functions/tools has 3 binaries (api, worker, sync).
-  Point entry at one of them, e.g. entry: "functions/tools/src/bin/api.rs"
+  Point handler at one of them, e.g. handler: "functions/tools/src/bin/api.rs"
 ```
 
 `cargo metadata` also returns the workspace root and `target_directory`, so
@@ -110,7 +117,7 @@ Hooked in at `buildFunction` in `cmd/anvil/cmd/build.go`, next to the Node case
 | no cargo-lambda, Docker running | in `ghcr.io/cargo-lambda/cargo-lambda` |
 | neither | error (below) |
 
-A local Rust toolchain is required either way: `cargo metadata` (entry
+A local Rust toolchain is required either way: `cargo metadata` (handler
 resolution) and `cargo new` / `cargo add` (scaffolding) always run on the host.
 This matches both CDK Rust constructs, which only move the build itself into
 the container.
@@ -163,7 +170,7 @@ With that, an unchanged binary means no Lambda update, exactly like CDK's
 
 - `bundler.NeedsRebuild` / `HashDirectory`: they don't exclude `target/` and
   can't see changes in shared workspace crates. Cargo decides instead.
-- `BlankBundle`: Rust always has an entry.
+- `BlankBundle`: Rust always has a handler.
 
 ## Scaffolding
 
@@ -173,18 +180,18 @@ files.
 
 ### Rules
 
-1. **Create only.** If the entry already exists (a directory with a
+1. **Create only.** If the handler's path already exists (a directory with a
    `Cargo.toml`, or the `.rs` file), skip it. The only edit to an existing file
    is adding a **new** package to the workspace `members`.
 2. **Never delete.** Removing a Lambda from the config leaves its code.
 3. **Workspace:**
-   - an existing `[workspace]` at or above the entry: **join it**
+   - an existing `[workspace]` at or above the handler's path: **join it**
    - none: **create one at the project root**
    - the project root `Cargo.toml` is a plain `[package]`: **stop** with a
      message. Converting a user's package is never done automatically
 4. **An existing package outside the workspace's `members`:** warn with the
    fix. It's user code, so no automatic edit (Cargo would refuse to build it).
-5. **A `.rs` entry inside an existing package:** create just the file. Cargo
+5. **A `.rs` handler inside an existing package:** create just the file. Cargo
    discovers `src/bin/*.rs` on its own.
 6. **`gen/db` is never scaffolded over.** It's Anvil-owned and handled by the
    DSQL generator.
@@ -193,7 +200,7 @@ files.
 
 TOML edits go through Cargo, which preserves comments and formatting:
 
-- `cargo new --bin <entry>`: creates the package and adds it to the enclosing
+- `cargo new --bin <handler path>`: creates the package and adds it to the enclosing
   workspace's `members` (Cargo has done this since well before 1.85, the
   minimum the edition already requires)
 - `cargo add …`: adds dependencies
@@ -328,7 +335,7 @@ Generation moves **before** the build:
 
 ```
 1. discover    (unchanged — the one build-mode preview)
-2. generate    scaffold missing Rust entries, write gen/ and gen/db
+2. generate    scaffold missing Rust packages, write gen/ and gen/db
 3. build       Node via esbuild, Rust via cargo lambda
 4. deploy
 ```
@@ -343,7 +350,7 @@ first is safe.
 
 ## End-to-end
 
-1. Declare `new anvil.aws.Lambda('api', { runtime: 'rust', entry: 'functions/api' })`.
+1. Declare `new anvil.aws.Lambda('api', { runtime: 'rust', handler: 'functions/api' })`.
 2. `anvil generate` (or straight to `anvil deploy`): workspace, package, blank
    handler and `gen/db` appear.
 3. Write the handler. Add crates with `cargo add`.
@@ -390,7 +397,7 @@ Each step is its own commit and testable alone; one branch, since 3 and 4 share
 the workspace code.
 
 1. Deterministic zip (`0755`, fixed timestamps); `rust` → `provided.al2023` in
-   the component; required-`entry` validation.
+   the component; required-`handler` validation.
 2. Rust build: `cargo metadata` resolution, grouped `cargo lambda` runs,
    builder selection (local cargo-lambda, then Docker), the pinned image.
 3. Scaffolder: workspace detection/creation, `rust-toolchain.toml`,

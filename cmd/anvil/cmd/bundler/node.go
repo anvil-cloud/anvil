@@ -2,6 +2,7 @@ package bundler
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -83,6 +84,32 @@ func Bundle(opts BundleOptions) (*BundleResult, error) {
 	}
 
 	return bundleResult, nil
+}
+
+// nodeEntryExtensions are tried in order when resolving a handler's file.
+var nodeEntryExtensions = []string{".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs"}
+
+// ResolveNodeEntry finds the source file for a handler path written without
+// an extension, the way Lambda handlers are: "functions/api/index" finds
+// functions/api/index.ts (or .js, ...). Exactly one match is allowed, so an
+// index.ts next to a stale compiled index.js is reported, not guessed.
+func ResolveNodeEntry(pathWithoutExt string) (string, error) {
+	var found []string
+	for _, ext := range nodeEntryExtensions {
+		candidate := pathWithoutExt + ext
+		if info, err := os.Stat(candidate); err == nil && !info.IsDir() {
+			found = append(found, candidate)
+		}
+	}
+
+	switch len(found) {
+	case 0:
+		return "", fmt.Errorf("no source file %s.ts (or %s) found", pathWithoutExt, strings.Join(nodeEntryExtensions[1:], ", "))
+	case 1:
+		return found[0], nil
+	default:
+		return "", fmt.Errorf("ambiguous: %s all exist; keep only one", strings.Join(found, ", "))
+	}
 }
 
 // BlankBundle returns a minimal Node.js handler for blank Lambda placeholders.

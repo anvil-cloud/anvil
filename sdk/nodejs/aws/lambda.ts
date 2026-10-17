@@ -61,7 +61,6 @@ export class Lambda extends pulumi.ComponentResource {
             }
             resourceInputs["architecture"] = args?.architecture;
             resourceInputs["encryption"] = args?.encryption;
-            resourceInputs["entry"] = args?.entry;
             resourceInputs["environment"] = args?.environment;
             resourceInputs["handler"] = args?.handler;
             resourceInputs["hatch"] = args?.hatch;
@@ -103,15 +102,11 @@ export interface LambdaArgs {
      */
     encryption?: pulumi.Input<string>;
     /**
-     * Path to the function's code, relative to the project root. Node: the entry file, e.g. "functions/api/index.ts"; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
-     */
-    entry?: pulumi.Input<string>;
-    /**
      * Environment variables available to the function at runtime. Supports plain strings and Pulumi outputs.
      */
     environment?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     /**
-     * Node only: the handler in the bundled index.js. Default: "index.handler". Ignored for Rust (always "bootstrap").
+     * Where the function's code is, relative to the project root, in the usual Lambda form. Node: <file without extension>.<export>, e.g. "functions/api/index.handler" for `export const handler` in functions/api/index.ts; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
      */
     handler?: pulumi.Input<string>;
     hatch?: pulumi.Input<inputs.aws.LambdaHatchArgsArgs>;

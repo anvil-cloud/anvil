@@ -40,8 +40,7 @@ export default new App({
   run(ctx) {
     const fn = new anvil.aws.Lambda('processor', {
       runtime: 'nodejs20.x',
-      handler: 'index.handler',
-      code: './src',
+      handler: 'src/index.handler',
       environment: {
         // forward reference — `db` is declared below
         DSQL_ENDPOINT: ctx.ref<anvil.aws.DSQL>('db').endpoint,
@@ -82,8 +81,7 @@ export default new App({
 
     const fn = new anvil.aws.Lambda('processor', {
       runtime: 'nodejs20.x',
-      handler: 'index.handler',
-      code: './src',
+      handler: 'src/index.handler',
     });
 
     // Grants the Lambda read access to the bucket and scopes down to specific bucket paths

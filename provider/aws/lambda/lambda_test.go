@@ -33,9 +33,16 @@ func TestValidateArgs(t *testing.T) {
 		args    LambdaArgs
 		wantErr string
 	}{
-		{"rust with entry", LambdaArgs{Runtime: "rust", Entry: "functions/api"}, ""},
-		{"rust without entry", LambdaArgs{Runtime: "rust"}, `runtime "rust" requires entry, e.g. entry: "functions/api"`},
-		{"node without entry deploys a placeholder", LambdaArgs{Runtime: "nodejs24.x"}, ""},
+		{"rust with a package path", LambdaArgs{Runtime: "rust", Handler: "functions/api"}, ""},
+		{"rust with a .rs file", LambdaArgs{Runtime: "rust", Handler: "functions/tools/src/bin/sync.rs"}, ""},
+		{"rust without handler", LambdaArgs{Runtime: "rust"}, `runtime "rust" requires handler, e.g. handler: "functions/api"`},
+		{"node handler", LambdaArgs{Runtime: "nodejs24.x", Handler: "functions/api/index.handler"}, ""},
+		{"node without handler deploys a placeholder", LambdaArgs{Runtime: "nodejs24.x"}, ""},
+		{"node handler written as a file path", LambdaArgs{Runtime: "nodejs24.x", Handler: "functions/api/index.ts"}, `write the export name instead, e.g. "functions/api/index.handler"`},
+		{"node handler with no export", LambdaArgs{Runtime: "nodejs24.x", Handler: "functions/api/index"}, "must be <file>.<export>"},
+		{"node handler with a dot only in a directory", LambdaArgs{Runtime: "nodejs24.x", Handler: "functions/v1.2/index"}, "must be <file>.<export>"},
+		{"node handler with a trailing dot", LambdaArgs{Runtime: "nodejs24.x", Handler: "functions/api/index."}, "must be <file>.<export>"},
+		{"node handler with an invalid export", LambdaArgs{Runtime: "nodejs24.x", Handler: "functions/api/index.my-handler"}, "not a valid export name"},
 	}
 
 	for _, tt := range tests {
@@ -61,10 +68,10 @@ func TestResolveRuntime(t *testing.T) {
 		wantRuntime string
 		wantHandler string
 	}{
-		{"rust", LambdaArgs{Runtime: "rust"}, "provided.al2023", "bootstrap"},
-		{"rust ignores a user handler", LambdaArgs{Runtime: "rust", Handler: "index.handler"}, "provided.al2023", "bootstrap"},
-		{"node default handler", LambdaArgs{Runtime: "nodejs24.x"}, "nodejs24.x", "index.handler"},
-		{"node explicit handler", LambdaArgs{Runtime: "nodejs22.x", Handler: "index.main"}, "nodejs22.x", "index.main"},
+		{"rust", LambdaArgs{Runtime: "rust", Handler: "functions/api"}, "provided.al2023", "bootstrap"},
+		{"node", LambdaArgs{Runtime: "nodejs24.x", Handler: "functions/api/index.handler"}, "nodejs24.x", "index.handler"},
+		{"node custom export", LambdaArgs{Runtime: "nodejs22.x", Handler: "functions/api/server.main"}, "nodejs22.x", "index.main"},
+		{"node placeholder", LambdaArgs{Runtime: "nodejs24.x"}, "nodejs24.x", "index.handler"},
 	}
 
 	for _, tt := range tests {
@@ -77,8 +84,27 @@ func TestResolveRuntime(t *testing.T) {
 	}
 }
 
+func TestCodePath(t *testing.T) {
+	tests := []struct {
+		name string
+		args LambdaArgs
+		want string
+	}{
+		{"node drops the export", LambdaArgs{Runtime: "nodejs24.x", Handler: "functions/api/index.handler"}, "functions/api/index"},
+		{"rust is the handler as-is", LambdaArgs{Runtime: "rust", Handler: "functions/tools/src/bin/sync.rs"}, "functions/tools/src/bin/sync.rs"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := codePath(tt.args); got != tt.want {
+				t.Errorf("got %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestCodeArchive(t *testing.T) {
-	rust := LambdaArgs{Runtime: "rust", Entry: "functions/api"}
+	rust := LambdaArgs{Runtime: "rust", Handler: "functions/api"}
 	node := LambdaArgs{Runtime: "nodejs24.x"}
 
 	t.Run("built zip is used as-is", func(t *testing.T) {
