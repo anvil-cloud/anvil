@@ -95,19 +95,29 @@ the CLI never guesses the layout.
 ## Build
 
 Hooked in at `buildFunction` in `cmd/anvil/cmd/build.go`, next to the Node case
-(today anything non-Node is `unsupported runtime`).
+(previously anything non-Node was `unsupported runtime`). Implemented in
+`cmd/anvil/cmd/bundler/cargo.go` (resolution, grouping) and
+`cmd/anvil/cmd/bundler/aws/rust.go` (builders, zips).
 
 1. Resolve every Rust function's package and bin (above).
 2. **Group by (workspace root, architecture)** and run one build per group:
 
    ```
-   cargo lambda build --release --arm64 --bin api --bin worker
+   cargo lambda build --release --target aarch64-unknown-linux-gnu \
+     --manifest-path <root>/Cargo.toml --lambda-dir <target>/lambda/arm64 \
+     --bin api --bin worker
    ```
 
    Cargo locks `target/`, so parallel per-function builds would only queue.
    One grouped run compiles shared dependencies once.
-3. Take `<target_directory>/lambda/<bin>/bootstrap` and zip it as `bootstrap`.
-4. Hand the zip path to the provider through the existing `fn-<name>` config.
+3. Take `<target_directory>/lambda/<arch>/<bin>/bootstrap` and zip it as
+   `bootstrap`. The per-architecture directory keeps arm64 and x86_64 builds
+   of the same bin apart, and never touches the user's own
+   `cargo lambda build` output (`target/lambda/<bin>`).
+4. Two packages with a binary of the same name in one workspace are an
+   error: Cargo selects binaries by name, so it can't build them apart.
+5. Hand the zip path to the provider through the existing `fn-<name>` config.
+   A failed group fails every function in it; `--partial` deploys the rest.
 
 ### Which builder
 
@@ -132,13 +142,15 @@ Rust Lambdas need cargo-lambda or Docker to build.
 
 ```
 docker run --rm \
-  --user <uid>:<gid> \
+  --user <uid>:<gid> -e HOME=/tmp \
   -v <workspace root>:/workspace -w /workspace \
   -v $CARGO_HOME/registry:/usr/local/cargo/registry \
   -v $CARGO_HOME/git:/usr/local/cargo/git \
-  -e CARGO_TARGET_DIR=target/docker \
-  ghcr.io/cargo-lambda/cargo-lambda@sha256:<pinned> \
-  cargo lambda build --release --arm64 --bin api --bin worker
+  -e CARGO_TARGET_DIR=/workspace/target/docker \
+  --entrypoint cargo \
+  ghcr.io/cargo-lambda/cargo-lambda:1.9.2@sha256:aa011e79… \
+  lambda build --release --target aarch64-unknown-linux-gnu \
+    --lambda-dir /workspace/target/docker/lambda/arm64 --bin api --bin worker
 ```
 
 - **Image pinned by digest,** bumped deliberately with Anvil releases. A
@@ -146,10 +158,14 @@ docker run --rm \
   user's Lambdas.
 - **Separate target dir** (`target/docker`). The container's Linux host
   artifacts and the Mac's would otherwise keep invalidating each other's
-  cache. Output is read from `target/docker/lambda/<bin>/bootstrap`.
+  cache. Output is read from `target/docker/lambda/<arch>/<bin>/bootstrap`.
+- **`--entrypoint cargo`** so the command doesn't depend on the image's own
+  entrypoint. The image is multi-arch (amd64 and arm64), so it runs natively
+  on Apple silicon.
 - **Registry and git caches mounted** from the host, so crates aren't
   re-downloaded on every build.
-- **`--user`** so files in `target/` aren't owned by root on Linux hosts.
+- **`--user`** so files in `target/` aren't owned by root on Linux hosts;
+  `HOME=/tmp` gives that user somewhere to write Zig's cache.
 - **Toolchain:** verify during implementation whether the image honours
   `rust-toolchain.toml` (if it ships rustup it will install the pinned
   toolchain; that install then needs caching too).
