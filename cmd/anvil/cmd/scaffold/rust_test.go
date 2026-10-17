@@ -85,7 +85,8 @@ func TestRustCreatesWorkspaceAndPackages(t *testing.T) {
 	if strings.Contains(manifest, "[profile.release]") {
 		t.Error("workspace Cargo.toml must not set a release profile (cargo lambda's defaults apply)")
 	}
-	if tc := read(t, filepath.Join(root, "rust-toolchain.toml")); !strings.Contains(tc, `channel = "1.93.1"`) || !strings.Contains(tc, "aarch64-unknown-linux-gnu") {
+	if tc := read(t, filepath.Join(root, "rust-toolchain.toml")); !strings.Contains(tc, `channel = "1.93.1"`) || !strings.Contains(tc, "aarch64-unknown-linux-gnu") ||
+		!strings.Contains(tc, `components = ["rust-analyzer", "rustfmt", "clippy"]`) {
 		t.Errorf("rust-toolchain.toml = %q", tc)
 	}
 	if gi := read(t, filepath.Join(root, ".gitignore")); gi != ".anvil/\nnode_modules/\n/target\n" {
@@ -310,4 +311,46 @@ func TestRustCrate(t *testing.T) {
 			t.Errorf("created %q, calls %q, err %v; want nothing", created, *calls, err)
 		}
 	})
+}
+
+func TestPackageName(t *testing.T) {
+	tests := map[string]string{
+		"testRust":   "test-rust",
+		"api":        "api",
+		"APIHandler": "api-handler",
+		"orderV2":    "order-v2",
+		"orders_api": "orders-api",
+		"Worker":     "worker",
+		"test":       "test-fn",
+		"std":        "std-fn",
+		"fn":         "fn-fn",
+		"db":         "db-fn",
+		"2fa":        "fn-2fa",
+		"my.lambda!": "my-lambda",
+		"__":         "lambda",
+	}
+	for in, want := range tests {
+		if got := packageName(in); got != want {
+			t.Errorf("packageName(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
+func TestRustNamesPackageAfterTheLambda(t *testing.T) {
+	root := t.TempDir()
+	calls := stubCargo(t, "rustc 1.93.1\n")
+
+	if _, err := Rust(root, []RustFunction{{Name: "testRust", Handler: "backend/functions/test"}}, RustOptions{}); err != nil {
+		t.Fatal(err)
+	}
+
+	var init []string
+	for _, c := range *calls {
+		if c[0] == "init" {
+			init = c
+		}
+	}
+	if !strings.Contains(strings.Join(init, " "), "--name test-rust") {
+		t.Errorf("cargo init = %q, want --name test-rust", init)
+	}
 }

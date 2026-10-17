@@ -22,7 +22,9 @@ func TestScaffoldThenBuildReal(t *testing.T) {
 	t.Chdir(root)
 	fns := []RustFunction{
 		{Name: "api", Handler: "functions/api"},
-		{Name: "worker", Handler: "functions/worker"},
+		// A directory Cargo would reject as a package name: the package is
+		// named after the Lambda instead.
+		{Name: "worker", Handler: "functions/test"},
 	}
 
 	created, err := Rust(root, fns, RustOptions{})
@@ -32,8 +34,13 @@ func TestScaffoldThenBuildReal(t *testing.T) {
 	t.Logf("created: %q", created)
 
 	manifest := read(t, filepath.Join(root, "Cargo.toml"))
-	if !strings.Contains(manifest, `members = ["functions/api", "functions/worker"]`) {
-		t.Errorf("cargo didn't add both packages to members:\n%s", manifest)
+	for _, m := range []string{`"functions/api"`, `"functions/test"`} {
+		if !strings.Contains(manifest, m) {
+			t.Errorf("cargo didn't add %s to members:\n%s", m, manifest)
+		}
+	}
+	if pkg := read(t, filepath.Join(root, "functions/test/Cargo.toml")); !strings.Contains(pkg, `name = "worker"`) {
+		t.Errorf("functions/test should be package worker:\n%s", pkg)
 	}
 	pkg := read(t, filepath.Join(root, "functions/api/Cargo.toml"))
 	for _, s := range []string{"edition.workspace = true", "lambda_runtime.workspace = true", "tokio.workspace = true", "serde_json.workspace = true"} {
@@ -44,7 +51,7 @@ func TestScaffoldThenBuildReal(t *testing.T) {
 
 	results, failed := awsbundler.BuildRustLambdas([]awsbundler.RustFunction{
 		{Name: "api", Handler: "functions/api", Architecture: "arm64"},
-		{Name: "worker", Handler: "functions/worker", Architecture: "arm64"},
+		{Name: "worker", Handler: "functions/test", Architecture: "arm64"},
 	})
 	for name, err := range failed {
 		t.Fatalf("%s failed to build: %v", name, err)

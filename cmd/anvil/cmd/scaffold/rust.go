@@ -100,7 +100,7 @@ func (s *rustScaffolder) function(fn RustFunction) error {
 	if err := os.MkdirAll(path, 0o755); err != nil {
 		return err
 	}
-	if err := runCargo(s.root, "init", "--bin", "--vcs", "none", path); err != nil {
+	if err := runCargo(s.root, "init", "--bin", "--vcs", "none", "--name", packageName(fn.Name), path); err != nil {
 		return err
 	}
 
@@ -246,6 +246,64 @@ func definesTemplateDeps(manifest string) bool {
 
 func (s *rustScaffolder) note(rel string) {
 	s.created = append(s.created, rel)
+}
+
+// ── Package names ──────────────────────────────────────────
+
+// reservedPackageNames are names Cargo rejects for a package (they clash with
+// Rust's built-in crates or keywords), plus "db", the generated DSQL client.
+var reservedPackageNames = map[string]bool{
+	"test": true, "core": true, "std": true, "alloc": true, "proc-macro": true, "proc_macro": true,
+	"db": true,
+	"as": true, "async": true, "await": true, "break": true, "const": true, "continue": true,
+	"crate": true, "dyn": true, "else": true, "enum": true, "extern": true, "false": true,
+	"fn": true, "for": true, "gen": true, "if": true, "impl": true, "in": true, "let": true,
+	"loop": true, "match": true, "mod": true, "move": true, "mut": true, "pub": true,
+	"ref": true, "return": true, "self": true, "static": true, "struct": true, "super": true,
+	"trait": true, "true": true, "try": true, "type": true, "unsafe": true, "use": true,
+	"where": true, "while": true, "yield": true, "abstract": true, "become": true, "box": true,
+	"do": true, "final": true, "macro": true, "override": true, "priv": true, "typeof": true,
+	"unsized": true, "virtual": true,
+}
+
+var nonPackageChars = regexp.MustCompile(`[^a-z0-9]+`)
+
+// packageName is the Cargo package name for a Lambda: its Anvil name in
+// kebab-case ("testRust" → "test-rust"), so the handler's directory can be
+// called anything — even a name Cargo reserves, like "test". A Lambda whose
+// own name is reserved gets a "-fn" suffix.
+func packageName(lambdaName string) string {
+	isUpper := func(r rune) bool { return r >= 'A' && r <= 'Z' }
+	isLowerOrDigit := func(r rune) bool { return (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') }
+
+	// Split camelCase at word starts, keeping runs of capitals together:
+	// "APIHandler" → "api-handler", "orderV2" → "order-v2".
+	runes := []rune(lambdaName)
+	var b strings.Builder
+	for i, r := range runes {
+		if isUpper(r) && i > 0 {
+			prev := runes[i-1]
+			nextLower := i+1 < len(runes) && runes[i+1] >= 'a' && runes[i+1] <= 'z'
+			if isLowerOrDigit(prev) || (isUpper(prev) && nextLower) {
+				b.WriteByte('-')
+			}
+		}
+		if isUpper(r) {
+			r += 'a' - 'A'
+		}
+		b.WriteRune(r)
+	}
+	name := strings.Trim(nonPackageChars.ReplaceAllString(b.String(), "-"), "-")
+
+	switch {
+	case name == "":
+		name = "lambda"
+	case name[0] >= '0' && name[0] <= '9':
+		name = "fn-" + name
+	case reservedPackageNames[name]:
+		name += "-fn"
+	}
+	return name
 }
 
 // ── Cargo.toml inspection ──────────────────────────────────

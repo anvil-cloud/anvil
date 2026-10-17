@@ -25,12 +25,16 @@ tokio = { version = "1", features = ["macros"] }
 }
 
 // toolchainFile pins the compiler so laptop and CI build with the same Rust,
-// and lists the Lambda targets so rustup installs them automatically. Anvil
-// never edits it after creating it: changing channel is the override.
+// and lists the Lambda targets so rustup installs them automatically. The
+// components keep editor tooling on the same version: without
+// rust-analyzer here, the VS Code extension warns that a pinned toolchain is
+// too old for its bundled rust-analyzer. Anvil never edits it after creating
+// it: changing channel is the override.
 func toolchainFile(rustVersion string) string {
 	return fmt.Sprintf(`# Created by Anvil; yours to edit (e.g. bump channel to upgrade Rust).
 [toolchain]
 channel = %q
+components = ["rust-analyzer", "rustfmt", "clippy"]
 targets = ["aarch64-unknown-linux-gnu", "x86_64-unknown-linux-gnu"]
 `, rustVersion)
 }

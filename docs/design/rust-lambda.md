@@ -218,6 +218,14 @@ files.
 7. **`gen/db` is never scaffolded over.** It's Anvil-owned and handled by the
    DSQL generator.
 
+### Package names
+
+A new package is named after the Lambda, kebab-cased (`testRust` →
+`test-rust`), not after its directory. A handler directory can then be called
+anything, even a name Cargo rejects as a package (`test`, `std`, a Rust
+keyword). A Lambda whose own name is reserved, or is `db` (the generated
+client), gets a `-fn` suffix.
+
 ### How files are written
 
 TOML edits go through Cargo, which preserves comments and formatting:
@@ -274,8 +282,14 @@ serde_json = "1"
 ```toml
 [toolchain]
 channel = "<pinned version, e.g. 1.xx.0>"
+components = ["rust-analyzer", "rustfmt", "clippy"]
 targets = ["aarch64-unknown-linux-gnu", "x86_64-unknown-linux-gnu"]
 ```
+
+- **`components`** keeps editor tooling on the pinned version. Without
+  `rust-analyzer` here, the VS Code extension warns that the pinned toolchain
+  is too old for its bundled rust-analyzer; rustup installs the listed
+  components on first use.
 
 - **Pinned,** so laptop and CI compile with the same Rust. Anvil pins the
   host's current `rustc` version (already installed, and what the user
