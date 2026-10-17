@@ -100,14 +100,14 @@ func main() {
 }
 ```
 
-## Overrides
+## Escape hatch
 
-Every component accepts a `Transform` field to override the underlying resource config when you need to break from the defaults:
+Every component accepts a `Hatch` field — an escape hatch to override the underlying resource config when you need to break from the defaults:
 
 ```go
 bucket, err := anvilaws.NewBucket(ctx.PulumiCtx(), "custom", &anvilaws.BucketArgs{
     DataClassification: pulumi.String("non-sensitive"),
-    Transform: &anvilaws.BucketTransformArgs{
+    Hatch: &anvilaws.BucketHatchArgs{
         Bucket: &anvilaws.BucketOverridesArgs{
             ForceDestroy: pulumi.Bool(true),
             Tags:         pulumi.StringMap{"env": pulumi.String("dev")},

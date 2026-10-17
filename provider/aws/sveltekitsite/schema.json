@@ -13,6 +13,9 @@
             "type": "string"
           }
         },
+        "hatch": {
+          "type": "string"
+        },
         "originProtection": {
           "type": "boolean",
           "description": "OriginProtection locks CloudFront to a CDN/proxy in front of it (Cloudflare, Fastly, Akamai, nginx, ...). Requests without the x-origin-secret header are rejected at the edge; configure the proxy to send it on every request with the originSecret output as the value. Protection defaults to \"edge-oac\" while it's enabled, so the server Function URL can't be reached around the proxy."
@@ -34,9 +37,6 @@
         "securityHeaders": {
           "description": "SecurityHeaders configures the security headers CloudFront adds to every response. On by default: Strict-Transport-Security (1 year), X-Content-Type-Options: nosniff, X-Frame-Options: SAMEORIGIN, Referrer-Policy: strict-origin-when-cross-origin, a Permissions-Policy that turns off camera, microphone, geolocation, USB and Topics, and Cross-Origin-Opener-Policy: same-origin-allow-popups. Headers your app sets itself take priority. Content-Security-Policy is left to SvelteKit's kit.csp.",
           "$ref": "#/types/anvil:aws:SiteSecurityHeaders"
-        },
-        "transform": {
-          "type": "string"
         },
         "waf": {
           "description": "Waf attaches a WAF WebACL to the site's CloudFront distribution. Protection defaults to \"edge-oac\" while it's attached.",

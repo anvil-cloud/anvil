@@ -60,7 +60,7 @@ export class Queue extends pulumi.ComponentResource {
             resourceInputs["consumer"] = args?.consumer;
             resourceInputs["dlq"] = args?.dlq;
             resourceInputs["fifo"] = args?.fifo;
-            resourceInputs["transform"] = args?.transform;
+            resourceInputs["hatch"] = args?.hatch;
             resourceInputs["arn"] = undefined /*out*/;
             resourceInputs["dlqArn"] = undefined /*out*/;
             resourceInputs["dlqUrl"] = undefined /*out*/;
@@ -94,5 +94,5 @@ export interface QueueArgs {
      * Creates a FIFO queue when true. FIFO queues guarantee message ordering and exactly-once processing but have lower throughput (~3,000 msg/s vs unlimited for standard). Use for financial transactions, inventory updates, or any workflow where ordering or deduplication matters. Default: false.
      */
     fifo?: pulumi.Input<boolean>;
-    transform?: pulumi.Input<inputs.aws.QueueTransformArgsArgs>;
+    hatch?: pulumi.Input<inputs.aws.QueueHatchArgsArgs>;
 }

@@ -16,15 +16,35 @@ from .. import _utilities
 import pulumi_gcp
 
 __all__ = [
+    'BucketHatchArgsArgs',
+    'BucketHatchArgsArgsDict',
     'BucketOverridesArgs',
     'BucketOverridesArgsDict',
-    'BucketTransformArgsArgs',
-    'BucketTransformArgsArgsDict',
+    'FunctionHatchArgsArgs',
+    'FunctionHatchArgsArgsDict',
     'FunctionOverridesArgs',
     'FunctionOverridesArgsDict',
-    'FunctionTransformArgsArgs',
-    'FunctionTransformArgsArgsDict',
 ]
+
+class BucketHatchArgsArgsDict(TypedDict):
+    bucket: NotRequired[pulumi.Input['BucketOverridesArgsDict']]
+
+@pulumi.input_type
+class BucketHatchArgsArgs:
+    def __init__(__self__, *,
+                 bucket: Optional[pulumi.Input['BucketOverridesArgs']] = None):
+        if bucket is not None:
+            pulumi.set(__self__, "bucket", bucket)
+
+    @_builtins.property
+    @pulumi.getter
+    def bucket(self) -> Optional[pulumi.Input['BucketOverridesArgs']]:
+        return pulumi.get(self, "bucket")
+
+    @bucket.setter
+    def bucket(self, value: Optional[pulumi.Input['BucketOverridesArgs']]):
+        pulumi.set(self, "bucket", value)
+
 
 class BucketOverridesArgsDict(TypedDict):
     autoclass: NotRequired[pulumi.Input['pulumi_gcp.storage.BucketAutoclassArgsDict']]
@@ -524,24 +544,24 @@ class BucketOverridesArgs:
         pulumi.set(self, "website", value)
 
 
-class BucketTransformArgsArgsDict(TypedDict):
-    bucket: NotRequired[pulumi.Input['BucketOverridesArgsDict']]
+class FunctionHatchArgsArgsDict(TypedDict):
+    function: NotRequired[pulumi.Input['FunctionOverridesArgsDict']]
 
 @pulumi.input_type
-class BucketTransformArgsArgs:
+class FunctionHatchArgsArgs:
     def __init__(__self__, *,
-                 bucket: Optional[pulumi.Input['BucketOverridesArgs']] = None):
-        if bucket is not None:
-            pulumi.set(__self__, "bucket", bucket)
+                 function: Optional[pulumi.Input['FunctionOverridesArgs']] = None):
+        if function is not None:
+            pulumi.set(__self__, "function", function)
 
     @_builtins.property
     @pulumi.getter
-    def bucket(self) -> Optional[pulumi.Input['BucketOverridesArgs']]:
-        return pulumi.get(self, "bucket")
+    def function(self) -> Optional[pulumi.Input['FunctionOverridesArgs']]:
+        return pulumi.get(self, "function")
 
-    @bucket.setter
-    def bucket(self, value: Optional[pulumi.Input['BucketOverridesArgs']]):
-        pulumi.set(self, "bucket", value)
+    @function.setter
+    def function(self, value: Optional[pulumi.Input['FunctionOverridesArgs']]):
+        pulumi.set(self, "function", value)
 
 
 class FunctionOverridesArgsDict(TypedDict):
@@ -764,25 +784,5 @@ class FunctionOverridesArgs:
     @service_config.setter
     def service_config(self, value: Optional[pulumi.Input['pulumi_gcp.cloudfunctionsv2.FunctionServiceConfigArgs']]):
         pulumi.set(self, "service_config", value)
-
-
-class FunctionTransformArgsArgsDict(TypedDict):
-    function: NotRequired[pulumi.Input['FunctionOverridesArgsDict']]
-
-@pulumi.input_type
-class FunctionTransformArgsArgs:
-    def __init__(__self__, *,
-                 function: Optional[pulumi.Input['FunctionOverridesArgs']] = None):
-        if function is not None:
-            pulumi.set(__self__, "function", function)
-
-    @_builtins.property
-    @pulumi.getter
-    def function(self) -> Optional[pulumi.Input['FunctionOverridesArgs']]:
-        return pulumi.get(self, "function")
-
-    @function.setter
-    def function(self, value: Optional[pulumi.Input['FunctionOverridesArgs']]):
-        pulumi.set(self, "function", value)
 
 

@@ -46,27 +46,27 @@ func NewFunction(ctx *pulumi.Context,
 
 type functionArgs struct {
 	// The name of the function to execute.
-	EntryPoint string `pulumi:"entryPoint"`
+	EntryPoint string             `pulumi:"entryPoint"`
+	Hatch      *FunctionHatchArgs `pulumi:"hatch"`
 	// The GCP region to deploy to (e.g. us-central1).
 	Location string `pulumi:"location"`
 	// The name of the Cloud Function.
 	Name string `pulumi:"name"`
 	// The runtime to use (e.g. nodejs20, python312, go122).
-	Runtime   string                 `pulumi:"runtime"`
-	Transform *FunctionTransformArgs `pulumi:"transform"`
+	Runtime string `pulumi:"runtime"`
 }
 
 // The set of arguments for constructing a Function resource.
 type FunctionArgs struct {
 	// The name of the function to execute.
 	EntryPoint pulumi.StringInput
+	Hatch      FunctionHatchArgsPtrInput
 	// The GCP region to deploy to (e.g. us-central1).
 	Location pulumi.StringInput
 	// The name of the Cloud Function.
 	Name pulumi.StringInput
 	// The runtime to use (e.g. nodejs20, python312, go122).
-	Runtime   pulumi.StringInput
-	Transform FunctionTransformArgsPtrInput
+	Runtime pulumi.StringInput
 }
 
 func (FunctionArgs) ElementType() reflect.Type {

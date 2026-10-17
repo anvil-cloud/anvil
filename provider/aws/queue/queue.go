@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
-	"github.com/anvil-cloud/anvil/provider/internal/transform"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"
 	awslambda "github.com/pulumi/pulumi-aws/sdk/v7/go/aws/lambda"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/sqs"
@@ -71,7 +71,7 @@ type QueueArgs struct {
 	// Creates the event source mapping and grants the necessary IAM permissions.
 	Consumer *QueueConsumerArgs `pulumi:"consumer,optional"`
 
-	Transform map[string]map[string]interface{} `pulumi:"transform,optional"`
+	Hatch map[string]map[string]interface{} `pulumi:"hatch,optional"`
 }
 
 // Queue is the Anvil-managed SQS queue component resource.
@@ -191,9 +191,9 @@ func NewQueue(ctx *pulumi.Context, name string, args QueueArgs, opts ...pulumi.R
 			dlqProps["fifoQueue"] = pulumi.Bool(true)
 		}
 
-		dlqPropsTransformed := transform.MergeTransform(args.Transform["dlq"], dlqProps)
+		dlqPropsMerged := hatch.Merge(args.Hatch["dlq"], dlqProps)
 		dlqRes := &sqs.Queue{}
-		if err := ctx.RegisterResource("aws:sqs/queue:Queue", name+"-dlq", dlqPropsTransformed, dlqRes, pulumi.Parent(q)); err != nil {
+		if err := ctx.RegisterResource("aws:sqs/queue:Queue", name+"-dlq", dlqPropsMerged, dlqRes, pulumi.Parent(q)); err != nil {
 			return nil, fmt.Errorf("failed to create DLQ for queue %q: %w", name, err)
 		}
 		dlqArn = dlqRes.Arn
@@ -227,9 +227,9 @@ func NewQueue(ctx *pulumi.Context, name string, args QueueArgs, opts ...pulumi.R
 		queueProps["fifoQueue"] = pulumi.Bool(true)
 	}
 
-	queuePropsTransformed := transform.MergeTransform(args.Transform["queue"], queueProps)
+	queuePropsMerged := hatch.Merge(args.Hatch["queue"], queueProps)
 	queueRes := &sqs.Queue{}
-	if err := ctx.RegisterResource("aws:sqs/queue:Queue", name, queuePropsTransformed, queueRes, pulumi.Parent(q)); err != nil {
+	if err := ctx.RegisterResource("aws:sqs/queue:Queue", name, queuePropsMerged, queueRes, pulumi.Parent(q)); err != nil {
 		return nil, fmt.Errorf("failed to create queue %q: %w", name, err)
 	}
 

@@ -28,12 +28,12 @@ class LambdaArgs:
                  encryption: Optional[pulumi.Input[_builtins.str]] = None,
                  entry: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 hatch: Optional[pulumi.Input['LambdaHatchArgsArgs']] = None,
                  log_retention: Optional[pulumi.Input['LambdaLogRetention']] = None,
                  memory: Optional[pulumi.Input[_builtins.int]] = None,
                  permissions: Optional[pulumi.Input[Sequence[pulumi.Input['LambdaPermissionArgs']]]] = None,
                  timeout: Optional[pulumi.Input[_builtins.int]] = None,
                  tracing: Optional[pulumi.Input[_builtins.bool]] = None,
-                 transform: Optional[pulumi.Input['LambdaTransformArgsArgs']] = None,
                  url: Optional[pulumi.Input[_builtins.bool]] = None,
                  vpc: Optional[pulumi.Input['LambdaVpcArgsArgs']] = None):
         """
@@ -42,7 +42,7 @@ class LambdaArgs:
         :param pulumi.Input[_builtins.str] handler: The exported function name in the entry file. e.g. "handler" for `export const handler = ...`
         :param pulumi.Input['LambdaRuntime'] runtime: The Lambda runtime identifier.
         :param pulumi.Input['LambdaArchitecture'] architecture: CPU architecture. Default: arm64 (Graviton).
-        :param pulumi.Input[_builtins.str] encryption: Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via transform["lambda"].
+        :param pulumi.Input[_builtins.str] encryption: Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
         :param pulumi.Input[_builtins.str] entry: Path to the function's entry point file, relative to the project root. e.g. "functions/api/index.ts". Omit to deploy a blank Lambda placeholder.
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment: Environment variables available to the function at runtime. Supports plain strings and Pulumi outputs.
         :param pulumi.Input['LambdaLogRetention'] log_retention: CloudWatch log group retention period. Default: "1y" (satisfies SOC 2, ISO 27001, PCI-DSS baseline).
@@ -63,6 +63,8 @@ class LambdaArgs:
             pulumi.set(__self__, "entry", entry)
         if environment is not None:
             pulumi.set(__self__, "environment", environment)
+        if hatch is not None:
+            pulumi.set(__self__, "hatch", hatch)
         if log_retention is not None:
             pulumi.set(__self__, "log_retention", log_retention)
         if memory is not None:
@@ -73,8 +75,6 @@ class LambdaArgs:
             pulumi.set(__self__, "timeout", timeout)
         if tracing is not None:
             pulumi.set(__self__, "tracing", tracing)
-        if transform is not None:
-            pulumi.set(__self__, "transform", transform)
         if url is not None:
             pulumi.set(__self__, "url", url)
         if vpc is not None:
@@ -120,7 +120,7 @@ class LambdaArgs:
     @pulumi.getter
     def encryption(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via transform["lambda"].
+        Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
         """
         return pulumi.get(self, "encryption")
 
@@ -151,6 +151,15 @@ class LambdaArgs:
     @environment.setter
     def environment(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "environment", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def hatch(self) -> Optional[pulumi.Input['LambdaHatchArgsArgs']]:
+        return pulumi.get(self, "hatch")
+
+    @hatch.setter
+    def hatch(self, value: Optional[pulumi.Input['LambdaHatchArgsArgs']]):
+        pulumi.set(self, "hatch", value)
 
     @_builtins.property
     @pulumi.getter(name="logRetention")
@@ -214,15 +223,6 @@ class LambdaArgs:
 
     @_builtins.property
     @pulumi.getter
-    def transform(self) -> Optional[pulumi.Input['LambdaTransformArgsArgs']]:
-        return pulumi.get(self, "transform")
-
-    @transform.setter
-    def transform(self, value: Optional[pulumi.Input['LambdaTransformArgsArgs']]):
-        pulumi.set(self, "transform", value)
-
-    @_builtins.property
-    @pulumi.getter
     def url(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
         Enable a direct HTTPS endpoint for the function. Auth mode is AWS_IAM - never public. Default: false.
@@ -257,13 +257,13 @@ class Lambda(pulumi.ComponentResource):
                  entry: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  handler: Optional[pulumi.Input[_builtins.str]] = None,
+                 hatch: Optional[pulumi.Input[Union['LambdaHatchArgsArgs', 'LambdaHatchArgsArgsDict']]] = None,
                  log_retention: Optional[pulumi.Input['LambdaLogRetention']] = None,
                  memory: Optional[pulumi.Input[_builtins.int]] = None,
                  permissions: Optional[pulumi.Input[Sequence[pulumi.Input[Union['LambdaPermissionArgs', 'LambdaPermissionArgsDict']]]]] = None,
                  runtime: Optional[pulumi.Input['LambdaRuntime']] = None,
                  timeout: Optional[pulumi.Input[_builtins.int]] = None,
                  tracing: Optional[pulumi.Input[_builtins.bool]] = None,
-                 transform: Optional[pulumi.Input[Union['LambdaTransformArgsArgs', 'LambdaTransformArgsArgsDict']]] = None,
                  url: Optional[pulumi.Input[_builtins.bool]] = None,
                  vpc: Optional[pulumi.Input[Union['LambdaVpcArgsArgs', 'LambdaVpcArgsArgsDict']]] = None,
                  __props__=None):
@@ -273,7 +273,7 @@ class Lambda(pulumi.ComponentResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input['LambdaArchitecture'] architecture: CPU architecture. Default: arm64 (Graviton).
-        :param pulumi.Input[_builtins.str] encryption: Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via transform["lambda"].
+        :param pulumi.Input[_builtins.str] encryption: Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
         :param pulumi.Input[_builtins.str] entry: Path to the function's entry point file, relative to the project root. e.g. "functions/api/index.ts". Omit to deploy a blank Lambda placeholder.
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment: Environment variables available to the function at runtime. Supports plain strings and Pulumi outputs.
         :param pulumi.Input[_builtins.str] handler: The exported function name in the entry file. e.g. "handler" for `export const handler = ...`
@@ -315,13 +315,13 @@ class Lambda(pulumi.ComponentResource):
                  entry: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  handler: Optional[pulumi.Input[_builtins.str]] = None,
+                 hatch: Optional[pulumi.Input[Union['LambdaHatchArgsArgs', 'LambdaHatchArgsArgsDict']]] = None,
                  log_retention: Optional[pulumi.Input['LambdaLogRetention']] = None,
                  memory: Optional[pulumi.Input[_builtins.int]] = None,
                  permissions: Optional[pulumi.Input[Sequence[pulumi.Input[Union['LambdaPermissionArgs', 'LambdaPermissionArgsDict']]]]] = None,
                  runtime: Optional[pulumi.Input['LambdaRuntime']] = None,
                  timeout: Optional[pulumi.Input[_builtins.int]] = None,
                  tracing: Optional[pulumi.Input[_builtins.bool]] = None,
-                 transform: Optional[pulumi.Input[Union['LambdaTransformArgsArgs', 'LambdaTransformArgsArgsDict']]] = None,
                  url: Optional[pulumi.Input[_builtins.bool]] = None,
                  vpc: Optional[pulumi.Input[Union['LambdaVpcArgsArgs', 'LambdaVpcArgsArgsDict']]] = None,
                  __props__=None):
@@ -342,6 +342,7 @@ class Lambda(pulumi.ComponentResource):
             if handler is None and not opts.urn:
                 raise TypeError("Missing required property 'handler'")
             __props__.__dict__["handler"] = handler
+            __props__.__dict__["hatch"] = hatch
             __props__.__dict__["log_retention"] = log_retention
             __props__.__dict__["memory"] = memory
             __props__.__dict__["permissions"] = permissions
@@ -350,7 +351,6 @@ class Lambda(pulumi.ComponentResource):
             __props__.__dict__["runtime"] = runtime
             __props__.__dict__["timeout"] = timeout
             __props__.__dict__["tracing"] = tracing
-            __props__.__dict__["transform"] = transform
             __props__.__dict__["url"] = url
             __props__.__dict__["vpc"] = vpc
             __props__.__dict__["arn"] = None

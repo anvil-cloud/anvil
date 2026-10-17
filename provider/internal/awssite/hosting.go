@@ -18,9 +18,9 @@ type HostingInputs struct {
 	OriginProtection bool
 	SecurityHeaders  *sites.SiteSecurityHeadersArgs
 
-	// Transform is the component's transform map; Hosting reads its
+	// Hatch is the component's hatch map; Hosting reads its
 	// "responseHeadersPolicy" entry.
-	Transform map[string]map[string]interface{}
+	Hatch map[string]map[string]interface{}
 }
 
 // Hosting is the shared hosting layer for every site component: server
@@ -76,7 +76,7 @@ func NewHosting(ctx *pulumi.Context, parent pulumi.Resource, name string, in Hos
 		return nil, err
 	}
 	if headers.Enabled {
-		h.headersPolicyID, err = CreateSecurityHeadersPolicy(ctx, parent, name, headers, in.Transform["responseHeadersPolicy"])
+		h.headersPolicyID, err = CreateSecurityHeadersPolicy(ctx, parent, name, headers, in.Hatch["responseHeadersPolicy"])
 		if err != nil {
 			return nil, err
 		}

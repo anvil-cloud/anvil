@@ -20,7 +20,7 @@ import (
 
 var _ = internal.GetEnvOrDefault
 
-type BucketAccelerateConfigurationTransform struct {
+type BucketAccelerateConfigurationHatch struct {
 	// Name of the bucket.
 	Bucket *string `pulumi:"bucket"`
 	// Account ID of the expected bucket owner.
@@ -33,18 +33,18 @@ type BucketAccelerateConfigurationTransform struct {
 	Status *string `pulumi:"status"`
 }
 
-// BucketAccelerateConfigurationTransformInput is an input type that accepts BucketAccelerateConfigurationTransformArgs and BucketAccelerateConfigurationTransformOutput values.
-// You can construct a concrete instance of `BucketAccelerateConfigurationTransformInput` via:
+// BucketAccelerateConfigurationHatchInput is an input type that accepts BucketAccelerateConfigurationHatchArgs and BucketAccelerateConfigurationHatchOutput values.
+// You can construct a concrete instance of `BucketAccelerateConfigurationHatchInput` via:
 //
-//	BucketAccelerateConfigurationTransformArgs{...}
-type BucketAccelerateConfigurationTransformInput interface {
+//	BucketAccelerateConfigurationHatchArgs{...}
+type BucketAccelerateConfigurationHatchInput interface {
 	pulumi.Input
 
-	ToBucketAccelerateConfigurationTransformOutput() BucketAccelerateConfigurationTransformOutput
-	ToBucketAccelerateConfigurationTransformOutputWithContext(context.Context) BucketAccelerateConfigurationTransformOutput
+	ToBucketAccelerateConfigurationHatchOutput() BucketAccelerateConfigurationHatchOutput
+	ToBucketAccelerateConfigurationHatchOutputWithContext(context.Context) BucketAccelerateConfigurationHatchOutput
 }
 
-type BucketAccelerateConfigurationTransformArgs struct {
+type BucketAccelerateConfigurationHatchArgs struct {
 	// Name of the bucket.
 	Bucket pulumi.StringPtrInput `pulumi:"bucket"`
 	// Account ID of the expected bucket owner.
@@ -57,132 +57,132 @@ type BucketAccelerateConfigurationTransformArgs struct {
 	Status pulumi.StringPtrInput `pulumi:"status"`
 }
 
-func (BucketAccelerateConfigurationTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketAccelerateConfigurationTransform)(nil)).Elem()
+func (BucketAccelerateConfigurationHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketAccelerateConfigurationHatch)(nil)).Elem()
 }
 
-func (i BucketAccelerateConfigurationTransformArgs) ToBucketAccelerateConfigurationTransformOutput() BucketAccelerateConfigurationTransformOutput {
-	return i.ToBucketAccelerateConfigurationTransformOutputWithContext(context.Background())
+func (i BucketAccelerateConfigurationHatchArgs) ToBucketAccelerateConfigurationHatchOutput() BucketAccelerateConfigurationHatchOutput {
+	return i.ToBucketAccelerateConfigurationHatchOutputWithContext(context.Background())
 }
 
-func (i BucketAccelerateConfigurationTransformArgs) ToBucketAccelerateConfigurationTransformOutputWithContext(ctx context.Context) BucketAccelerateConfigurationTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketAccelerateConfigurationTransformOutput)
+func (i BucketAccelerateConfigurationHatchArgs) ToBucketAccelerateConfigurationHatchOutputWithContext(ctx context.Context) BucketAccelerateConfigurationHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketAccelerateConfigurationHatchOutput)
 }
 
-func (i BucketAccelerateConfigurationTransformArgs) ToBucketAccelerateConfigurationTransformPtrOutput() BucketAccelerateConfigurationTransformPtrOutput {
-	return i.ToBucketAccelerateConfigurationTransformPtrOutputWithContext(context.Background())
+func (i BucketAccelerateConfigurationHatchArgs) ToBucketAccelerateConfigurationHatchPtrOutput() BucketAccelerateConfigurationHatchPtrOutput {
+	return i.ToBucketAccelerateConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i BucketAccelerateConfigurationTransformArgs) ToBucketAccelerateConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketAccelerateConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketAccelerateConfigurationTransformOutput).ToBucketAccelerateConfigurationTransformPtrOutputWithContext(ctx)
+func (i BucketAccelerateConfigurationHatchArgs) ToBucketAccelerateConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketAccelerateConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketAccelerateConfigurationHatchOutput).ToBucketAccelerateConfigurationHatchPtrOutputWithContext(ctx)
 }
 
-// BucketAccelerateConfigurationTransformPtrInput is an input type that accepts BucketAccelerateConfigurationTransformArgs, BucketAccelerateConfigurationTransformPtr and BucketAccelerateConfigurationTransformPtrOutput values.
-// You can construct a concrete instance of `BucketAccelerateConfigurationTransformPtrInput` via:
+// BucketAccelerateConfigurationHatchPtrInput is an input type that accepts BucketAccelerateConfigurationHatchArgs, BucketAccelerateConfigurationHatchPtr and BucketAccelerateConfigurationHatchPtrOutput values.
+// You can construct a concrete instance of `BucketAccelerateConfigurationHatchPtrInput` via:
 //
-//	        BucketAccelerateConfigurationTransformArgs{...}
+//	        BucketAccelerateConfigurationHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketAccelerateConfigurationTransformPtrInput interface {
+type BucketAccelerateConfigurationHatchPtrInput interface {
 	pulumi.Input
 
-	ToBucketAccelerateConfigurationTransformPtrOutput() BucketAccelerateConfigurationTransformPtrOutput
-	ToBucketAccelerateConfigurationTransformPtrOutputWithContext(context.Context) BucketAccelerateConfigurationTransformPtrOutput
+	ToBucketAccelerateConfigurationHatchPtrOutput() BucketAccelerateConfigurationHatchPtrOutput
+	ToBucketAccelerateConfigurationHatchPtrOutputWithContext(context.Context) BucketAccelerateConfigurationHatchPtrOutput
 }
 
-type bucketAccelerateConfigurationTransformPtrType BucketAccelerateConfigurationTransformArgs
+type bucketAccelerateConfigurationHatchPtrType BucketAccelerateConfigurationHatchArgs
 
-func BucketAccelerateConfigurationTransformPtr(v *BucketAccelerateConfigurationTransformArgs) BucketAccelerateConfigurationTransformPtrInput {
-	return (*bucketAccelerateConfigurationTransformPtrType)(v)
+func BucketAccelerateConfigurationHatchPtr(v *BucketAccelerateConfigurationHatchArgs) BucketAccelerateConfigurationHatchPtrInput {
+	return (*bucketAccelerateConfigurationHatchPtrType)(v)
 }
 
-func (*bucketAccelerateConfigurationTransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketAccelerateConfigurationTransform)(nil)).Elem()
+func (*bucketAccelerateConfigurationHatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketAccelerateConfigurationHatch)(nil)).Elem()
 }
 
-func (i *bucketAccelerateConfigurationTransformPtrType) ToBucketAccelerateConfigurationTransformPtrOutput() BucketAccelerateConfigurationTransformPtrOutput {
-	return i.ToBucketAccelerateConfigurationTransformPtrOutputWithContext(context.Background())
+func (i *bucketAccelerateConfigurationHatchPtrType) ToBucketAccelerateConfigurationHatchPtrOutput() BucketAccelerateConfigurationHatchPtrOutput {
+	return i.ToBucketAccelerateConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketAccelerateConfigurationTransformPtrType) ToBucketAccelerateConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketAccelerateConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketAccelerateConfigurationTransformPtrOutput)
+func (i *bucketAccelerateConfigurationHatchPtrType) ToBucketAccelerateConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketAccelerateConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketAccelerateConfigurationHatchPtrOutput)
 }
 
-type BucketAccelerateConfigurationTransformOutput struct{ *pulumi.OutputState }
+type BucketAccelerateConfigurationHatchOutput struct{ *pulumi.OutputState }
 
-func (BucketAccelerateConfigurationTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketAccelerateConfigurationTransform)(nil)).Elem()
+func (BucketAccelerateConfigurationHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketAccelerateConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketAccelerateConfigurationTransformOutput) ToBucketAccelerateConfigurationTransformOutput() BucketAccelerateConfigurationTransformOutput {
+func (o BucketAccelerateConfigurationHatchOutput) ToBucketAccelerateConfigurationHatchOutput() BucketAccelerateConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketAccelerateConfigurationTransformOutput) ToBucketAccelerateConfigurationTransformOutputWithContext(ctx context.Context) BucketAccelerateConfigurationTransformOutput {
+func (o BucketAccelerateConfigurationHatchOutput) ToBucketAccelerateConfigurationHatchOutputWithContext(ctx context.Context) BucketAccelerateConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketAccelerateConfigurationTransformOutput) ToBucketAccelerateConfigurationTransformPtrOutput() BucketAccelerateConfigurationTransformPtrOutput {
-	return o.ToBucketAccelerateConfigurationTransformPtrOutputWithContext(context.Background())
+func (o BucketAccelerateConfigurationHatchOutput) ToBucketAccelerateConfigurationHatchPtrOutput() BucketAccelerateConfigurationHatchPtrOutput {
+	return o.ToBucketAccelerateConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (o BucketAccelerateConfigurationTransformOutput) ToBucketAccelerateConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketAccelerateConfigurationTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketAccelerateConfigurationTransform) *BucketAccelerateConfigurationTransform {
+func (o BucketAccelerateConfigurationHatchOutput) ToBucketAccelerateConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketAccelerateConfigurationHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketAccelerateConfigurationHatch) *BucketAccelerateConfigurationHatch {
 		return &v
-	}).(BucketAccelerateConfigurationTransformPtrOutput)
+	}).(BucketAccelerateConfigurationHatchPtrOutput)
 }
 
 // Name of the bucket.
-func (o BucketAccelerateConfigurationTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketAccelerateConfigurationTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o BucketAccelerateConfigurationHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketAccelerateConfigurationHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketAccelerateConfigurationTransformOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketAccelerateConfigurationTransform) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
+func (o BucketAccelerateConfigurationHatchOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketAccelerateConfigurationHatch) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketAccelerateConfigurationTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketAccelerateConfigurationTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o BucketAccelerateConfigurationHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketAccelerateConfigurationHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
 // Transfer acceleration state of the bucket. Valid values: `Enabled`, `Suspended`.
-func (o BucketAccelerateConfigurationTransformOutput) Status() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketAccelerateConfigurationTransform) *string { return v.Status }).(pulumi.StringPtrOutput)
+func (o BucketAccelerateConfigurationHatchOutput) Status() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketAccelerateConfigurationHatch) *string { return v.Status }).(pulumi.StringPtrOutput)
 }
 
-type BucketAccelerateConfigurationTransformPtrOutput struct{ *pulumi.OutputState }
+type BucketAccelerateConfigurationHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketAccelerateConfigurationTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketAccelerateConfigurationTransform)(nil)).Elem()
+func (BucketAccelerateConfigurationHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketAccelerateConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketAccelerateConfigurationTransformPtrOutput) ToBucketAccelerateConfigurationTransformPtrOutput() BucketAccelerateConfigurationTransformPtrOutput {
+func (o BucketAccelerateConfigurationHatchPtrOutput) ToBucketAccelerateConfigurationHatchPtrOutput() BucketAccelerateConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketAccelerateConfigurationTransformPtrOutput) ToBucketAccelerateConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketAccelerateConfigurationTransformPtrOutput {
+func (o BucketAccelerateConfigurationHatchPtrOutput) ToBucketAccelerateConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketAccelerateConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketAccelerateConfigurationTransformPtrOutput) Elem() BucketAccelerateConfigurationTransformOutput {
-	return o.ApplyT(func(v *BucketAccelerateConfigurationTransform) BucketAccelerateConfigurationTransform {
+func (o BucketAccelerateConfigurationHatchPtrOutput) Elem() BucketAccelerateConfigurationHatchOutput {
+	return o.ApplyT(func(v *BucketAccelerateConfigurationHatch) BucketAccelerateConfigurationHatch {
 		if v != nil {
 			return *v
 		}
-		var ret BucketAccelerateConfigurationTransform
+		var ret BucketAccelerateConfigurationHatch
 		return ret
-	}).(BucketAccelerateConfigurationTransformOutput)
+	}).(BucketAccelerateConfigurationHatchOutput)
 }
 
 // Name of the bucket.
-func (o BucketAccelerateConfigurationTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketAccelerateConfigurationTransform) *string {
+func (o BucketAccelerateConfigurationHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketAccelerateConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -193,8 +193,8 @@ func (o BucketAccelerateConfigurationTransformPtrOutput) Bucket() pulumi.StringP
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketAccelerateConfigurationTransformPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketAccelerateConfigurationTransform) *string {
+func (o BucketAccelerateConfigurationHatchPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketAccelerateConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -203,8 +203,8 @@ func (o BucketAccelerateConfigurationTransformPtrOutput) ExpectedBucketOwner() p
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketAccelerateConfigurationTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketAccelerateConfigurationTransform) *string {
+func (o BucketAccelerateConfigurationHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketAccelerateConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -213,8 +213,8 @@ func (o BucketAccelerateConfigurationTransformPtrOutput) Region() pulumi.StringP
 }
 
 // Transfer acceleration state of the bucket. Valid values: `Enabled`, `Suspended`.
-func (o BucketAccelerateConfigurationTransformPtrOutput) Status() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketAccelerateConfigurationTransform) *string {
+func (o BucketAccelerateConfigurationHatchPtrOutput) Status() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketAccelerateConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -222,7 +222,7 @@ func (o BucketAccelerateConfigurationTransformPtrOutput) Status() pulumi.StringP
 	}).(pulumi.StringPtrOutput)
 }
 
-type BucketAclTransform struct {
+type BucketAclHatch struct {
 	// Configuration block that sets the ACL permissions for an object per grantee. See below.
 	AccessControlPolicy *s3.BucketAclAccessControlPolicy `pulumi:"accessControlPolicy"`
 	// Specifies the Canned ACL to apply to the bucket. Valid values: <span pulumi-lang-nodejs="`private`" pulumi-lang-dotnet="`Private`" pulumi-lang-go="`private`" pulumi-lang-python="`private`" pulumi-lang-yaml="`private`" pulumi-lang-java="`private`">`private`</span>, `public-read`, `public-read-write`, `aws-exec-read`, `authenticated-read`, `bucket-owner-read`, `bucket-owner-full-control`, `log-delivery-write`. Full details are available on the [AWS documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl).
@@ -237,18 +237,18 @@ type BucketAclTransform struct {
 	Region *string `pulumi:"region"`
 }
 
-// BucketAclTransformInput is an input type that accepts BucketAclTransformArgs and BucketAclTransformOutput values.
-// You can construct a concrete instance of `BucketAclTransformInput` via:
+// BucketAclHatchInput is an input type that accepts BucketAclHatchArgs and BucketAclHatchOutput values.
+// You can construct a concrete instance of `BucketAclHatchInput` via:
 //
-//	BucketAclTransformArgs{...}
-type BucketAclTransformInput interface {
+//	BucketAclHatchArgs{...}
+type BucketAclHatchInput interface {
 	pulumi.Input
 
-	ToBucketAclTransformOutput() BucketAclTransformOutput
-	ToBucketAclTransformOutputWithContext(context.Context) BucketAclTransformOutput
+	ToBucketAclHatchOutput() BucketAclHatchOutput
+	ToBucketAclHatchOutputWithContext(context.Context) BucketAclHatchOutput
 }
 
-type BucketAclTransformArgs struct {
+type BucketAclHatchArgs struct {
 	// Configuration block that sets the ACL permissions for an object per grantee. See below.
 	AccessControlPolicy s3.BucketAclAccessControlPolicyPtrInput `pulumi:"accessControlPolicy"`
 	// Specifies the Canned ACL to apply to the bucket. Valid values: <span pulumi-lang-nodejs="`private`" pulumi-lang-dotnet="`Private`" pulumi-lang-go="`private`" pulumi-lang-python="`private`" pulumi-lang-yaml="`private`" pulumi-lang-java="`private`">`private`</span>, `public-read`, `public-read-write`, `aws-exec-read`, `authenticated-read`, `bucket-owner-read`, `bucket-owner-full-control`, `log-delivery-write`. Full details are available on the [AWS documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl).
@@ -263,137 +263,137 @@ type BucketAclTransformArgs struct {
 	Region pulumi.StringPtrInput `pulumi:"region"`
 }
 
-func (BucketAclTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketAclTransform)(nil)).Elem()
+func (BucketAclHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketAclHatch)(nil)).Elem()
 }
 
-func (i BucketAclTransformArgs) ToBucketAclTransformOutput() BucketAclTransformOutput {
-	return i.ToBucketAclTransformOutputWithContext(context.Background())
+func (i BucketAclHatchArgs) ToBucketAclHatchOutput() BucketAclHatchOutput {
+	return i.ToBucketAclHatchOutputWithContext(context.Background())
 }
 
-func (i BucketAclTransformArgs) ToBucketAclTransformOutputWithContext(ctx context.Context) BucketAclTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketAclTransformOutput)
+func (i BucketAclHatchArgs) ToBucketAclHatchOutputWithContext(ctx context.Context) BucketAclHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketAclHatchOutput)
 }
 
-func (i BucketAclTransformArgs) ToBucketAclTransformPtrOutput() BucketAclTransformPtrOutput {
-	return i.ToBucketAclTransformPtrOutputWithContext(context.Background())
+func (i BucketAclHatchArgs) ToBucketAclHatchPtrOutput() BucketAclHatchPtrOutput {
+	return i.ToBucketAclHatchPtrOutputWithContext(context.Background())
 }
 
-func (i BucketAclTransformArgs) ToBucketAclTransformPtrOutputWithContext(ctx context.Context) BucketAclTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketAclTransformOutput).ToBucketAclTransformPtrOutputWithContext(ctx)
+func (i BucketAclHatchArgs) ToBucketAclHatchPtrOutputWithContext(ctx context.Context) BucketAclHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketAclHatchOutput).ToBucketAclHatchPtrOutputWithContext(ctx)
 }
 
-// BucketAclTransformPtrInput is an input type that accepts BucketAclTransformArgs, BucketAclTransformPtr and BucketAclTransformPtrOutput values.
-// You can construct a concrete instance of `BucketAclTransformPtrInput` via:
+// BucketAclHatchPtrInput is an input type that accepts BucketAclHatchArgs, BucketAclHatchPtr and BucketAclHatchPtrOutput values.
+// You can construct a concrete instance of `BucketAclHatchPtrInput` via:
 //
-//	        BucketAclTransformArgs{...}
+//	        BucketAclHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketAclTransformPtrInput interface {
+type BucketAclHatchPtrInput interface {
 	pulumi.Input
 
-	ToBucketAclTransformPtrOutput() BucketAclTransformPtrOutput
-	ToBucketAclTransformPtrOutputWithContext(context.Context) BucketAclTransformPtrOutput
+	ToBucketAclHatchPtrOutput() BucketAclHatchPtrOutput
+	ToBucketAclHatchPtrOutputWithContext(context.Context) BucketAclHatchPtrOutput
 }
 
-type bucketAclTransformPtrType BucketAclTransformArgs
+type bucketAclHatchPtrType BucketAclHatchArgs
 
-func BucketAclTransformPtr(v *BucketAclTransformArgs) BucketAclTransformPtrInput {
-	return (*bucketAclTransformPtrType)(v)
+func BucketAclHatchPtr(v *BucketAclHatchArgs) BucketAclHatchPtrInput {
+	return (*bucketAclHatchPtrType)(v)
 }
 
-func (*bucketAclTransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketAclTransform)(nil)).Elem()
+func (*bucketAclHatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketAclHatch)(nil)).Elem()
 }
 
-func (i *bucketAclTransformPtrType) ToBucketAclTransformPtrOutput() BucketAclTransformPtrOutput {
-	return i.ToBucketAclTransformPtrOutputWithContext(context.Background())
+func (i *bucketAclHatchPtrType) ToBucketAclHatchPtrOutput() BucketAclHatchPtrOutput {
+	return i.ToBucketAclHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketAclTransformPtrType) ToBucketAclTransformPtrOutputWithContext(ctx context.Context) BucketAclTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketAclTransformPtrOutput)
+func (i *bucketAclHatchPtrType) ToBucketAclHatchPtrOutputWithContext(ctx context.Context) BucketAclHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketAclHatchPtrOutput)
 }
 
-type BucketAclTransformOutput struct{ *pulumi.OutputState }
+type BucketAclHatchOutput struct{ *pulumi.OutputState }
 
-func (BucketAclTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketAclTransform)(nil)).Elem()
+func (BucketAclHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketAclHatch)(nil)).Elem()
 }
 
-func (o BucketAclTransformOutput) ToBucketAclTransformOutput() BucketAclTransformOutput {
+func (o BucketAclHatchOutput) ToBucketAclHatchOutput() BucketAclHatchOutput {
 	return o
 }
 
-func (o BucketAclTransformOutput) ToBucketAclTransformOutputWithContext(ctx context.Context) BucketAclTransformOutput {
+func (o BucketAclHatchOutput) ToBucketAclHatchOutputWithContext(ctx context.Context) BucketAclHatchOutput {
 	return o
 }
 
-func (o BucketAclTransformOutput) ToBucketAclTransformPtrOutput() BucketAclTransformPtrOutput {
-	return o.ToBucketAclTransformPtrOutputWithContext(context.Background())
+func (o BucketAclHatchOutput) ToBucketAclHatchPtrOutput() BucketAclHatchPtrOutput {
+	return o.ToBucketAclHatchPtrOutputWithContext(context.Background())
 }
 
-func (o BucketAclTransformOutput) ToBucketAclTransformPtrOutputWithContext(ctx context.Context) BucketAclTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketAclTransform) *BucketAclTransform {
+func (o BucketAclHatchOutput) ToBucketAclHatchPtrOutputWithContext(ctx context.Context) BucketAclHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketAclHatch) *BucketAclHatch {
 		return &v
-	}).(BucketAclTransformPtrOutput)
+	}).(BucketAclHatchPtrOutput)
 }
 
 // Configuration block that sets the ACL permissions for an object per grantee. See below.
-func (o BucketAclTransformOutput) AccessControlPolicy() s3.BucketAclAccessControlPolicyPtrOutput {
-	return o.ApplyT(func(v BucketAclTransform) *s3.BucketAclAccessControlPolicy { return v.AccessControlPolicy }).(s3.BucketAclAccessControlPolicyPtrOutput)
+func (o BucketAclHatchOutput) AccessControlPolicy() s3.BucketAclAccessControlPolicyPtrOutput {
+	return o.ApplyT(func(v BucketAclHatch) *s3.BucketAclAccessControlPolicy { return v.AccessControlPolicy }).(s3.BucketAclAccessControlPolicyPtrOutput)
 }
 
 // Specifies the Canned ACL to apply to the bucket. Valid values: <span pulumi-lang-nodejs="`private`" pulumi-lang-dotnet="`Private`" pulumi-lang-go="`private`" pulumi-lang-python="`private`" pulumi-lang-yaml="`private`" pulumi-lang-java="`private`">`private`</span>, `public-read`, `public-read-write`, `aws-exec-read`, `authenticated-read`, `bucket-owner-read`, `bucket-owner-full-control`, `log-delivery-write`. Full details are available on the [AWS documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl).
-func (o BucketAclTransformOutput) Acl() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketAclTransform) *string { return v.Acl }).(pulumi.StringPtrOutput)
+func (o BucketAclHatchOutput) Acl() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketAclHatch) *string { return v.Acl }).(pulumi.StringPtrOutput)
 }
 
 // Bucket to which to apply the ACL.
-func (o BucketAclTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketAclTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o BucketAclHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketAclHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketAclTransformOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketAclTransform) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
+func (o BucketAclHatchOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketAclHatch) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketAclTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketAclTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o BucketAclHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketAclHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
-type BucketAclTransformPtrOutput struct{ *pulumi.OutputState }
+type BucketAclHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketAclTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketAclTransform)(nil)).Elem()
+func (BucketAclHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketAclHatch)(nil)).Elem()
 }
 
-func (o BucketAclTransformPtrOutput) ToBucketAclTransformPtrOutput() BucketAclTransformPtrOutput {
+func (o BucketAclHatchPtrOutput) ToBucketAclHatchPtrOutput() BucketAclHatchPtrOutput {
 	return o
 }
 
-func (o BucketAclTransformPtrOutput) ToBucketAclTransformPtrOutputWithContext(ctx context.Context) BucketAclTransformPtrOutput {
+func (o BucketAclHatchPtrOutput) ToBucketAclHatchPtrOutputWithContext(ctx context.Context) BucketAclHatchPtrOutput {
 	return o
 }
 
-func (o BucketAclTransformPtrOutput) Elem() BucketAclTransformOutput {
-	return o.ApplyT(func(v *BucketAclTransform) BucketAclTransform {
+func (o BucketAclHatchPtrOutput) Elem() BucketAclHatchOutput {
+	return o.ApplyT(func(v *BucketAclHatch) BucketAclHatch {
 		if v != nil {
 			return *v
 		}
-		var ret BucketAclTransform
+		var ret BucketAclHatch
 		return ret
-	}).(BucketAclTransformOutput)
+	}).(BucketAclHatchOutput)
 }
 
 // Configuration block that sets the ACL permissions for an object per grantee. See below.
-func (o BucketAclTransformPtrOutput) AccessControlPolicy() s3.BucketAclAccessControlPolicyPtrOutput {
-	return o.ApplyT(func(v *BucketAclTransform) *s3.BucketAclAccessControlPolicy {
+func (o BucketAclHatchPtrOutput) AccessControlPolicy() s3.BucketAclAccessControlPolicyPtrOutput {
+	return o.ApplyT(func(v *BucketAclHatch) *s3.BucketAclAccessControlPolicy {
 		if v == nil {
 			return nil
 		}
@@ -402,8 +402,8 @@ func (o BucketAclTransformPtrOutput) AccessControlPolicy() s3.BucketAclAccessCon
 }
 
 // Specifies the Canned ACL to apply to the bucket. Valid values: <span pulumi-lang-nodejs="`private`" pulumi-lang-dotnet="`Private`" pulumi-lang-go="`private`" pulumi-lang-python="`private`" pulumi-lang-yaml="`private`" pulumi-lang-java="`private`">`private`</span>, `public-read`, `public-read-write`, `aws-exec-read`, `authenticated-read`, `bucket-owner-read`, `bucket-owner-full-control`, `log-delivery-write`. Full details are available on the [AWS documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl).
-func (o BucketAclTransformPtrOutput) Acl() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketAclTransform) *string {
+func (o BucketAclHatchPtrOutput) Acl() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketAclHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -412,8 +412,8 @@ func (o BucketAclTransformPtrOutput) Acl() pulumi.StringPtrOutput {
 }
 
 // Bucket to which to apply the ACL.
-func (o BucketAclTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketAclTransform) *string {
+func (o BucketAclHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketAclHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -424,8 +424,8 @@ func (o BucketAclTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketAclTransformPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketAclTransform) *string {
+func (o BucketAclHatchPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketAclHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -434,8 +434,8 @@ func (o BucketAclTransformPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutpu
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketAclTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketAclTransform) *string {
+func (o BucketAclHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketAclHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -443,7 +443,7 @@ func (o BucketAclTransformPtrOutput) Region() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-type BucketCorsConfigurationTransform struct {
+type BucketCorsConfigurationHatch struct {
 	// Name of the bucket.
 	Bucket *string `pulumi:"bucket"`
 	// Set of origins and methods (cross-origin access that you want to allow). See below. You can configure up to 100 rules.
@@ -456,18 +456,18 @@ type BucketCorsConfigurationTransform struct {
 	Region *string `pulumi:"region"`
 }
 
-// BucketCorsConfigurationTransformInput is an input type that accepts BucketCorsConfigurationTransformArgs and BucketCorsConfigurationTransformOutput values.
-// You can construct a concrete instance of `BucketCorsConfigurationTransformInput` via:
+// BucketCorsConfigurationHatchInput is an input type that accepts BucketCorsConfigurationHatchArgs and BucketCorsConfigurationHatchOutput values.
+// You can construct a concrete instance of `BucketCorsConfigurationHatchInput` via:
 //
-//	BucketCorsConfigurationTransformArgs{...}
-type BucketCorsConfigurationTransformInput interface {
+//	BucketCorsConfigurationHatchArgs{...}
+type BucketCorsConfigurationHatchInput interface {
 	pulumi.Input
 
-	ToBucketCorsConfigurationTransformOutput() BucketCorsConfigurationTransformOutput
-	ToBucketCorsConfigurationTransformOutputWithContext(context.Context) BucketCorsConfigurationTransformOutput
+	ToBucketCorsConfigurationHatchOutput() BucketCorsConfigurationHatchOutput
+	ToBucketCorsConfigurationHatchOutputWithContext(context.Context) BucketCorsConfigurationHatchOutput
 }
 
-type BucketCorsConfigurationTransformArgs struct {
+type BucketCorsConfigurationHatchArgs struct {
 	// Name of the bucket.
 	Bucket pulumi.StringPtrInput `pulumi:"bucket"`
 	// Set of origins and methods (cross-origin access that you want to allow). See below. You can configure up to 100 rules.
@@ -480,132 +480,132 @@ type BucketCorsConfigurationTransformArgs struct {
 	Region pulumi.StringPtrInput `pulumi:"region"`
 }
 
-func (BucketCorsConfigurationTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketCorsConfigurationTransform)(nil)).Elem()
+func (BucketCorsConfigurationHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketCorsConfigurationHatch)(nil)).Elem()
 }
 
-func (i BucketCorsConfigurationTransformArgs) ToBucketCorsConfigurationTransformOutput() BucketCorsConfigurationTransformOutput {
-	return i.ToBucketCorsConfigurationTransformOutputWithContext(context.Background())
+func (i BucketCorsConfigurationHatchArgs) ToBucketCorsConfigurationHatchOutput() BucketCorsConfigurationHatchOutput {
+	return i.ToBucketCorsConfigurationHatchOutputWithContext(context.Background())
 }
 
-func (i BucketCorsConfigurationTransformArgs) ToBucketCorsConfigurationTransformOutputWithContext(ctx context.Context) BucketCorsConfigurationTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketCorsConfigurationTransformOutput)
+func (i BucketCorsConfigurationHatchArgs) ToBucketCorsConfigurationHatchOutputWithContext(ctx context.Context) BucketCorsConfigurationHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketCorsConfigurationHatchOutput)
 }
 
-func (i BucketCorsConfigurationTransformArgs) ToBucketCorsConfigurationTransformPtrOutput() BucketCorsConfigurationTransformPtrOutput {
-	return i.ToBucketCorsConfigurationTransformPtrOutputWithContext(context.Background())
+func (i BucketCorsConfigurationHatchArgs) ToBucketCorsConfigurationHatchPtrOutput() BucketCorsConfigurationHatchPtrOutput {
+	return i.ToBucketCorsConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i BucketCorsConfigurationTransformArgs) ToBucketCorsConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketCorsConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketCorsConfigurationTransformOutput).ToBucketCorsConfigurationTransformPtrOutputWithContext(ctx)
+func (i BucketCorsConfigurationHatchArgs) ToBucketCorsConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketCorsConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketCorsConfigurationHatchOutput).ToBucketCorsConfigurationHatchPtrOutputWithContext(ctx)
 }
 
-// BucketCorsConfigurationTransformPtrInput is an input type that accepts BucketCorsConfigurationTransformArgs, BucketCorsConfigurationTransformPtr and BucketCorsConfigurationTransformPtrOutput values.
-// You can construct a concrete instance of `BucketCorsConfigurationTransformPtrInput` via:
+// BucketCorsConfigurationHatchPtrInput is an input type that accepts BucketCorsConfigurationHatchArgs, BucketCorsConfigurationHatchPtr and BucketCorsConfigurationHatchPtrOutput values.
+// You can construct a concrete instance of `BucketCorsConfigurationHatchPtrInput` via:
 //
-//	        BucketCorsConfigurationTransformArgs{...}
+//	        BucketCorsConfigurationHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketCorsConfigurationTransformPtrInput interface {
+type BucketCorsConfigurationHatchPtrInput interface {
 	pulumi.Input
 
-	ToBucketCorsConfigurationTransformPtrOutput() BucketCorsConfigurationTransformPtrOutput
-	ToBucketCorsConfigurationTransformPtrOutputWithContext(context.Context) BucketCorsConfigurationTransformPtrOutput
+	ToBucketCorsConfigurationHatchPtrOutput() BucketCorsConfigurationHatchPtrOutput
+	ToBucketCorsConfigurationHatchPtrOutputWithContext(context.Context) BucketCorsConfigurationHatchPtrOutput
 }
 
-type bucketCorsConfigurationTransformPtrType BucketCorsConfigurationTransformArgs
+type bucketCorsConfigurationHatchPtrType BucketCorsConfigurationHatchArgs
 
-func BucketCorsConfigurationTransformPtr(v *BucketCorsConfigurationTransformArgs) BucketCorsConfigurationTransformPtrInput {
-	return (*bucketCorsConfigurationTransformPtrType)(v)
+func BucketCorsConfigurationHatchPtr(v *BucketCorsConfigurationHatchArgs) BucketCorsConfigurationHatchPtrInput {
+	return (*bucketCorsConfigurationHatchPtrType)(v)
 }
 
-func (*bucketCorsConfigurationTransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketCorsConfigurationTransform)(nil)).Elem()
+func (*bucketCorsConfigurationHatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketCorsConfigurationHatch)(nil)).Elem()
 }
 
-func (i *bucketCorsConfigurationTransformPtrType) ToBucketCorsConfigurationTransformPtrOutput() BucketCorsConfigurationTransformPtrOutput {
-	return i.ToBucketCorsConfigurationTransformPtrOutputWithContext(context.Background())
+func (i *bucketCorsConfigurationHatchPtrType) ToBucketCorsConfigurationHatchPtrOutput() BucketCorsConfigurationHatchPtrOutput {
+	return i.ToBucketCorsConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketCorsConfigurationTransformPtrType) ToBucketCorsConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketCorsConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketCorsConfigurationTransformPtrOutput)
+func (i *bucketCorsConfigurationHatchPtrType) ToBucketCorsConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketCorsConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketCorsConfigurationHatchPtrOutput)
 }
 
-type BucketCorsConfigurationTransformOutput struct{ *pulumi.OutputState }
+type BucketCorsConfigurationHatchOutput struct{ *pulumi.OutputState }
 
-func (BucketCorsConfigurationTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketCorsConfigurationTransform)(nil)).Elem()
+func (BucketCorsConfigurationHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketCorsConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketCorsConfigurationTransformOutput) ToBucketCorsConfigurationTransformOutput() BucketCorsConfigurationTransformOutput {
+func (o BucketCorsConfigurationHatchOutput) ToBucketCorsConfigurationHatchOutput() BucketCorsConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketCorsConfigurationTransformOutput) ToBucketCorsConfigurationTransformOutputWithContext(ctx context.Context) BucketCorsConfigurationTransformOutput {
+func (o BucketCorsConfigurationHatchOutput) ToBucketCorsConfigurationHatchOutputWithContext(ctx context.Context) BucketCorsConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketCorsConfigurationTransformOutput) ToBucketCorsConfigurationTransformPtrOutput() BucketCorsConfigurationTransformPtrOutput {
-	return o.ToBucketCorsConfigurationTransformPtrOutputWithContext(context.Background())
+func (o BucketCorsConfigurationHatchOutput) ToBucketCorsConfigurationHatchPtrOutput() BucketCorsConfigurationHatchPtrOutput {
+	return o.ToBucketCorsConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (o BucketCorsConfigurationTransformOutput) ToBucketCorsConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketCorsConfigurationTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketCorsConfigurationTransform) *BucketCorsConfigurationTransform {
+func (o BucketCorsConfigurationHatchOutput) ToBucketCorsConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketCorsConfigurationHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketCorsConfigurationHatch) *BucketCorsConfigurationHatch {
 		return &v
-	}).(BucketCorsConfigurationTransformPtrOutput)
+	}).(BucketCorsConfigurationHatchPtrOutput)
 }
 
 // Name of the bucket.
-func (o BucketCorsConfigurationTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketCorsConfigurationTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o BucketCorsConfigurationHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketCorsConfigurationHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Set of origins and methods (cross-origin access that you want to allow). See below. You can configure up to 100 rules.
-func (o BucketCorsConfigurationTransformOutput) CorsRules() s3.BucketCorsConfigurationCorsRuleArrayOutput {
-	return o.ApplyT(func(v BucketCorsConfigurationTransform) []s3.BucketCorsConfigurationCorsRule { return v.CorsRules }).(s3.BucketCorsConfigurationCorsRuleArrayOutput)
+func (o BucketCorsConfigurationHatchOutput) CorsRules() s3.BucketCorsConfigurationCorsRuleArrayOutput {
+	return o.ApplyT(func(v BucketCorsConfigurationHatch) []s3.BucketCorsConfigurationCorsRule { return v.CorsRules }).(s3.BucketCorsConfigurationCorsRuleArrayOutput)
 }
 
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketCorsConfigurationTransformOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketCorsConfigurationTransform) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
+func (o BucketCorsConfigurationHatchOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketCorsConfigurationHatch) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketCorsConfigurationTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketCorsConfigurationTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o BucketCorsConfigurationHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketCorsConfigurationHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
-type BucketCorsConfigurationTransformPtrOutput struct{ *pulumi.OutputState }
+type BucketCorsConfigurationHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketCorsConfigurationTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketCorsConfigurationTransform)(nil)).Elem()
+func (BucketCorsConfigurationHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketCorsConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketCorsConfigurationTransformPtrOutput) ToBucketCorsConfigurationTransformPtrOutput() BucketCorsConfigurationTransformPtrOutput {
+func (o BucketCorsConfigurationHatchPtrOutput) ToBucketCorsConfigurationHatchPtrOutput() BucketCorsConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketCorsConfigurationTransformPtrOutput) ToBucketCorsConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketCorsConfigurationTransformPtrOutput {
+func (o BucketCorsConfigurationHatchPtrOutput) ToBucketCorsConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketCorsConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketCorsConfigurationTransformPtrOutput) Elem() BucketCorsConfigurationTransformOutput {
-	return o.ApplyT(func(v *BucketCorsConfigurationTransform) BucketCorsConfigurationTransform {
+func (o BucketCorsConfigurationHatchPtrOutput) Elem() BucketCorsConfigurationHatchOutput {
+	return o.ApplyT(func(v *BucketCorsConfigurationHatch) BucketCorsConfigurationHatch {
 		if v != nil {
 			return *v
 		}
-		var ret BucketCorsConfigurationTransform
+		var ret BucketCorsConfigurationHatch
 		return ret
-	}).(BucketCorsConfigurationTransformOutput)
+	}).(BucketCorsConfigurationHatchOutput)
 }
 
 // Name of the bucket.
-func (o BucketCorsConfigurationTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketCorsConfigurationTransform) *string {
+func (o BucketCorsConfigurationHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketCorsConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -614,8 +614,8 @@ func (o BucketCorsConfigurationTransformPtrOutput) Bucket() pulumi.StringPtrOutp
 }
 
 // Set of origins and methods (cross-origin access that you want to allow). See below. You can configure up to 100 rules.
-func (o BucketCorsConfigurationTransformPtrOutput) CorsRules() s3.BucketCorsConfigurationCorsRuleArrayOutput {
-	return o.ApplyT(func(v *BucketCorsConfigurationTransform) []s3.BucketCorsConfigurationCorsRule {
+func (o BucketCorsConfigurationHatchPtrOutput) CorsRules() s3.BucketCorsConfigurationCorsRuleArrayOutput {
+	return o.ApplyT(func(v *BucketCorsConfigurationHatch) []s3.BucketCorsConfigurationCorsRule {
 		if v == nil {
 			return nil
 		}
@@ -626,8 +626,8 @@ func (o BucketCorsConfigurationTransformPtrOutput) CorsRules() s3.BucketCorsConf
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketCorsConfigurationTransformPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketCorsConfigurationTransform) *string {
+func (o BucketCorsConfigurationHatchPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketCorsConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -636,8 +636,8 @@ func (o BucketCorsConfigurationTransformPtrOutput) ExpectedBucketOwner() pulumi.
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketCorsConfigurationTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketCorsConfigurationTransform) *string {
+func (o BucketCorsConfigurationHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketCorsConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -645,7 +645,367 @@ func (o BucketCorsConfigurationTransformPtrOutput) Region() pulumi.StringPtrOutp
 	}).(pulumi.StringPtrOutput)
 }
 
-type BucketLifecycleConfigurationTransform struct {
+type BucketHatch struct {
+	// Name of the bucket.
+	Bucket *string `pulumi:"bucket"`
+	// Creates a unique bucket name beginning with the specified prefix.
+	BucketPrefix *string `pulumi:"bucketPrefix"`
+	// Boolean that indicates all objects should be deleted from the bucket when the bucket is destroyed.
+	ForceDestroy *bool `pulumi:"forceDestroy"`
+	// Indicates whether this bucket has an Object Lock configuration enabled.
+	ObjectLockEnabled *bool `pulumi:"objectLockEnabled"`
+	// Region where this resource will be managed.
+	Region *string `pulumi:"region"`
+	// Map of tags to assign to the bucket.
+	Tags map[string]string `pulumi:"tags"`
+}
+
+type BucketHatchArgs struct {
+	AccelerationStatus                *BucketAccelerateConfigurationHatch           `pulumi:"accelerationStatus"`
+	Acl                               *BucketAclHatch                               `pulumi:"acl"`
+	Bucket                            *BucketOverrides                              `pulumi:"bucket"`
+	CorsRules                         *BucketCorsConfigurationHatch                 `pulumi:"corsRules"`
+	Grants                            *BucketAclHatch                               `pulumi:"grants"`
+	LifecycleRules                    *BucketLifecycleConfigurationHatch            `pulumi:"lifecycleRules"`
+	Logging                           *BucketLoggingHatch                           `pulumi:"logging"`
+	ObjectLockConfiguration           *BucketObjectLockConfigurationHatch           `pulumi:"objectLockConfiguration"`
+	Policy                            *BucketPolicyHatch                            `pulumi:"policy"`
+	PublicAccessBlock                 *PABHatch                                     `pulumi:"publicAccessBlock"`
+	ReplicationConfiguration          *BucketReplicationConfigHatch                 `pulumi:"replicationConfiguration"`
+	RequestPayer                      *BucketRequestPaymentConfigurationHatch       `pulumi:"requestPayer"`
+	ServerSideEncryptionConfiguration *BucketServerSideEncryptionConfigurationHatch `pulumi:"serverSideEncryptionConfiguration"`
+	Versioning                        *BucketVersioningHatch                        `pulumi:"versioning"`
+	Website                           *BucketWebsiteConfigurationHatch              `pulumi:"website"`
+}
+
+// BucketHatchArgsInput is an input type that accepts BucketHatchArgsArgs and BucketHatchArgsOutput values.
+// You can construct a concrete instance of `BucketHatchArgsInput` via:
+//
+//	BucketHatchArgsArgs{...}
+type BucketHatchArgsInput interface {
+	pulumi.Input
+
+	ToBucketHatchArgsOutput() BucketHatchArgsOutput
+	ToBucketHatchArgsOutputWithContext(context.Context) BucketHatchArgsOutput
+}
+
+type BucketHatchArgsArgs struct {
+	AccelerationStatus                BucketAccelerateConfigurationHatchPtrInput           `pulumi:"accelerationStatus"`
+	Acl                               BucketAclHatchPtrInput                               `pulumi:"acl"`
+	Bucket                            BucketOverridesPtrInput                              `pulumi:"bucket"`
+	CorsRules                         BucketCorsConfigurationHatchPtrInput                 `pulumi:"corsRules"`
+	Grants                            BucketAclHatchPtrInput                               `pulumi:"grants"`
+	LifecycleRules                    BucketLifecycleConfigurationHatchPtrInput            `pulumi:"lifecycleRules"`
+	Logging                           BucketLoggingHatchPtrInput                           `pulumi:"logging"`
+	ObjectLockConfiguration           BucketObjectLockConfigurationHatchPtrInput           `pulumi:"objectLockConfiguration"`
+	Policy                            BucketPolicyHatchPtrInput                            `pulumi:"policy"`
+	PublicAccessBlock                 PABHatchPtrInput                                     `pulumi:"publicAccessBlock"`
+	ReplicationConfiguration          BucketReplicationConfigHatchPtrInput                 `pulumi:"replicationConfiguration"`
+	RequestPayer                      BucketRequestPaymentConfigurationHatchPtrInput       `pulumi:"requestPayer"`
+	ServerSideEncryptionConfiguration BucketServerSideEncryptionConfigurationHatchPtrInput `pulumi:"serverSideEncryptionConfiguration"`
+	Versioning                        BucketVersioningHatchPtrInput                        `pulumi:"versioning"`
+	Website                           BucketWebsiteConfigurationHatchPtrInput              `pulumi:"website"`
+}
+
+func (BucketHatchArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketHatchArgs)(nil)).Elem()
+}
+
+func (i BucketHatchArgsArgs) ToBucketHatchArgsOutput() BucketHatchArgsOutput {
+	return i.ToBucketHatchArgsOutputWithContext(context.Background())
+}
+
+func (i BucketHatchArgsArgs) ToBucketHatchArgsOutputWithContext(ctx context.Context) BucketHatchArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketHatchArgsOutput)
+}
+
+func (i BucketHatchArgsArgs) ToBucketHatchArgsPtrOutput() BucketHatchArgsPtrOutput {
+	return i.ToBucketHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i BucketHatchArgsArgs) ToBucketHatchArgsPtrOutputWithContext(ctx context.Context) BucketHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketHatchArgsOutput).ToBucketHatchArgsPtrOutputWithContext(ctx)
+}
+
+// BucketHatchArgsPtrInput is an input type that accepts BucketHatchArgsArgs, BucketHatchArgsPtr and BucketHatchArgsPtrOutput values.
+// You can construct a concrete instance of `BucketHatchArgsPtrInput` via:
+//
+//	        BucketHatchArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type BucketHatchArgsPtrInput interface {
+	pulumi.Input
+
+	ToBucketHatchArgsPtrOutput() BucketHatchArgsPtrOutput
+	ToBucketHatchArgsPtrOutputWithContext(context.Context) BucketHatchArgsPtrOutput
+}
+
+type bucketHatchArgsPtrType BucketHatchArgsArgs
+
+func BucketHatchArgsPtr(v *BucketHatchArgsArgs) BucketHatchArgsPtrInput {
+	return (*bucketHatchArgsPtrType)(v)
+}
+
+func (*bucketHatchArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketHatchArgs)(nil)).Elem()
+}
+
+func (i *bucketHatchArgsPtrType) ToBucketHatchArgsPtrOutput() BucketHatchArgsPtrOutput {
+	return i.ToBucketHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *bucketHatchArgsPtrType) ToBucketHatchArgsPtrOutputWithContext(ctx context.Context) BucketHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketHatchArgsPtrOutput)
+}
+
+type BucketHatchArgsOutput struct{ *pulumi.OutputState }
+
+func (BucketHatchArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketHatchArgs)(nil)).Elem()
+}
+
+func (o BucketHatchArgsOutput) ToBucketHatchArgsOutput() BucketHatchArgsOutput {
+	return o
+}
+
+func (o BucketHatchArgsOutput) ToBucketHatchArgsOutputWithContext(ctx context.Context) BucketHatchArgsOutput {
+	return o
+}
+
+func (o BucketHatchArgsOutput) ToBucketHatchArgsPtrOutput() BucketHatchArgsPtrOutput {
+	return o.ToBucketHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (o BucketHatchArgsOutput) ToBucketHatchArgsPtrOutputWithContext(ctx context.Context) BucketHatchArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketHatchArgs) *BucketHatchArgs {
+		return &v
+	}).(BucketHatchArgsPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) AccelerationStatus() BucketAccelerateConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketAccelerateConfigurationHatch { return v.AccelerationStatus }).(BucketAccelerateConfigurationHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) Acl() BucketAclHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketAclHatch { return v.Acl }).(BucketAclHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) Bucket() BucketOverridesPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketOverrides { return v.Bucket }).(BucketOverridesPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) CorsRules() BucketCorsConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketCorsConfigurationHatch { return v.CorsRules }).(BucketCorsConfigurationHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) Grants() BucketAclHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketAclHatch { return v.Grants }).(BucketAclHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) LifecycleRules() BucketLifecycleConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketLifecycleConfigurationHatch { return v.LifecycleRules }).(BucketLifecycleConfigurationHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) Logging() BucketLoggingHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketLoggingHatch { return v.Logging }).(BucketLoggingHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) ObjectLockConfiguration() BucketObjectLockConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketObjectLockConfigurationHatch { return v.ObjectLockConfiguration }).(BucketObjectLockConfigurationHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) Policy() BucketPolicyHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketPolicyHatch { return v.Policy }).(BucketPolicyHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) PublicAccessBlock() PABHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *PABHatch { return v.PublicAccessBlock }).(PABHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) ReplicationConfiguration() BucketReplicationConfigHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketReplicationConfigHatch { return v.ReplicationConfiguration }).(BucketReplicationConfigHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) RequestPayer() BucketRequestPaymentConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketRequestPaymentConfigurationHatch { return v.RequestPayer }).(BucketRequestPaymentConfigurationHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) ServerSideEncryptionConfiguration() BucketServerSideEncryptionConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketServerSideEncryptionConfigurationHatch {
+		return v.ServerSideEncryptionConfiguration
+	}).(BucketServerSideEncryptionConfigurationHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) Versioning() BucketVersioningHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketVersioningHatch { return v.Versioning }).(BucketVersioningHatchPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) Website() BucketWebsiteConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketWebsiteConfigurationHatch { return v.Website }).(BucketWebsiteConfigurationHatchPtrOutput)
+}
+
+type BucketHatchArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (BucketHatchArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketHatchArgs)(nil)).Elem()
+}
+
+func (o BucketHatchArgsPtrOutput) ToBucketHatchArgsPtrOutput() BucketHatchArgsPtrOutput {
+	return o
+}
+
+func (o BucketHatchArgsPtrOutput) ToBucketHatchArgsPtrOutputWithContext(ctx context.Context) BucketHatchArgsPtrOutput {
+	return o
+}
+
+func (o BucketHatchArgsPtrOutput) Elem() BucketHatchArgsOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) BucketHatchArgs {
+		if v != nil {
+			return *v
+		}
+		var ret BucketHatchArgs
+		return ret
+	}).(BucketHatchArgsOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) AccelerationStatus() BucketAccelerateConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketAccelerateConfigurationHatch {
+		if v == nil {
+			return nil
+		}
+		return v.AccelerationStatus
+	}).(BucketAccelerateConfigurationHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) Acl() BucketAclHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketAclHatch {
+		if v == nil {
+			return nil
+		}
+		return v.Acl
+	}).(BucketAclHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) Bucket() BucketOverridesPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketOverrides {
+		if v == nil {
+			return nil
+		}
+		return v.Bucket
+	}).(BucketOverridesPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) CorsRules() BucketCorsConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketCorsConfigurationHatch {
+		if v == nil {
+			return nil
+		}
+		return v.CorsRules
+	}).(BucketCorsConfigurationHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) Grants() BucketAclHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketAclHatch {
+		if v == nil {
+			return nil
+		}
+		return v.Grants
+	}).(BucketAclHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) LifecycleRules() BucketLifecycleConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketLifecycleConfigurationHatch {
+		if v == nil {
+			return nil
+		}
+		return v.LifecycleRules
+	}).(BucketLifecycleConfigurationHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) Logging() BucketLoggingHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketLoggingHatch {
+		if v == nil {
+			return nil
+		}
+		return v.Logging
+	}).(BucketLoggingHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) ObjectLockConfiguration() BucketObjectLockConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketObjectLockConfigurationHatch {
+		if v == nil {
+			return nil
+		}
+		return v.ObjectLockConfiguration
+	}).(BucketObjectLockConfigurationHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) Policy() BucketPolicyHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketPolicyHatch {
+		if v == nil {
+			return nil
+		}
+		return v.Policy
+	}).(BucketPolicyHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) PublicAccessBlock() PABHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *PABHatch {
+		if v == nil {
+			return nil
+		}
+		return v.PublicAccessBlock
+	}).(PABHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) ReplicationConfiguration() BucketReplicationConfigHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketReplicationConfigHatch {
+		if v == nil {
+			return nil
+		}
+		return v.ReplicationConfiguration
+	}).(BucketReplicationConfigHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) RequestPayer() BucketRequestPaymentConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketRequestPaymentConfigurationHatch {
+		if v == nil {
+			return nil
+		}
+		return v.RequestPayer
+	}).(BucketRequestPaymentConfigurationHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) ServerSideEncryptionConfiguration() BucketServerSideEncryptionConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketServerSideEncryptionConfigurationHatch {
+		if v == nil {
+			return nil
+		}
+		return v.ServerSideEncryptionConfiguration
+	}).(BucketServerSideEncryptionConfigurationHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) Versioning() BucketVersioningHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketVersioningHatch {
+		if v == nil {
+			return nil
+		}
+		return v.Versioning
+	}).(BucketVersioningHatchPtrOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) Website() BucketWebsiteConfigurationHatchPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketWebsiteConfigurationHatch {
+		if v == nil {
+			return nil
+		}
+		return v.Website
+	}).(BucketWebsiteConfigurationHatchPtrOutput)
+}
+
+type BucketLifecycleConfigurationHatch struct {
 	// Name of the source S3 bucket you want Amazon S3 to monitor.
 	Bucket *string `pulumi:"bucket"`
 	// Account ID of the expected bucket owner. If the bucket is owned by a different account, the request will fail with an HTTP 403 (Access Denied) error.
@@ -661,18 +1021,18 @@ type BucketLifecycleConfigurationTransform struct {
 	TransitionDefaultMinimumObjectSize *string `pulumi:"transitionDefaultMinimumObjectSize"`
 }
 
-// BucketLifecycleConfigurationTransformInput is an input type that accepts BucketLifecycleConfigurationTransformArgs and BucketLifecycleConfigurationTransformOutput values.
-// You can construct a concrete instance of `BucketLifecycleConfigurationTransformInput` via:
+// BucketLifecycleConfigurationHatchInput is an input type that accepts BucketLifecycleConfigurationHatchArgs and BucketLifecycleConfigurationHatchOutput values.
+// You can construct a concrete instance of `BucketLifecycleConfigurationHatchInput` via:
 //
-//	BucketLifecycleConfigurationTransformArgs{...}
-type BucketLifecycleConfigurationTransformInput interface {
+//	BucketLifecycleConfigurationHatchArgs{...}
+type BucketLifecycleConfigurationHatchInput interface {
 	pulumi.Input
 
-	ToBucketLifecycleConfigurationTransformOutput() BucketLifecycleConfigurationTransformOutput
-	ToBucketLifecycleConfigurationTransformOutputWithContext(context.Context) BucketLifecycleConfigurationTransformOutput
+	ToBucketLifecycleConfigurationHatchOutput() BucketLifecycleConfigurationHatchOutput
+	ToBucketLifecycleConfigurationHatchOutputWithContext(context.Context) BucketLifecycleConfigurationHatchOutput
 }
 
-type BucketLifecycleConfigurationTransformArgs struct {
+type BucketLifecycleConfigurationHatchArgs struct {
 	// Name of the source S3 bucket you want Amazon S3 to monitor.
 	Bucket pulumi.StringPtrInput `pulumi:"bucket"`
 	// Account ID of the expected bucket owner. If the bucket is owned by a different account, the request will fail with an HTTP 403 (Access Denied) error.
@@ -688,143 +1048,141 @@ type BucketLifecycleConfigurationTransformArgs struct {
 	TransitionDefaultMinimumObjectSize pulumi.StringPtrInput `pulumi:"transitionDefaultMinimumObjectSize"`
 }
 
-func (BucketLifecycleConfigurationTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketLifecycleConfigurationTransform)(nil)).Elem()
+func (BucketLifecycleConfigurationHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketLifecycleConfigurationHatch)(nil)).Elem()
 }
 
-func (i BucketLifecycleConfigurationTransformArgs) ToBucketLifecycleConfigurationTransformOutput() BucketLifecycleConfigurationTransformOutput {
-	return i.ToBucketLifecycleConfigurationTransformOutputWithContext(context.Background())
+func (i BucketLifecycleConfigurationHatchArgs) ToBucketLifecycleConfigurationHatchOutput() BucketLifecycleConfigurationHatchOutput {
+	return i.ToBucketLifecycleConfigurationHatchOutputWithContext(context.Background())
 }
 
-func (i BucketLifecycleConfigurationTransformArgs) ToBucketLifecycleConfigurationTransformOutputWithContext(ctx context.Context) BucketLifecycleConfigurationTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketLifecycleConfigurationTransformOutput)
+func (i BucketLifecycleConfigurationHatchArgs) ToBucketLifecycleConfigurationHatchOutputWithContext(ctx context.Context) BucketLifecycleConfigurationHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketLifecycleConfigurationHatchOutput)
 }
 
-func (i BucketLifecycleConfigurationTransformArgs) ToBucketLifecycleConfigurationTransformPtrOutput() BucketLifecycleConfigurationTransformPtrOutput {
-	return i.ToBucketLifecycleConfigurationTransformPtrOutputWithContext(context.Background())
+func (i BucketLifecycleConfigurationHatchArgs) ToBucketLifecycleConfigurationHatchPtrOutput() BucketLifecycleConfigurationHatchPtrOutput {
+	return i.ToBucketLifecycleConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i BucketLifecycleConfigurationTransformArgs) ToBucketLifecycleConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketLifecycleConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketLifecycleConfigurationTransformOutput).ToBucketLifecycleConfigurationTransformPtrOutputWithContext(ctx)
+func (i BucketLifecycleConfigurationHatchArgs) ToBucketLifecycleConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketLifecycleConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketLifecycleConfigurationHatchOutput).ToBucketLifecycleConfigurationHatchPtrOutputWithContext(ctx)
 }
 
-// BucketLifecycleConfigurationTransformPtrInput is an input type that accepts BucketLifecycleConfigurationTransformArgs, BucketLifecycleConfigurationTransformPtr and BucketLifecycleConfigurationTransformPtrOutput values.
-// You can construct a concrete instance of `BucketLifecycleConfigurationTransformPtrInput` via:
+// BucketLifecycleConfigurationHatchPtrInput is an input type that accepts BucketLifecycleConfigurationHatchArgs, BucketLifecycleConfigurationHatchPtr and BucketLifecycleConfigurationHatchPtrOutput values.
+// You can construct a concrete instance of `BucketLifecycleConfigurationHatchPtrInput` via:
 //
-//	        BucketLifecycleConfigurationTransformArgs{...}
+//	        BucketLifecycleConfigurationHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketLifecycleConfigurationTransformPtrInput interface {
+type BucketLifecycleConfigurationHatchPtrInput interface {
 	pulumi.Input
 
-	ToBucketLifecycleConfigurationTransformPtrOutput() BucketLifecycleConfigurationTransformPtrOutput
-	ToBucketLifecycleConfigurationTransformPtrOutputWithContext(context.Context) BucketLifecycleConfigurationTransformPtrOutput
+	ToBucketLifecycleConfigurationHatchPtrOutput() BucketLifecycleConfigurationHatchPtrOutput
+	ToBucketLifecycleConfigurationHatchPtrOutputWithContext(context.Context) BucketLifecycleConfigurationHatchPtrOutput
 }
 
-type bucketLifecycleConfigurationTransformPtrType BucketLifecycleConfigurationTransformArgs
+type bucketLifecycleConfigurationHatchPtrType BucketLifecycleConfigurationHatchArgs
 
-func BucketLifecycleConfigurationTransformPtr(v *BucketLifecycleConfigurationTransformArgs) BucketLifecycleConfigurationTransformPtrInput {
-	return (*bucketLifecycleConfigurationTransformPtrType)(v)
+func BucketLifecycleConfigurationHatchPtr(v *BucketLifecycleConfigurationHatchArgs) BucketLifecycleConfigurationHatchPtrInput {
+	return (*bucketLifecycleConfigurationHatchPtrType)(v)
 }
 
-func (*bucketLifecycleConfigurationTransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketLifecycleConfigurationTransform)(nil)).Elem()
+func (*bucketLifecycleConfigurationHatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketLifecycleConfigurationHatch)(nil)).Elem()
 }
 
-func (i *bucketLifecycleConfigurationTransformPtrType) ToBucketLifecycleConfigurationTransformPtrOutput() BucketLifecycleConfigurationTransformPtrOutput {
-	return i.ToBucketLifecycleConfigurationTransformPtrOutputWithContext(context.Background())
+func (i *bucketLifecycleConfigurationHatchPtrType) ToBucketLifecycleConfigurationHatchPtrOutput() BucketLifecycleConfigurationHatchPtrOutput {
+	return i.ToBucketLifecycleConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketLifecycleConfigurationTransformPtrType) ToBucketLifecycleConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketLifecycleConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketLifecycleConfigurationTransformPtrOutput)
+func (i *bucketLifecycleConfigurationHatchPtrType) ToBucketLifecycleConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketLifecycleConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketLifecycleConfigurationHatchPtrOutput)
 }
 
-type BucketLifecycleConfigurationTransformOutput struct{ *pulumi.OutputState }
+type BucketLifecycleConfigurationHatchOutput struct{ *pulumi.OutputState }
 
-func (BucketLifecycleConfigurationTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketLifecycleConfigurationTransform)(nil)).Elem()
+func (BucketLifecycleConfigurationHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketLifecycleConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketLifecycleConfigurationTransformOutput) ToBucketLifecycleConfigurationTransformOutput() BucketLifecycleConfigurationTransformOutput {
+func (o BucketLifecycleConfigurationHatchOutput) ToBucketLifecycleConfigurationHatchOutput() BucketLifecycleConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketLifecycleConfigurationTransformOutput) ToBucketLifecycleConfigurationTransformOutputWithContext(ctx context.Context) BucketLifecycleConfigurationTransformOutput {
+func (o BucketLifecycleConfigurationHatchOutput) ToBucketLifecycleConfigurationHatchOutputWithContext(ctx context.Context) BucketLifecycleConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketLifecycleConfigurationTransformOutput) ToBucketLifecycleConfigurationTransformPtrOutput() BucketLifecycleConfigurationTransformPtrOutput {
-	return o.ToBucketLifecycleConfigurationTransformPtrOutputWithContext(context.Background())
+func (o BucketLifecycleConfigurationHatchOutput) ToBucketLifecycleConfigurationHatchPtrOutput() BucketLifecycleConfigurationHatchPtrOutput {
+	return o.ToBucketLifecycleConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (o BucketLifecycleConfigurationTransformOutput) ToBucketLifecycleConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketLifecycleConfigurationTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketLifecycleConfigurationTransform) *BucketLifecycleConfigurationTransform {
+func (o BucketLifecycleConfigurationHatchOutput) ToBucketLifecycleConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketLifecycleConfigurationHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketLifecycleConfigurationHatch) *BucketLifecycleConfigurationHatch {
 		return &v
-	}).(BucketLifecycleConfigurationTransformPtrOutput)
+	}).(BucketLifecycleConfigurationHatchPtrOutput)
 }
 
 // Name of the source S3 bucket you want Amazon S3 to monitor.
-func (o BucketLifecycleConfigurationTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketLifecycleConfigurationTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o BucketLifecycleConfigurationHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketLifecycleConfigurationHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Account ID of the expected bucket owner. If the bucket is owned by a different account, the request will fail with an HTTP 403 (Access Denied) error.
 //
 // Deprecated: This attribute will be removed in a future verion of the provider.
-func (o BucketLifecycleConfigurationTransformOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketLifecycleConfigurationTransform) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
+func (o BucketLifecycleConfigurationHatchOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketLifecycleConfigurationHatch) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketLifecycleConfigurationTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketLifecycleConfigurationTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o BucketLifecycleConfigurationHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketLifecycleConfigurationHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
 // List of configuration blocks describing the rules managing the replication. See below.
-func (o BucketLifecycleConfigurationTransformOutput) Rules() s3.BucketLifecycleConfigurationRuleArrayOutput {
-	return o.ApplyT(func(v BucketLifecycleConfigurationTransform) []s3.BucketLifecycleConfigurationRule { return v.Rules }).(s3.BucketLifecycleConfigurationRuleArrayOutput)
+func (o BucketLifecycleConfigurationHatchOutput) Rules() s3.BucketLifecycleConfigurationRuleArrayOutput {
+	return o.ApplyT(func(v BucketLifecycleConfigurationHatch) []s3.BucketLifecycleConfigurationRule { return v.Rules }).(s3.BucketLifecycleConfigurationRuleArrayOutput)
 }
 
-func (o BucketLifecycleConfigurationTransformOutput) Timeouts() s3.BucketLifecycleConfigurationTimeoutsPtrOutput {
-	return o.ApplyT(func(v BucketLifecycleConfigurationTransform) *s3.BucketLifecycleConfigurationTimeouts {
-		return v.Timeouts
-	}).(s3.BucketLifecycleConfigurationTimeoutsPtrOutput)
+func (o BucketLifecycleConfigurationHatchOutput) Timeouts() s3.BucketLifecycleConfigurationTimeoutsPtrOutput {
+	return o.ApplyT(func(v BucketLifecycleConfigurationHatch) *s3.BucketLifecycleConfigurationTimeouts { return v.Timeouts }).(s3.BucketLifecycleConfigurationTimeoutsPtrOutput)
 }
 
 // The default minimum object size behavior applied to the lifecycle configuration. Valid values: `all_storage_classes_128K` (default), <span pulumi-lang-nodejs="`variesByStorageClass`" pulumi-lang-dotnet="`VariesByStorageClass`" pulumi-lang-go="`variesByStorageClass`" pulumi-lang-python="`varies_by_storage_class`" pulumi-lang-yaml="`variesByStorageClass`" pulumi-lang-java="`variesByStorageClass`">`varies_by_storage_class`</span>. To customize the minimum object size for any transition you can add a <span pulumi-lang-nodejs="`filter`" pulumi-lang-dotnet="`Filter`" pulumi-lang-go="`filter`" pulumi-lang-python="`filter`" pulumi-lang-yaml="`filter`" pulumi-lang-java="`filter`">`filter`</span> that specifies a custom <span pulumi-lang-nodejs="`objectSizeGreaterThan`" pulumi-lang-dotnet="`ObjectSizeGreaterThan`" pulumi-lang-go="`objectSizeGreaterThan`" pulumi-lang-python="`object_size_greater_than`" pulumi-lang-yaml="`objectSizeGreaterThan`" pulumi-lang-java="`objectSizeGreaterThan`">`object_size_greater_than`</span> or <span pulumi-lang-nodejs="`objectSizeLessThan`" pulumi-lang-dotnet="`ObjectSizeLessThan`" pulumi-lang-go="`objectSizeLessThan`" pulumi-lang-python="`object_size_less_than`" pulumi-lang-yaml="`objectSizeLessThan`" pulumi-lang-java="`objectSizeLessThan`">`object_size_less_than`</span> value. Custom filters always take precedence over the default transition behavior.
-func (o BucketLifecycleConfigurationTransformOutput) TransitionDefaultMinimumObjectSize() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketLifecycleConfigurationTransform) *string { return v.TransitionDefaultMinimumObjectSize }).(pulumi.StringPtrOutput)
+func (o BucketLifecycleConfigurationHatchOutput) TransitionDefaultMinimumObjectSize() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketLifecycleConfigurationHatch) *string { return v.TransitionDefaultMinimumObjectSize }).(pulumi.StringPtrOutput)
 }
 
-type BucketLifecycleConfigurationTransformPtrOutput struct{ *pulumi.OutputState }
+type BucketLifecycleConfigurationHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketLifecycleConfigurationTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketLifecycleConfigurationTransform)(nil)).Elem()
+func (BucketLifecycleConfigurationHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketLifecycleConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketLifecycleConfigurationTransformPtrOutput) ToBucketLifecycleConfigurationTransformPtrOutput() BucketLifecycleConfigurationTransformPtrOutput {
+func (o BucketLifecycleConfigurationHatchPtrOutput) ToBucketLifecycleConfigurationHatchPtrOutput() BucketLifecycleConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketLifecycleConfigurationTransformPtrOutput) ToBucketLifecycleConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketLifecycleConfigurationTransformPtrOutput {
+func (o BucketLifecycleConfigurationHatchPtrOutput) ToBucketLifecycleConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketLifecycleConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketLifecycleConfigurationTransformPtrOutput) Elem() BucketLifecycleConfigurationTransformOutput {
-	return o.ApplyT(func(v *BucketLifecycleConfigurationTransform) BucketLifecycleConfigurationTransform {
+func (o BucketLifecycleConfigurationHatchPtrOutput) Elem() BucketLifecycleConfigurationHatchOutput {
+	return o.ApplyT(func(v *BucketLifecycleConfigurationHatch) BucketLifecycleConfigurationHatch {
 		if v != nil {
 			return *v
 		}
-		var ret BucketLifecycleConfigurationTransform
+		var ret BucketLifecycleConfigurationHatch
 		return ret
-	}).(BucketLifecycleConfigurationTransformOutput)
+	}).(BucketLifecycleConfigurationHatchOutput)
 }
 
 // Name of the source S3 bucket you want Amazon S3 to monitor.
-func (o BucketLifecycleConfigurationTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketLifecycleConfigurationTransform) *string {
+func (o BucketLifecycleConfigurationHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketLifecycleConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -835,8 +1193,8 @@ func (o BucketLifecycleConfigurationTransformPtrOutput) Bucket() pulumi.StringPt
 // Account ID of the expected bucket owner. If the bucket is owned by a different account, the request will fail with an HTTP 403 (Access Denied) error.
 //
 // Deprecated: This attribute will be removed in a future verion of the provider.
-func (o BucketLifecycleConfigurationTransformPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketLifecycleConfigurationTransform) *string {
+func (o BucketLifecycleConfigurationHatchPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketLifecycleConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -845,8 +1203,8 @@ func (o BucketLifecycleConfigurationTransformPtrOutput) ExpectedBucketOwner() pu
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketLifecycleConfigurationTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketLifecycleConfigurationTransform) *string {
+func (o BucketLifecycleConfigurationHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketLifecycleConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -855,8 +1213,8 @@ func (o BucketLifecycleConfigurationTransformPtrOutput) Region() pulumi.StringPt
 }
 
 // List of configuration blocks describing the rules managing the replication. See below.
-func (o BucketLifecycleConfigurationTransformPtrOutput) Rules() s3.BucketLifecycleConfigurationRuleArrayOutput {
-	return o.ApplyT(func(v *BucketLifecycleConfigurationTransform) []s3.BucketLifecycleConfigurationRule {
+func (o BucketLifecycleConfigurationHatchPtrOutput) Rules() s3.BucketLifecycleConfigurationRuleArrayOutput {
+	return o.ApplyT(func(v *BucketLifecycleConfigurationHatch) []s3.BucketLifecycleConfigurationRule {
 		if v == nil {
 			return nil
 		}
@@ -864,8 +1222,8 @@ func (o BucketLifecycleConfigurationTransformPtrOutput) Rules() s3.BucketLifecyc
 	}).(s3.BucketLifecycleConfigurationRuleArrayOutput)
 }
 
-func (o BucketLifecycleConfigurationTransformPtrOutput) Timeouts() s3.BucketLifecycleConfigurationTimeoutsPtrOutput {
-	return o.ApplyT(func(v *BucketLifecycleConfigurationTransform) *s3.BucketLifecycleConfigurationTimeouts {
+func (o BucketLifecycleConfigurationHatchPtrOutput) Timeouts() s3.BucketLifecycleConfigurationTimeoutsPtrOutput {
+	return o.ApplyT(func(v *BucketLifecycleConfigurationHatch) *s3.BucketLifecycleConfigurationTimeouts {
 		if v == nil {
 			return nil
 		}
@@ -874,8 +1232,8 @@ func (o BucketLifecycleConfigurationTransformPtrOutput) Timeouts() s3.BucketLife
 }
 
 // The default minimum object size behavior applied to the lifecycle configuration. Valid values: `all_storage_classes_128K` (default), <span pulumi-lang-nodejs="`variesByStorageClass`" pulumi-lang-dotnet="`VariesByStorageClass`" pulumi-lang-go="`variesByStorageClass`" pulumi-lang-python="`varies_by_storage_class`" pulumi-lang-yaml="`variesByStorageClass`" pulumi-lang-java="`variesByStorageClass`">`varies_by_storage_class`</span>. To customize the minimum object size for any transition you can add a <span pulumi-lang-nodejs="`filter`" pulumi-lang-dotnet="`Filter`" pulumi-lang-go="`filter`" pulumi-lang-python="`filter`" pulumi-lang-yaml="`filter`" pulumi-lang-java="`filter`">`filter`</span> that specifies a custom <span pulumi-lang-nodejs="`objectSizeGreaterThan`" pulumi-lang-dotnet="`ObjectSizeGreaterThan`" pulumi-lang-go="`objectSizeGreaterThan`" pulumi-lang-python="`object_size_greater_than`" pulumi-lang-yaml="`objectSizeGreaterThan`" pulumi-lang-java="`objectSizeGreaterThan`">`object_size_greater_than`</span> or <span pulumi-lang-nodejs="`objectSizeLessThan`" pulumi-lang-dotnet="`ObjectSizeLessThan`" pulumi-lang-go="`objectSizeLessThan`" pulumi-lang-python="`object_size_less_than`" pulumi-lang-yaml="`objectSizeLessThan`" pulumi-lang-java="`objectSizeLessThan`">`object_size_less_than`</span> value. Custom filters always take precedence over the default transition behavior.
-func (o BucketLifecycleConfigurationTransformPtrOutput) TransitionDefaultMinimumObjectSize() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketLifecycleConfigurationTransform) *string {
+func (o BucketLifecycleConfigurationHatchPtrOutput) TransitionDefaultMinimumObjectSize() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketLifecycleConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -883,7 +1241,7 @@ func (o BucketLifecycleConfigurationTransformPtrOutput) TransitionDefaultMinimum
 	}).(pulumi.StringPtrOutput)
 }
 
-type BucketLoggingTransform struct {
+type BucketLoggingHatch struct {
 	// Name of the bucket.
 	Bucket *string `pulumi:"bucket"`
 	// Account ID of the expected bucket owner.
@@ -902,18 +1260,18 @@ type BucketLoggingTransform struct {
 	TargetPrefix *string `pulumi:"targetPrefix"`
 }
 
-// BucketLoggingTransformInput is an input type that accepts BucketLoggingTransformArgs and BucketLoggingTransformOutput values.
-// You can construct a concrete instance of `BucketLoggingTransformInput` via:
+// BucketLoggingHatchInput is an input type that accepts BucketLoggingHatchArgs and BucketLoggingHatchOutput values.
+// You can construct a concrete instance of `BucketLoggingHatchInput` via:
 //
-//	BucketLoggingTransformArgs{...}
-type BucketLoggingTransformInput interface {
+//	BucketLoggingHatchArgs{...}
+type BucketLoggingHatchInput interface {
 	pulumi.Input
 
-	ToBucketLoggingTransformOutput() BucketLoggingTransformOutput
-	ToBucketLoggingTransformOutputWithContext(context.Context) BucketLoggingTransformOutput
+	ToBucketLoggingHatchOutput() BucketLoggingHatchOutput
+	ToBucketLoggingHatchOutputWithContext(context.Context) BucketLoggingHatchOutput
 }
 
-type BucketLoggingTransformArgs struct {
+type BucketLoggingHatchArgs struct {
 	// Name of the bucket.
 	Bucket pulumi.StringPtrInput `pulumi:"bucket"`
 	// Account ID of the expected bucket owner.
@@ -932,147 +1290,147 @@ type BucketLoggingTransformArgs struct {
 	TargetPrefix pulumi.StringPtrInput `pulumi:"targetPrefix"`
 }
 
-func (BucketLoggingTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketLoggingTransform)(nil)).Elem()
+func (BucketLoggingHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketLoggingHatch)(nil)).Elem()
 }
 
-func (i BucketLoggingTransformArgs) ToBucketLoggingTransformOutput() BucketLoggingTransformOutput {
-	return i.ToBucketLoggingTransformOutputWithContext(context.Background())
+func (i BucketLoggingHatchArgs) ToBucketLoggingHatchOutput() BucketLoggingHatchOutput {
+	return i.ToBucketLoggingHatchOutputWithContext(context.Background())
 }
 
-func (i BucketLoggingTransformArgs) ToBucketLoggingTransformOutputWithContext(ctx context.Context) BucketLoggingTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketLoggingTransformOutput)
+func (i BucketLoggingHatchArgs) ToBucketLoggingHatchOutputWithContext(ctx context.Context) BucketLoggingHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketLoggingHatchOutput)
 }
 
-func (i BucketLoggingTransformArgs) ToBucketLoggingTransformPtrOutput() BucketLoggingTransformPtrOutput {
-	return i.ToBucketLoggingTransformPtrOutputWithContext(context.Background())
+func (i BucketLoggingHatchArgs) ToBucketLoggingHatchPtrOutput() BucketLoggingHatchPtrOutput {
+	return i.ToBucketLoggingHatchPtrOutputWithContext(context.Background())
 }
 
-func (i BucketLoggingTransformArgs) ToBucketLoggingTransformPtrOutputWithContext(ctx context.Context) BucketLoggingTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketLoggingTransformOutput).ToBucketLoggingTransformPtrOutputWithContext(ctx)
+func (i BucketLoggingHatchArgs) ToBucketLoggingHatchPtrOutputWithContext(ctx context.Context) BucketLoggingHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketLoggingHatchOutput).ToBucketLoggingHatchPtrOutputWithContext(ctx)
 }
 
-// BucketLoggingTransformPtrInput is an input type that accepts BucketLoggingTransformArgs, BucketLoggingTransformPtr and BucketLoggingTransformPtrOutput values.
-// You can construct a concrete instance of `BucketLoggingTransformPtrInput` via:
+// BucketLoggingHatchPtrInput is an input type that accepts BucketLoggingHatchArgs, BucketLoggingHatchPtr and BucketLoggingHatchPtrOutput values.
+// You can construct a concrete instance of `BucketLoggingHatchPtrInput` via:
 //
-//	        BucketLoggingTransformArgs{...}
+//	        BucketLoggingHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketLoggingTransformPtrInput interface {
+type BucketLoggingHatchPtrInput interface {
 	pulumi.Input
 
-	ToBucketLoggingTransformPtrOutput() BucketLoggingTransformPtrOutput
-	ToBucketLoggingTransformPtrOutputWithContext(context.Context) BucketLoggingTransformPtrOutput
+	ToBucketLoggingHatchPtrOutput() BucketLoggingHatchPtrOutput
+	ToBucketLoggingHatchPtrOutputWithContext(context.Context) BucketLoggingHatchPtrOutput
 }
 
-type bucketLoggingTransformPtrType BucketLoggingTransformArgs
+type bucketLoggingHatchPtrType BucketLoggingHatchArgs
 
-func BucketLoggingTransformPtr(v *BucketLoggingTransformArgs) BucketLoggingTransformPtrInput {
-	return (*bucketLoggingTransformPtrType)(v)
+func BucketLoggingHatchPtr(v *BucketLoggingHatchArgs) BucketLoggingHatchPtrInput {
+	return (*bucketLoggingHatchPtrType)(v)
 }
 
-func (*bucketLoggingTransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketLoggingTransform)(nil)).Elem()
+func (*bucketLoggingHatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketLoggingHatch)(nil)).Elem()
 }
 
-func (i *bucketLoggingTransformPtrType) ToBucketLoggingTransformPtrOutput() BucketLoggingTransformPtrOutput {
-	return i.ToBucketLoggingTransformPtrOutputWithContext(context.Background())
+func (i *bucketLoggingHatchPtrType) ToBucketLoggingHatchPtrOutput() BucketLoggingHatchPtrOutput {
+	return i.ToBucketLoggingHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketLoggingTransformPtrType) ToBucketLoggingTransformPtrOutputWithContext(ctx context.Context) BucketLoggingTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketLoggingTransformPtrOutput)
+func (i *bucketLoggingHatchPtrType) ToBucketLoggingHatchPtrOutputWithContext(ctx context.Context) BucketLoggingHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketLoggingHatchPtrOutput)
 }
 
-type BucketLoggingTransformOutput struct{ *pulumi.OutputState }
+type BucketLoggingHatchOutput struct{ *pulumi.OutputState }
 
-func (BucketLoggingTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketLoggingTransform)(nil)).Elem()
+func (BucketLoggingHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketLoggingHatch)(nil)).Elem()
 }
 
-func (o BucketLoggingTransformOutput) ToBucketLoggingTransformOutput() BucketLoggingTransformOutput {
+func (o BucketLoggingHatchOutput) ToBucketLoggingHatchOutput() BucketLoggingHatchOutput {
 	return o
 }
 
-func (o BucketLoggingTransformOutput) ToBucketLoggingTransformOutputWithContext(ctx context.Context) BucketLoggingTransformOutput {
+func (o BucketLoggingHatchOutput) ToBucketLoggingHatchOutputWithContext(ctx context.Context) BucketLoggingHatchOutput {
 	return o
 }
 
-func (o BucketLoggingTransformOutput) ToBucketLoggingTransformPtrOutput() BucketLoggingTransformPtrOutput {
-	return o.ToBucketLoggingTransformPtrOutputWithContext(context.Background())
+func (o BucketLoggingHatchOutput) ToBucketLoggingHatchPtrOutput() BucketLoggingHatchPtrOutput {
+	return o.ToBucketLoggingHatchPtrOutputWithContext(context.Background())
 }
 
-func (o BucketLoggingTransformOutput) ToBucketLoggingTransformPtrOutputWithContext(ctx context.Context) BucketLoggingTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketLoggingTransform) *BucketLoggingTransform {
+func (o BucketLoggingHatchOutput) ToBucketLoggingHatchPtrOutputWithContext(ctx context.Context) BucketLoggingHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketLoggingHatch) *BucketLoggingHatch {
 		return &v
-	}).(BucketLoggingTransformPtrOutput)
+	}).(BucketLoggingHatchPtrOutput)
 }
 
 // Name of the bucket.
-func (o BucketLoggingTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketLoggingTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o BucketLoggingHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketLoggingHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketLoggingTransformOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketLoggingTransform) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
+func (o BucketLoggingHatchOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketLoggingHatch) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketLoggingTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketLoggingTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o BucketLoggingHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketLoggingHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
 // Name of the bucket where you want Amazon S3 to store server access logs.
-func (o BucketLoggingTransformOutput) TargetBucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketLoggingTransform) *string { return v.TargetBucket }).(pulumi.StringPtrOutput)
+func (o BucketLoggingHatchOutput) TargetBucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketLoggingHatch) *string { return v.TargetBucket }).(pulumi.StringPtrOutput)
 }
 
 // Set of configuration blocks with information for granting permissions. See below.
-func (o BucketLoggingTransformOutput) TargetGrants() s3.BucketLoggingTargetGrantArrayOutput {
-	return o.ApplyT(func(v BucketLoggingTransform) []s3.BucketLoggingTargetGrant { return v.TargetGrants }).(s3.BucketLoggingTargetGrantArrayOutput)
+func (o BucketLoggingHatchOutput) TargetGrants() s3.BucketLoggingTargetGrantArrayOutput {
+	return o.ApplyT(func(v BucketLoggingHatch) []s3.BucketLoggingTargetGrant { return v.TargetGrants }).(s3.BucketLoggingTargetGrantArrayOutput)
 }
 
 // Amazon S3 key format for log objects. See below.
-func (o BucketLoggingTransformOutput) TargetObjectKeyFormat() s3.BucketLoggingTargetObjectKeyFormatPtrOutput {
-	return o.ApplyT(func(v BucketLoggingTransform) *s3.BucketLoggingTargetObjectKeyFormat { return v.TargetObjectKeyFormat }).(s3.BucketLoggingTargetObjectKeyFormatPtrOutput)
+func (o BucketLoggingHatchOutput) TargetObjectKeyFormat() s3.BucketLoggingTargetObjectKeyFormatPtrOutput {
+	return o.ApplyT(func(v BucketLoggingHatch) *s3.BucketLoggingTargetObjectKeyFormat { return v.TargetObjectKeyFormat }).(s3.BucketLoggingTargetObjectKeyFormatPtrOutput)
 }
 
 // Prefix for all log object keys.
-func (o BucketLoggingTransformOutput) TargetPrefix() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketLoggingTransform) *string { return v.TargetPrefix }).(pulumi.StringPtrOutput)
+func (o BucketLoggingHatchOutput) TargetPrefix() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketLoggingHatch) *string { return v.TargetPrefix }).(pulumi.StringPtrOutput)
 }
 
-type BucketLoggingTransformPtrOutput struct{ *pulumi.OutputState }
+type BucketLoggingHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketLoggingTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketLoggingTransform)(nil)).Elem()
+func (BucketLoggingHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketLoggingHatch)(nil)).Elem()
 }
 
-func (o BucketLoggingTransformPtrOutput) ToBucketLoggingTransformPtrOutput() BucketLoggingTransformPtrOutput {
+func (o BucketLoggingHatchPtrOutput) ToBucketLoggingHatchPtrOutput() BucketLoggingHatchPtrOutput {
 	return o
 }
 
-func (o BucketLoggingTransformPtrOutput) ToBucketLoggingTransformPtrOutputWithContext(ctx context.Context) BucketLoggingTransformPtrOutput {
+func (o BucketLoggingHatchPtrOutput) ToBucketLoggingHatchPtrOutputWithContext(ctx context.Context) BucketLoggingHatchPtrOutput {
 	return o
 }
 
-func (o BucketLoggingTransformPtrOutput) Elem() BucketLoggingTransformOutput {
-	return o.ApplyT(func(v *BucketLoggingTransform) BucketLoggingTransform {
+func (o BucketLoggingHatchPtrOutput) Elem() BucketLoggingHatchOutput {
+	return o.ApplyT(func(v *BucketLoggingHatch) BucketLoggingHatch {
 		if v != nil {
 			return *v
 		}
-		var ret BucketLoggingTransform
+		var ret BucketLoggingHatch
 		return ret
-	}).(BucketLoggingTransformOutput)
+	}).(BucketLoggingHatchOutput)
 }
 
 // Name of the bucket.
-func (o BucketLoggingTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketLoggingTransform) *string {
+func (o BucketLoggingHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketLoggingHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1083,8 +1441,8 @@ func (o BucketLoggingTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketLoggingTransformPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketLoggingTransform) *string {
+func (o BucketLoggingHatchPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketLoggingHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1093,8 +1451,8 @@ func (o BucketLoggingTransformPtrOutput) ExpectedBucketOwner() pulumi.StringPtrO
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketLoggingTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketLoggingTransform) *string {
+func (o BucketLoggingHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketLoggingHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1103,8 +1461,8 @@ func (o BucketLoggingTransformPtrOutput) Region() pulumi.StringPtrOutput {
 }
 
 // Name of the bucket where you want Amazon S3 to store server access logs.
-func (o BucketLoggingTransformPtrOutput) TargetBucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketLoggingTransform) *string {
+func (o BucketLoggingHatchPtrOutput) TargetBucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketLoggingHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1113,8 +1471,8 @@ func (o BucketLoggingTransformPtrOutput) TargetBucket() pulumi.StringPtrOutput {
 }
 
 // Set of configuration blocks with information for granting permissions. See below.
-func (o BucketLoggingTransformPtrOutput) TargetGrants() s3.BucketLoggingTargetGrantArrayOutput {
-	return o.ApplyT(func(v *BucketLoggingTransform) []s3.BucketLoggingTargetGrant {
+func (o BucketLoggingHatchPtrOutput) TargetGrants() s3.BucketLoggingTargetGrantArrayOutput {
+	return o.ApplyT(func(v *BucketLoggingHatch) []s3.BucketLoggingTargetGrant {
 		if v == nil {
 			return nil
 		}
@@ -1123,8 +1481,8 @@ func (o BucketLoggingTransformPtrOutput) TargetGrants() s3.BucketLoggingTargetGr
 }
 
 // Amazon S3 key format for log objects. See below.
-func (o BucketLoggingTransformPtrOutput) TargetObjectKeyFormat() s3.BucketLoggingTargetObjectKeyFormatPtrOutput {
-	return o.ApplyT(func(v *BucketLoggingTransform) *s3.BucketLoggingTargetObjectKeyFormat {
+func (o BucketLoggingHatchPtrOutput) TargetObjectKeyFormat() s3.BucketLoggingTargetObjectKeyFormatPtrOutput {
+	return o.ApplyT(func(v *BucketLoggingHatch) *s3.BucketLoggingTargetObjectKeyFormat {
 		if v == nil {
 			return nil
 		}
@@ -1133,8 +1491,8 @@ func (o BucketLoggingTransformPtrOutput) TargetObjectKeyFormat() s3.BucketLoggin
 }
 
 // Prefix for all log object keys.
-func (o BucketLoggingTransformPtrOutput) TargetPrefix() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketLoggingTransform) *string {
+func (o BucketLoggingHatchPtrOutput) TargetPrefix() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketLoggingHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1142,7 +1500,7 @@ func (o BucketLoggingTransformPtrOutput) TargetPrefix() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-type BucketObjectLockConfigurationTransform struct {
+type BucketObjectLockConfigurationHatch struct {
 	// Name of the bucket.
 	Bucket *string `pulumi:"bucket"`
 	// Account ID of the expected bucket owner.
@@ -1160,18 +1518,18 @@ type BucketObjectLockConfigurationTransform struct {
 	Token *string `pulumi:"token"`
 }
 
-// BucketObjectLockConfigurationTransformInput is an input type that accepts BucketObjectLockConfigurationTransformArgs and BucketObjectLockConfigurationTransformOutput values.
-// You can construct a concrete instance of `BucketObjectLockConfigurationTransformInput` via:
+// BucketObjectLockConfigurationHatchInput is an input type that accepts BucketObjectLockConfigurationHatchArgs and BucketObjectLockConfigurationHatchOutput values.
+// You can construct a concrete instance of `BucketObjectLockConfigurationHatchInput` via:
 //
-//	BucketObjectLockConfigurationTransformArgs{...}
-type BucketObjectLockConfigurationTransformInput interface {
+//	BucketObjectLockConfigurationHatchArgs{...}
+type BucketObjectLockConfigurationHatchInput interface {
 	pulumi.Input
 
-	ToBucketObjectLockConfigurationTransformOutput() BucketObjectLockConfigurationTransformOutput
-	ToBucketObjectLockConfigurationTransformOutputWithContext(context.Context) BucketObjectLockConfigurationTransformOutput
+	ToBucketObjectLockConfigurationHatchOutput() BucketObjectLockConfigurationHatchOutput
+	ToBucketObjectLockConfigurationHatchOutputWithContext(context.Context) BucketObjectLockConfigurationHatchOutput
 }
 
-type BucketObjectLockConfigurationTransformArgs struct {
+type BucketObjectLockConfigurationHatchArgs struct {
 	// Name of the bucket.
 	Bucket pulumi.StringPtrInput `pulumi:"bucket"`
 	// Account ID of the expected bucket owner.
@@ -1189,143 +1547,143 @@ type BucketObjectLockConfigurationTransformArgs struct {
 	Token pulumi.StringPtrInput `pulumi:"token"`
 }
 
-func (BucketObjectLockConfigurationTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketObjectLockConfigurationTransform)(nil)).Elem()
+func (BucketObjectLockConfigurationHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketObjectLockConfigurationHatch)(nil)).Elem()
 }
 
-func (i BucketObjectLockConfigurationTransformArgs) ToBucketObjectLockConfigurationTransformOutput() BucketObjectLockConfigurationTransformOutput {
-	return i.ToBucketObjectLockConfigurationTransformOutputWithContext(context.Background())
+func (i BucketObjectLockConfigurationHatchArgs) ToBucketObjectLockConfigurationHatchOutput() BucketObjectLockConfigurationHatchOutput {
+	return i.ToBucketObjectLockConfigurationHatchOutputWithContext(context.Background())
 }
 
-func (i BucketObjectLockConfigurationTransformArgs) ToBucketObjectLockConfigurationTransformOutputWithContext(ctx context.Context) BucketObjectLockConfigurationTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketObjectLockConfigurationTransformOutput)
+func (i BucketObjectLockConfigurationHatchArgs) ToBucketObjectLockConfigurationHatchOutputWithContext(ctx context.Context) BucketObjectLockConfigurationHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketObjectLockConfigurationHatchOutput)
 }
 
-func (i BucketObjectLockConfigurationTransformArgs) ToBucketObjectLockConfigurationTransformPtrOutput() BucketObjectLockConfigurationTransformPtrOutput {
-	return i.ToBucketObjectLockConfigurationTransformPtrOutputWithContext(context.Background())
+func (i BucketObjectLockConfigurationHatchArgs) ToBucketObjectLockConfigurationHatchPtrOutput() BucketObjectLockConfigurationHatchPtrOutput {
+	return i.ToBucketObjectLockConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i BucketObjectLockConfigurationTransformArgs) ToBucketObjectLockConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketObjectLockConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketObjectLockConfigurationTransformOutput).ToBucketObjectLockConfigurationTransformPtrOutputWithContext(ctx)
+func (i BucketObjectLockConfigurationHatchArgs) ToBucketObjectLockConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketObjectLockConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketObjectLockConfigurationHatchOutput).ToBucketObjectLockConfigurationHatchPtrOutputWithContext(ctx)
 }
 
-// BucketObjectLockConfigurationTransformPtrInput is an input type that accepts BucketObjectLockConfigurationTransformArgs, BucketObjectLockConfigurationTransformPtr and BucketObjectLockConfigurationTransformPtrOutput values.
-// You can construct a concrete instance of `BucketObjectLockConfigurationTransformPtrInput` via:
+// BucketObjectLockConfigurationHatchPtrInput is an input type that accepts BucketObjectLockConfigurationHatchArgs, BucketObjectLockConfigurationHatchPtr and BucketObjectLockConfigurationHatchPtrOutput values.
+// You can construct a concrete instance of `BucketObjectLockConfigurationHatchPtrInput` via:
 //
-//	        BucketObjectLockConfigurationTransformArgs{...}
+//	        BucketObjectLockConfigurationHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketObjectLockConfigurationTransformPtrInput interface {
+type BucketObjectLockConfigurationHatchPtrInput interface {
 	pulumi.Input
 
-	ToBucketObjectLockConfigurationTransformPtrOutput() BucketObjectLockConfigurationTransformPtrOutput
-	ToBucketObjectLockConfigurationTransformPtrOutputWithContext(context.Context) BucketObjectLockConfigurationTransformPtrOutput
+	ToBucketObjectLockConfigurationHatchPtrOutput() BucketObjectLockConfigurationHatchPtrOutput
+	ToBucketObjectLockConfigurationHatchPtrOutputWithContext(context.Context) BucketObjectLockConfigurationHatchPtrOutput
 }
 
-type bucketObjectLockConfigurationTransformPtrType BucketObjectLockConfigurationTransformArgs
+type bucketObjectLockConfigurationHatchPtrType BucketObjectLockConfigurationHatchArgs
 
-func BucketObjectLockConfigurationTransformPtr(v *BucketObjectLockConfigurationTransformArgs) BucketObjectLockConfigurationTransformPtrInput {
-	return (*bucketObjectLockConfigurationTransformPtrType)(v)
+func BucketObjectLockConfigurationHatchPtr(v *BucketObjectLockConfigurationHatchArgs) BucketObjectLockConfigurationHatchPtrInput {
+	return (*bucketObjectLockConfigurationHatchPtrType)(v)
 }
 
-func (*bucketObjectLockConfigurationTransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketObjectLockConfigurationTransform)(nil)).Elem()
+func (*bucketObjectLockConfigurationHatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketObjectLockConfigurationHatch)(nil)).Elem()
 }
 
-func (i *bucketObjectLockConfigurationTransformPtrType) ToBucketObjectLockConfigurationTransformPtrOutput() BucketObjectLockConfigurationTransformPtrOutput {
-	return i.ToBucketObjectLockConfigurationTransformPtrOutputWithContext(context.Background())
+func (i *bucketObjectLockConfigurationHatchPtrType) ToBucketObjectLockConfigurationHatchPtrOutput() BucketObjectLockConfigurationHatchPtrOutput {
+	return i.ToBucketObjectLockConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketObjectLockConfigurationTransformPtrType) ToBucketObjectLockConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketObjectLockConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketObjectLockConfigurationTransformPtrOutput)
+func (i *bucketObjectLockConfigurationHatchPtrType) ToBucketObjectLockConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketObjectLockConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketObjectLockConfigurationHatchPtrOutput)
 }
 
-type BucketObjectLockConfigurationTransformOutput struct{ *pulumi.OutputState }
+type BucketObjectLockConfigurationHatchOutput struct{ *pulumi.OutputState }
 
-func (BucketObjectLockConfigurationTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketObjectLockConfigurationTransform)(nil)).Elem()
+func (BucketObjectLockConfigurationHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketObjectLockConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketObjectLockConfigurationTransformOutput) ToBucketObjectLockConfigurationTransformOutput() BucketObjectLockConfigurationTransformOutput {
+func (o BucketObjectLockConfigurationHatchOutput) ToBucketObjectLockConfigurationHatchOutput() BucketObjectLockConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketObjectLockConfigurationTransformOutput) ToBucketObjectLockConfigurationTransformOutputWithContext(ctx context.Context) BucketObjectLockConfigurationTransformOutput {
+func (o BucketObjectLockConfigurationHatchOutput) ToBucketObjectLockConfigurationHatchOutputWithContext(ctx context.Context) BucketObjectLockConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketObjectLockConfigurationTransformOutput) ToBucketObjectLockConfigurationTransformPtrOutput() BucketObjectLockConfigurationTransformPtrOutput {
-	return o.ToBucketObjectLockConfigurationTransformPtrOutputWithContext(context.Background())
+func (o BucketObjectLockConfigurationHatchOutput) ToBucketObjectLockConfigurationHatchPtrOutput() BucketObjectLockConfigurationHatchPtrOutput {
+	return o.ToBucketObjectLockConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (o BucketObjectLockConfigurationTransformOutput) ToBucketObjectLockConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketObjectLockConfigurationTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketObjectLockConfigurationTransform) *BucketObjectLockConfigurationTransform {
+func (o BucketObjectLockConfigurationHatchOutput) ToBucketObjectLockConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketObjectLockConfigurationHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketObjectLockConfigurationHatch) *BucketObjectLockConfigurationHatch {
 		return &v
-	}).(BucketObjectLockConfigurationTransformPtrOutput)
+	}).(BucketObjectLockConfigurationHatchPtrOutput)
 }
 
 // Name of the bucket.
-func (o BucketObjectLockConfigurationTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketObjectLockConfigurationTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o BucketObjectLockConfigurationHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketObjectLockConfigurationHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketObjectLockConfigurationTransformOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketObjectLockConfigurationTransform) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
+func (o BucketObjectLockConfigurationHatchOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketObjectLockConfigurationHatch) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
 }
 
 // Indicates whether this bucket has an Object Lock configuration enabled. Defaults to `Enabled`. Valid values: `Enabled`.
-func (o BucketObjectLockConfigurationTransformOutput) ObjectLockEnabled() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketObjectLockConfigurationTransform) *string { return v.ObjectLockEnabled }).(pulumi.StringPtrOutput)
+func (o BucketObjectLockConfigurationHatchOutput) ObjectLockEnabled() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketObjectLockConfigurationHatch) *string { return v.ObjectLockEnabled }).(pulumi.StringPtrOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketObjectLockConfigurationTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketObjectLockConfigurationTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o BucketObjectLockConfigurationHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketObjectLockConfigurationHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
 // Configuration block for specifying the Object Lock rule for the specified object. See below.
-func (o BucketObjectLockConfigurationTransformOutput) Rule() s3.BucketObjectLockConfigurationRulePtrOutput {
-	return o.ApplyT(func(v BucketObjectLockConfigurationTransform) *s3.BucketObjectLockConfigurationRule { return v.Rule }).(s3.BucketObjectLockConfigurationRulePtrOutput)
+func (o BucketObjectLockConfigurationHatchOutput) Rule() s3.BucketObjectLockConfigurationRulePtrOutput {
+	return o.ApplyT(func(v BucketObjectLockConfigurationHatch) *s3.BucketObjectLockConfigurationRule { return v.Rule }).(s3.BucketObjectLockConfigurationRulePtrOutput)
 }
 
 // This argument is deprecated and no longer needed to enable Object Lock.
 // To enable Object Lock for an existing bucket, you must first enable versioning on the bucket and then enable Object Lock. For more details on versioning, see the <span pulumi-lang-nodejs="`aws.s3.BucketVersioning`" pulumi-lang-dotnet="`aws.s3.BucketVersioning`" pulumi-lang-go="`s3.BucketVersioning`" pulumi-lang-python="`s3.BucketVersioning`" pulumi-lang-yaml="`aws.s3.BucketVersioning`" pulumi-lang-java="`aws.s3.BucketVersioning`">`aws.s3.BucketVersioning`</span> resource.
-func (o BucketObjectLockConfigurationTransformOutput) Token() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketObjectLockConfigurationTransform) *string { return v.Token }).(pulumi.StringPtrOutput)
+func (o BucketObjectLockConfigurationHatchOutput) Token() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketObjectLockConfigurationHatch) *string { return v.Token }).(pulumi.StringPtrOutput)
 }
 
-type BucketObjectLockConfigurationTransformPtrOutput struct{ *pulumi.OutputState }
+type BucketObjectLockConfigurationHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketObjectLockConfigurationTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketObjectLockConfigurationTransform)(nil)).Elem()
+func (BucketObjectLockConfigurationHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketObjectLockConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketObjectLockConfigurationTransformPtrOutput) ToBucketObjectLockConfigurationTransformPtrOutput() BucketObjectLockConfigurationTransformPtrOutput {
+func (o BucketObjectLockConfigurationHatchPtrOutput) ToBucketObjectLockConfigurationHatchPtrOutput() BucketObjectLockConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketObjectLockConfigurationTransformPtrOutput) ToBucketObjectLockConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketObjectLockConfigurationTransformPtrOutput {
+func (o BucketObjectLockConfigurationHatchPtrOutput) ToBucketObjectLockConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketObjectLockConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketObjectLockConfigurationTransformPtrOutput) Elem() BucketObjectLockConfigurationTransformOutput {
-	return o.ApplyT(func(v *BucketObjectLockConfigurationTransform) BucketObjectLockConfigurationTransform {
+func (o BucketObjectLockConfigurationHatchPtrOutput) Elem() BucketObjectLockConfigurationHatchOutput {
+	return o.ApplyT(func(v *BucketObjectLockConfigurationHatch) BucketObjectLockConfigurationHatch {
 		if v != nil {
 			return *v
 		}
-		var ret BucketObjectLockConfigurationTransform
+		var ret BucketObjectLockConfigurationHatch
 		return ret
-	}).(BucketObjectLockConfigurationTransformOutput)
+	}).(BucketObjectLockConfigurationHatchOutput)
 }
 
 // Name of the bucket.
-func (o BucketObjectLockConfigurationTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketObjectLockConfigurationTransform) *string {
+func (o BucketObjectLockConfigurationHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketObjectLockConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1336,8 +1694,8 @@ func (o BucketObjectLockConfigurationTransformPtrOutput) Bucket() pulumi.StringP
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketObjectLockConfigurationTransformPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketObjectLockConfigurationTransform) *string {
+func (o BucketObjectLockConfigurationHatchPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketObjectLockConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1346,8 +1704,8 @@ func (o BucketObjectLockConfigurationTransformPtrOutput) ExpectedBucketOwner() p
 }
 
 // Indicates whether this bucket has an Object Lock configuration enabled. Defaults to `Enabled`. Valid values: `Enabled`.
-func (o BucketObjectLockConfigurationTransformPtrOutput) ObjectLockEnabled() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketObjectLockConfigurationTransform) *string {
+func (o BucketObjectLockConfigurationHatchPtrOutput) ObjectLockEnabled() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketObjectLockConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1356,8 +1714,8 @@ func (o BucketObjectLockConfigurationTransformPtrOutput) ObjectLockEnabled() pul
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketObjectLockConfigurationTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketObjectLockConfigurationTransform) *string {
+func (o BucketObjectLockConfigurationHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketObjectLockConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1366,8 +1724,8 @@ func (o BucketObjectLockConfigurationTransformPtrOutput) Region() pulumi.StringP
 }
 
 // Configuration block for specifying the Object Lock rule for the specified object. See below.
-func (o BucketObjectLockConfigurationTransformPtrOutput) Rule() s3.BucketObjectLockConfigurationRulePtrOutput {
-	return o.ApplyT(func(v *BucketObjectLockConfigurationTransform) *s3.BucketObjectLockConfigurationRule {
+func (o BucketObjectLockConfigurationHatchPtrOutput) Rule() s3.BucketObjectLockConfigurationRulePtrOutput {
+	return o.ApplyT(func(v *BucketObjectLockConfigurationHatch) *s3.BucketObjectLockConfigurationRule {
 		if v == nil {
 			return nil
 		}
@@ -1377,8 +1735,8 @@ func (o BucketObjectLockConfigurationTransformPtrOutput) Rule() s3.BucketObjectL
 
 // This argument is deprecated and no longer needed to enable Object Lock.
 // To enable Object Lock for an existing bucket, you must first enable versioning on the bucket and then enable Object Lock. For more details on versioning, see the <span pulumi-lang-nodejs="`aws.s3.BucketVersioning`" pulumi-lang-dotnet="`aws.s3.BucketVersioning`" pulumi-lang-go="`s3.BucketVersioning`" pulumi-lang-python="`s3.BucketVersioning`" pulumi-lang-yaml="`aws.s3.BucketVersioning`" pulumi-lang-java="`aws.s3.BucketVersioning`">`aws.s3.BucketVersioning`</span> resource.
-func (o BucketObjectLockConfigurationTransformPtrOutput) Token() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketObjectLockConfigurationTransform) *string {
+func (o BucketObjectLockConfigurationHatchPtrOutput) Token() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketObjectLockConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1626,7 +1984,7 @@ func (o BucketOverridesPtrOutput) Tags() pulumi.StringMapOutput {
 	}).(pulumi.StringMapOutput)
 }
 
-type BucketPolicyTransform struct {
+type BucketPolicyHatch struct {
 	// Name of the bucket to which to apply the policy.
 	Bucket *string `pulumi:"bucket"`
 	// Text of the policy. Although this is a bucket policy rather than an IAM policy, the <span pulumi-lang-nodejs="`aws.iam.getPolicyDocument`" pulumi-lang-dotnet="`aws.iam.getPolicyDocument`" pulumi-lang-go="`iam.getPolicyDocument`" pulumi-lang-python="`iam_get_policy_document`" pulumi-lang-yaml="`aws.iam.getPolicyDocument`" pulumi-lang-java="`aws.iam.getPolicyDocument`">`aws.iam.getPolicyDocument`</span> data source may be used, so long as it specifies a principal. For more information about building AWS IAM policy documents, see the AWS IAM Policy Document Guide. Note: Bucket policies are limited to 20 KB in size.
@@ -1635,18 +1993,18 @@ type BucketPolicyTransform struct {
 	Region *string `pulumi:"region"`
 }
 
-// BucketPolicyTransformInput is an input type that accepts BucketPolicyTransformArgs and BucketPolicyTransformOutput values.
-// You can construct a concrete instance of `BucketPolicyTransformInput` via:
+// BucketPolicyHatchInput is an input type that accepts BucketPolicyHatchArgs and BucketPolicyHatchOutput values.
+// You can construct a concrete instance of `BucketPolicyHatchInput` via:
 //
-//	BucketPolicyTransformArgs{...}
-type BucketPolicyTransformInput interface {
+//	BucketPolicyHatchArgs{...}
+type BucketPolicyHatchInput interface {
 	pulumi.Input
 
-	ToBucketPolicyTransformOutput() BucketPolicyTransformOutput
-	ToBucketPolicyTransformOutputWithContext(context.Context) BucketPolicyTransformOutput
+	ToBucketPolicyHatchOutput() BucketPolicyHatchOutput
+	ToBucketPolicyHatchOutputWithContext(context.Context) BucketPolicyHatchOutput
 }
 
-type BucketPolicyTransformArgs struct {
+type BucketPolicyHatchArgs struct {
 	// Name of the bucket to which to apply the policy.
 	Bucket pulumi.StringPtrInput `pulumi:"bucket"`
 	// Text of the policy. Although this is a bucket policy rather than an IAM policy, the <span pulumi-lang-nodejs="`aws.iam.getPolicyDocument`" pulumi-lang-dotnet="`aws.iam.getPolicyDocument`" pulumi-lang-go="`iam.getPolicyDocument`" pulumi-lang-python="`iam_get_policy_document`" pulumi-lang-yaml="`aws.iam.getPolicyDocument`" pulumi-lang-java="`aws.iam.getPolicyDocument`">`aws.iam.getPolicyDocument`</span> data source may be used, so long as it specifies a principal. For more information about building AWS IAM policy documents, see the AWS IAM Policy Document Guide. Note: Bucket policies are limited to 20 KB in size.
@@ -1655,125 +2013,125 @@ type BucketPolicyTransformArgs struct {
 	Region pulumi.StringPtrInput `pulumi:"region"`
 }
 
-func (BucketPolicyTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketPolicyTransform)(nil)).Elem()
+func (BucketPolicyHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketPolicyHatch)(nil)).Elem()
 }
 
-func (i BucketPolicyTransformArgs) ToBucketPolicyTransformOutput() BucketPolicyTransformOutput {
-	return i.ToBucketPolicyTransformOutputWithContext(context.Background())
+func (i BucketPolicyHatchArgs) ToBucketPolicyHatchOutput() BucketPolicyHatchOutput {
+	return i.ToBucketPolicyHatchOutputWithContext(context.Background())
 }
 
-func (i BucketPolicyTransformArgs) ToBucketPolicyTransformOutputWithContext(ctx context.Context) BucketPolicyTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketPolicyTransformOutput)
+func (i BucketPolicyHatchArgs) ToBucketPolicyHatchOutputWithContext(ctx context.Context) BucketPolicyHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketPolicyHatchOutput)
 }
 
-func (i BucketPolicyTransformArgs) ToBucketPolicyTransformPtrOutput() BucketPolicyTransformPtrOutput {
-	return i.ToBucketPolicyTransformPtrOutputWithContext(context.Background())
+func (i BucketPolicyHatchArgs) ToBucketPolicyHatchPtrOutput() BucketPolicyHatchPtrOutput {
+	return i.ToBucketPolicyHatchPtrOutputWithContext(context.Background())
 }
 
-func (i BucketPolicyTransformArgs) ToBucketPolicyTransformPtrOutputWithContext(ctx context.Context) BucketPolicyTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketPolicyTransformOutput).ToBucketPolicyTransformPtrOutputWithContext(ctx)
+func (i BucketPolicyHatchArgs) ToBucketPolicyHatchPtrOutputWithContext(ctx context.Context) BucketPolicyHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketPolicyHatchOutput).ToBucketPolicyHatchPtrOutputWithContext(ctx)
 }
 
-// BucketPolicyTransformPtrInput is an input type that accepts BucketPolicyTransformArgs, BucketPolicyTransformPtr and BucketPolicyTransformPtrOutput values.
-// You can construct a concrete instance of `BucketPolicyTransformPtrInput` via:
+// BucketPolicyHatchPtrInput is an input type that accepts BucketPolicyHatchArgs, BucketPolicyHatchPtr and BucketPolicyHatchPtrOutput values.
+// You can construct a concrete instance of `BucketPolicyHatchPtrInput` via:
 //
-//	        BucketPolicyTransformArgs{...}
+//	        BucketPolicyHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketPolicyTransformPtrInput interface {
+type BucketPolicyHatchPtrInput interface {
 	pulumi.Input
 
-	ToBucketPolicyTransformPtrOutput() BucketPolicyTransformPtrOutput
-	ToBucketPolicyTransformPtrOutputWithContext(context.Context) BucketPolicyTransformPtrOutput
+	ToBucketPolicyHatchPtrOutput() BucketPolicyHatchPtrOutput
+	ToBucketPolicyHatchPtrOutputWithContext(context.Context) BucketPolicyHatchPtrOutput
 }
 
-type bucketPolicyTransformPtrType BucketPolicyTransformArgs
+type bucketPolicyHatchPtrType BucketPolicyHatchArgs
 
-func BucketPolicyTransformPtr(v *BucketPolicyTransformArgs) BucketPolicyTransformPtrInput {
-	return (*bucketPolicyTransformPtrType)(v)
+func BucketPolicyHatchPtr(v *BucketPolicyHatchArgs) BucketPolicyHatchPtrInput {
+	return (*bucketPolicyHatchPtrType)(v)
 }
 
-func (*bucketPolicyTransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketPolicyTransform)(nil)).Elem()
+func (*bucketPolicyHatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketPolicyHatch)(nil)).Elem()
 }
 
-func (i *bucketPolicyTransformPtrType) ToBucketPolicyTransformPtrOutput() BucketPolicyTransformPtrOutput {
-	return i.ToBucketPolicyTransformPtrOutputWithContext(context.Background())
+func (i *bucketPolicyHatchPtrType) ToBucketPolicyHatchPtrOutput() BucketPolicyHatchPtrOutput {
+	return i.ToBucketPolicyHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketPolicyTransformPtrType) ToBucketPolicyTransformPtrOutputWithContext(ctx context.Context) BucketPolicyTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketPolicyTransformPtrOutput)
+func (i *bucketPolicyHatchPtrType) ToBucketPolicyHatchPtrOutputWithContext(ctx context.Context) BucketPolicyHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketPolicyHatchPtrOutput)
 }
 
-type BucketPolicyTransformOutput struct{ *pulumi.OutputState }
+type BucketPolicyHatchOutput struct{ *pulumi.OutputState }
 
-func (BucketPolicyTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketPolicyTransform)(nil)).Elem()
+func (BucketPolicyHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketPolicyHatch)(nil)).Elem()
 }
 
-func (o BucketPolicyTransformOutput) ToBucketPolicyTransformOutput() BucketPolicyTransformOutput {
+func (o BucketPolicyHatchOutput) ToBucketPolicyHatchOutput() BucketPolicyHatchOutput {
 	return o
 }
 
-func (o BucketPolicyTransformOutput) ToBucketPolicyTransformOutputWithContext(ctx context.Context) BucketPolicyTransformOutput {
+func (o BucketPolicyHatchOutput) ToBucketPolicyHatchOutputWithContext(ctx context.Context) BucketPolicyHatchOutput {
 	return o
 }
 
-func (o BucketPolicyTransformOutput) ToBucketPolicyTransformPtrOutput() BucketPolicyTransformPtrOutput {
-	return o.ToBucketPolicyTransformPtrOutputWithContext(context.Background())
+func (o BucketPolicyHatchOutput) ToBucketPolicyHatchPtrOutput() BucketPolicyHatchPtrOutput {
+	return o.ToBucketPolicyHatchPtrOutputWithContext(context.Background())
 }
 
-func (o BucketPolicyTransformOutput) ToBucketPolicyTransformPtrOutputWithContext(ctx context.Context) BucketPolicyTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketPolicyTransform) *BucketPolicyTransform {
+func (o BucketPolicyHatchOutput) ToBucketPolicyHatchPtrOutputWithContext(ctx context.Context) BucketPolicyHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketPolicyHatch) *BucketPolicyHatch {
 		return &v
-	}).(BucketPolicyTransformPtrOutput)
+	}).(BucketPolicyHatchPtrOutput)
 }
 
 // Name of the bucket to which to apply the policy.
-func (o BucketPolicyTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketPolicyTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o BucketPolicyHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketPolicyHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Text of the policy. Although this is a bucket policy rather than an IAM policy, the <span pulumi-lang-nodejs="`aws.iam.getPolicyDocument`" pulumi-lang-dotnet="`aws.iam.getPolicyDocument`" pulumi-lang-go="`iam.getPolicyDocument`" pulumi-lang-python="`iam_get_policy_document`" pulumi-lang-yaml="`aws.iam.getPolicyDocument`" pulumi-lang-java="`aws.iam.getPolicyDocument`">`aws.iam.getPolicyDocument`</span> data source may be used, so long as it specifies a principal. For more information about building AWS IAM policy documents, see the AWS IAM Policy Document Guide. Note: Bucket policies are limited to 20 KB in size.
-func (o BucketPolicyTransformOutput) Policy() pulumi.AnyOutput {
-	return o.ApplyT(func(v BucketPolicyTransform) interface{} { return v.Policy }).(pulumi.AnyOutput)
+func (o BucketPolicyHatchOutput) Policy() pulumi.AnyOutput {
+	return o.ApplyT(func(v BucketPolicyHatch) interface{} { return v.Policy }).(pulumi.AnyOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketPolicyTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketPolicyTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o BucketPolicyHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketPolicyHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
-type BucketPolicyTransformPtrOutput struct{ *pulumi.OutputState }
+type BucketPolicyHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketPolicyTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketPolicyTransform)(nil)).Elem()
+func (BucketPolicyHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketPolicyHatch)(nil)).Elem()
 }
 
-func (o BucketPolicyTransformPtrOutput) ToBucketPolicyTransformPtrOutput() BucketPolicyTransformPtrOutput {
+func (o BucketPolicyHatchPtrOutput) ToBucketPolicyHatchPtrOutput() BucketPolicyHatchPtrOutput {
 	return o
 }
 
-func (o BucketPolicyTransformPtrOutput) ToBucketPolicyTransformPtrOutputWithContext(ctx context.Context) BucketPolicyTransformPtrOutput {
+func (o BucketPolicyHatchPtrOutput) ToBucketPolicyHatchPtrOutputWithContext(ctx context.Context) BucketPolicyHatchPtrOutput {
 	return o
 }
 
-func (o BucketPolicyTransformPtrOutput) Elem() BucketPolicyTransformOutput {
-	return o.ApplyT(func(v *BucketPolicyTransform) BucketPolicyTransform {
+func (o BucketPolicyHatchPtrOutput) Elem() BucketPolicyHatchOutput {
+	return o.ApplyT(func(v *BucketPolicyHatch) BucketPolicyHatch {
 		if v != nil {
 			return *v
 		}
-		var ret BucketPolicyTransform
+		var ret BucketPolicyHatch
 		return ret
-	}).(BucketPolicyTransformOutput)
+	}).(BucketPolicyHatchOutput)
 }
 
 // Name of the bucket to which to apply the policy.
-func (o BucketPolicyTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketPolicyTransform) *string {
+func (o BucketPolicyHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketPolicyHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1782,8 +2140,8 @@ func (o BucketPolicyTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
 }
 
 // Text of the policy. Although this is a bucket policy rather than an IAM policy, the <span pulumi-lang-nodejs="`aws.iam.getPolicyDocument`" pulumi-lang-dotnet="`aws.iam.getPolicyDocument`" pulumi-lang-go="`iam.getPolicyDocument`" pulumi-lang-python="`iam_get_policy_document`" pulumi-lang-yaml="`aws.iam.getPolicyDocument`" pulumi-lang-java="`aws.iam.getPolicyDocument`">`aws.iam.getPolicyDocument`</span> data source may be used, so long as it specifies a principal. For more information about building AWS IAM policy documents, see the AWS IAM Policy Document Guide. Note: Bucket policies are limited to 20 KB in size.
-func (o BucketPolicyTransformPtrOutput) Policy() pulumi.AnyOutput {
-	return o.ApplyT(func(v *BucketPolicyTransform) interface{} {
+func (o BucketPolicyHatchPtrOutput) Policy() pulumi.AnyOutput {
+	return o.ApplyT(func(v *BucketPolicyHatch) interface{} {
 		if v == nil {
 			return nil
 		}
@@ -1792,8 +2150,8 @@ func (o BucketPolicyTransformPtrOutput) Policy() pulumi.AnyOutput {
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketPolicyTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketPolicyTransform) *string {
+func (o BucketPolicyHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketPolicyHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1801,7 +2159,7 @@ func (o BucketPolicyTransformPtrOutput) Region() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-type BucketReplicationConfigTransform struct {
+type BucketReplicationConfigHatch struct {
 	// Name of the source S3 bucket you want Amazon S3 to monitor.
 	Bucket *string `pulumi:"bucket"`
 	// Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
@@ -1822,18 +2180,18 @@ type BucketReplicationConfigTransform struct {
 	Token *string `pulumi:"token"`
 }
 
-// BucketReplicationConfigTransformInput is an input type that accepts BucketReplicationConfigTransformArgs and BucketReplicationConfigTransformOutput values.
-// You can construct a concrete instance of `BucketReplicationConfigTransformInput` via:
+// BucketReplicationConfigHatchInput is an input type that accepts BucketReplicationConfigHatchArgs and BucketReplicationConfigHatchOutput values.
+// You can construct a concrete instance of `BucketReplicationConfigHatchInput` via:
 //
-//	BucketReplicationConfigTransformArgs{...}
-type BucketReplicationConfigTransformInput interface {
+//	BucketReplicationConfigHatchArgs{...}
+type BucketReplicationConfigHatchInput interface {
 	pulumi.Input
 
-	ToBucketReplicationConfigTransformOutput() BucketReplicationConfigTransformOutput
-	ToBucketReplicationConfigTransformOutputWithContext(context.Context) BucketReplicationConfigTransformOutput
+	ToBucketReplicationConfigHatchOutput() BucketReplicationConfigHatchOutput
+	ToBucketReplicationConfigHatchOutputWithContext(context.Context) BucketReplicationConfigHatchOutput
 }
 
-type BucketReplicationConfigTransformArgs struct {
+type BucketReplicationConfigHatchArgs struct {
 	// Name of the source S3 bucket you want Amazon S3 to monitor.
 	Bucket pulumi.StringPtrInput `pulumi:"bucket"`
 	// Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
@@ -1854,96 +2212,96 @@ type BucketReplicationConfigTransformArgs struct {
 	Token pulumi.StringPtrInput `pulumi:"token"`
 }
 
-func (BucketReplicationConfigTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketReplicationConfigTransform)(nil)).Elem()
+func (BucketReplicationConfigHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketReplicationConfigHatch)(nil)).Elem()
 }
 
-func (i BucketReplicationConfigTransformArgs) ToBucketReplicationConfigTransformOutput() BucketReplicationConfigTransformOutput {
-	return i.ToBucketReplicationConfigTransformOutputWithContext(context.Background())
+func (i BucketReplicationConfigHatchArgs) ToBucketReplicationConfigHatchOutput() BucketReplicationConfigHatchOutput {
+	return i.ToBucketReplicationConfigHatchOutputWithContext(context.Background())
 }
 
-func (i BucketReplicationConfigTransformArgs) ToBucketReplicationConfigTransformOutputWithContext(ctx context.Context) BucketReplicationConfigTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketReplicationConfigTransformOutput)
+func (i BucketReplicationConfigHatchArgs) ToBucketReplicationConfigHatchOutputWithContext(ctx context.Context) BucketReplicationConfigHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketReplicationConfigHatchOutput)
 }
 
-func (i BucketReplicationConfigTransformArgs) ToBucketReplicationConfigTransformPtrOutput() BucketReplicationConfigTransformPtrOutput {
-	return i.ToBucketReplicationConfigTransformPtrOutputWithContext(context.Background())
+func (i BucketReplicationConfigHatchArgs) ToBucketReplicationConfigHatchPtrOutput() BucketReplicationConfigHatchPtrOutput {
+	return i.ToBucketReplicationConfigHatchPtrOutputWithContext(context.Background())
 }
 
-func (i BucketReplicationConfigTransformArgs) ToBucketReplicationConfigTransformPtrOutputWithContext(ctx context.Context) BucketReplicationConfigTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketReplicationConfigTransformOutput).ToBucketReplicationConfigTransformPtrOutputWithContext(ctx)
+func (i BucketReplicationConfigHatchArgs) ToBucketReplicationConfigHatchPtrOutputWithContext(ctx context.Context) BucketReplicationConfigHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketReplicationConfigHatchOutput).ToBucketReplicationConfigHatchPtrOutputWithContext(ctx)
 }
 
-// BucketReplicationConfigTransformPtrInput is an input type that accepts BucketReplicationConfigTransformArgs, BucketReplicationConfigTransformPtr and BucketReplicationConfigTransformPtrOutput values.
-// You can construct a concrete instance of `BucketReplicationConfigTransformPtrInput` via:
+// BucketReplicationConfigHatchPtrInput is an input type that accepts BucketReplicationConfigHatchArgs, BucketReplicationConfigHatchPtr and BucketReplicationConfigHatchPtrOutput values.
+// You can construct a concrete instance of `BucketReplicationConfigHatchPtrInput` via:
 //
-//	        BucketReplicationConfigTransformArgs{...}
+//	        BucketReplicationConfigHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketReplicationConfigTransformPtrInput interface {
+type BucketReplicationConfigHatchPtrInput interface {
 	pulumi.Input
 
-	ToBucketReplicationConfigTransformPtrOutput() BucketReplicationConfigTransformPtrOutput
-	ToBucketReplicationConfigTransformPtrOutputWithContext(context.Context) BucketReplicationConfigTransformPtrOutput
+	ToBucketReplicationConfigHatchPtrOutput() BucketReplicationConfigHatchPtrOutput
+	ToBucketReplicationConfigHatchPtrOutputWithContext(context.Context) BucketReplicationConfigHatchPtrOutput
 }
 
-type bucketReplicationConfigTransformPtrType BucketReplicationConfigTransformArgs
+type bucketReplicationConfigHatchPtrType BucketReplicationConfigHatchArgs
 
-func BucketReplicationConfigTransformPtr(v *BucketReplicationConfigTransformArgs) BucketReplicationConfigTransformPtrInput {
-	return (*bucketReplicationConfigTransformPtrType)(v)
+func BucketReplicationConfigHatchPtr(v *BucketReplicationConfigHatchArgs) BucketReplicationConfigHatchPtrInput {
+	return (*bucketReplicationConfigHatchPtrType)(v)
 }
 
-func (*bucketReplicationConfigTransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketReplicationConfigTransform)(nil)).Elem()
+func (*bucketReplicationConfigHatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketReplicationConfigHatch)(nil)).Elem()
 }
 
-func (i *bucketReplicationConfigTransformPtrType) ToBucketReplicationConfigTransformPtrOutput() BucketReplicationConfigTransformPtrOutput {
-	return i.ToBucketReplicationConfigTransformPtrOutputWithContext(context.Background())
+func (i *bucketReplicationConfigHatchPtrType) ToBucketReplicationConfigHatchPtrOutput() BucketReplicationConfigHatchPtrOutput {
+	return i.ToBucketReplicationConfigHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketReplicationConfigTransformPtrType) ToBucketReplicationConfigTransformPtrOutputWithContext(ctx context.Context) BucketReplicationConfigTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketReplicationConfigTransformPtrOutput)
+func (i *bucketReplicationConfigHatchPtrType) ToBucketReplicationConfigHatchPtrOutputWithContext(ctx context.Context) BucketReplicationConfigHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketReplicationConfigHatchPtrOutput)
 }
 
-type BucketReplicationConfigTransformOutput struct{ *pulumi.OutputState }
+type BucketReplicationConfigHatchOutput struct{ *pulumi.OutputState }
 
-func (BucketReplicationConfigTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketReplicationConfigTransform)(nil)).Elem()
+func (BucketReplicationConfigHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketReplicationConfigHatch)(nil)).Elem()
 }
 
-func (o BucketReplicationConfigTransformOutput) ToBucketReplicationConfigTransformOutput() BucketReplicationConfigTransformOutput {
+func (o BucketReplicationConfigHatchOutput) ToBucketReplicationConfigHatchOutput() BucketReplicationConfigHatchOutput {
 	return o
 }
 
-func (o BucketReplicationConfigTransformOutput) ToBucketReplicationConfigTransformOutputWithContext(ctx context.Context) BucketReplicationConfigTransformOutput {
+func (o BucketReplicationConfigHatchOutput) ToBucketReplicationConfigHatchOutputWithContext(ctx context.Context) BucketReplicationConfigHatchOutput {
 	return o
 }
 
-func (o BucketReplicationConfigTransformOutput) ToBucketReplicationConfigTransformPtrOutput() BucketReplicationConfigTransformPtrOutput {
-	return o.ToBucketReplicationConfigTransformPtrOutputWithContext(context.Background())
+func (o BucketReplicationConfigHatchOutput) ToBucketReplicationConfigHatchPtrOutput() BucketReplicationConfigHatchPtrOutput {
+	return o.ToBucketReplicationConfigHatchPtrOutputWithContext(context.Background())
 }
 
-func (o BucketReplicationConfigTransformOutput) ToBucketReplicationConfigTransformPtrOutputWithContext(ctx context.Context) BucketReplicationConfigTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketReplicationConfigTransform) *BucketReplicationConfigTransform {
+func (o BucketReplicationConfigHatchOutput) ToBucketReplicationConfigHatchPtrOutputWithContext(ctx context.Context) BucketReplicationConfigHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketReplicationConfigHatch) *BucketReplicationConfigHatch {
 		return &v
-	}).(BucketReplicationConfigTransformPtrOutput)
+	}).(BucketReplicationConfigHatchPtrOutput)
 }
 
 // Name of the source S3 bucket you want Amazon S3 to monitor.
-func (o BucketReplicationConfigTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketReplicationConfigTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o BucketReplicationConfigHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketReplicationConfigHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketReplicationConfigTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketReplicationConfigTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o BucketReplicationConfigHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketReplicationConfigHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
 // ARN of the IAM role for Amazon S3 to assume when replicating the objects.
-func (o BucketReplicationConfigTransformOutput) Role() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketReplicationConfigTransform) *string { return v.Role }).(pulumi.StringPtrOutput)
+func (o BucketReplicationConfigHatchOutput) Role() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketReplicationConfigHatch) *string { return v.Role }).(pulumi.StringPtrOutput)
 }
 
 // List of configuration blocks describing the rules managing the replication. See below.
@@ -1954,43 +2312,43 @@ func (o BucketReplicationConfigTransformOutput) Role() pulumi.StringPtrOutput {
 //
 // > **NOTE:** The <span pulumi-lang-nodejs="`existingObjectReplication`" pulumi-lang-dotnet="`ExistingObjectReplication`" pulumi-lang-go="`existingObjectReplication`" pulumi-lang-python="`existing_object_replication`" pulumi-lang-yaml="`existingObjectReplication`" pulumi-lang-java="`existingObjectReplication`">`existing_object_replication`</span> parameter is not supported by Amazon S3 at this time and should not be included in your <span pulumi-lang-nodejs="`rule`" pulumi-lang-dotnet="`Rule`" pulumi-lang-go="`rule`" pulumi-lang-python="`rule`" pulumi-lang-yaml="`rule`" pulumi-lang-java="`rule`">`rule`</span> configurations. Specifying this parameter will result in `MalformedXML` errors.
 // To replicate existing objects, please refer to the [Replicating existing objects with S3 Batch Replication](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-batch-replication-batch.html) documentation in the Amazon S3 User Guide.
-func (o BucketReplicationConfigTransformOutput) Rules() s3.BucketReplicationConfigRuleArrayOutput {
-	return o.ApplyT(func(v BucketReplicationConfigTransform) []s3.BucketReplicationConfigRule { return v.Rules }).(s3.BucketReplicationConfigRuleArrayOutput)
+func (o BucketReplicationConfigHatchOutput) Rules() s3.BucketReplicationConfigRuleArrayOutput {
+	return o.ApplyT(func(v BucketReplicationConfigHatch) []s3.BucketReplicationConfigRule { return v.Rules }).(s3.BucketReplicationConfigRuleArrayOutput)
 }
 
 // Token to allow replication to be enabled on an Object Lock-enabled bucket. You must contact AWS support for the bucket's "Object Lock token".
 // For more details, see [Using S3 Object Lock with replication](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-managing.html#object-lock-managing-replication).
-func (o BucketReplicationConfigTransformOutput) Token() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketReplicationConfigTransform) *string { return v.Token }).(pulumi.StringPtrOutput)
+func (o BucketReplicationConfigHatchOutput) Token() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketReplicationConfigHatch) *string { return v.Token }).(pulumi.StringPtrOutput)
 }
 
-type BucketReplicationConfigTransformPtrOutput struct{ *pulumi.OutputState }
+type BucketReplicationConfigHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketReplicationConfigTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketReplicationConfigTransform)(nil)).Elem()
+func (BucketReplicationConfigHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketReplicationConfigHatch)(nil)).Elem()
 }
 
-func (o BucketReplicationConfigTransformPtrOutput) ToBucketReplicationConfigTransformPtrOutput() BucketReplicationConfigTransformPtrOutput {
+func (o BucketReplicationConfigHatchPtrOutput) ToBucketReplicationConfigHatchPtrOutput() BucketReplicationConfigHatchPtrOutput {
 	return o
 }
 
-func (o BucketReplicationConfigTransformPtrOutput) ToBucketReplicationConfigTransformPtrOutputWithContext(ctx context.Context) BucketReplicationConfigTransformPtrOutput {
+func (o BucketReplicationConfigHatchPtrOutput) ToBucketReplicationConfigHatchPtrOutputWithContext(ctx context.Context) BucketReplicationConfigHatchPtrOutput {
 	return o
 }
 
-func (o BucketReplicationConfigTransformPtrOutput) Elem() BucketReplicationConfigTransformOutput {
-	return o.ApplyT(func(v *BucketReplicationConfigTransform) BucketReplicationConfigTransform {
+func (o BucketReplicationConfigHatchPtrOutput) Elem() BucketReplicationConfigHatchOutput {
+	return o.ApplyT(func(v *BucketReplicationConfigHatch) BucketReplicationConfigHatch {
 		if v != nil {
 			return *v
 		}
-		var ret BucketReplicationConfigTransform
+		var ret BucketReplicationConfigHatch
 		return ret
-	}).(BucketReplicationConfigTransformOutput)
+	}).(BucketReplicationConfigHatchOutput)
 }
 
 // Name of the source S3 bucket you want Amazon S3 to monitor.
-func (o BucketReplicationConfigTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketReplicationConfigTransform) *string {
+func (o BucketReplicationConfigHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketReplicationConfigHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -1999,8 +2357,8 @@ func (o BucketReplicationConfigTransformPtrOutput) Bucket() pulumi.StringPtrOutp
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketReplicationConfigTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketReplicationConfigTransform) *string {
+func (o BucketReplicationConfigHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketReplicationConfigHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -2009,8 +2367,8 @@ func (o BucketReplicationConfigTransformPtrOutput) Region() pulumi.StringPtrOutp
 }
 
 // ARN of the IAM role for Amazon S3 to assume when replicating the objects.
-func (o BucketReplicationConfigTransformPtrOutput) Role() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketReplicationConfigTransform) *string {
+func (o BucketReplicationConfigHatchPtrOutput) Role() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketReplicationConfigHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -2026,8 +2384,8 @@ func (o BucketReplicationConfigTransformPtrOutput) Role() pulumi.StringPtrOutput
 //
 // > **NOTE:** The <span pulumi-lang-nodejs="`existingObjectReplication`" pulumi-lang-dotnet="`ExistingObjectReplication`" pulumi-lang-go="`existingObjectReplication`" pulumi-lang-python="`existing_object_replication`" pulumi-lang-yaml="`existingObjectReplication`" pulumi-lang-java="`existingObjectReplication`">`existing_object_replication`</span> parameter is not supported by Amazon S3 at this time and should not be included in your <span pulumi-lang-nodejs="`rule`" pulumi-lang-dotnet="`Rule`" pulumi-lang-go="`rule`" pulumi-lang-python="`rule`" pulumi-lang-yaml="`rule`" pulumi-lang-java="`rule`">`rule`</span> configurations. Specifying this parameter will result in `MalformedXML` errors.
 // To replicate existing objects, please refer to the [Replicating existing objects with S3 Batch Replication](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-batch-replication-batch.html) documentation in the Amazon S3 User Guide.
-func (o BucketReplicationConfigTransformPtrOutput) Rules() s3.BucketReplicationConfigRuleArrayOutput {
-	return o.ApplyT(func(v *BucketReplicationConfigTransform) []s3.BucketReplicationConfigRule {
+func (o BucketReplicationConfigHatchPtrOutput) Rules() s3.BucketReplicationConfigRuleArrayOutput {
+	return o.ApplyT(func(v *BucketReplicationConfigHatch) []s3.BucketReplicationConfigRule {
 		if v == nil {
 			return nil
 		}
@@ -2037,8 +2395,8 @@ func (o BucketReplicationConfigTransformPtrOutput) Rules() s3.BucketReplicationC
 
 // Token to allow replication to be enabled on an Object Lock-enabled bucket. You must contact AWS support for the bucket's "Object Lock token".
 // For more details, see [Using S3 Object Lock with replication](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-managing.html#object-lock-managing-replication).
-func (o BucketReplicationConfigTransformPtrOutput) Token() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketReplicationConfigTransform) *string {
+func (o BucketReplicationConfigHatchPtrOutput) Token() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketReplicationConfigHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -2046,7 +2404,7 @@ func (o BucketReplicationConfigTransformPtrOutput) Token() pulumi.StringPtrOutpu
 	}).(pulumi.StringPtrOutput)
 }
 
-type BucketRequestPaymentConfigurationTransform struct {
+type BucketRequestPaymentConfigurationHatch struct {
 	// Name of the bucket.
 	Bucket *string `pulumi:"bucket"`
 	// Account ID of the expected bucket owner.
@@ -2059,18 +2417,18 @@ type BucketRequestPaymentConfigurationTransform struct {
 	Region *string `pulumi:"region"`
 }
 
-// BucketRequestPaymentConfigurationTransformInput is an input type that accepts BucketRequestPaymentConfigurationTransformArgs and BucketRequestPaymentConfigurationTransformOutput values.
-// You can construct a concrete instance of `BucketRequestPaymentConfigurationTransformInput` via:
+// BucketRequestPaymentConfigurationHatchInput is an input type that accepts BucketRequestPaymentConfigurationHatchArgs and BucketRequestPaymentConfigurationHatchOutput values.
+// You can construct a concrete instance of `BucketRequestPaymentConfigurationHatchInput` via:
 //
-//	BucketRequestPaymentConfigurationTransformArgs{...}
-type BucketRequestPaymentConfigurationTransformInput interface {
+//	BucketRequestPaymentConfigurationHatchArgs{...}
+type BucketRequestPaymentConfigurationHatchInput interface {
 	pulumi.Input
 
-	ToBucketRequestPaymentConfigurationTransformOutput() BucketRequestPaymentConfigurationTransformOutput
-	ToBucketRequestPaymentConfigurationTransformOutputWithContext(context.Context) BucketRequestPaymentConfigurationTransformOutput
+	ToBucketRequestPaymentConfigurationHatchOutput() BucketRequestPaymentConfigurationHatchOutput
+	ToBucketRequestPaymentConfigurationHatchOutputWithContext(context.Context) BucketRequestPaymentConfigurationHatchOutput
 }
 
-type BucketRequestPaymentConfigurationTransformArgs struct {
+type BucketRequestPaymentConfigurationHatchArgs struct {
 	// Name of the bucket.
 	Bucket pulumi.StringPtrInput `pulumi:"bucket"`
 	// Account ID of the expected bucket owner.
@@ -2083,132 +2441,132 @@ type BucketRequestPaymentConfigurationTransformArgs struct {
 	Region pulumi.StringPtrInput `pulumi:"region"`
 }
 
-func (BucketRequestPaymentConfigurationTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketRequestPaymentConfigurationTransform)(nil)).Elem()
+func (BucketRequestPaymentConfigurationHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketRequestPaymentConfigurationHatch)(nil)).Elem()
 }
 
-func (i BucketRequestPaymentConfigurationTransformArgs) ToBucketRequestPaymentConfigurationTransformOutput() BucketRequestPaymentConfigurationTransformOutput {
-	return i.ToBucketRequestPaymentConfigurationTransformOutputWithContext(context.Background())
+func (i BucketRequestPaymentConfigurationHatchArgs) ToBucketRequestPaymentConfigurationHatchOutput() BucketRequestPaymentConfigurationHatchOutput {
+	return i.ToBucketRequestPaymentConfigurationHatchOutputWithContext(context.Background())
 }
 
-func (i BucketRequestPaymentConfigurationTransformArgs) ToBucketRequestPaymentConfigurationTransformOutputWithContext(ctx context.Context) BucketRequestPaymentConfigurationTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketRequestPaymentConfigurationTransformOutput)
+func (i BucketRequestPaymentConfigurationHatchArgs) ToBucketRequestPaymentConfigurationHatchOutputWithContext(ctx context.Context) BucketRequestPaymentConfigurationHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketRequestPaymentConfigurationHatchOutput)
 }
 
-func (i BucketRequestPaymentConfigurationTransformArgs) ToBucketRequestPaymentConfigurationTransformPtrOutput() BucketRequestPaymentConfigurationTransformPtrOutput {
-	return i.ToBucketRequestPaymentConfigurationTransformPtrOutputWithContext(context.Background())
+func (i BucketRequestPaymentConfigurationHatchArgs) ToBucketRequestPaymentConfigurationHatchPtrOutput() BucketRequestPaymentConfigurationHatchPtrOutput {
+	return i.ToBucketRequestPaymentConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i BucketRequestPaymentConfigurationTransformArgs) ToBucketRequestPaymentConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketRequestPaymentConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketRequestPaymentConfigurationTransformOutput).ToBucketRequestPaymentConfigurationTransformPtrOutputWithContext(ctx)
+func (i BucketRequestPaymentConfigurationHatchArgs) ToBucketRequestPaymentConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketRequestPaymentConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketRequestPaymentConfigurationHatchOutput).ToBucketRequestPaymentConfigurationHatchPtrOutputWithContext(ctx)
 }
 
-// BucketRequestPaymentConfigurationTransformPtrInput is an input type that accepts BucketRequestPaymentConfigurationTransformArgs, BucketRequestPaymentConfigurationTransformPtr and BucketRequestPaymentConfigurationTransformPtrOutput values.
-// You can construct a concrete instance of `BucketRequestPaymentConfigurationTransformPtrInput` via:
+// BucketRequestPaymentConfigurationHatchPtrInput is an input type that accepts BucketRequestPaymentConfigurationHatchArgs, BucketRequestPaymentConfigurationHatchPtr and BucketRequestPaymentConfigurationHatchPtrOutput values.
+// You can construct a concrete instance of `BucketRequestPaymentConfigurationHatchPtrInput` via:
 //
-//	        BucketRequestPaymentConfigurationTransformArgs{...}
+//	        BucketRequestPaymentConfigurationHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketRequestPaymentConfigurationTransformPtrInput interface {
+type BucketRequestPaymentConfigurationHatchPtrInput interface {
 	pulumi.Input
 
-	ToBucketRequestPaymentConfigurationTransformPtrOutput() BucketRequestPaymentConfigurationTransformPtrOutput
-	ToBucketRequestPaymentConfigurationTransformPtrOutputWithContext(context.Context) BucketRequestPaymentConfigurationTransformPtrOutput
+	ToBucketRequestPaymentConfigurationHatchPtrOutput() BucketRequestPaymentConfigurationHatchPtrOutput
+	ToBucketRequestPaymentConfigurationHatchPtrOutputWithContext(context.Context) BucketRequestPaymentConfigurationHatchPtrOutput
 }
 
-type bucketRequestPaymentConfigurationTransformPtrType BucketRequestPaymentConfigurationTransformArgs
+type bucketRequestPaymentConfigurationHatchPtrType BucketRequestPaymentConfigurationHatchArgs
 
-func BucketRequestPaymentConfigurationTransformPtr(v *BucketRequestPaymentConfigurationTransformArgs) BucketRequestPaymentConfigurationTransformPtrInput {
-	return (*bucketRequestPaymentConfigurationTransformPtrType)(v)
+func BucketRequestPaymentConfigurationHatchPtr(v *BucketRequestPaymentConfigurationHatchArgs) BucketRequestPaymentConfigurationHatchPtrInput {
+	return (*bucketRequestPaymentConfigurationHatchPtrType)(v)
 }
 
-func (*bucketRequestPaymentConfigurationTransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketRequestPaymentConfigurationTransform)(nil)).Elem()
+func (*bucketRequestPaymentConfigurationHatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketRequestPaymentConfigurationHatch)(nil)).Elem()
 }
 
-func (i *bucketRequestPaymentConfigurationTransformPtrType) ToBucketRequestPaymentConfigurationTransformPtrOutput() BucketRequestPaymentConfigurationTransformPtrOutput {
-	return i.ToBucketRequestPaymentConfigurationTransformPtrOutputWithContext(context.Background())
+func (i *bucketRequestPaymentConfigurationHatchPtrType) ToBucketRequestPaymentConfigurationHatchPtrOutput() BucketRequestPaymentConfigurationHatchPtrOutput {
+	return i.ToBucketRequestPaymentConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketRequestPaymentConfigurationTransformPtrType) ToBucketRequestPaymentConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketRequestPaymentConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketRequestPaymentConfigurationTransformPtrOutput)
+func (i *bucketRequestPaymentConfigurationHatchPtrType) ToBucketRequestPaymentConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketRequestPaymentConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketRequestPaymentConfigurationHatchPtrOutput)
 }
 
-type BucketRequestPaymentConfigurationTransformOutput struct{ *pulumi.OutputState }
+type BucketRequestPaymentConfigurationHatchOutput struct{ *pulumi.OutputState }
 
-func (BucketRequestPaymentConfigurationTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketRequestPaymentConfigurationTransform)(nil)).Elem()
+func (BucketRequestPaymentConfigurationHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketRequestPaymentConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketRequestPaymentConfigurationTransformOutput) ToBucketRequestPaymentConfigurationTransformOutput() BucketRequestPaymentConfigurationTransformOutput {
+func (o BucketRequestPaymentConfigurationHatchOutput) ToBucketRequestPaymentConfigurationHatchOutput() BucketRequestPaymentConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketRequestPaymentConfigurationTransformOutput) ToBucketRequestPaymentConfigurationTransformOutputWithContext(ctx context.Context) BucketRequestPaymentConfigurationTransformOutput {
+func (o BucketRequestPaymentConfigurationHatchOutput) ToBucketRequestPaymentConfigurationHatchOutputWithContext(ctx context.Context) BucketRequestPaymentConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketRequestPaymentConfigurationTransformOutput) ToBucketRequestPaymentConfigurationTransformPtrOutput() BucketRequestPaymentConfigurationTransformPtrOutput {
-	return o.ToBucketRequestPaymentConfigurationTransformPtrOutputWithContext(context.Background())
+func (o BucketRequestPaymentConfigurationHatchOutput) ToBucketRequestPaymentConfigurationHatchPtrOutput() BucketRequestPaymentConfigurationHatchPtrOutput {
+	return o.ToBucketRequestPaymentConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (o BucketRequestPaymentConfigurationTransformOutput) ToBucketRequestPaymentConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketRequestPaymentConfigurationTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketRequestPaymentConfigurationTransform) *BucketRequestPaymentConfigurationTransform {
+func (o BucketRequestPaymentConfigurationHatchOutput) ToBucketRequestPaymentConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketRequestPaymentConfigurationHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketRequestPaymentConfigurationHatch) *BucketRequestPaymentConfigurationHatch {
 		return &v
-	}).(BucketRequestPaymentConfigurationTransformPtrOutput)
+	}).(BucketRequestPaymentConfigurationHatchPtrOutput)
 }
 
 // Name of the bucket.
-func (o BucketRequestPaymentConfigurationTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketRequestPaymentConfigurationTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o BucketRequestPaymentConfigurationHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketRequestPaymentConfigurationHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketRequestPaymentConfigurationTransformOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketRequestPaymentConfigurationTransform) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
+func (o BucketRequestPaymentConfigurationHatchOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketRequestPaymentConfigurationHatch) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
 }
 
 // Specifies who pays for the download and request fees. Valid values: `BucketOwner`, `Requester`.
-func (o BucketRequestPaymentConfigurationTransformOutput) Payer() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketRequestPaymentConfigurationTransform) *string { return v.Payer }).(pulumi.StringPtrOutput)
+func (o BucketRequestPaymentConfigurationHatchOutput) Payer() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketRequestPaymentConfigurationHatch) *string { return v.Payer }).(pulumi.StringPtrOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketRequestPaymentConfigurationTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketRequestPaymentConfigurationTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o BucketRequestPaymentConfigurationHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketRequestPaymentConfigurationHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
-type BucketRequestPaymentConfigurationTransformPtrOutput struct{ *pulumi.OutputState }
+type BucketRequestPaymentConfigurationHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketRequestPaymentConfigurationTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketRequestPaymentConfigurationTransform)(nil)).Elem()
+func (BucketRequestPaymentConfigurationHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketRequestPaymentConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketRequestPaymentConfigurationTransformPtrOutput) ToBucketRequestPaymentConfigurationTransformPtrOutput() BucketRequestPaymentConfigurationTransformPtrOutput {
+func (o BucketRequestPaymentConfigurationHatchPtrOutput) ToBucketRequestPaymentConfigurationHatchPtrOutput() BucketRequestPaymentConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketRequestPaymentConfigurationTransformPtrOutput) ToBucketRequestPaymentConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketRequestPaymentConfigurationTransformPtrOutput {
+func (o BucketRequestPaymentConfigurationHatchPtrOutput) ToBucketRequestPaymentConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketRequestPaymentConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketRequestPaymentConfigurationTransformPtrOutput) Elem() BucketRequestPaymentConfigurationTransformOutput {
-	return o.ApplyT(func(v *BucketRequestPaymentConfigurationTransform) BucketRequestPaymentConfigurationTransform {
+func (o BucketRequestPaymentConfigurationHatchPtrOutput) Elem() BucketRequestPaymentConfigurationHatchOutput {
+	return o.ApplyT(func(v *BucketRequestPaymentConfigurationHatch) BucketRequestPaymentConfigurationHatch {
 		if v != nil {
 			return *v
 		}
-		var ret BucketRequestPaymentConfigurationTransform
+		var ret BucketRequestPaymentConfigurationHatch
 		return ret
-	}).(BucketRequestPaymentConfigurationTransformOutput)
+	}).(BucketRequestPaymentConfigurationHatchOutput)
 }
 
 // Name of the bucket.
-func (o BucketRequestPaymentConfigurationTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketRequestPaymentConfigurationTransform) *string {
+func (o BucketRequestPaymentConfigurationHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketRequestPaymentConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -2219,8 +2577,8 @@ func (o BucketRequestPaymentConfigurationTransformPtrOutput) Bucket() pulumi.Str
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketRequestPaymentConfigurationTransformPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketRequestPaymentConfigurationTransform) *string {
+func (o BucketRequestPaymentConfigurationHatchPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketRequestPaymentConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -2229,8 +2587,8 @@ func (o BucketRequestPaymentConfigurationTransformPtrOutput) ExpectedBucketOwner
 }
 
 // Specifies who pays for the download and request fees. Valid values: `BucketOwner`, `Requester`.
-func (o BucketRequestPaymentConfigurationTransformPtrOutput) Payer() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketRequestPaymentConfigurationTransform) *string {
+func (o BucketRequestPaymentConfigurationHatchPtrOutput) Payer() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketRequestPaymentConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -2239,8 +2597,8 @@ func (o BucketRequestPaymentConfigurationTransformPtrOutput) Payer() pulumi.Stri
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketRequestPaymentConfigurationTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketRequestPaymentConfigurationTransform) *string {
+func (o BucketRequestPaymentConfigurationHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketRequestPaymentConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -2248,7 +2606,7 @@ func (o BucketRequestPaymentConfigurationTransformPtrOutput) Region() pulumi.Str
 	}).(pulumi.StringPtrOutput)
 }
 
-type BucketServerSideEncryptionConfigurationTransform struct {
+type BucketServerSideEncryptionConfigurationHatch struct {
 	// ID (name) of the bucket.
 	Bucket *string `pulumi:"bucket"`
 	// Account ID of the expected bucket owner.
@@ -2261,18 +2619,18 @@ type BucketServerSideEncryptionConfigurationTransform struct {
 	Rules []s3.BucketServerSideEncryptionConfigurationRule `pulumi:"rules"`
 }
 
-// BucketServerSideEncryptionConfigurationTransformInput is an input type that accepts BucketServerSideEncryptionConfigurationTransformArgs and BucketServerSideEncryptionConfigurationTransformOutput values.
-// You can construct a concrete instance of `BucketServerSideEncryptionConfigurationTransformInput` via:
+// BucketServerSideEncryptionConfigurationHatchInput is an input type that accepts BucketServerSideEncryptionConfigurationHatchArgs and BucketServerSideEncryptionConfigurationHatchOutput values.
+// You can construct a concrete instance of `BucketServerSideEncryptionConfigurationHatchInput` via:
 //
-//	BucketServerSideEncryptionConfigurationTransformArgs{...}
-type BucketServerSideEncryptionConfigurationTransformInput interface {
+//	BucketServerSideEncryptionConfigurationHatchArgs{...}
+type BucketServerSideEncryptionConfigurationHatchInput interface {
 	pulumi.Input
 
-	ToBucketServerSideEncryptionConfigurationTransformOutput() BucketServerSideEncryptionConfigurationTransformOutput
-	ToBucketServerSideEncryptionConfigurationTransformOutputWithContext(context.Context) BucketServerSideEncryptionConfigurationTransformOutput
+	ToBucketServerSideEncryptionConfigurationHatchOutput() BucketServerSideEncryptionConfigurationHatchOutput
+	ToBucketServerSideEncryptionConfigurationHatchOutputWithContext(context.Context) BucketServerSideEncryptionConfigurationHatchOutput
 }
 
-type BucketServerSideEncryptionConfigurationTransformArgs struct {
+type BucketServerSideEncryptionConfigurationHatchArgs struct {
 	// ID (name) of the bucket.
 	Bucket pulumi.StringPtrInput `pulumi:"bucket"`
 	// Account ID of the expected bucket owner.
@@ -2285,134 +2643,134 @@ type BucketServerSideEncryptionConfigurationTransformArgs struct {
 	Rules s3.BucketServerSideEncryptionConfigurationRuleArrayInput `pulumi:"rules"`
 }
 
-func (BucketServerSideEncryptionConfigurationTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketServerSideEncryptionConfigurationTransform)(nil)).Elem()
+func (BucketServerSideEncryptionConfigurationHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketServerSideEncryptionConfigurationHatch)(nil)).Elem()
 }
 
-func (i BucketServerSideEncryptionConfigurationTransformArgs) ToBucketServerSideEncryptionConfigurationTransformOutput() BucketServerSideEncryptionConfigurationTransformOutput {
-	return i.ToBucketServerSideEncryptionConfigurationTransformOutputWithContext(context.Background())
+func (i BucketServerSideEncryptionConfigurationHatchArgs) ToBucketServerSideEncryptionConfigurationHatchOutput() BucketServerSideEncryptionConfigurationHatchOutput {
+	return i.ToBucketServerSideEncryptionConfigurationHatchOutputWithContext(context.Background())
 }
 
-func (i BucketServerSideEncryptionConfigurationTransformArgs) ToBucketServerSideEncryptionConfigurationTransformOutputWithContext(ctx context.Context) BucketServerSideEncryptionConfigurationTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketServerSideEncryptionConfigurationTransformOutput)
+func (i BucketServerSideEncryptionConfigurationHatchArgs) ToBucketServerSideEncryptionConfigurationHatchOutputWithContext(ctx context.Context) BucketServerSideEncryptionConfigurationHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketServerSideEncryptionConfigurationHatchOutput)
 }
 
-func (i BucketServerSideEncryptionConfigurationTransformArgs) ToBucketServerSideEncryptionConfigurationTransformPtrOutput() BucketServerSideEncryptionConfigurationTransformPtrOutput {
-	return i.ToBucketServerSideEncryptionConfigurationTransformPtrOutputWithContext(context.Background())
+func (i BucketServerSideEncryptionConfigurationHatchArgs) ToBucketServerSideEncryptionConfigurationHatchPtrOutput() BucketServerSideEncryptionConfigurationHatchPtrOutput {
+	return i.ToBucketServerSideEncryptionConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i BucketServerSideEncryptionConfigurationTransformArgs) ToBucketServerSideEncryptionConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketServerSideEncryptionConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketServerSideEncryptionConfigurationTransformOutput).ToBucketServerSideEncryptionConfigurationTransformPtrOutputWithContext(ctx)
+func (i BucketServerSideEncryptionConfigurationHatchArgs) ToBucketServerSideEncryptionConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketServerSideEncryptionConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketServerSideEncryptionConfigurationHatchOutput).ToBucketServerSideEncryptionConfigurationHatchPtrOutputWithContext(ctx)
 }
 
-// BucketServerSideEncryptionConfigurationTransformPtrInput is an input type that accepts BucketServerSideEncryptionConfigurationTransformArgs, BucketServerSideEncryptionConfigurationTransformPtr and BucketServerSideEncryptionConfigurationTransformPtrOutput values.
-// You can construct a concrete instance of `BucketServerSideEncryptionConfigurationTransformPtrInput` via:
+// BucketServerSideEncryptionConfigurationHatchPtrInput is an input type that accepts BucketServerSideEncryptionConfigurationHatchArgs, BucketServerSideEncryptionConfigurationHatchPtr and BucketServerSideEncryptionConfigurationHatchPtrOutput values.
+// You can construct a concrete instance of `BucketServerSideEncryptionConfigurationHatchPtrInput` via:
 //
-//	        BucketServerSideEncryptionConfigurationTransformArgs{...}
+//	        BucketServerSideEncryptionConfigurationHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketServerSideEncryptionConfigurationTransformPtrInput interface {
+type BucketServerSideEncryptionConfigurationHatchPtrInput interface {
 	pulumi.Input
 
-	ToBucketServerSideEncryptionConfigurationTransformPtrOutput() BucketServerSideEncryptionConfigurationTransformPtrOutput
-	ToBucketServerSideEncryptionConfigurationTransformPtrOutputWithContext(context.Context) BucketServerSideEncryptionConfigurationTransformPtrOutput
+	ToBucketServerSideEncryptionConfigurationHatchPtrOutput() BucketServerSideEncryptionConfigurationHatchPtrOutput
+	ToBucketServerSideEncryptionConfigurationHatchPtrOutputWithContext(context.Context) BucketServerSideEncryptionConfigurationHatchPtrOutput
 }
 
-type bucketServerSideEncryptionConfigurationTransformPtrType BucketServerSideEncryptionConfigurationTransformArgs
+type bucketServerSideEncryptionConfigurationHatchPtrType BucketServerSideEncryptionConfigurationHatchArgs
 
-func BucketServerSideEncryptionConfigurationTransformPtr(v *BucketServerSideEncryptionConfigurationTransformArgs) BucketServerSideEncryptionConfigurationTransformPtrInput {
-	return (*bucketServerSideEncryptionConfigurationTransformPtrType)(v)
+func BucketServerSideEncryptionConfigurationHatchPtr(v *BucketServerSideEncryptionConfigurationHatchArgs) BucketServerSideEncryptionConfigurationHatchPtrInput {
+	return (*bucketServerSideEncryptionConfigurationHatchPtrType)(v)
 }
 
-func (*bucketServerSideEncryptionConfigurationTransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketServerSideEncryptionConfigurationTransform)(nil)).Elem()
+func (*bucketServerSideEncryptionConfigurationHatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketServerSideEncryptionConfigurationHatch)(nil)).Elem()
 }
 
-func (i *bucketServerSideEncryptionConfigurationTransformPtrType) ToBucketServerSideEncryptionConfigurationTransformPtrOutput() BucketServerSideEncryptionConfigurationTransformPtrOutput {
-	return i.ToBucketServerSideEncryptionConfigurationTransformPtrOutputWithContext(context.Background())
+func (i *bucketServerSideEncryptionConfigurationHatchPtrType) ToBucketServerSideEncryptionConfigurationHatchPtrOutput() BucketServerSideEncryptionConfigurationHatchPtrOutput {
+	return i.ToBucketServerSideEncryptionConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketServerSideEncryptionConfigurationTransformPtrType) ToBucketServerSideEncryptionConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketServerSideEncryptionConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketServerSideEncryptionConfigurationTransformPtrOutput)
+func (i *bucketServerSideEncryptionConfigurationHatchPtrType) ToBucketServerSideEncryptionConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketServerSideEncryptionConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketServerSideEncryptionConfigurationHatchPtrOutput)
 }
 
-type BucketServerSideEncryptionConfigurationTransformOutput struct{ *pulumi.OutputState }
+type BucketServerSideEncryptionConfigurationHatchOutput struct{ *pulumi.OutputState }
 
-func (BucketServerSideEncryptionConfigurationTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketServerSideEncryptionConfigurationTransform)(nil)).Elem()
+func (BucketServerSideEncryptionConfigurationHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketServerSideEncryptionConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketServerSideEncryptionConfigurationTransformOutput) ToBucketServerSideEncryptionConfigurationTransformOutput() BucketServerSideEncryptionConfigurationTransformOutput {
+func (o BucketServerSideEncryptionConfigurationHatchOutput) ToBucketServerSideEncryptionConfigurationHatchOutput() BucketServerSideEncryptionConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketServerSideEncryptionConfigurationTransformOutput) ToBucketServerSideEncryptionConfigurationTransformOutputWithContext(ctx context.Context) BucketServerSideEncryptionConfigurationTransformOutput {
+func (o BucketServerSideEncryptionConfigurationHatchOutput) ToBucketServerSideEncryptionConfigurationHatchOutputWithContext(ctx context.Context) BucketServerSideEncryptionConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketServerSideEncryptionConfigurationTransformOutput) ToBucketServerSideEncryptionConfigurationTransformPtrOutput() BucketServerSideEncryptionConfigurationTransformPtrOutput {
-	return o.ToBucketServerSideEncryptionConfigurationTransformPtrOutputWithContext(context.Background())
+func (o BucketServerSideEncryptionConfigurationHatchOutput) ToBucketServerSideEncryptionConfigurationHatchPtrOutput() BucketServerSideEncryptionConfigurationHatchPtrOutput {
+	return o.ToBucketServerSideEncryptionConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (o BucketServerSideEncryptionConfigurationTransformOutput) ToBucketServerSideEncryptionConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketServerSideEncryptionConfigurationTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketServerSideEncryptionConfigurationTransform) *BucketServerSideEncryptionConfigurationTransform {
+func (o BucketServerSideEncryptionConfigurationHatchOutput) ToBucketServerSideEncryptionConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketServerSideEncryptionConfigurationHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketServerSideEncryptionConfigurationHatch) *BucketServerSideEncryptionConfigurationHatch {
 		return &v
-	}).(BucketServerSideEncryptionConfigurationTransformPtrOutput)
+	}).(BucketServerSideEncryptionConfigurationHatchPtrOutput)
 }
 
 // ID (name) of the bucket.
-func (o BucketServerSideEncryptionConfigurationTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketServerSideEncryptionConfigurationTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o BucketServerSideEncryptionConfigurationHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketServerSideEncryptionConfigurationHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketServerSideEncryptionConfigurationTransformOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketServerSideEncryptionConfigurationTransform) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
+func (o BucketServerSideEncryptionConfigurationHatchOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketServerSideEncryptionConfigurationHatch) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketServerSideEncryptionConfigurationTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketServerSideEncryptionConfigurationTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o BucketServerSideEncryptionConfigurationHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketServerSideEncryptionConfigurationHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
 // Set of server-side encryption configuration rules. See below. Currently, only a single rule is supported.
-func (o BucketServerSideEncryptionConfigurationTransformOutput) Rules() s3.BucketServerSideEncryptionConfigurationRuleArrayOutput {
-	return o.ApplyT(func(v BucketServerSideEncryptionConfigurationTransform) []s3.BucketServerSideEncryptionConfigurationRule {
+func (o BucketServerSideEncryptionConfigurationHatchOutput) Rules() s3.BucketServerSideEncryptionConfigurationRuleArrayOutput {
+	return o.ApplyT(func(v BucketServerSideEncryptionConfigurationHatch) []s3.BucketServerSideEncryptionConfigurationRule {
 		return v.Rules
 	}).(s3.BucketServerSideEncryptionConfigurationRuleArrayOutput)
 }
 
-type BucketServerSideEncryptionConfigurationTransformPtrOutput struct{ *pulumi.OutputState }
+type BucketServerSideEncryptionConfigurationHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketServerSideEncryptionConfigurationTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketServerSideEncryptionConfigurationTransform)(nil)).Elem()
+func (BucketServerSideEncryptionConfigurationHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketServerSideEncryptionConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketServerSideEncryptionConfigurationTransformPtrOutput) ToBucketServerSideEncryptionConfigurationTransformPtrOutput() BucketServerSideEncryptionConfigurationTransformPtrOutput {
+func (o BucketServerSideEncryptionConfigurationHatchPtrOutput) ToBucketServerSideEncryptionConfigurationHatchPtrOutput() BucketServerSideEncryptionConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketServerSideEncryptionConfigurationTransformPtrOutput) ToBucketServerSideEncryptionConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketServerSideEncryptionConfigurationTransformPtrOutput {
+func (o BucketServerSideEncryptionConfigurationHatchPtrOutput) ToBucketServerSideEncryptionConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketServerSideEncryptionConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketServerSideEncryptionConfigurationTransformPtrOutput) Elem() BucketServerSideEncryptionConfigurationTransformOutput {
-	return o.ApplyT(func(v *BucketServerSideEncryptionConfigurationTransform) BucketServerSideEncryptionConfigurationTransform {
+func (o BucketServerSideEncryptionConfigurationHatchPtrOutput) Elem() BucketServerSideEncryptionConfigurationHatchOutput {
+	return o.ApplyT(func(v *BucketServerSideEncryptionConfigurationHatch) BucketServerSideEncryptionConfigurationHatch {
 		if v != nil {
 			return *v
 		}
-		var ret BucketServerSideEncryptionConfigurationTransform
+		var ret BucketServerSideEncryptionConfigurationHatch
 		return ret
-	}).(BucketServerSideEncryptionConfigurationTransformOutput)
+	}).(BucketServerSideEncryptionConfigurationHatchOutput)
 }
 
 // ID (name) of the bucket.
-func (o BucketServerSideEncryptionConfigurationTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketServerSideEncryptionConfigurationTransform) *string {
+func (o BucketServerSideEncryptionConfigurationHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketServerSideEncryptionConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -2423,8 +2781,8 @@ func (o BucketServerSideEncryptionConfigurationTransformPtrOutput) Bucket() pulu
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketServerSideEncryptionConfigurationTransformPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketServerSideEncryptionConfigurationTransform) *string {
+func (o BucketServerSideEncryptionConfigurationHatchPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketServerSideEncryptionConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -2433,8 +2791,8 @@ func (o BucketServerSideEncryptionConfigurationTransformPtrOutput) ExpectedBucke
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketServerSideEncryptionConfigurationTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketServerSideEncryptionConfigurationTransform) *string {
+func (o BucketServerSideEncryptionConfigurationHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketServerSideEncryptionConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -2443,8 +2801,8 @@ func (o BucketServerSideEncryptionConfigurationTransformPtrOutput) Region() pulu
 }
 
 // Set of server-side encryption configuration rules. See below. Currently, only a single rule is supported.
-func (o BucketServerSideEncryptionConfigurationTransformPtrOutput) Rules() s3.BucketServerSideEncryptionConfigurationRuleArrayOutput {
-	return o.ApplyT(func(v *BucketServerSideEncryptionConfigurationTransform) []s3.BucketServerSideEncryptionConfigurationRule {
+func (o BucketServerSideEncryptionConfigurationHatchPtrOutput) Rules() s3.BucketServerSideEncryptionConfigurationRuleArrayOutput {
+	return o.ApplyT(func(v *BucketServerSideEncryptionConfigurationHatch) []s3.BucketServerSideEncryptionConfigurationRule {
 		if v == nil {
 			return nil
 		}
@@ -2452,367 +2810,7 @@ func (o BucketServerSideEncryptionConfigurationTransformPtrOutput) Rules() s3.Bu
 	}).(s3.BucketServerSideEncryptionConfigurationRuleArrayOutput)
 }
 
-type BucketTransform struct {
-	// Name of the bucket.
-	Bucket *string `pulumi:"bucket"`
-	// Creates a unique bucket name beginning with the specified prefix.
-	BucketPrefix *string `pulumi:"bucketPrefix"`
-	// Boolean that indicates all objects should be deleted from the bucket when the bucket is destroyed.
-	ForceDestroy *bool `pulumi:"forceDestroy"`
-	// Indicates whether this bucket has an Object Lock configuration enabled.
-	ObjectLockEnabled *bool `pulumi:"objectLockEnabled"`
-	// Region where this resource will be managed.
-	Region *string `pulumi:"region"`
-	// Map of tags to assign to the bucket.
-	Tags map[string]string `pulumi:"tags"`
-}
-
-type BucketTransformArgs struct {
-	AccelerationStatus                *BucketAccelerateConfigurationTransform           `pulumi:"accelerationStatus"`
-	Acl                               *BucketAclTransform                               `pulumi:"acl"`
-	Bucket                            *BucketOverrides                                  `pulumi:"bucket"`
-	CorsRules                         *BucketCorsConfigurationTransform                 `pulumi:"corsRules"`
-	Grants                            *BucketAclTransform                               `pulumi:"grants"`
-	LifecycleRules                    *BucketLifecycleConfigurationTransform            `pulumi:"lifecycleRules"`
-	Logging                           *BucketLoggingTransform                           `pulumi:"logging"`
-	ObjectLockConfiguration           *BucketObjectLockConfigurationTransform           `pulumi:"objectLockConfiguration"`
-	Policy                            *BucketPolicyTransform                            `pulumi:"policy"`
-	PublicAccessBlock                 *PABTransform                                     `pulumi:"publicAccessBlock"`
-	ReplicationConfiguration          *BucketReplicationConfigTransform                 `pulumi:"replicationConfiguration"`
-	RequestPayer                      *BucketRequestPaymentConfigurationTransform       `pulumi:"requestPayer"`
-	ServerSideEncryptionConfiguration *BucketServerSideEncryptionConfigurationTransform `pulumi:"serverSideEncryptionConfiguration"`
-	Versioning                        *BucketVersioningTransform                        `pulumi:"versioning"`
-	Website                           *BucketWebsiteConfigurationTransform              `pulumi:"website"`
-}
-
-// BucketTransformArgsInput is an input type that accepts BucketTransformArgsArgs and BucketTransformArgsOutput values.
-// You can construct a concrete instance of `BucketTransformArgsInput` via:
-//
-//	BucketTransformArgsArgs{...}
-type BucketTransformArgsInput interface {
-	pulumi.Input
-
-	ToBucketTransformArgsOutput() BucketTransformArgsOutput
-	ToBucketTransformArgsOutputWithContext(context.Context) BucketTransformArgsOutput
-}
-
-type BucketTransformArgsArgs struct {
-	AccelerationStatus                BucketAccelerateConfigurationTransformPtrInput           `pulumi:"accelerationStatus"`
-	Acl                               BucketAclTransformPtrInput                               `pulumi:"acl"`
-	Bucket                            BucketOverridesPtrInput                                  `pulumi:"bucket"`
-	CorsRules                         BucketCorsConfigurationTransformPtrInput                 `pulumi:"corsRules"`
-	Grants                            BucketAclTransformPtrInput                               `pulumi:"grants"`
-	LifecycleRules                    BucketLifecycleConfigurationTransformPtrInput            `pulumi:"lifecycleRules"`
-	Logging                           BucketLoggingTransformPtrInput                           `pulumi:"logging"`
-	ObjectLockConfiguration           BucketObjectLockConfigurationTransformPtrInput           `pulumi:"objectLockConfiguration"`
-	Policy                            BucketPolicyTransformPtrInput                            `pulumi:"policy"`
-	PublicAccessBlock                 PABTransformPtrInput                                     `pulumi:"publicAccessBlock"`
-	ReplicationConfiguration          BucketReplicationConfigTransformPtrInput                 `pulumi:"replicationConfiguration"`
-	RequestPayer                      BucketRequestPaymentConfigurationTransformPtrInput       `pulumi:"requestPayer"`
-	ServerSideEncryptionConfiguration BucketServerSideEncryptionConfigurationTransformPtrInput `pulumi:"serverSideEncryptionConfiguration"`
-	Versioning                        BucketVersioningTransformPtrInput                        `pulumi:"versioning"`
-	Website                           BucketWebsiteConfigurationTransformPtrInput              `pulumi:"website"`
-}
-
-func (BucketTransformArgsArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketTransformArgs)(nil)).Elem()
-}
-
-func (i BucketTransformArgsArgs) ToBucketTransformArgsOutput() BucketTransformArgsOutput {
-	return i.ToBucketTransformArgsOutputWithContext(context.Background())
-}
-
-func (i BucketTransformArgsArgs) ToBucketTransformArgsOutputWithContext(ctx context.Context) BucketTransformArgsOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketTransformArgsOutput)
-}
-
-func (i BucketTransformArgsArgs) ToBucketTransformArgsPtrOutput() BucketTransformArgsPtrOutput {
-	return i.ToBucketTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i BucketTransformArgsArgs) ToBucketTransformArgsPtrOutputWithContext(ctx context.Context) BucketTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketTransformArgsOutput).ToBucketTransformArgsPtrOutputWithContext(ctx)
-}
-
-// BucketTransformArgsPtrInput is an input type that accepts BucketTransformArgsArgs, BucketTransformArgsPtr and BucketTransformArgsPtrOutput values.
-// You can construct a concrete instance of `BucketTransformArgsPtrInput` via:
-//
-//	        BucketTransformArgsArgs{...}
-//
-//	or:
-//
-//	        nil
-type BucketTransformArgsPtrInput interface {
-	pulumi.Input
-
-	ToBucketTransformArgsPtrOutput() BucketTransformArgsPtrOutput
-	ToBucketTransformArgsPtrOutputWithContext(context.Context) BucketTransformArgsPtrOutput
-}
-
-type bucketTransformArgsPtrType BucketTransformArgsArgs
-
-func BucketTransformArgsPtr(v *BucketTransformArgsArgs) BucketTransformArgsPtrInput {
-	return (*bucketTransformArgsPtrType)(v)
-}
-
-func (*bucketTransformArgsPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketTransformArgs)(nil)).Elem()
-}
-
-func (i *bucketTransformArgsPtrType) ToBucketTransformArgsPtrOutput() BucketTransformArgsPtrOutput {
-	return i.ToBucketTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i *bucketTransformArgsPtrType) ToBucketTransformArgsPtrOutputWithContext(ctx context.Context) BucketTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketTransformArgsPtrOutput)
-}
-
-type BucketTransformArgsOutput struct{ *pulumi.OutputState }
-
-func (BucketTransformArgsOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketTransformArgs)(nil)).Elem()
-}
-
-func (o BucketTransformArgsOutput) ToBucketTransformArgsOutput() BucketTransformArgsOutput {
-	return o
-}
-
-func (o BucketTransformArgsOutput) ToBucketTransformArgsOutputWithContext(ctx context.Context) BucketTransformArgsOutput {
-	return o
-}
-
-func (o BucketTransformArgsOutput) ToBucketTransformArgsPtrOutput() BucketTransformArgsPtrOutput {
-	return o.ToBucketTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (o BucketTransformArgsOutput) ToBucketTransformArgsPtrOutputWithContext(ctx context.Context) BucketTransformArgsPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketTransformArgs) *BucketTransformArgs {
-		return &v
-	}).(BucketTransformArgsPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) AccelerationStatus() BucketAccelerateConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketAccelerateConfigurationTransform { return v.AccelerationStatus }).(BucketAccelerateConfigurationTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) Acl() BucketAclTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketAclTransform { return v.Acl }).(BucketAclTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) Bucket() BucketOverridesPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketOverrides { return v.Bucket }).(BucketOverridesPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) CorsRules() BucketCorsConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketCorsConfigurationTransform { return v.CorsRules }).(BucketCorsConfigurationTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) Grants() BucketAclTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketAclTransform { return v.Grants }).(BucketAclTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) LifecycleRules() BucketLifecycleConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketLifecycleConfigurationTransform { return v.LifecycleRules }).(BucketLifecycleConfigurationTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) Logging() BucketLoggingTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketLoggingTransform { return v.Logging }).(BucketLoggingTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) ObjectLockConfiguration() BucketObjectLockConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketObjectLockConfigurationTransform { return v.ObjectLockConfiguration }).(BucketObjectLockConfigurationTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) Policy() BucketPolicyTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketPolicyTransform { return v.Policy }).(BucketPolicyTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) PublicAccessBlock() PABTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *PABTransform { return v.PublicAccessBlock }).(PABTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) ReplicationConfiguration() BucketReplicationConfigTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketReplicationConfigTransform { return v.ReplicationConfiguration }).(BucketReplicationConfigTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) RequestPayer() BucketRequestPaymentConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketRequestPaymentConfigurationTransform { return v.RequestPayer }).(BucketRequestPaymentConfigurationTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) ServerSideEncryptionConfiguration() BucketServerSideEncryptionConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketServerSideEncryptionConfigurationTransform {
-		return v.ServerSideEncryptionConfiguration
-	}).(BucketServerSideEncryptionConfigurationTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) Versioning() BucketVersioningTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketVersioningTransform { return v.Versioning }).(BucketVersioningTransformPtrOutput)
-}
-
-func (o BucketTransformArgsOutput) Website() BucketWebsiteConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketWebsiteConfigurationTransform { return v.Website }).(BucketWebsiteConfigurationTransformPtrOutput)
-}
-
-type BucketTransformArgsPtrOutput struct{ *pulumi.OutputState }
-
-func (BucketTransformArgsPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketTransformArgs)(nil)).Elem()
-}
-
-func (o BucketTransformArgsPtrOutput) ToBucketTransformArgsPtrOutput() BucketTransformArgsPtrOutput {
-	return o
-}
-
-func (o BucketTransformArgsPtrOutput) ToBucketTransformArgsPtrOutputWithContext(ctx context.Context) BucketTransformArgsPtrOutput {
-	return o
-}
-
-func (o BucketTransformArgsPtrOutput) Elem() BucketTransformArgsOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) BucketTransformArgs {
-		if v != nil {
-			return *v
-		}
-		var ret BucketTransformArgs
-		return ret
-	}).(BucketTransformArgsOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) AccelerationStatus() BucketAccelerateConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketAccelerateConfigurationTransform {
-		if v == nil {
-			return nil
-		}
-		return v.AccelerationStatus
-	}).(BucketAccelerateConfigurationTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) Acl() BucketAclTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketAclTransform {
-		if v == nil {
-			return nil
-		}
-		return v.Acl
-	}).(BucketAclTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) Bucket() BucketOverridesPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketOverrides {
-		if v == nil {
-			return nil
-		}
-		return v.Bucket
-	}).(BucketOverridesPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) CorsRules() BucketCorsConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketCorsConfigurationTransform {
-		if v == nil {
-			return nil
-		}
-		return v.CorsRules
-	}).(BucketCorsConfigurationTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) Grants() BucketAclTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketAclTransform {
-		if v == nil {
-			return nil
-		}
-		return v.Grants
-	}).(BucketAclTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) LifecycleRules() BucketLifecycleConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketLifecycleConfigurationTransform {
-		if v == nil {
-			return nil
-		}
-		return v.LifecycleRules
-	}).(BucketLifecycleConfigurationTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) Logging() BucketLoggingTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketLoggingTransform {
-		if v == nil {
-			return nil
-		}
-		return v.Logging
-	}).(BucketLoggingTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) ObjectLockConfiguration() BucketObjectLockConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketObjectLockConfigurationTransform {
-		if v == nil {
-			return nil
-		}
-		return v.ObjectLockConfiguration
-	}).(BucketObjectLockConfigurationTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) Policy() BucketPolicyTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketPolicyTransform {
-		if v == nil {
-			return nil
-		}
-		return v.Policy
-	}).(BucketPolicyTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) PublicAccessBlock() PABTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *PABTransform {
-		if v == nil {
-			return nil
-		}
-		return v.PublicAccessBlock
-	}).(PABTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) ReplicationConfiguration() BucketReplicationConfigTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketReplicationConfigTransform {
-		if v == nil {
-			return nil
-		}
-		return v.ReplicationConfiguration
-	}).(BucketReplicationConfigTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) RequestPayer() BucketRequestPaymentConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketRequestPaymentConfigurationTransform {
-		if v == nil {
-			return nil
-		}
-		return v.RequestPayer
-	}).(BucketRequestPaymentConfigurationTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) ServerSideEncryptionConfiguration() BucketServerSideEncryptionConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketServerSideEncryptionConfigurationTransform {
-		if v == nil {
-			return nil
-		}
-		return v.ServerSideEncryptionConfiguration
-	}).(BucketServerSideEncryptionConfigurationTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) Versioning() BucketVersioningTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketVersioningTransform {
-		if v == nil {
-			return nil
-		}
-		return v.Versioning
-	}).(BucketVersioningTransformPtrOutput)
-}
-
-func (o BucketTransformArgsPtrOutput) Website() BucketWebsiteConfigurationTransformPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketWebsiteConfigurationTransform {
-		if v == nil {
-			return nil
-		}
-		return v.Website
-	}).(BucketWebsiteConfigurationTransformPtrOutput)
-}
-
-type BucketVersioningTransform struct {
+type BucketVersioningHatch struct {
 	// Name of the S3 bucket.
 	Bucket *string `pulumi:"bucket"`
 	// Account ID of the expected bucket owner.
@@ -2827,18 +2825,18 @@ type BucketVersioningTransform struct {
 	VersioningConfiguration *s3.BucketVersioningVersioningConfiguration `pulumi:"versioningConfiguration"`
 }
 
-// BucketVersioningTransformInput is an input type that accepts BucketVersioningTransformArgs and BucketVersioningTransformOutput values.
-// You can construct a concrete instance of `BucketVersioningTransformInput` via:
+// BucketVersioningHatchInput is an input type that accepts BucketVersioningHatchArgs and BucketVersioningHatchOutput values.
+// You can construct a concrete instance of `BucketVersioningHatchInput` via:
 //
-//	BucketVersioningTransformArgs{...}
-type BucketVersioningTransformInput interface {
+//	BucketVersioningHatchArgs{...}
+type BucketVersioningHatchInput interface {
 	pulumi.Input
 
-	ToBucketVersioningTransformOutput() BucketVersioningTransformOutput
-	ToBucketVersioningTransformOutputWithContext(context.Context) BucketVersioningTransformOutput
+	ToBucketVersioningHatchOutput() BucketVersioningHatchOutput
+	ToBucketVersioningHatchOutputWithContext(context.Context) BucketVersioningHatchOutput
 }
 
-type BucketVersioningTransformArgs struct {
+type BucketVersioningHatchArgs struct {
 	// Name of the S3 bucket.
 	Bucket pulumi.StringPtrInput `pulumi:"bucket"`
 	// Account ID of the expected bucket owner.
@@ -2853,139 +2851,139 @@ type BucketVersioningTransformArgs struct {
 	VersioningConfiguration s3.BucketVersioningVersioningConfigurationPtrInput `pulumi:"versioningConfiguration"`
 }
 
-func (BucketVersioningTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketVersioningTransform)(nil)).Elem()
+func (BucketVersioningHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketVersioningHatch)(nil)).Elem()
 }
 
-func (i BucketVersioningTransformArgs) ToBucketVersioningTransformOutput() BucketVersioningTransformOutput {
-	return i.ToBucketVersioningTransformOutputWithContext(context.Background())
+func (i BucketVersioningHatchArgs) ToBucketVersioningHatchOutput() BucketVersioningHatchOutput {
+	return i.ToBucketVersioningHatchOutputWithContext(context.Background())
 }
 
-func (i BucketVersioningTransformArgs) ToBucketVersioningTransformOutputWithContext(ctx context.Context) BucketVersioningTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketVersioningTransformOutput)
+func (i BucketVersioningHatchArgs) ToBucketVersioningHatchOutputWithContext(ctx context.Context) BucketVersioningHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketVersioningHatchOutput)
 }
 
-func (i BucketVersioningTransformArgs) ToBucketVersioningTransformPtrOutput() BucketVersioningTransformPtrOutput {
-	return i.ToBucketVersioningTransformPtrOutputWithContext(context.Background())
+func (i BucketVersioningHatchArgs) ToBucketVersioningHatchPtrOutput() BucketVersioningHatchPtrOutput {
+	return i.ToBucketVersioningHatchPtrOutputWithContext(context.Background())
 }
 
-func (i BucketVersioningTransformArgs) ToBucketVersioningTransformPtrOutputWithContext(ctx context.Context) BucketVersioningTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketVersioningTransformOutput).ToBucketVersioningTransformPtrOutputWithContext(ctx)
+func (i BucketVersioningHatchArgs) ToBucketVersioningHatchPtrOutputWithContext(ctx context.Context) BucketVersioningHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketVersioningHatchOutput).ToBucketVersioningHatchPtrOutputWithContext(ctx)
 }
 
-// BucketVersioningTransformPtrInput is an input type that accepts BucketVersioningTransformArgs, BucketVersioningTransformPtr and BucketVersioningTransformPtrOutput values.
-// You can construct a concrete instance of `BucketVersioningTransformPtrInput` via:
+// BucketVersioningHatchPtrInput is an input type that accepts BucketVersioningHatchArgs, BucketVersioningHatchPtr and BucketVersioningHatchPtrOutput values.
+// You can construct a concrete instance of `BucketVersioningHatchPtrInput` via:
 //
-//	        BucketVersioningTransformArgs{...}
+//	        BucketVersioningHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketVersioningTransformPtrInput interface {
+type BucketVersioningHatchPtrInput interface {
 	pulumi.Input
 
-	ToBucketVersioningTransformPtrOutput() BucketVersioningTransformPtrOutput
-	ToBucketVersioningTransformPtrOutputWithContext(context.Context) BucketVersioningTransformPtrOutput
+	ToBucketVersioningHatchPtrOutput() BucketVersioningHatchPtrOutput
+	ToBucketVersioningHatchPtrOutputWithContext(context.Context) BucketVersioningHatchPtrOutput
 }
 
-type bucketVersioningTransformPtrType BucketVersioningTransformArgs
+type bucketVersioningHatchPtrType BucketVersioningHatchArgs
 
-func BucketVersioningTransformPtr(v *BucketVersioningTransformArgs) BucketVersioningTransformPtrInput {
-	return (*bucketVersioningTransformPtrType)(v)
+func BucketVersioningHatchPtr(v *BucketVersioningHatchArgs) BucketVersioningHatchPtrInput {
+	return (*bucketVersioningHatchPtrType)(v)
 }
 
-func (*bucketVersioningTransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketVersioningTransform)(nil)).Elem()
+func (*bucketVersioningHatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketVersioningHatch)(nil)).Elem()
 }
 
-func (i *bucketVersioningTransformPtrType) ToBucketVersioningTransformPtrOutput() BucketVersioningTransformPtrOutput {
-	return i.ToBucketVersioningTransformPtrOutputWithContext(context.Background())
+func (i *bucketVersioningHatchPtrType) ToBucketVersioningHatchPtrOutput() BucketVersioningHatchPtrOutput {
+	return i.ToBucketVersioningHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketVersioningTransformPtrType) ToBucketVersioningTransformPtrOutputWithContext(ctx context.Context) BucketVersioningTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketVersioningTransformPtrOutput)
+func (i *bucketVersioningHatchPtrType) ToBucketVersioningHatchPtrOutputWithContext(ctx context.Context) BucketVersioningHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketVersioningHatchPtrOutput)
 }
 
-type BucketVersioningTransformOutput struct{ *pulumi.OutputState }
+type BucketVersioningHatchOutput struct{ *pulumi.OutputState }
 
-func (BucketVersioningTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketVersioningTransform)(nil)).Elem()
+func (BucketVersioningHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketVersioningHatch)(nil)).Elem()
 }
 
-func (o BucketVersioningTransformOutput) ToBucketVersioningTransformOutput() BucketVersioningTransformOutput {
+func (o BucketVersioningHatchOutput) ToBucketVersioningHatchOutput() BucketVersioningHatchOutput {
 	return o
 }
 
-func (o BucketVersioningTransformOutput) ToBucketVersioningTransformOutputWithContext(ctx context.Context) BucketVersioningTransformOutput {
+func (o BucketVersioningHatchOutput) ToBucketVersioningHatchOutputWithContext(ctx context.Context) BucketVersioningHatchOutput {
 	return o
 }
 
-func (o BucketVersioningTransformOutput) ToBucketVersioningTransformPtrOutput() BucketVersioningTransformPtrOutput {
-	return o.ToBucketVersioningTransformPtrOutputWithContext(context.Background())
+func (o BucketVersioningHatchOutput) ToBucketVersioningHatchPtrOutput() BucketVersioningHatchPtrOutput {
+	return o.ToBucketVersioningHatchPtrOutputWithContext(context.Background())
 }
 
-func (o BucketVersioningTransformOutput) ToBucketVersioningTransformPtrOutputWithContext(ctx context.Context) BucketVersioningTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketVersioningTransform) *BucketVersioningTransform {
+func (o BucketVersioningHatchOutput) ToBucketVersioningHatchPtrOutputWithContext(ctx context.Context) BucketVersioningHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketVersioningHatch) *BucketVersioningHatch {
 		return &v
-	}).(BucketVersioningTransformPtrOutput)
+	}).(BucketVersioningHatchPtrOutput)
 }
 
 // Name of the S3 bucket.
-func (o BucketVersioningTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketVersioningTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o BucketVersioningHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketVersioningHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketVersioningTransformOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketVersioningTransform) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
+func (o BucketVersioningHatchOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketVersioningHatch) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
 }
 
 // Concatenation of the authentication device's serial number, a space, and the value that is displayed on your authentication device.
-func (o BucketVersioningTransformOutput) Mfa() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketVersioningTransform) *string { return v.Mfa }).(pulumi.StringPtrOutput)
+func (o BucketVersioningHatchOutput) Mfa() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketVersioningHatch) *string { return v.Mfa }).(pulumi.StringPtrOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketVersioningTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketVersioningTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o BucketVersioningHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketVersioningHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
 // Configuration block for the versioning parameters. See below.
-func (o BucketVersioningTransformOutput) VersioningConfiguration() s3.BucketVersioningVersioningConfigurationPtrOutput {
-	return o.ApplyT(func(v BucketVersioningTransform) *s3.BucketVersioningVersioningConfiguration {
+func (o BucketVersioningHatchOutput) VersioningConfiguration() s3.BucketVersioningVersioningConfigurationPtrOutput {
+	return o.ApplyT(func(v BucketVersioningHatch) *s3.BucketVersioningVersioningConfiguration {
 		return v.VersioningConfiguration
 	}).(s3.BucketVersioningVersioningConfigurationPtrOutput)
 }
 
-type BucketVersioningTransformPtrOutput struct{ *pulumi.OutputState }
+type BucketVersioningHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketVersioningTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketVersioningTransform)(nil)).Elem()
+func (BucketVersioningHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketVersioningHatch)(nil)).Elem()
 }
 
-func (o BucketVersioningTransformPtrOutput) ToBucketVersioningTransformPtrOutput() BucketVersioningTransformPtrOutput {
+func (o BucketVersioningHatchPtrOutput) ToBucketVersioningHatchPtrOutput() BucketVersioningHatchPtrOutput {
 	return o
 }
 
-func (o BucketVersioningTransformPtrOutput) ToBucketVersioningTransformPtrOutputWithContext(ctx context.Context) BucketVersioningTransformPtrOutput {
+func (o BucketVersioningHatchPtrOutput) ToBucketVersioningHatchPtrOutputWithContext(ctx context.Context) BucketVersioningHatchPtrOutput {
 	return o
 }
 
-func (o BucketVersioningTransformPtrOutput) Elem() BucketVersioningTransformOutput {
-	return o.ApplyT(func(v *BucketVersioningTransform) BucketVersioningTransform {
+func (o BucketVersioningHatchPtrOutput) Elem() BucketVersioningHatchOutput {
+	return o.ApplyT(func(v *BucketVersioningHatch) BucketVersioningHatch {
 		if v != nil {
 			return *v
 		}
-		var ret BucketVersioningTransform
+		var ret BucketVersioningHatch
 		return ret
-	}).(BucketVersioningTransformOutput)
+	}).(BucketVersioningHatchOutput)
 }
 
 // Name of the S3 bucket.
-func (o BucketVersioningTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketVersioningTransform) *string {
+func (o BucketVersioningHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketVersioningHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -2996,8 +2994,8 @@ func (o BucketVersioningTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketVersioningTransformPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketVersioningTransform) *string {
+func (o BucketVersioningHatchPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketVersioningHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -3006,8 +3004,8 @@ func (o BucketVersioningTransformPtrOutput) ExpectedBucketOwner() pulumi.StringP
 }
 
 // Concatenation of the authentication device's serial number, a space, and the value that is displayed on your authentication device.
-func (o BucketVersioningTransformPtrOutput) Mfa() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketVersioningTransform) *string {
+func (o BucketVersioningHatchPtrOutput) Mfa() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketVersioningHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -3016,8 +3014,8 @@ func (o BucketVersioningTransformPtrOutput) Mfa() pulumi.StringPtrOutput {
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketVersioningTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketVersioningTransform) *string {
+func (o BucketVersioningHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketVersioningHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -3026,8 +3024,8 @@ func (o BucketVersioningTransformPtrOutput) Region() pulumi.StringPtrOutput {
 }
 
 // Configuration block for the versioning parameters. See below.
-func (o BucketVersioningTransformPtrOutput) VersioningConfiguration() s3.BucketVersioningVersioningConfigurationPtrOutput {
-	return o.ApplyT(func(v *BucketVersioningTransform) *s3.BucketVersioningVersioningConfiguration {
+func (o BucketVersioningHatchPtrOutput) VersioningConfiguration() s3.BucketVersioningVersioningConfigurationPtrOutput {
+	return o.ApplyT(func(v *BucketVersioningHatch) *s3.BucketVersioningVersioningConfiguration {
 		if v == nil {
 			return nil
 		}
@@ -3035,7 +3033,7 @@ func (o BucketVersioningTransformPtrOutput) VersioningConfiguration() s3.BucketV
 	}).(s3.BucketVersioningVersioningConfigurationPtrOutput)
 }
 
-type BucketWebsiteConfigurationTransform struct {
+type BucketWebsiteConfigurationHatch struct {
 	// Name of the bucket.
 	Bucket *string `pulumi:"bucket"`
 	// Name of the error document for the website. See below.
@@ -3057,18 +3055,18 @@ type BucketWebsiteConfigurationTransform struct {
 	RoutingRules []s3.BucketWebsiteConfigurationRoutingRule `pulumi:"routingRules"`
 }
 
-// BucketWebsiteConfigurationTransformInput is an input type that accepts BucketWebsiteConfigurationTransformArgs and BucketWebsiteConfigurationTransformOutput values.
-// You can construct a concrete instance of `BucketWebsiteConfigurationTransformInput` via:
+// BucketWebsiteConfigurationHatchInput is an input type that accepts BucketWebsiteConfigurationHatchArgs and BucketWebsiteConfigurationHatchOutput values.
+// You can construct a concrete instance of `BucketWebsiteConfigurationHatchInput` via:
 //
-//	BucketWebsiteConfigurationTransformArgs{...}
-type BucketWebsiteConfigurationTransformInput interface {
+//	BucketWebsiteConfigurationHatchArgs{...}
+type BucketWebsiteConfigurationHatchInput interface {
 	pulumi.Input
 
-	ToBucketWebsiteConfigurationTransformOutput() BucketWebsiteConfigurationTransformOutput
-	ToBucketWebsiteConfigurationTransformOutputWithContext(context.Context) BucketWebsiteConfigurationTransformOutput
+	ToBucketWebsiteConfigurationHatchOutput() BucketWebsiteConfigurationHatchOutput
+	ToBucketWebsiteConfigurationHatchOutputWithContext(context.Context) BucketWebsiteConfigurationHatchOutput
 }
 
-type BucketWebsiteConfigurationTransformArgs struct {
+type BucketWebsiteConfigurationHatchArgs struct {
 	// Name of the bucket.
 	Bucket pulumi.StringPtrInput `pulumi:"bucket"`
 	// Name of the error document for the website. See below.
@@ -3090,91 +3088,91 @@ type BucketWebsiteConfigurationTransformArgs struct {
 	RoutingRules s3.BucketWebsiteConfigurationRoutingRuleArrayInput `pulumi:"routingRules"`
 }
 
-func (BucketWebsiteConfigurationTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketWebsiteConfigurationTransform)(nil)).Elem()
+func (BucketWebsiteConfigurationHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketWebsiteConfigurationHatch)(nil)).Elem()
 }
 
-func (i BucketWebsiteConfigurationTransformArgs) ToBucketWebsiteConfigurationTransformOutput() BucketWebsiteConfigurationTransformOutput {
-	return i.ToBucketWebsiteConfigurationTransformOutputWithContext(context.Background())
+func (i BucketWebsiteConfigurationHatchArgs) ToBucketWebsiteConfigurationHatchOutput() BucketWebsiteConfigurationHatchOutput {
+	return i.ToBucketWebsiteConfigurationHatchOutputWithContext(context.Background())
 }
 
-func (i BucketWebsiteConfigurationTransformArgs) ToBucketWebsiteConfigurationTransformOutputWithContext(ctx context.Context) BucketWebsiteConfigurationTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketWebsiteConfigurationTransformOutput)
+func (i BucketWebsiteConfigurationHatchArgs) ToBucketWebsiteConfigurationHatchOutputWithContext(ctx context.Context) BucketWebsiteConfigurationHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketWebsiteConfigurationHatchOutput)
 }
 
-func (i BucketWebsiteConfigurationTransformArgs) ToBucketWebsiteConfigurationTransformPtrOutput() BucketWebsiteConfigurationTransformPtrOutput {
-	return i.ToBucketWebsiteConfigurationTransformPtrOutputWithContext(context.Background())
+func (i BucketWebsiteConfigurationHatchArgs) ToBucketWebsiteConfigurationHatchPtrOutput() BucketWebsiteConfigurationHatchPtrOutput {
+	return i.ToBucketWebsiteConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i BucketWebsiteConfigurationTransformArgs) ToBucketWebsiteConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketWebsiteConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketWebsiteConfigurationTransformOutput).ToBucketWebsiteConfigurationTransformPtrOutputWithContext(ctx)
+func (i BucketWebsiteConfigurationHatchArgs) ToBucketWebsiteConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketWebsiteConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketWebsiteConfigurationHatchOutput).ToBucketWebsiteConfigurationHatchPtrOutputWithContext(ctx)
 }
 
-// BucketWebsiteConfigurationTransformPtrInput is an input type that accepts BucketWebsiteConfigurationTransformArgs, BucketWebsiteConfigurationTransformPtr and BucketWebsiteConfigurationTransformPtrOutput values.
-// You can construct a concrete instance of `BucketWebsiteConfigurationTransformPtrInput` via:
+// BucketWebsiteConfigurationHatchPtrInput is an input type that accepts BucketWebsiteConfigurationHatchArgs, BucketWebsiteConfigurationHatchPtr and BucketWebsiteConfigurationHatchPtrOutput values.
+// You can construct a concrete instance of `BucketWebsiteConfigurationHatchPtrInput` via:
 //
-//	        BucketWebsiteConfigurationTransformArgs{...}
+//	        BucketWebsiteConfigurationHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketWebsiteConfigurationTransformPtrInput interface {
+type BucketWebsiteConfigurationHatchPtrInput interface {
 	pulumi.Input
 
-	ToBucketWebsiteConfigurationTransformPtrOutput() BucketWebsiteConfigurationTransformPtrOutput
-	ToBucketWebsiteConfigurationTransformPtrOutputWithContext(context.Context) BucketWebsiteConfigurationTransformPtrOutput
+	ToBucketWebsiteConfigurationHatchPtrOutput() BucketWebsiteConfigurationHatchPtrOutput
+	ToBucketWebsiteConfigurationHatchPtrOutputWithContext(context.Context) BucketWebsiteConfigurationHatchPtrOutput
 }
 
-type bucketWebsiteConfigurationTransformPtrType BucketWebsiteConfigurationTransformArgs
+type bucketWebsiteConfigurationHatchPtrType BucketWebsiteConfigurationHatchArgs
 
-func BucketWebsiteConfigurationTransformPtr(v *BucketWebsiteConfigurationTransformArgs) BucketWebsiteConfigurationTransformPtrInput {
-	return (*bucketWebsiteConfigurationTransformPtrType)(v)
+func BucketWebsiteConfigurationHatchPtr(v *BucketWebsiteConfigurationHatchArgs) BucketWebsiteConfigurationHatchPtrInput {
+	return (*bucketWebsiteConfigurationHatchPtrType)(v)
 }
 
-func (*bucketWebsiteConfigurationTransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketWebsiteConfigurationTransform)(nil)).Elem()
+func (*bucketWebsiteConfigurationHatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketWebsiteConfigurationHatch)(nil)).Elem()
 }
 
-func (i *bucketWebsiteConfigurationTransformPtrType) ToBucketWebsiteConfigurationTransformPtrOutput() BucketWebsiteConfigurationTransformPtrOutput {
-	return i.ToBucketWebsiteConfigurationTransformPtrOutputWithContext(context.Background())
+func (i *bucketWebsiteConfigurationHatchPtrType) ToBucketWebsiteConfigurationHatchPtrOutput() BucketWebsiteConfigurationHatchPtrOutput {
+	return i.ToBucketWebsiteConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketWebsiteConfigurationTransformPtrType) ToBucketWebsiteConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketWebsiteConfigurationTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketWebsiteConfigurationTransformPtrOutput)
+func (i *bucketWebsiteConfigurationHatchPtrType) ToBucketWebsiteConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketWebsiteConfigurationHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketWebsiteConfigurationHatchPtrOutput)
 }
 
-type BucketWebsiteConfigurationTransformOutput struct{ *pulumi.OutputState }
+type BucketWebsiteConfigurationHatchOutput struct{ *pulumi.OutputState }
 
-func (BucketWebsiteConfigurationTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketWebsiteConfigurationTransform)(nil)).Elem()
+func (BucketWebsiteConfigurationHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketWebsiteConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketWebsiteConfigurationTransformOutput) ToBucketWebsiteConfigurationTransformOutput() BucketWebsiteConfigurationTransformOutput {
+func (o BucketWebsiteConfigurationHatchOutput) ToBucketWebsiteConfigurationHatchOutput() BucketWebsiteConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketWebsiteConfigurationTransformOutput) ToBucketWebsiteConfigurationTransformOutputWithContext(ctx context.Context) BucketWebsiteConfigurationTransformOutput {
+func (o BucketWebsiteConfigurationHatchOutput) ToBucketWebsiteConfigurationHatchOutputWithContext(ctx context.Context) BucketWebsiteConfigurationHatchOutput {
 	return o
 }
 
-func (o BucketWebsiteConfigurationTransformOutput) ToBucketWebsiteConfigurationTransformPtrOutput() BucketWebsiteConfigurationTransformPtrOutput {
-	return o.ToBucketWebsiteConfigurationTransformPtrOutputWithContext(context.Background())
+func (o BucketWebsiteConfigurationHatchOutput) ToBucketWebsiteConfigurationHatchPtrOutput() BucketWebsiteConfigurationHatchPtrOutput {
+	return o.ToBucketWebsiteConfigurationHatchPtrOutputWithContext(context.Background())
 }
 
-func (o BucketWebsiteConfigurationTransformOutput) ToBucketWebsiteConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketWebsiteConfigurationTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketWebsiteConfigurationTransform) *BucketWebsiteConfigurationTransform {
+func (o BucketWebsiteConfigurationHatchOutput) ToBucketWebsiteConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketWebsiteConfigurationHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketWebsiteConfigurationHatch) *BucketWebsiteConfigurationHatch {
 		return &v
-	}).(BucketWebsiteConfigurationTransformPtrOutput)
+	}).(BucketWebsiteConfigurationHatchPtrOutput)
 }
 
 // Name of the bucket.
-func (o BucketWebsiteConfigurationTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketWebsiteConfigurationTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o BucketWebsiteConfigurationHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketWebsiteConfigurationHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Name of the error document for the website. See below.
-func (o BucketWebsiteConfigurationTransformOutput) ErrorDocument() s3.BucketWebsiteConfigurationErrorDocumentPtrOutput {
-	return o.ApplyT(func(v BucketWebsiteConfigurationTransform) *s3.BucketWebsiteConfigurationErrorDocument {
+func (o BucketWebsiteConfigurationHatchOutput) ErrorDocument() s3.BucketWebsiteConfigurationErrorDocumentPtrOutput {
+	return o.ApplyT(func(v BucketWebsiteConfigurationHatch) *s3.BucketWebsiteConfigurationErrorDocument {
 		return v.ErrorDocument
 	}).(s3.BucketWebsiteConfigurationErrorDocumentPtrOutput)
 }
@@ -3182,69 +3180,69 @@ func (o BucketWebsiteConfigurationTransformOutput) ErrorDocument() s3.BucketWebs
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketWebsiteConfigurationTransformOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketWebsiteConfigurationTransform) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
+func (o BucketWebsiteConfigurationHatchOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketWebsiteConfigurationHatch) *string { return v.ExpectedBucketOwner }).(pulumi.StringPtrOutput)
 }
 
 // Name of the index document for the website. See below.
-func (o BucketWebsiteConfigurationTransformOutput) IndexDocument() s3.BucketWebsiteConfigurationIndexDocumentPtrOutput {
-	return o.ApplyT(func(v BucketWebsiteConfigurationTransform) *s3.BucketWebsiteConfigurationIndexDocument {
+func (o BucketWebsiteConfigurationHatchOutput) IndexDocument() s3.BucketWebsiteConfigurationIndexDocumentPtrOutput {
+	return o.ApplyT(func(v BucketWebsiteConfigurationHatch) *s3.BucketWebsiteConfigurationIndexDocument {
 		return v.IndexDocument
 	}).(s3.BucketWebsiteConfigurationIndexDocumentPtrOutput)
 }
 
 // Redirect behavior for every request to this bucket's website endpoint. See below. Conflicts with <span pulumi-lang-nodejs="`errorDocument`" pulumi-lang-dotnet="`ErrorDocument`" pulumi-lang-go="`errorDocument`" pulumi-lang-python="`error_document`" pulumi-lang-yaml="`errorDocument`" pulumi-lang-java="`errorDocument`">`error_document`</span>, <span pulumi-lang-nodejs="`indexDocument`" pulumi-lang-dotnet="`IndexDocument`" pulumi-lang-go="`indexDocument`" pulumi-lang-python="`index_document`" pulumi-lang-yaml="`indexDocument`" pulumi-lang-java="`indexDocument`">`index_document`</span>, and <span pulumi-lang-nodejs="`routingRule`" pulumi-lang-dotnet="`RoutingRule`" pulumi-lang-go="`routingRule`" pulumi-lang-python="`routing_rule`" pulumi-lang-yaml="`routingRule`" pulumi-lang-java="`routingRule`">`routing_rule`</span>.
-func (o BucketWebsiteConfigurationTransformOutput) RedirectAllRequestsTo() s3.BucketWebsiteConfigurationRedirectAllRequestsToPtrOutput {
-	return o.ApplyT(func(v BucketWebsiteConfigurationTransform) *s3.BucketWebsiteConfigurationRedirectAllRequestsTo {
+func (o BucketWebsiteConfigurationHatchOutput) RedirectAllRequestsTo() s3.BucketWebsiteConfigurationRedirectAllRequestsToPtrOutput {
+	return o.ApplyT(func(v BucketWebsiteConfigurationHatch) *s3.BucketWebsiteConfigurationRedirectAllRequestsTo {
 		return v.RedirectAllRequestsTo
 	}).(s3.BucketWebsiteConfigurationRedirectAllRequestsToPtrOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketWebsiteConfigurationTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketWebsiteConfigurationTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o BucketWebsiteConfigurationHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketWebsiteConfigurationHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
 // JSON array containing [routing rules](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-websiteconfiguration-routingrules.html)
 // describing redirect behavior and when redirects are applied. Use this parameter when your routing rules contain empty String values (`""`) as seen in the example above.
-func (o BucketWebsiteConfigurationTransformOutput) RoutingRuleDetails() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v BucketWebsiteConfigurationTransform) *string { return v.RoutingRuleDetails }).(pulumi.StringPtrOutput)
+func (o BucketWebsiteConfigurationHatchOutput) RoutingRuleDetails() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v BucketWebsiteConfigurationHatch) *string { return v.RoutingRuleDetails }).(pulumi.StringPtrOutput)
 }
 
 // List of rules that define when a redirect is applied and the redirect behavior. See below.
-func (o BucketWebsiteConfigurationTransformOutput) RoutingRules() s3.BucketWebsiteConfigurationRoutingRuleArrayOutput {
-	return o.ApplyT(func(v BucketWebsiteConfigurationTransform) []s3.BucketWebsiteConfigurationRoutingRule {
+func (o BucketWebsiteConfigurationHatchOutput) RoutingRules() s3.BucketWebsiteConfigurationRoutingRuleArrayOutput {
+	return o.ApplyT(func(v BucketWebsiteConfigurationHatch) []s3.BucketWebsiteConfigurationRoutingRule {
 		return v.RoutingRules
 	}).(s3.BucketWebsiteConfigurationRoutingRuleArrayOutput)
 }
 
-type BucketWebsiteConfigurationTransformPtrOutput struct{ *pulumi.OutputState }
+type BucketWebsiteConfigurationHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketWebsiteConfigurationTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketWebsiteConfigurationTransform)(nil)).Elem()
+func (BucketWebsiteConfigurationHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketWebsiteConfigurationHatch)(nil)).Elem()
 }
 
-func (o BucketWebsiteConfigurationTransformPtrOutput) ToBucketWebsiteConfigurationTransformPtrOutput() BucketWebsiteConfigurationTransformPtrOutput {
+func (o BucketWebsiteConfigurationHatchPtrOutput) ToBucketWebsiteConfigurationHatchPtrOutput() BucketWebsiteConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketWebsiteConfigurationTransformPtrOutput) ToBucketWebsiteConfigurationTransformPtrOutputWithContext(ctx context.Context) BucketWebsiteConfigurationTransformPtrOutput {
+func (o BucketWebsiteConfigurationHatchPtrOutput) ToBucketWebsiteConfigurationHatchPtrOutputWithContext(ctx context.Context) BucketWebsiteConfigurationHatchPtrOutput {
 	return o
 }
 
-func (o BucketWebsiteConfigurationTransformPtrOutput) Elem() BucketWebsiteConfigurationTransformOutput {
-	return o.ApplyT(func(v *BucketWebsiteConfigurationTransform) BucketWebsiteConfigurationTransform {
+func (o BucketWebsiteConfigurationHatchPtrOutput) Elem() BucketWebsiteConfigurationHatchOutput {
+	return o.ApplyT(func(v *BucketWebsiteConfigurationHatch) BucketWebsiteConfigurationHatch {
 		if v != nil {
 			return *v
 		}
-		var ret BucketWebsiteConfigurationTransform
+		var ret BucketWebsiteConfigurationHatch
 		return ret
-	}).(BucketWebsiteConfigurationTransformOutput)
+	}).(BucketWebsiteConfigurationHatchOutput)
 }
 
 // Name of the bucket.
-func (o BucketWebsiteConfigurationTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketWebsiteConfigurationTransform) *string {
+func (o BucketWebsiteConfigurationHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketWebsiteConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -3253,8 +3251,8 @@ func (o BucketWebsiteConfigurationTransformPtrOutput) Bucket() pulumi.StringPtrO
 }
 
 // Name of the error document for the website. See below.
-func (o BucketWebsiteConfigurationTransformPtrOutput) ErrorDocument() s3.BucketWebsiteConfigurationErrorDocumentPtrOutput {
-	return o.ApplyT(func(v *BucketWebsiteConfigurationTransform) *s3.BucketWebsiteConfigurationErrorDocument {
+func (o BucketWebsiteConfigurationHatchPtrOutput) ErrorDocument() s3.BucketWebsiteConfigurationErrorDocumentPtrOutput {
+	return o.ApplyT(func(v *BucketWebsiteConfigurationHatch) *s3.BucketWebsiteConfigurationErrorDocument {
 		if v == nil {
 			return nil
 		}
@@ -3265,8 +3263,8 @@ func (o BucketWebsiteConfigurationTransformPtrOutput) ErrorDocument() s3.BucketW
 // Account ID of the expected bucket owner.
 //
 // Deprecated: expected_bucket_owner is deprecated. It will be removed in a future verion of the provider.
-func (o BucketWebsiteConfigurationTransformPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketWebsiteConfigurationTransform) *string {
+func (o BucketWebsiteConfigurationHatchPtrOutput) ExpectedBucketOwner() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketWebsiteConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -3275,8 +3273,8 @@ func (o BucketWebsiteConfigurationTransformPtrOutput) ExpectedBucketOwner() pulu
 }
 
 // Name of the index document for the website. See below.
-func (o BucketWebsiteConfigurationTransformPtrOutput) IndexDocument() s3.BucketWebsiteConfigurationIndexDocumentPtrOutput {
-	return o.ApplyT(func(v *BucketWebsiteConfigurationTransform) *s3.BucketWebsiteConfigurationIndexDocument {
+func (o BucketWebsiteConfigurationHatchPtrOutput) IndexDocument() s3.BucketWebsiteConfigurationIndexDocumentPtrOutput {
+	return o.ApplyT(func(v *BucketWebsiteConfigurationHatch) *s3.BucketWebsiteConfigurationIndexDocument {
 		if v == nil {
 			return nil
 		}
@@ -3285,8 +3283,8 @@ func (o BucketWebsiteConfigurationTransformPtrOutput) IndexDocument() s3.BucketW
 }
 
 // Redirect behavior for every request to this bucket's website endpoint. See below. Conflicts with <span pulumi-lang-nodejs="`errorDocument`" pulumi-lang-dotnet="`ErrorDocument`" pulumi-lang-go="`errorDocument`" pulumi-lang-python="`error_document`" pulumi-lang-yaml="`errorDocument`" pulumi-lang-java="`errorDocument`">`error_document`</span>, <span pulumi-lang-nodejs="`indexDocument`" pulumi-lang-dotnet="`IndexDocument`" pulumi-lang-go="`indexDocument`" pulumi-lang-python="`index_document`" pulumi-lang-yaml="`indexDocument`" pulumi-lang-java="`indexDocument`">`index_document`</span>, and <span pulumi-lang-nodejs="`routingRule`" pulumi-lang-dotnet="`RoutingRule`" pulumi-lang-go="`routingRule`" pulumi-lang-python="`routing_rule`" pulumi-lang-yaml="`routingRule`" pulumi-lang-java="`routingRule`">`routing_rule`</span>.
-func (o BucketWebsiteConfigurationTransformPtrOutput) RedirectAllRequestsTo() s3.BucketWebsiteConfigurationRedirectAllRequestsToPtrOutput {
-	return o.ApplyT(func(v *BucketWebsiteConfigurationTransform) *s3.BucketWebsiteConfigurationRedirectAllRequestsTo {
+func (o BucketWebsiteConfigurationHatchPtrOutput) RedirectAllRequestsTo() s3.BucketWebsiteConfigurationRedirectAllRequestsToPtrOutput {
+	return o.ApplyT(func(v *BucketWebsiteConfigurationHatch) *s3.BucketWebsiteConfigurationRedirectAllRequestsTo {
 		if v == nil {
 			return nil
 		}
@@ -3295,8 +3293,8 @@ func (o BucketWebsiteConfigurationTransformPtrOutput) RedirectAllRequestsTo() s3
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o BucketWebsiteConfigurationTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketWebsiteConfigurationTransform) *string {
+func (o BucketWebsiteConfigurationHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketWebsiteConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -3306,8 +3304,8 @@ func (o BucketWebsiteConfigurationTransformPtrOutput) Region() pulumi.StringPtrO
 
 // JSON array containing [routing rules](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-websiteconfiguration-routingrules.html)
 // describing redirect behavior and when redirects are applied. Use this parameter when your routing rules contain empty String values (`""`) as seen in the example above.
-func (o BucketWebsiteConfigurationTransformPtrOutput) RoutingRuleDetails() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *BucketWebsiteConfigurationTransform) *string {
+func (o BucketWebsiteConfigurationHatchPtrOutput) RoutingRuleDetails() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *BucketWebsiteConfigurationHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -3316,8 +3314,8 @@ func (o BucketWebsiteConfigurationTransformPtrOutput) RoutingRuleDetails() pulum
 }
 
 // List of rules that define when a redirect is applied and the redirect behavior. See below.
-func (o BucketWebsiteConfigurationTransformPtrOutput) RoutingRules() s3.BucketWebsiteConfigurationRoutingRuleArrayOutput {
-	return o.ApplyT(func(v *BucketWebsiteConfigurationTransform) []s3.BucketWebsiteConfigurationRoutingRule {
+func (o BucketWebsiteConfigurationHatchPtrOutput) RoutingRules() s3.BucketWebsiteConfigurationRoutingRuleArrayOutput {
+	return o.ApplyT(func(v *BucketWebsiteConfigurationHatch) []s3.BucketWebsiteConfigurationRoutingRule {
 		if v == nil {
 			return nil
 		}
@@ -4043,6 +4041,139 @@ func (o CognitoUserPoolEmailConfigurationPtrOutput) SesFromAddress() pulumi.Stri
 		}
 		return v.SesFromAddress
 	}).(pulumi.StringPtrOutput)
+}
+
+type CognitoUserPoolHatchArgs struct {
+	CognitoUserPool *CognitoUserPoolOverrides `pulumi:"cognitoUserPool"`
+}
+
+// CognitoUserPoolHatchArgsInput is an input type that accepts CognitoUserPoolHatchArgsArgs and CognitoUserPoolHatchArgsOutput values.
+// You can construct a concrete instance of `CognitoUserPoolHatchArgsInput` via:
+//
+//	CognitoUserPoolHatchArgsArgs{...}
+type CognitoUserPoolHatchArgsInput interface {
+	pulumi.Input
+
+	ToCognitoUserPoolHatchArgsOutput() CognitoUserPoolHatchArgsOutput
+	ToCognitoUserPoolHatchArgsOutputWithContext(context.Context) CognitoUserPoolHatchArgsOutput
+}
+
+type CognitoUserPoolHatchArgsArgs struct {
+	CognitoUserPool CognitoUserPoolOverridesPtrInput `pulumi:"cognitoUserPool"`
+}
+
+func (CognitoUserPoolHatchArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*CognitoUserPoolHatchArgs)(nil)).Elem()
+}
+
+func (i CognitoUserPoolHatchArgsArgs) ToCognitoUserPoolHatchArgsOutput() CognitoUserPoolHatchArgsOutput {
+	return i.ToCognitoUserPoolHatchArgsOutputWithContext(context.Background())
+}
+
+func (i CognitoUserPoolHatchArgsArgs) ToCognitoUserPoolHatchArgsOutputWithContext(ctx context.Context) CognitoUserPoolHatchArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CognitoUserPoolHatchArgsOutput)
+}
+
+func (i CognitoUserPoolHatchArgsArgs) ToCognitoUserPoolHatchArgsPtrOutput() CognitoUserPoolHatchArgsPtrOutput {
+	return i.ToCognitoUserPoolHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i CognitoUserPoolHatchArgsArgs) ToCognitoUserPoolHatchArgsPtrOutputWithContext(ctx context.Context) CognitoUserPoolHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CognitoUserPoolHatchArgsOutput).ToCognitoUserPoolHatchArgsPtrOutputWithContext(ctx)
+}
+
+// CognitoUserPoolHatchArgsPtrInput is an input type that accepts CognitoUserPoolHatchArgsArgs, CognitoUserPoolHatchArgsPtr and CognitoUserPoolHatchArgsPtrOutput values.
+// You can construct a concrete instance of `CognitoUserPoolHatchArgsPtrInput` via:
+//
+//	        CognitoUserPoolHatchArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type CognitoUserPoolHatchArgsPtrInput interface {
+	pulumi.Input
+
+	ToCognitoUserPoolHatchArgsPtrOutput() CognitoUserPoolHatchArgsPtrOutput
+	ToCognitoUserPoolHatchArgsPtrOutputWithContext(context.Context) CognitoUserPoolHatchArgsPtrOutput
+}
+
+type cognitoUserPoolHatchArgsPtrType CognitoUserPoolHatchArgsArgs
+
+func CognitoUserPoolHatchArgsPtr(v *CognitoUserPoolHatchArgsArgs) CognitoUserPoolHatchArgsPtrInput {
+	return (*cognitoUserPoolHatchArgsPtrType)(v)
+}
+
+func (*cognitoUserPoolHatchArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**CognitoUserPoolHatchArgs)(nil)).Elem()
+}
+
+func (i *cognitoUserPoolHatchArgsPtrType) ToCognitoUserPoolHatchArgsPtrOutput() CognitoUserPoolHatchArgsPtrOutput {
+	return i.ToCognitoUserPoolHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *cognitoUserPoolHatchArgsPtrType) ToCognitoUserPoolHatchArgsPtrOutputWithContext(ctx context.Context) CognitoUserPoolHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CognitoUserPoolHatchArgsPtrOutput)
+}
+
+type CognitoUserPoolHatchArgsOutput struct{ *pulumi.OutputState }
+
+func (CognitoUserPoolHatchArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*CognitoUserPoolHatchArgs)(nil)).Elem()
+}
+
+func (o CognitoUserPoolHatchArgsOutput) ToCognitoUserPoolHatchArgsOutput() CognitoUserPoolHatchArgsOutput {
+	return o
+}
+
+func (o CognitoUserPoolHatchArgsOutput) ToCognitoUserPoolHatchArgsOutputWithContext(ctx context.Context) CognitoUserPoolHatchArgsOutput {
+	return o
+}
+
+func (o CognitoUserPoolHatchArgsOutput) ToCognitoUserPoolHatchArgsPtrOutput() CognitoUserPoolHatchArgsPtrOutput {
+	return o.ToCognitoUserPoolHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (o CognitoUserPoolHatchArgsOutput) ToCognitoUserPoolHatchArgsPtrOutputWithContext(ctx context.Context) CognitoUserPoolHatchArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v CognitoUserPoolHatchArgs) *CognitoUserPoolHatchArgs {
+		return &v
+	}).(CognitoUserPoolHatchArgsPtrOutput)
+}
+
+func (o CognitoUserPoolHatchArgsOutput) CognitoUserPool() CognitoUserPoolOverridesPtrOutput {
+	return o.ApplyT(func(v CognitoUserPoolHatchArgs) *CognitoUserPoolOverrides { return v.CognitoUserPool }).(CognitoUserPoolOverridesPtrOutput)
+}
+
+type CognitoUserPoolHatchArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (CognitoUserPoolHatchArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**CognitoUserPoolHatchArgs)(nil)).Elem()
+}
+
+func (o CognitoUserPoolHatchArgsPtrOutput) ToCognitoUserPoolHatchArgsPtrOutput() CognitoUserPoolHatchArgsPtrOutput {
+	return o
+}
+
+func (o CognitoUserPoolHatchArgsPtrOutput) ToCognitoUserPoolHatchArgsPtrOutputWithContext(ctx context.Context) CognitoUserPoolHatchArgsPtrOutput {
+	return o
+}
+
+func (o CognitoUserPoolHatchArgsPtrOutput) Elem() CognitoUserPoolHatchArgsOutput {
+	return o.ApplyT(func(v *CognitoUserPoolHatchArgs) CognitoUserPoolHatchArgs {
+		if v != nil {
+			return *v
+		}
+		var ret CognitoUserPoolHatchArgs
+		return ret
+	}).(CognitoUserPoolHatchArgsOutput)
+}
+
+func (o CognitoUserPoolHatchArgsPtrOutput) CognitoUserPool() CognitoUserPoolOverridesPtrOutput {
+	return o.ApplyT(func(v *CognitoUserPoolHatchArgs) *CognitoUserPoolOverrides {
+		if v == nil {
+			return nil
+		}
+		return v.CognitoUserPool
+	}).(CognitoUserPoolOverridesPtrOutput)
 }
 
 // Hosted UI (Managed Login) configuration. Enables the Cognito-hosted sign-in page.
@@ -5662,139 +5793,6 @@ func (o CognitoUserPoolTokenValidityPtrOutput) RefreshTokenValidity() pulumi.Int
 	}).(pulumi.IntPtrOutput)
 }
 
-type CognitoUserPoolTransformArgs struct {
-	CognitoUserPool *CognitoUserPoolOverrides `pulumi:"cognitoUserPool"`
-}
-
-// CognitoUserPoolTransformArgsInput is an input type that accepts CognitoUserPoolTransformArgsArgs and CognitoUserPoolTransformArgsOutput values.
-// You can construct a concrete instance of `CognitoUserPoolTransformArgsInput` via:
-//
-//	CognitoUserPoolTransformArgsArgs{...}
-type CognitoUserPoolTransformArgsInput interface {
-	pulumi.Input
-
-	ToCognitoUserPoolTransformArgsOutput() CognitoUserPoolTransformArgsOutput
-	ToCognitoUserPoolTransformArgsOutputWithContext(context.Context) CognitoUserPoolTransformArgsOutput
-}
-
-type CognitoUserPoolTransformArgsArgs struct {
-	CognitoUserPool CognitoUserPoolOverridesPtrInput `pulumi:"cognitoUserPool"`
-}
-
-func (CognitoUserPoolTransformArgsArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*CognitoUserPoolTransformArgs)(nil)).Elem()
-}
-
-func (i CognitoUserPoolTransformArgsArgs) ToCognitoUserPoolTransformArgsOutput() CognitoUserPoolTransformArgsOutput {
-	return i.ToCognitoUserPoolTransformArgsOutputWithContext(context.Background())
-}
-
-func (i CognitoUserPoolTransformArgsArgs) ToCognitoUserPoolTransformArgsOutputWithContext(ctx context.Context) CognitoUserPoolTransformArgsOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(CognitoUserPoolTransformArgsOutput)
-}
-
-func (i CognitoUserPoolTransformArgsArgs) ToCognitoUserPoolTransformArgsPtrOutput() CognitoUserPoolTransformArgsPtrOutput {
-	return i.ToCognitoUserPoolTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i CognitoUserPoolTransformArgsArgs) ToCognitoUserPoolTransformArgsPtrOutputWithContext(ctx context.Context) CognitoUserPoolTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(CognitoUserPoolTransformArgsOutput).ToCognitoUserPoolTransformArgsPtrOutputWithContext(ctx)
-}
-
-// CognitoUserPoolTransformArgsPtrInput is an input type that accepts CognitoUserPoolTransformArgsArgs, CognitoUserPoolTransformArgsPtr and CognitoUserPoolTransformArgsPtrOutput values.
-// You can construct a concrete instance of `CognitoUserPoolTransformArgsPtrInput` via:
-//
-//	        CognitoUserPoolTransformArgsArgs{...}
-//
-//	or:
-//
-//	        nil
-type CognitoUserPoolTransformArgsPtrInput interface {
-	pulumi.Input
-
-	ToCognitoUserPoolTransformArgsPtrOutput() CognitoUserPoolTransformArgsPtrOutput
-	ToCognitoUserPoolTransformArgsPtrOutputWithContext(context.Context) CognitoUserPoolTransformArgsPtrOutput
-}
-
-type cognitoUserPoolTransformArgsPtrType CognitoUserPoolTransformArgsArgs
-
-func CognitoUserPoolTransformArgsPtr(v *CognitoUserPoolTransformArgsArgs) CognitoUserPoolTransformArgsPtrInput {
-	return (*cognitoUserPoolTransformArgsPtrType)(v)
-}
-
-func (*cognitoUserPoolTransformArgsPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**CognitoUserPoolTransformArgs)(nil)).Elem()
-}
-
-func (i *cognitoUserPoolTransformArgsPtrType) ToCognitoUserPoolTransformArgsPtrOutput() CognitoUserPoolTransformArgsPtrOutput {
-	return i.ToCognitoUserPoolTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i *cognitoUserPoolTransformArgsPtrType) ToCognitoUserPoolTransformArgsPtrOutputWithContext(ctx context.Context) CognitoUserPoolTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(CognitoUserPoolTransformArgsPtrOutput)
-}
-
-type CognitoUserPoolTransformArgsOutput struct{ *pulumi.OutputState }
-
-func (CognitoUserPoolTransformArgsOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*CognitoUserPoolTransformArgs)(nil)).Elem()
-}
-
-func (o CognitoUserPoolTransformArgsOutput) ToCognitoUserPoolTransformArgsOutput() CognitoUserPoolTransformArgsOutput {
-	return o
-}
-
-func (o CognitoUserPoolTransformArgsOutput) ToCognitoUserPoolTransformArgsOutputWithContext(ctx context.Context) CognitoUserPoolTransformArgsOutput {
-	return o
-}
-
-func (o CognitoUserPoolTransformArgsOutput) ToCognitoUserPoolTransformArgsPtrOutput() CognitoUserPoolTransformArgsPtrOutput {
-	return o.ToCognitoUserPoolTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (o CognitoUserPoolTransformArgsOutput) ToCognitoUserPoolTransformArgsPtrOutputWithContext(ctx context.Context) CognitoUserPoolTransformArgsPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v CognitoUserPoolTransformArgs) *CognitoUserPoolTransformArgs {
-		return &v
-	}).(CognitoUserPoolTransformArgsPtrOutput)
-}
-
-func (o CognitoUserPoolTransformArgsOutput) CognitoUserPool() CognitoUserPoolOverridesPtrOutput {
-	return o.ApplyT(func(v CognitoUserPoolTransformArgs) *CognitoUserPoolOverrides { return v.CognitoUserPool }).(CognitoUserPoolOverridesPtrOutput)
-}
-
-type CognitoUserPoolTransformArgsPtrOutput struct{ *pulumi.OutputState }
-
-func (CognitoUserPoolTransformArgsPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**CognitoUserPoolTransformArgs)(nil)).Elem()
-}
-
-func (o CognitoUserPoolTransformArgsPtrOutput) ToCognitoUserPoolTransformArgsPtrOutput() CognitoUserPoolTransformArgsPtrOutput {
-	return o
-}
-
-func (o CognitoUserPoolTransformArgsPtrOutput) ToCognitoUserPoolTransformArgsPtrOutputWithContext(ctx context.Context) CognitoUserPoolTransformArgsPtrOutput {
-	return o
-}
-
-func (o CognitoUserPoolTransformArgsPtrOutput) Elem() CognitoUserPoolTransformArgsOutput {
-	return o.ApplyT(func(v *CognitoUserPoolTransformArgs) CognitoUserPoolTransformArgs {
-		if v != nil {
-			return *v
-		}
-		var ret CognitoUserPoolTransformArgs
-		return ret
-	}).(CognitoUserPoolTransformArgsOutput)
-}
-
-func (o CognitoUserPoolTransformArgsPtrOutput) CognitoUserPool() CognitoUserPoolOverridesPtrOutput {
-	return o.ApplyT(func(v *CognitoUserPoolTransformArgs) *CognitoUserPoolOverrides {
-		if v == nil {
-			return nil
-		}
-		return v.CognitoUserPool
-	}).(CognitoUserPoolOverridesPtrOutput)
-}
-
 // Attaches a WAF to the user pool.
 type CognitoUserPoolWaf struct {
 	// ARN of a regional-scope WebACL in the same region as the pool. Pass waf.arn from an Anvil Waf with scope "regional".
@@ -6293,6 +6291,10 @@ func (o DSQLColumnArrayOutput) Index(i pulumi.IntInput) DSQLColumnOutput {
 	return pulumi.All(o, i).ApplyT(func(vs []interface{}) DSQLColumn {
 		return vs[0].([]DSQLColumn)[vs[1].(int)]
 	}).(DSQLColumnOutput)
+}
+
+type DSQLHatchArgs struct {
+	Cluster *DSQLOverrides `pulumi:"cluster"`
 }
 
 // A secondary index on a table. Created with CREATE INDEX ASYNC (DSQL requirement); the build runs in the background.
@@ -6943,10 +6945,6 @@ func (o DSQLTableArrayOutput) Index(i pulumi.IntInput) DSQLTableOutput {
 	}).(DSQLTableOutput)
 }
 
-type DSQLTransformArgs struct {
-	Cluster *DSQLOverrides `pulumi:"cluster"`
-}
-
 // VPC configuration for DSQL. When set without hasNat, Anvil creates interface VPC endpoints per region so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
 type DSQLVpcArgs struct {
 	// Signal that a NAT gateway already exists in this VPC. When true, Anvil skips interface endpoint creation — the Lambda routes to the public DSQL endpoint via NAT. When false (default), Anvil creates interface endpoints per region.
@@ -7123,6 +7121,139 @@ func (o DSQLVpcArgsPtrOutput) VpcId() pulumi.AnyOutput {
 		}
 		return v.VpcId
 	}).(pulumi.AnyOutput)
+}
+
+type DsqlHatchArgs struct {
+	Dsql *DsqlOverrides `pulumi:"dsql"`
+}
+
+// DsqlHatchArgsInput is an input type that accepts DsqlHatchArgsArgs and DsqlHatchArgsOutput values.
+// You can construct a concrete instance of `DsqlHatchArgsInput` via:
+//
+//	DsqlHatchArgsArgs{...}
+type DsqlHatchArgsInput interface {
+	pulumi.Input
+
+	ToDsqlHatchArgsOutput() DsqlHatchArgsOutput
+	ToDsqlHatchArgsOutputWithContext(context.Context) DsqlHatchArgsOutput
+}
+
+type DsqlHatchArgsArgs struct {
+	Dsql DsqlOverridesPtrInput `pulumi:"dsql"`
+}
+
+func (DsqlHatchArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*DsqlHatchArgs)(nil)).Elem()
+}
+
+func (i DsqlHatchArgsArgs) ToDsqlHatchArgsOutput() DsqlHatchArgsOutput {
+	return i.ToDsqlHatchArgsOutputWithContext(context.Background())
+}
+
+func (i DsqlHatchArgsArgs) ToDsqlHatchArgsOutputWithContext(ctx context.Context) DsqlHatchArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DsqlHatchArgsOutput)
+}
+
+func (i DsqlHatchArgsArgs) ToDsqlHatchArgsPtrOutput() DsqlHatchArgsPtrOutput {
+	return i.ToDsqlHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i DsqlHatchArgsArgs) ToDsqlHatchArgsPtrOutputWithContext(ctx context.Context) DsqlHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DsqlHatchArgsOutput).ToDsqlHatchArgsPtrOutputWithContext(ctx)
+}
+
+// DsqlHatchArgsPtrInput is an input type that accepts DsqlHatchArgsArgs, DsqlHatchArgsPtr and DsqlHatchArgsPtrOutput values.
+// You can construct a concrete instance of `DsqlHatchArgsPtrInput` via:
+//
+//	        DsqlHatchArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type DsqlHatchArgsPtrInput interface {
+	pulumi.Input
+
+	ToDsqlHatchArgsPtrOutput() DsqlHatchArgsPtrOutput
+	ToDsqlHatchArgsPtrOutputWithContext(context.Context) DsqlHatchArgsPtrOutput
+}
+
+type dsqlHatchArgsPtrType DsqlHatchArgsArgs
+
+func DsqlHatchArgsPtr(v *DsqlHatchArgsArgs) DsqlHatchArgsPtrInput {
+	return (*dsqlHatchArgsPtrType)(v)
+}
+
+func (*dsqlHatchArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**DsqlHatchArgs)(nil)).Elem()
+}
+
+func (i *dsqlHatchArgsPtrType) ToDsqlHatchArgsPtrOutput() DsqlHatchArgsPtrOutput {
+	return i.ToDsqlHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *dsqlHatchArgsPtrType) ToDsqlHatchArgsPtrOutputWithContext(ctx context.Context) DsqlHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DsqlHatchArgsPtrOutput)
+}
+
+type DsqlHatchArgsOutput struct{ *pulumi.OutputState }
+
+func (DsqlHatchArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*DsqlHatchArgs)(nil)).Elem()
+}
+
+func (o DsqlHatchArgsOutput) ToDsqlHatchArgsOutput() DsqlHatchArgsOutput {
+	return o
+}
+
+func (o DsqlHatchArgsOutput) ToDsqlHatchArgsOutputWithContext(ctx context.Context) DsqlHatchArgsOutput {
+	return o
+}
+
+func (o DsqlHatchArgsOutput) ToDsqlHatchArgsPtrOutput() DsqlHatchArgsPtrOutput {
+	return o.ToDsqlHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (o DsqlHatchArgsOutput) ToDsqlHatchArgsPtrOutputWithContext(ctx context.Context) DsqlHatchArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v DsqlHatchArgs) *DsqlHatchArgs {
+		return &v
+	}).(DsqlHatchArgsPtrOutput)
+}
+
+func (o DsqlHatchArgsOutput) Dsql() DsqlOverridesPtrOutput {
+	return o.ApplyT(func(v DsqlHatchArgs) *DsqlOverrides { return v.Dsql }).(DsqlOverridesPtrOutput)
+}
+
+type DsqlHatchArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (DsqlHatchArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**DsqlHatchArgs)(nil)).Elem()
+}
+
+func (o DsqlHatchArgsPtrOutput) ToDsqlHatchArgsPtrOutput() DsqlHatchArgsPtrOutput {
+	return o
+}
+
+func (o DsqlHatchArgsPtrOutput) ToDsqlHatchArgsPtrOutputWithContext(ctx context.Context) DsqlHatchArgsPtrOutput {
+	return o
+}
+
+func (o DsqlHatchArgsPtrOutput) Elem() DsqlHatchArgsOutput {
+	return o.ApplyT(func(v *DsqlHatchArgs) DsqlHatchArgs {
+		if v != nil {
+			return *v
+		}
+		var ret DsqlHatchArgs
+		return ret
+	}).(DsqlHatchArgsOutput)
+}
+
+func (o DsqlHatchArgsPtrOutput) Dsql() DsqlOverridesPtrOutput {
+	return o.ApplyT(func(v *DsqlHatchArgs) *DsqlOverrides {
+		if v == nil {
+			return nil
+		}
+		return v.Dsql
+	}).(DsqlOverridesPtrOutput)
 }
 
 type DsqlOverrides struct {
@@ -7378,139 +7509,6 @@ func (o DsqlOverridesPtrOutput) Timeouts() dsql.ClusterTimeoutsPtrOutput {
 		}
 		return v.Timeouts
 	}).(dsql.ClusterTimeoutsPtrOutput)
-}
-
-type DsqlTransformArgs struct {
-	Dsql *DsqlOverrides `pulumi:"dsql"`
-}
-
-// DsqlTransformArgsInput is an input type that accepts DsqlTransformArgsArgs and DsqlTransformArgsOutput values.
-// You can construct a concrete instance of `DsqlTransformArgsInput` via:
-//
-//	DsqlTransformArgsArgs{...}
-type DsqlTransformArgsInput interface {
-	pulumi.Input
-
-	ToDsqlTransformArgsOutput() DsqlTransformArgsOutput
-	ToDsqlTransformArgsOutputWithContext(context.Context) DsqlTransformArgsOutput
-}
-
-type DsqlTransformArgsArgs struct {
-	Dsql DsqlOverridesPtrInput `pulumi:"dsql"`
-}
-
-func (DsqlTransformArgsArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*DsqlTransformArgs)(nil)).Elem()
-}
-
-func (i DsqlTransformArgsArgs) ToDsqlTransformArgsOutput() DsqlTransformArgsOutput {
-	return i.ToDsqlTransformArgsOutputWithContext(context.Background())
-}
-
-func (i DsqlTransformArgsArgs) ToDsqlTransformArgsOutputWithContext(ctx context.Context) DsqlTransformArgsOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(DsqlTransformArgsOutput)
-}
-
-func (i DsqlTransformArgsArgs) ToDsqlTransformArgsPtrOutput() DsqlTransformArgsPtrOutput {
-	return i.ToDsqlTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i DsqlTransformArgsArgs) ToDsqlTransformArgsPtrOutputWithContext(ctx context.Context) DsqlTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(DsqlTransformArgsOutput).ToDsqlTransformArgsPtrOutputWithContext(ctx)
-}
-
-// DsqlTransformArgsPtrInput is an input type that accepts DsqlTransformArgsArgs, DsqlTransformArgsPtr and DsqlTransformArgsPtrOutput values.
-// You can construct a concrete instance of `DsqlTransformArgsPtrInput` via:
-//
-//	        DsqlTransformArgsArgs{...}
-//
-//	or:
-//
-//	        nil
-type DsqlTransformArgsPtrInput interface {
-	pulumi.Input
-
-	ToDsqlTransformArgsPtrOutput() DsqlTransformArgsPtrOutput
-	ToDsqlTransformArgsPtrOutputWithContext(context.Context) DsqlTransformArgsPtrOutput
-}
-
-type dsqlTransformArgsPtrType DsqlTransformArgsArgs
-
-func DsqlTransformArgsPtr(v *DsqlTransformArgsArgs) DsqlTransformArgsPtrInput {
-	return (*dsqlTransformArgsPtrType)(v)
-}
-
-func (*dsqlTransformArgsPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**DsqlTransformArgs)(nil)).Elem()
-}
-
-func (i *dsqlTransformArgsPtrType) ToDsqlTransformArgsPtrOutput() DsqlTransformArgsPtrOutput {
-	return i.ToDsqlTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i *dsqlTransformArgsPtrType) ToDsqlTransformArgsPtrOutputWithContext(ctx context.Context) DsqlTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(DsqlTransformArgsPtrOutput)
-}
-
-type DsqlTransformArgsOutput struct{ *pulumi.OutputState }
-
-func (DsqlTransformArgsOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*DsqlTransformArgs)(nil)).Elem()
-}
-
-func (o DsqlTransformArgsOutput) ToDsqlTransformArgsOutput() DsqlTransformArgsOutput {
-	return o
-}
-
-func (o DsqlTransformArgsOutput) ToDsqlTransformArgsOutputWithContext(ctx context.Context) DsqlTransformArgsOutput {
-	return o
-}
-
-func (o DsqlTransformArgsOutput) ToDsqlTransformArgsPtrOutput() DsqlTransformArgsPtrOutput {
-	return o.ToDsqlTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (o DsqlTransformArgsOutput) ToDsqlTransformArgsPtrOutputWithContext(ctx context.Context) DsqlTransformArgsPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v DsqlTransformArgs) *DsqlTransformArgs {
-		return &v
-	}).(DsqlTransformArgsPtrOutput)
-}
-
-func (o DsqlTransformArgsOutput) Dsql() DsqlOverridesPtrOutput {
-	return o.ApplyT(func(v DsqlTransformArgs) *DsqlOverrides { return v.Dsql }).(DsqlOverridesPtrOutput)
-}
-
-type DsqlTransformArgsPtrOutput struct{ *pulumi.OutputState }
-
-func (DsqlTransformArgsPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**DsqlTransformArgs)(nil)).Elem()
-}
-
-func (o DsqlTransformArgsPtrOutput) ToDsqlTransformArgsPtrOutput() DsqlTransformArgsPtrOutput {
-	return o
-}
-
-func (o DsqlTransformArgsPtrOutput) ToDsqlTransformArgsPtrOutputWithContext(ctx context.Context) DsqlTransformArgsPtrOutput {
-	return o
-}
-
-func (o DsqlTransformArgsPtrOutput) Elem() DsqlTransformArgsOutput {
-	return o.ApplyT(func(v *DsqlTransformArgs) DsqlTransformArgs {
-		if v != nil {
-			return *v
-		}
-		var ret DsqlTransformArgs
-		return ret
-	}).(DsqlTransformArgsOutput)
-}
-
-func (o DsqlTransformArgsPtrOutput) Dsql() DsqlOverridesPtrOutput {
-	return o.ApplyT(func(v *DsqlTransformArgs) *DsqlOverrides {
-		if v == nil {
-			return nil
-		}
-		return v.Dsql
-	}).(DsqlOverridesPtrOutput)
 }
 
 // A Global Secondary Index. All key attributes must use the explicit { name, type } shape — Anvil merges these into the table attributeDefinitions automatically.
@@ -8482,6 +8480,139 @@ func (o DynamoDBStreamLambdaConsumerPtrOutput) LambdaRoleArn() pulumi.StringPtrO
 	}).(pulumi.StringPtrOutput)
 }
 
+type DynamoHatchArgs struct {
+	Dynamo *DynamoOverrides `pulumi:"dynamo"`
+}
+
+// DynamoHatchArgsInput is an input type that accepts DynamoHatchArgsArgs and DynamoHatchArgsOutput values.
+// You can construct a concrete instance of `DynamoHatchArgsInput` via:
+//
+//	DynamoHatchArgsArgs{...}
+type DynamoHatchArgsInput interface {
+	pulumi.Input
+
+	ToDynamoHatchArgsOutput() DynamoHatchArgsOutput
+	ToDynamoHatchArgsOutputWithContext(context.Context) DynamoHatchArgsOutput
+}
+
+type DynamoHatchArgsArgs struct {
+	Dynamo DynamoOverridesPtrInput `pulumi:"dynamo"`
+}
+
+func (DynamoHatchArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*DynamoHatchArgs)(nil)).Elem()
+}
+
+func (i DynamoHatchArgsArgs) ToDynamoHatchArgsOutput() DynamoHatchArgsOutput {
+	return i.ToDynamoHatchArgsOutputWithContext(context.Background())
+}
+
+func (i DynamoHatchArgsArgs) ToDynamoHatchArgsOutputWithContext(ctx context.Context) DynamoHatchArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DynamoHatchArgsOutput)
+}
+
+func (i DynamoHatchArgsArgs) ToDynamoHatchArgsPtrOutput() DynamoHatchArgsPtrOutput {
+	return i.ToDynamoHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i DynamoHatchArgsArgs) ToDynamoHatchArgsPtrOutputWithContext(ctx context.Context) DynamoHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DynamoHatchArgsOutput).ToDynamoHatchArgsPtrOutputWithContext(ctx)
+}
+
+// DynamoHatchArgsPtrInput is an input type that accepts DynamoHatchArgsArgs, DynamoHatchArgsPtr and DynamoHatchArgsPtrOutput values.
+// You can construct a concrete instance of `DynamoHatchArgsPtrInput` via:
+//
+//	        DynamoHatchArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type DynamoHatchArgsPtrInput interface {
+	pulumi.Input
+
+	ToDynamoHatchArgsPtrOutput() DynamoHatchArgsPtrOutput
+	ToDynamoHatchArgsPtrOutputWithContext(context.Context) DynamoHatchArgsPtrOutput
+}
+
+type dynamoHatchArgsPtrType DynamoHatchArgsArgs
+
+func DynamoHatchArgsPtr(v *DynamoHatchArgsArgs) DynamoHatchArgsPtrInput {
+	return (*dynamoHatchArgsPtrType)(v)
+}
+
+func (*dynamoHatchArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**DynamoHatchArgs)(nil)).Elem()
+}
+
+func (i *dynamoHatchArgsPtrType) ToDynamoHatchArgsPtrOutput() DynamoHatchArgsPtrOutput {
+	return i.ToDynamoHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *dynamoHatchArgsPtrType) ToDynamoHatchArgsPtrOutputWithContext(ctx context.Context) DynamoHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DynamoHatchArgsPtrOutput)
+}
+
+type DynamoHatchArgsOutput struct{ *pulumi.OutputState }
+
+func (DynamoHatchArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*DynamoHatchArgs)(nil)).Elem()
+}
+
+func (o DynamoHatchArgsOutput) ToDynamoHatchArgsOutput() DynamoHatchArgsOutput {
+	return o
+}
+
+func (o DynamoHatchArgsOutput) ToDynamoHatchArgsOutputWithContext(ctx context.Context) DynamoHatchArgsOutput {
+	return o
+}
+
+func (o DynamoHatchArgsOutput) ToDynamoHatchArgsPtrOutput() DynamoHatchArgsPtrOutput {
+	return o.ToDynamoHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (o DynamoHatchArgsOutput) ToDynamoHatchArgsPtrOutputWithContext(ctx context.Context) DynamoHatchArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v DynamoHatchArgs) *DynamoHatchArgs {
+		return &v
+	}).(DynamoHatchArgsPtrOutput)
+}
+
+func (o DynamoHatchArgsOutput) Dynamo() DynamoOverridesPtrOutput {
+	return o.ApplyT(func(v DynamoHatchArgs) *DynamoOverrides { return v.Dynamo }).(DynamoOverridesPtrOutput)
+}
+
+type DynamoHatchArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (DynamoHatchArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**DynamoHatchArgs)(nil)).Elem()
+}
+
+func (o DynamoHatchArgsPtrOutput) ToDynamoHatchArgsPtrOutput() DynamoHatchArgsPtrOutput {
+	return o
+}
+
+func (o DynamoHatchArgsPtrOutput) ToDynamoHatchArgsPtrOutputWithContext(ctx context.Context) DynamoHatchArgsPtrOutput {
+	return o
+}
+
+func (o DynamoHatchArgsPtrOutput) Elem() DynamoHatchArgsOutput {
+	return o.ApplyT(func(v *DynamoHatchArgs) DynamoHatchArgs {
+		if v != nil {
+			return *v
+		}
+		var ret DynamoHatchArgs
+		return ret
+	}).(DynamoHatchArgsOutput)
+}
+
+func (o DynamoHatchArgsPtrOutput) Dynamo() DynamoOverridesPtrOutput {
+	return o.ApplyT(func(v *DynamoHatchArgs) *DynamoOverrides {
+		if v == nil {
+			return nil
+		}
+		return v.Dynamo
+	}).(DynamoOverridesPtrOutput)
+}
+
 type DynamoOverrides struct {
 	// Set of nested attribute definitions. Only required for <span pulumi-lang-nodejs="`hashKey`" pulumi-lang-dotnet="`HashKey`" pulumi-lang-go="`hashKey`" pulumi-lang-python="`hash_key`" pulumi-lang-yaml="`hashKey`" pulumi-lang-java="`hashKey`">`hash_key`</span> and <span pulumi-lang-nodejs="`rangeKey`" pulumi-lang-dotnet="`RangeKey`" pulumi-lang-go="`rangeKey`" pulumi-lang-python="`range_key`" pulumi-lang-yaml="`rangeKey`" pulumi-lang-java="`rangeKey`">`range_key`</span> attributes. See below.
 	Attributes []dynamodb.TableAttribute `pulumi:"attributes"`
@@ -9137,141 +9268,141 @@ func (o DynamoOverridesPtrOutput) WriteCapacity() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-type DynamoTransformArgs struct {
-	Dynamo *DynamoOverrides `pulumi:"dynamo"`
+// Direct overrides for the underlying aws.cloudwatch.EventArchive resource. Use retentionDays to change the default 7 day retention.
+type EventArchiveOverrides struct {
 }
 
-// DynamoTransformArgsInput is an input type that accepts DynamoTransformArgsArgs and DynamoTransformArgsOutput values.
-// You can construct a concrete instance of `DynamoTransformArgsInput` via:
+type EventBridgeHatchArgs struct {
+	EventBridge *EventBridgeOverrides `pulumi:"eventBridge"`
+}
+
+// EventBridgeHatchArgsInput is an input type that accepts EventBridgeHatchArgsArgs and EventBridgeHatchArgsOutput values.
+// You can construct a concrete instance of `EventBridgeHatchArgsInput` via:
 //
-//	DynamoTransformArgsArgs{...}
-type DynamoTransformArgsInput interface {
+//	EventBridgeHatchArgsArgs{...}
+type EventBridgeHatchArgsInput interface {
 	pulumi.Input
 
-	ToDynamoTransformArgsOutput() DynamoTransformArgsOutput
-	ToDynamoTransformArgsOutputWithContext(context.Context) DynamoTransformArgsOutput
+	ToEventBridgeHatchArgsOutput() EventBridgeHatchArgsOutput
+	ToEventBridgeHatchArgsOutputWithContext(context.Context) EventBridgeHatchArgsOutput
 }
 
-type DynamoTransformArgsArgs struct {
-	Dynamo DynamoOverridesPtrInput `pulumi:"dynamo"`
+type EventBridgeHatchArgsArgs struct {
+	EventBridge EventBridgeOverridesPtrInput `pulumi:"eventBridge"`
 }
 
-func (DynamoTransformArgsArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*DynamoTransformArgs)(nil)).Elem()
+func (EventBridgeHatchArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*EventBridgeHatchArgs)(nil)).Elem()
 }
 
-func (i DynamoTransformArgsArgs) ToDynamoTransformArgsOutput() DynamoTransformArgsOutput {
-	return i.ToDynamoTransformArgsOutputWithContext(context.Background())
+func (i EventBridgeHatchArgsArgs) ToEventBridgeHatchArgsOutput() EventBridgeHatchArgsOutput {
+	return i.ToEventBridgeHatchArgsOutputWithContext(context.Background())
 }
 
-func (i DynamoTransformArgsArgs) ToDynamoTransformArgsOutputWithContext(ctx context.Context) DynamoTransformArgsOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(DynamoTransformArgsOutput)
+func (i EventBridgeHatchArgsArgs) ToEventBridgeHatchArgsOutputWithContext(ctx context.Context) EventBridgeHatchArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(EventBridgeHatchArgsOutput)
 }
 
-func (i DynamoTransformArgsArgs) ToDynamoTransformArgsPtrOutput() DynamoTransformArgsPtrOutput {
-	return i.ToDynamoTransformArgsPtrOutputWithContext(context.Background())
+func (i EventBridgeHatchArgsArgs) ToEventBridgeHatchArgsPtrOutput() EventBridgeHatchArgsPtrOutput {
+	return i.ToEventBridgeHatchArgsPtrOutputWithContext(context.Background())
 }
 
-func (i DynamoTransformArgsArgs) ToDynamoTransformArgsPtrOutputWithContext(ctx context.Context) DynamoTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(DynamoTransformArgsOutput).ToDynamoTransformArgsPtrOutputWithContext(ctx)
+func (i EventBridgeHatchArgsArgs) ToEventBridgeHatchArgsPtrOutputWithContext(ctx context.Context) EventBridgeHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(EventBridgeHatchArgsOutput).ToEventBridgeHatchArgsPtrOutputWithContext(ctx)
 }
 
-// DynamoTransformArgsPtrInput is an input type that accepts DynamoTransformArgsArgs, DynamoTransformArgsPtr and DynamoTransformArgsPtrOutput values.
-// You can construct a concrete instance of `DynamoTransformArgsPtrInput` via:
+// EventBridgeHatchArgsPtrInput is an input type that accepts EventBridgeHatchArgsArgs, EventBridgeHatchArgsPtr and EventBridgeHatchArgsPtrOutput values.
+// You can construct a concrete instance of `EventBridgeHatchArgsPtrInput` via:
 //
-//	        DynamoTransformArgsArgs{...}
+//	        EventBridgeHatchArgsArgs{...}
 //
 //	or:
 //
 //	        nil
-type DynamoTransformArgsPtrInput interface {
+type EventBridgeHatchArgsPtrInput interface {
 	pulumi.Input
 
-	ToDynamoTransformArgsPtrOutput() DynamoTransformArgsPtrOutput
-	ToDynamoTransformArgsPtrOutputWithContext(context.Context) DynamoTransformArgsPtrOutput
+	ToEventBridgeHatchArgsPtrOutput() EventBridgeHatchArgsPtrOutput
+	ToEventBridgeHatchArgsPtrOutputWithContext(context.Context) EventBridgeHatchArgsPtrOutput
 }
 
-type dynamoTransformArgsPtrType DynamoTransformArgsArgs
+type eventBridgeHatchArgsPtrType EventBridgeHatchArgsArgs
 
-func DynamoTransformArgsPtr(v *DynamoTransformArgsArgs) DynamoTransformArgsPtrInput {
-	return (*dynamoTransformArgsPtrType)(v)
+func EventBridgeHatchArgsPtr(v *EventBridgeHatchArgsArgs) EventBridgeHatchArgsPtrInput {
+	return (*eventBridgeHatchArgsPtrType)(v)
 }
 
-func (*dynamoTransformArgsPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**DynamoTransformArgs)(nil)).Elem()
+func (*eventBridgeHatchArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**EventBridgeHatchArgs)(nil)).Elem()
 }
 
-func (i *dynamoTransformArgsPtrType) ToDynamoTransformArgsPtrOutput() DynamoTransformArgsPtrOutput {
-	return i.ToDynamoTransformArgsPtrOutputWithContext(context.Background())
+func (i *eventBridgeHatchArgsPtrType) ToEventBridgeHatchArgsPtrOutput() EventBridgeHatchArgsPtrOutput {
+	return i.ToEventBridgeHatchArgsPtrOutputWithContext(context.Background())
 }
 
-func (i *dynamoTransformArgsPtrType) ToDynamoTransformArgsPtrOutputWithContext(ctx context.Context) DynamoTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(DynamoTransformArgsPtrOutput)
+func (i *eventBridgeHatchArgsPtrType) ToEventBridgeHatchArgsPtrOutputWithContext(ctx context.Context) EventBridgeHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(EventBridgeHatchArgsPtrOutput)
 }
 
-type DynamoTransformArgsOutput struct{ *pulumi.OutputState }
+type EventBridgeHatchArgsOutput struct{ *pulumi.OutputState }
 
-func (DynamoTransformArgsOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*DynamoTransformArgs)(nil)).Elem()
+func (EventBridgeHatchArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*EventBridgeHatchArgs)(nil)).Elem()
 }
 
-func (o DynamoTransformArgsOutput) ToDynamoTransformArgsOutput() DynamoTransformArgsOutput {
+func (o EventBridgeHatchArgsOutput) ToEventBridgeHatchArgsOutput() EventBridgeHatchArgsOutput {
 	return o
 }
 
-func (o DynamoTransformArgsOutput) ToDynamoTransformArgsOutputWithContext(ctx context.Context) DynamoTransformArgsOutput {
+func (o EventBridgeHatchArgsOutput) ToEventBridgeHatchArgsOutputWithContext(ctx context.Context) EventBridgeHatchArgsOutput {
 	return o
 }
 
-func (o DynamoTransformArgsOutput) ToDynamoTransformArgsPtrOutput() DynamoTransformArgsPtrOutput {
-	return o.ToDynamoTransformArgsPtrOutputWithContext(context.Background())
+func (o EventBridgeHatchArgsOutput) ToEventBridgeHatchArgsPtrOutput() EventBridgeHatchArgsPtrOutput {
+	return o.ToEventBridgeHatchArgsPtrOutputWithContext(context.Background())
 }
 
-func (o DynamoTransformArgsOutput) ToDynamoTransformArgsPtrOutputWithContext(ctx context.Context) DynamoTransformArgsPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v DynamoTransformArgs) *DynamoTransformArgs {
+func (o EventBridgeHatchArgsOutput) ToEventBridgeHatchArgsPtrOutputWithContext(ctx context.Context) EventBridgeHatchArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v EventBridgeHatchArgs) *EventBridgeHatchArgs {
 		return &v
-	}).(DynamoTransformArgsPtrOutput)
+	}).(EventBridgeHatchArgsPtrOutput)
 }
 
-func (o DynamoTransformArgsOutput) Dynamo() DynamoOverridesPtrOutput {
-	return o.ApplyT(func(v DynamoTransformArgs) *DynamoOverrides { return v.Dynamo }).(DynamoOverridesPtrOutput)
+func (o EventBridgeHatchArgsOutput) EventBridge() EventBridgeOverridesPtrOutput {
+	return o.ApplyT(func(v EventBridgeHatchArgs) *EventBridgeOverrides { return v.EventBridge }).(EventBridgeOverridesPtrOutput)
 }
 
-type DynamoTransformArgsPtrOutput struct{ *pulumi.OutputState }
+type EventBridgeHatchArgsPtrOutput struct{ *pulumi.OutputState }
 
-func (DynamoTransformArgsPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**DynamoTransformArgs)(nil)).Elem()
+func (EventBridgeHatchArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**EventBridgeHatchArgs)(nil)).Elem()
 }
 
-func (o DynamoTransformArgsPtrOutput) ToDynamoTransformArgsPtrOutput() DynamoTransformArgsPtrOutput {
+func (o EventBridgeHatchArgsPtrOutput) ToEventBridgeHatchArgsPtrOutput() EventBridgeHatchArgsPtrOutput {
 	return o
 }
 
-func (o DynamoTransformArgsPtrOutput) ToDynamoTransformArgsPtrOutputWithContext(ctx context.Context) DynamoTransformArgsPtrOutput {
+func (o EventBridgeHatchArgsPtrOutput) ToEventBridgeHatchArgsPtrOutputWithContext(ctx context.Context) EventBridgeHatchArgsPtrOutput {
 	return o
 }
 
-func (o DynamoTransformArgsPtrOutput) Elem() DynamoTransformArgsOutput {
-	return o.ApplyT(func(v *DynamoTransformArgs) DynamoTransformArgs {
+func (o EventBridgeHatchArgsPtrOutput) Elem() EventBridgeHatchArgsOutput {
+	return o.ApplyT(func(v *EventBridgeHatchArgs) EventBridgeHatchArgs {
 		if v != nil {
 			return *v
 		}
-		var ret DynamoTransformArgs
+		var ret EventBridgeHatchArgs
 		return ret
-	}).(DynamoTransformArgsOutput)
+	}).(EventBridgeHatchArgsOutput)
 }
 
-func (o DynamoTransformArgsPtrOutput) Dynamo() DynamoOverridesPtrOutput {
-	return o.ApplyT(func(v *DynamoTransformArgs) *DynamoOverrides {
+func (o EventBridgeHatchArgsPtrOutput) EventBridge() EventBridgeOverridesPtrOutput {
+	return o.ApplyT(func(v *EventBridgeHatchArgs) *EventBridgeOverrides {
 		if v == nil {
 			return nil
 		}
-		return v.Dynamo
-	}).(DynamoOverridesPtrOutput)
-}
-
-// Direct overrides for the underlying aws.cloudwatch.EventArchive resource. Use retentionDays to change the default 7 day retention.
-type EventArchiveOverrides struct {
+		return v.EventBridge
+	}).(EventBridgeOverridesPtrOutput)
 }
 
 type EventBridgeOverrides struct {
@@ -9552,137 +9683,10 @@ func (o EventBridgeOverridesPtrOutput) Tags() pulumi.StringMapOutput {
 	}).(pulumi.StringMapOutput)
 }
 
-type EventBridgeTransformArgs struct {
-	EventBridge *EventBridgeOverrides `pulumi:"eventBridge"`
-}
-
-// EventBridgeTransformArgsInput is an input type that accepts EventBridgeTransformArgsArgs and EventBridgeTransformArgsOutput values.
-// You can construct a concrete instance of `EventBridgeTransformArgsInput` via:
-//
-//	EventBridgeTransformArgsArgs{...}
-type EventBridgeTransformArgsInput interface {
-	pulumi.Input
-
-	ToEventBridgeTransformArgsOutput() EventBridgeTransformArgsOutput
-	ToEventBridgeTransformArgsOutputWithContext(context.Context) EventBridgeTransformArgsOutput
-}
-
-type EventBridgeTransformArgsArgs struct {
-	EventBridge EventBridgeOverridesPtrInput `pulumi:"eventBridge"`
-}
-
-func (EventBridgeTransformArgsArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*EventBridgeTransformArgs)(nil)).Elem()
-}
-
-func (i EventBridgeTransformArgsArgs) ToEventBridgeTransformArgsOutput() EventBridgeTransformArgsOutput {
-	return i.ToEventBridgeTransformArgsOutputWithContext(context.Background())
-}
-
-func (i EventBridgeTransformArgsArgs) ToEventBridgeTransformArgsOutputWithContext(ctx context.Context) EventBridgeTransformArgsOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(EventBridgeTransformArgsOutput)
-}
-
-func (i EventBridgeTransformArgsArgs) ToEventBridgeTransformArgsPtrOutput() EventBridgeTransformArgsPtrOutput {
-	return i.ToEventBridgeTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i EventBridgeTransformArgsArgs) ToEventBridgeTransformArgsPtrOutputWithContext(ctx context.Context) EventBridgeTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(EventBridgeTransformArgsOutput).ToEventBridgeTransformArgsPtrOutputWithContext(ctx)
-}
-
-// EventBridgeTransformArgsPtrInput is an input type that accepts EventBridgeTransformArgsArgs, EventBridgeTransformArgsPtr and EventBridgeTransformArgsPtrOutput values.
-// You can construct a concrete instance of `EventBridgeTransformArgsPtrInput` via:
-//
-//	        EventBridgeTransformArgsArgs{...}
-//
-//	or:
-//
-//	        nil
-type EventBridgeTransformArgsPtrInput interface {
-	pulumi.Input
-
-	ToEventBridgeTransformArgsPtrOutput() EventBridgeTransformArgsPtrOutput
-	ToEventBridgeTransformArgsPtrOutputWithContext(context.Context) EventBridgeTransformArgsPtrOutput
-}
-
-type eventBridgeTransformArgsPtrType EventBridgeTransformArgsArgs
-
-func EventBridgeTransformArgsPtr(v *EventBridgeTransformArgsArgs) EventBridgeTransformArgsPtrInput {
-	return (*eventBridgeTransformArgsPtrType)(v)
-}
-
-func (*eventBridgeTransformArgsPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**EventBridgeTransformArgs)(nil)).Elem()
-}
-
-func (i *eventBridgeTransformArgsPtrType) ToEventBridgeTransformArgsPtrOutput() EventBridgeTransformArgsPtrOutput {
-	return i.ToEventBridgeTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i *eventBridgeTransformArgsPtrType) ToEventBridgeTransformArgsPtrOutputWithContext(ctx context.Context) EventBridgeTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(EventBridgeTransformArgsPtrOutput)
-}
-
-type EventBridgeTransformArgsOutput struct{ *pulumi.OutputState }
-
-func (EventBridgeTransformArgsOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*EventBridgeTransformArgs)(nil)).Elem()
-}
-
-func (o EventBridgeTransformArgsOutput) ToEventBridgeTransformArgsOutput() EventBridgeTransformArgsOutput {
-	return o
-}
-
-func (o EventBridgeTransformArgsOutput) ToEventBridgeTransformArgsOutputWithContext(ctx context.Context) EventBridgeTransformArgsOutput {
-	return o
-}
-
-func (o EventBridgeTransformArgsOutput) ToEventBridgeTransformArgsPtrOutput() EventBridgeTransformArgsPtrOutput {
-	return o.ToEventBridgeTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (o EventBridgeTransformArgsOutput) ToEventBridgeTransformArgsPtrOutputWithContext(ctx context.Context) EventBridgeTransformArgsPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v EventBridgeTransformArgs) *EventBridgeTransformArgs {
-		return &v
-	}).(EventBridgeTransformArgsPtrOutput)
-}
-
-func (o EventBridgeTransformArgsOutput) EventBridge() EventBridgeOverridesPtrOutput {
-	return o.ApplyT(func(v EventBridgeTransformArgs) *EventBridgeOverrides { return v.EventBridge }).(EventBridgeOverridesPtrOutput)
-}
-
-type EventBridgeTransformArgsPtrOutput struct{ *pulumi.OutputState }
-
-func (EventBridgeTransformArgsPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**EventBridgeTransformArgs)(nil)).Elem()
-}
-
-func (o EventBridgeTransformArgsPtrOutput) ToEventBridgeTransformArgsPtrOutput() EventBridgeTransformArgsPtrOutput {
-	return o
-}
-
-func (o EventBridgeTransformArgsPtrOutput) ToEventBridgeTransformArgsPtrOutputWithContext(ctx context.Context) EventBridgeTransformArgsPtrOutput {
-	return o
-}
-
-func (o EventBridgeTransformArgsPtrOutput) Elem() EventBridgeTransformArgsOutput {
-	return o.ApplyT(func(v *EventBridgeTransformArgs) EventBridgeTransformArgs {
-		if v != nil {
-			return *v
-		}
-		var ret EventBridgeTransformArgs
-		return ret
-	}).(EventBridgeTransformArgsOutput)
-}
-
-func (o EventBridgeTransformArgsPtrOutput) EventBridge() EventBridgeOverridesPtrOutput {
-	return o.ApplyT(func(v *EventBridgeTransformArgs) *EventBridgeOverrides {
-		if v == nil {
-			return nil
-		}
-		return v.EventBridge
-	}).(EventBridgeOverridesPtrOutput)
+// Escape hatches for direct Pulumi AWS resource overrides.
+type EventBusHatchArgs struct {
+	Archive *EventArchiveOverrides `pulumi:"archive"`
+	Bus     *EventBusOverrides     `pulumi:"bus"`
 }
 
 // Lambda function target for an EventBridge rule. Pass fn.arn and fn.roleArn from an Anvil Lambda component.
@@ -10092,12 +10096,6 @@ func (o EventBusRuleTargetOutput) ToEventBusRuleTargetOutputWithContext(ctx cont
 // Invoke a Lambda function when events match the rule pattern. Anvil creates the EventBridge target and grants EventBridge permission to invoke the function.
 func (o EventBusRuleTargetOutput) Lambda() EventBusLambdaTargetArgsPtrOutput {
 	return o.ApplyT(func(v EventBusRuleTarget) *EventBusLambdaTargetArgs { return v.Lambda }).(EventBusLambdaTargetArgsPtrOutput)
-}
-
-// Escape hatches for direct Pulumi AWS resource overrides.
-type EventBusTransformArgs struct {
-	Archive *EventArchiveOverrides `pulumi:"archive"`
-	Bus     *EventBusOverrides     `pulumi:"bus"`
 }
 
 // ACM certificate DNS validation CNAME record. Only populated when domain.dns: false and domain.certificateArn is omitted. Add this record in your DNS provider (e.g. Cloudflare) then re-run deploy — Anvil blocks until ACM confirms validation.
@@ -11698,6 +11696,172 @@ func (o HttpApiThrottlingPtrOutput) RateLimit() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
+type LambdaHatch struct {
+	// Instruction set architecture for your Lambda function.
+	Architectures []string `pulumi:"architectures"`
+	// Path to the function's deployment package within the local filesystem.
+	Code pulumi.Archive `pulumi:"code"`
+	// Base64-encoded representation the source code package file.
+	CodeSha256 *string `pulumi:"codeSha256"`
+	// Function entry point in your code.
+	Handler *string `pulumi:"handler"`
+	// ARN of the AWS Key Management Service key used to encrypt environment variables.
+	KmsKeyArn *string `pulumi:"kmsKeyArn"`
+	// List of Lambda Layer Version ARNs (maximum of 5) to attach to your Lambda Function.
+	Layers []string `pulumi:"layers"`
+	// Amount of memory in MB your Lambda Function can use at runtime.
+	MemorySize *int `pulumi:"memorySize"`
+	// Unique name for your Lambda Function.
+	Name *string `pulumi:"name"`
+	// Amount of reserved concurrent executions for this lambda function.
+	ReservedConcurrentExecutions *int `pulumi:"reservedConcurrentExecutions"`
+	// Identifier of the function's runtime.
+	Runtime *string `pulumi:"runtime"`
+	// User-defined hash of the source code package file.
+	SourceCodeHash *string `pulumi:"sourceCodeHash"`
+	// Key-value map of tags for the Lambda function.
+	Tags map[string]string `pulumi:"tags"`
+	// Amount of time your Lambda Function has to run in seconds.
+	Timeout *int `pulumi:"timeout"`
+	// Configuration block for X-Ray tracing. See below.
+	TracingConfig *lambda.FunctionTracingConfig `pulumi:"tracingConfig"`
+	// Configuration block for VPC. See below.
+	VpcConfig *lambda.FunctionVpcConfig `pulumi:"vpcConfig"`
+}
+
+type LambdaHatchArgs struct {
+	Lambda *LambdaOverrides `pulumi:"lambda"`
+}
+
+// LambdaHatchArgsInput is an input type that accepts LambdaHatchArgsArgs and LambdaHatchArgsOutput values.
+// You can construct a concrete instance of `LambdaHatchArgsInput` via:
+//
+//	LambdaHatchArgsArgs{...}
+type LambdaHatchArgsInput interface {
+	pulumi.Input
+
+	ToLambdaHatchArgsOutput() LambdaHatchArgsOutput
+	ToLambdaHatchArgsOutputWithContext(context.Context) LambdaHatchArgsOutput
+}
+
+type LambdaHatchArgsArgs struct {
+	Lambda LambdaOverridesPtrInput `pulumi:"lambda"`
+}
+
+func (LambdaHatchArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*LambdaHatchArgs)(nil)).Elem()
+}
+
+func (i LambdaHatchArgsArgs) ToLambdaHatchArgsOutput() LambdaHatchArgsOutput {
+	return i.ToLambdaHatchArgsOutputWithContext(context.Background())
+}
+
+func (i LambdaHatchArgsArgs) ToLambdaHatchArgsOutputWithContext(ctx context.Context) LambdaHatchArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(LambdaHatchArgsOutput)
+}
+
+func (i LambdaHatchArgsArgs) ToLambdaHatchArgsPtrOutput() LambdaHatchArgsPtrOutput {
+	return i.ToLambdaHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i LambdaHatchArgsArgs) ToLambdaHatchArgsPtrOutputWithContext(ctx context.Context) LambdaHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(LambdaHatchArgsOutput).ToLambdaHatchArgsPtrOutputWithContext(ctx)
+}
+
+// LambdaHatchArgsPtrInput is an input type that accepts LambdaHatchArgsArgs, LambdaHatchArgsPtr and LambdaHatchArgsPtrOutput values.
+// You can construct a concrete instance of `LambdaHatchArgsPtrInput` via:
+//
+//	        LambdaHatchArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type LambdaHatchArgsPtrInput interface {
+	pulumi.Input
+
+	ToLambdaHatchArgsPtrOutput() LambdaHatchArgsPtrOutput
+	ToLambdaHatchArgsPtrOutputWithContext(context.Context) LambdaHatchArgsPtrOutput
+}
+
+type lambdaHatchArgsPtrType LambdaHatchArgsArgs
+
+func LambdaHatchArgsPtr(v *LambdaHatchArgsArgs) LambdaHatchArgsPtrInput {
+	return (*lambdaHatchArgsPtrType)(v)
+}
+
+func (*lambdaHatchArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**LambdaHatchArgs)(nil)).Elem()
+}
+
+func (i *lambdaHatchArgsPtrType) ToLambdaHatchArgsPtrOutput() LambdaHatchArgsPtrOutput {
+	return i.ToLambdaHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *lambdaHatchArgsPtrType) ToLambdaHatchArgsPtrOutputWithContext(ctx context.Context) LambdaHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(LambdaHatchArgsPtrOutput)
+}
+
+type LambdaHatchArgsOutput struct{ *pulumi.OutputState }
+
+func (LambdaHatchArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*LambdaHatchArgs)(nil)).Elem()
+}
+
+func (o LambdaHatchArgsOutput) ToLambdaHatchArgsOutput() LambdaHatchArgsOutput {
+	return o
+}
+
+func (o LambdaHatchArgsOutput) ToLambdaHatchArgsOutputWithContext(ctx context.Context) LambdaHatchArgsOutput {
+	return o
+}
+
+func (o LambdaHatchArgsOutput) ToLambdaHatchArgsPtrOutput() LambdaHatchArgsPtrOutput {
+	return o.ToLambdaHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (o LambdaHatchArgsOutput) ToLambdaHatchArgsPtrOutputWithContext(ctx context.Context) LambdaHatchArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v LambdaHatchArgs) *LambdaHatchArgs {
+		return &v
+	}).(LambdaHatchArgsPtrOutput)
+}
+
+func (o LambdaHatchArgsOutput) Lambda() LambdaOverridesPtrOutput {
+	return o.ApplyT(func(v LambdaHatchArgs) *LambdaOverrides { return v.Lambda }).(LambdaOverridesPtrOutput)
+}
+
+type LambdaHatchArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (LambdaHatchArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**LambdaHatchArgs)(nil)).Elem()
+}
+
+func (o LambdaHatchArgsPtrOutput) ToLambdaHatchArgsPtrOutput() LambdaHatchArgsPtrOutput {
+	return o
+}
+
+func (o LambdaHatchArgsPtrOutput) ToLambdaHatchArgsPtrOutputWithContext(ctx context.Context) LambdaHatchArgsPtrOutput {
+	return o
+}
+
+func (o LambdaHatchArgsPtrOutput) Elem() LambdaHatchArgsOutput {
+	return o.ApplyT(func(v *LambdaHatchArgs) LambdaHatchArgs {
+		if v != nil {
+			return *v
+		}
+		var ret LambdaHatchArgs
+		return ret
+	}).(LambdaHatchArgsOutput)
+}
+
+func (o LambdaHatchArgsPtrOutput) Lambda() LambdaOverridesPtrOutput {
+	return o.ApplyT(func(v *LambdaHatchArgs) *LambdaOverrides {
+		if v == nil {
+			return nil
+		}
+		return v.Lambda
+	}).(LambdaOverridesPtrOutput)
+}
+
 type LambdaOverrides struct {
 	// Instruction set architecture for your Lambda function. Valid values are `[<span pulumi-lang-nodejs=""x8664"" pulumi-lang-dotnet=""X8664"" pulumi-lang-go=""x8664"" pulumi-lang-python=""x86_64"" pulumi-lang-yaml=""x8664"" pulumi-lang-java=""x8664"">"x86_64"</span>]` and `["arm64"]`. Default is `[<span pulumi-lang-nodejs=""x8664"" pulumi-lang-dotnet=""X8664"" pulumi-lang-go=""x8664"" pulumi-lang-python=""x86_64"" pulumi-lang-yaml=""x8664"" pulumi-lang-java=""x8664"">"x86_64"</span>]`. Removing this attribute, function's architecture stays the same.
 	Architectures []string `pulumi:"architectures"`
@@ -12693,172 +12857,6 @@ func (o LambdaPermissionArrayOutput) Index(i pulumi.IntInput) LambdaPermissionOu
 	}).(LambdaPermissionOutput)
 }
 
-type LambdaTransform struct {
-	// Instruction set architecture for your Lambda function.
-	Architectures []string `pulumi:"architectures"`
-	// Path to the function's deployment package within the local filesystem.
-	Code pulumi.Archive `pulumi:"code"`
-	// Base64-encoded representation the source code package file.
-	CodeSha256 *string `pulumi:"codeSha256"`
-	// Function entry point in your code.
-	Handler *string `pulumi:"handler"`
-	// ARN of the AWS Key Management Service key used to encrypt environment variables.
-	KmsKeyArn *string `pulumi:"kmsKeyArn"`
-	// List of Lambda Layer Version ARNs (maximum of 5) to attach to your Lambda Function.
-	Layers []string `pulumi:"layers"`
-	// Amount of memory in MB your Lambda Function can use at runtime.
-	MemorySize *int `pulumi:"memorySize"`
-	// Unique name for your Lambda Function.
-	Name *string `pulumi:"name"`
-	// Amount of reserved concurrent executions for this lambda function.
-	ReservedConcurrentExecutions *int `pulumi:"reservedConcurrentExecutions"`
-	// Identifier of the function's runtime.
-	Runtime *string `pulumi:"runtime"`
-	// User-defined hash of the source code package file.
-	SourceCodeHash *string `pulumi:"sourceCodeHash"`
-	// Key-value map of tags for the Lambda function.
-	Tags map[string]string `pulumi:"tags"`
-	// Amount of time your Lambda Function has to run in seconds.
-	Timeout *int `pulumi:"timeout"`
-	// Configuration block for X-Ray tracing. See below.
-	TracingConfig *lambda.FunctionTracingConfig `pulumi:"tracingConfig"`
-	// Configuration block for VPC. See below.
-	VpcConfig *lambda.FunctionVpcConfig `pulumi:"vpcConfig"`
-}
-
-type LambdaTransformArgs struct {
-	Lambda *LambdaOverrides `pulumi:"lambda"`
-}
-
-// LambdaTransformArgsInput is an input type that accepts LambdaTransformArgsArgs and LambdaTransformArgsOutput values.
-// You can construct a concrete instance of `LambdaTransformArgsInput` via:
-//
-//	LambdaTransformArgsArgs{...}
-type LambdaTransformArgsInput interface {
-	pulumi.Input
-
-	ToLambdaTransformArgsOutput() LambdaTransformArgsOutput
-	ToLambdaTransformArgsOutputWithContext(context.Context) LambdaTransformArgsOutput
-}
-
-type LambdaTransformArgsArgs struct {
-	Lambda LambdaOverridesPtrInput `pulumi:"lambda"`
-}
-
-func (LambdaTransformArgsArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*LambdaTransformArgs)(nil)).Elem()
-}
-
-func (i LambdaTransformArgsArgs) ToLambdaTransformArgsOutput() LambdaTransformArgsOutput {
-	return i.ToLambdaTransformArgsOutputWithContext(context.Background())
-}
-
-func (i LambdaTransformArgsArgs) ToLambdaTransformArgsOutputWithContext(ctx context.Context) LambdaTransformArgsOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(LambdaTransformArgsOutput)
-}
-
-func (i LambdaTransformArgsArgs) ToLambdaTransformArgsPtrOutput() LambdaTransformArgsPtrOutput {
-	return i.ToLambdaTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i LambdaTransformArgsArgs) ToLambdaTransformArgsPtrOutputWithContext(ctx context.Context) LambdaTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(LambdaTransformArgsOutput).ToLambdaTransformArgsPtrOutputWithContext(ctx)
-}
-
-// LambdaTransformArgsPtrInput is an input type that accepts LambdaTransformArgsArgs, LambdaTransformArgsPtr and LambdaTransformArgsPtrOutput values.
-// You can construct a concrete instance of `LambdaTransformArgsPtrInput` via:
-//
-//	        LambdaTransformArgsArgs{...}
-//
-//	or:
-//
-//	        nil
-type LambdaTransformArgsPtrInput interface {
-	pulumi.Input
-
-	ToLambdaTransformArgsPtrOutput() LambdaTransformArgsPtrOutput
-	ToLambdaTransformArgsPtrOutputWithContext(context.Context) LambdaTransformArgsPtrOutput
-}
-
-type lambdaTransformArgsPtrType LambdaTransformArgsArgs
-
-func LambdaTransformArgsPtr(v *LambdaTransformArgsArgs) LambdaTransformArgsPtrInput {
-	return (*lambdaTransformArgsPtrType)(v)
-}
-
-func (*lambdaTransformArgsPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**LambdaTransformArgs)(nil)).Elem()
-}
-
-func (i *lambdaTransformArgsPtrType) ToLambdaTransformArgsPtrOutput() LambdaTransformArgsPtrOutput {
-	return i.ToLambdaTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i *lambdaTransformArgsPtrType) ToLambdaTransformArgsPtrOutputWithContext(ctx context.Context) LambdaTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(LambdaTransformArgsPtrOutput)
-}
-
-type LambdaTransformArgsOutput struct{ *pulumi.OutputState }
-
-func (LambdaTransformArgsOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*LambdaTransformArgs)(nil)).Elem()
-}
-
-func (o LambdaTransformArgsOutput) ToLambdaTransformArgsOutput() LambdaTransformArgsOutput {
-	return o
-}
-
-func (o LambdaTransformArgsOutput) ToLambdaTransformArgsOutputWithContext(ctx context.Context) LambdaTransformArgsOutput {
-	return o
-}
-
-func (o LambdaTransformArgsOutput) ToLambdaTransformArgsPtrOutput() LambdaTransformArgsPtrOutput {
-	return o.ToLambdaTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (o LambdaTransformArgsOutput) ToLambdaTransformArgsPtrOutputWithContext(ctx context.Context) LambdaTransformArgsPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v LambdaTransformArgs) *LambdaTransformArgs {
-		return &v
-	}).(LambdaTransformArgsPtrOutput)
-}
-
-func (o LambdaTransformArgsOutput) Lambda() LambdaOverridesPtrOutput {
-	return o.ApplyT(func(v LambdaTransformArgs) *LambdaOverrides { return v.Lambda }).(LambdaOverridesPtrOutput)
-}
-
-type LambdaTransformArgsPtrOutput struct{ *pulumi.OutputState }
-
-func (LambdaTransformArgsPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**LambdaTransformArgs)(nil)).Elem()
-}
-
-func (o LambdaTransformArgsPtrOutput) ToLambdaTransformArgsPtrOutput() LambdaTransformArgsPtrOutput {
-	return o
-}
-
-func (o LambdaTransformArgsPtrOutput) ToLambdaTransformArgsPtrOutputWithContext(ctx context.Context) LambdaTransformArgsPtrOutput {
-	return o
-}
-
-func (o LambdaTransformArgsPtrOutput) Elem() LambdaTransformArgsOutput {
-	return o.ApplyT(func(v *LambdaTransformArgs) LambdaTransformArgs {
-		if v != nil {
-			return *v
-		}
-		var ret LambdaTransformArgs
-		return ret
-	}).(LambdaTransformArgsOutput)
-}
-
-func (o LambdaTransformArgsPtrOutput) Lambda() LambdaOverridesPtrOutput {
-	return o.ApplyT(func(v *LambdaTransformArgs) *LambdaOverrides {
-		if v == nil {
-			return nil
-		}
-		return v.Lambda
-	}).(LambdaOverridesPtrOutput)
-}
-
 type LambdaVpcArgs struct {
 	// CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.
 	Cidrs []LambdaVpcCidrArgs `pulumi:"cidrs"`
@@ -13287,7 +13285,7 @@ func (o LambdaVpcEndpointArgsArrayOutput) Index(i pulumi.IntInput) LambdaVpcEndp
 	}).(LambdaVpcEndpointArgsOutput)
 }
 
-type PABTransform struct {
+type PABHatch struct {
 	// Whether Amazon S3 should block public ACLs for this bucket. Defaults to <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>. Enabling this setting does not affect existing policies or ACLs. When set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span> causes the following behavior:
 	// * PUT Bucket ACL and PUT Object ACL calls will fail if the specified ACL allows public access.
 	// * PUT Object calls will fail if the request includes an object ACL.
@@ -13309,18 +13307,18 @@ type PABTransform struct {
 	SkipDestroy *bool `pulumi:"skipDestroy"`
 }
 
-// PABTransformInput is an input type that accepts PABTransformArgs and PABTransformOutput values.
-// You can construct a concrete instance of `PABTransformInput` via:
+// PABHatchInput is an input type that accepts PABHatchArgs and PABHatchOutput values.
+// You can construct a concrete instance of `PABHatchInput` via:
 //
-//	PABTransformArgs{...}
-type PABTransformInput interface {
+//	PABHatchArgs{...}
+type PABHatchInput interface {
 	pulumi.Input
 
-	ToPABTransformOutput() PABTransformOutput
-	ToPABTransformOutputWithContext(context.Context) PABTransformOutput
+	ToPABHatchOutput() PABHatchOutput
+	ToPABHatchOutputWithContext(context.Context) PABHatchOutput
 }
 
-type PABTransformArgs struct {
+type PABHatchArgs struct {
 	// Whether Amazon S3 should block public ACLs for this bucket. Defaults to <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>. Enabling this setting does not affect existing policies or ACLs. When set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span> causes the following behavior:
 	// * PUT Bucket ACL and PUT Object ACL calls will fail if the specified ACL allows public access.
 	// * PUT Object calls will fail if the request includes an object ACL.
@@ -13342,152 +13340,152 @@ type PABTransformArgs struct {
 	SkipDestroy pulumi.BoolPtrInput `pulumi:"skipDestroy"`
 }
 
-func (PABTransformArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*PABTransform)(nil)).Elem()
+func (PABHatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PABHatch)(nil)).Elem()
 }
 
-func (i PABTransformArgs) ToPABTransformOutput() PABTransformOutput {
-	return i.ToPABTransformOutputWithContext(context.Background())
+func (i PABHatchArgs) ToPABHatchOutput() PABHatchOutput {
+	return i.ToPABHatchOutputWithContext(context.Background())
 }
 
-func (i PABTransformArgs) ToPABTransformOutputWithContext(ctx context.Context) PABTransformOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(PABTransformOutput)
+func (i PABHatchArgs) ToPABHatchOutputWithContext(ctx context.Context) PABHatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PABHatchOutput)
 }
 
-func (i PABTransformArgs) ToPABTransformPtrOutput() PABTransformPtrOutput {
-	return i.ToPABTransformPtrOutputWithContext(context.Background())
+func (i PABHatchArgs) ToPABHatchPtrOutput() PABHatchPtrOutput {
+	return i.ToPABHatchPtrOutputWithContext(context.Background())
 }
 
-func (i PABTransformArgs) ToPABTransformPtrOutputWithContext(ctx context.Context) PABTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(PABTransformOutput).ToPABTransformPtrOutputWithContext(ctx)
+func (i PABHatchArgs) ToPABHatchPtrOutputWithContext(ctx context.Context) PABHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PABHatchOutput).ToPABHatchPtrOutputWithContext(ctx)
 }
 
-// PABTransformPtrInput is an input type that accepts PABTransformArgs, PABTransformPtr and PABTransformPtrOutput values.
-// You can construct a concrete instance of `PABTransformPtrInput` via:
+// PABHatchPtrInput is an input type that accepts PABHatchArgs, PABHatchPtr and PABHatchPtrOutput values.
+// You can construct a concrete instance of `PABHatchPtrInput` via:
 //
-//	        PABTransformArgs{...}
+//	        PABHatchArgs{...}
 //
 //	or:
 //
 //	        nil
-type PABTransformPtrInput interface {
+type PABHatchPtrInput interface {
 	pulumi.Input
 
-	ToPABTransformPtrOutput() PABTransformPtrOutput
-	ToPABTransformPtrOutputWithContext(context.Context) PABTransformPtrOutput
+	ToPABHatchPtrOutput() PABHatchPtrOutput
+	ToPABHatchPtrOutputWithContext(context.Context) PABHatchPtrOutput
 }
 
-type pabtransformPtrType PABTransformArgs
+type pabhatchPtrType PABHatchArgs
 
-func PABTransformPtr(v *PABTransformArgs) PABTransformPtrInput {
-	return (*pabtransformPtrType)(v)
+func PABHatchPtr(v *PABHatchArgs) PABHatchPtrInput {
+	return (*pabhatchPtrType)(v)
 }
 
-func (*pabtransformPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**PABTransform)(nil)).Elem()
+func (*pabhatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**PABHatch)(nil)).Elem()
 }
 
-func (i *pabtransformPtrType) ToPABTransformPtrOutput() PABTransformPtrOutput {
-	return i.ToPABTransformPtrOutputWithContext(context.Background())
+func (i *pabhatchPtrType) ToPABHatchPtrOutput() PABHatchPtrOutput {
+	return i.ToPABHatchPtrOutputWithContext(context.Background())
 }
 
-func (i *pabtransformPtrType) ToPABTransformPtrOutputWithContext(ctx context.Context) PABTransformPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(PABTransformPtrOutput)
+func (i *pabhatchPtrType) ToPABHatchPtrOutputWithContext(ctx context.Context) PABHatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PABHatchPtrOutput)
 }
 
-type PABTransformOutput struct{ *pulumi.OutputState }
+type PABHatchOutput struct{ *pulumi.OutputState }
 
-func (PABTransformOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*PABTransform)(nil)).Elem()
+func (PABHatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PABHatch)(nil)).Elem()
 }
 
-func (o PABTransformOutput) ToPABTransformOutput() PABTransformOutput {
+func (o PABHatchOutput) ToPABHatchOutput() PABHatchOutput {
 	return o
 }
 
-func (o PABTransformOutput) ToPABTransformOutputWithContext(ctx context.Context) PABTransformOutput {
+func (o PABHatchOutput) ToPABHatchOutputWithContext(ctx context.Context) PABHatchOutput {
 	return o
 }
 
-func (o PABTransformOutput) ToPABTransformPtrOutput() PABTransformPtrOutput {
-	return o.ToPABTransformPtrOutputWithContext(context.Background())
+func (o PABHatchOutput) ToPABHatchPtrOutput() PABHatchPtrOutput {
+	return o.ToPABHatchPtrOutputWithContext(context.Background())
 }
 
-func (o PABTransformOutput) ToPABTransformPtrOutputWithContext(ctx context.Context) PABTransformPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v PABTransform) *PABTransform {
+func (o PABHatchOutput) ToPABHatchPtrOutputWithContext(ctx context.Context) PABHatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v PABHatch) *PABHatch {
 		return &v
-	}).(PABTransformPtrOutput)
+	}).(PABHatchPtrOutput)
 }
 
 // Whether Amazon S3 should block public ACLs for this bucket. Defaults to <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>. Enabling this setting does not affect existing policies or ACLs. When set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span> causes the following behavior:
 // * PUT Bucket ACL and PUT Object ACL calls will fail if the specified ACL allows public access.
 // * PUT Object calls will fail if the request includes an object ACL.
-func (o PABTransformOutput) BlockPublicAcls() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v PABTransform) *bool { return v.BlockPublicAcls }).(pulumi.BoolPtrOutput)
+func (o PABHatchOutput) BlockPublicAcls() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v PABHatch) *bool { return v.BlockPublicAcls }).(pulumi.BoolPtrOutput)
 }
 
 // Whether Amazon S3 should block public bucket policies for this bucket. Defaults to <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>. Enabling this setting does not affect the existing bucket policy. When set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span> causes Amazon S3 to:
 // * Reject calls to PUT Bucket policy if the specified bucket policy allows public access.
-func (o PABTransformOutput) BlockPublicPolicy() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v PABTransform) *bool { return v.BlockPublicPolicy }).(pulumi.BoolPtrOutput)
+func (o PABHatchOutput) BlockPublicPolicy() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v PABHatch) *bool { return v.BlockPublicPolicy }).(pulumi.BoolPtrOutput)
 }
 
 // S3 Bucket to which this Public Access Block configuration should be applied.
-func (o PABTransformOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v PABTransform) *string { return v.Bucket }).(pulumi.StringPtrOutput)
+func (o PABHatchOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PABHatch) *string { return v.Bucket }).(pulumi.StringPtrOutput)
 }
 
 // Whether Amazon S3 should ignore public ACLs for this bucket. Defaults to <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>. Enabling this setting does not affect the persistence of any existing ACLs and doesn't prevent new public ACLs from being set. When set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span> causes Amazon S3 to:
 // * Ignore public ACLs on this bucket and any objects that it contains.
-func (o PABTransformOutput) IgnorePublicAcls() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v PABTransform) *bool { return v.IgnorePublicAcls }).(pulumi.BoolPtrOutput)
+func (o PABHatchOutput) IgnorePublicAcls() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v PABHatch) *bool { return v.IgnorePublicAcls }).(pulumi.BoolPtrOutput)
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o PABTransformOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v PABTransform) *string { return v.Region }).(pulumi.StringPtrOutput)
+func (o PABHatchOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PABHatch) *string { return v.Region }).(pulumi.StringPtrOutput)
 }
 
 // Whether Amazon S3 should restrict public bucket policies for this bucket. Defaults to <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>. Enabling this setting does not affect the previously stored bucket policy, except that public and cross-account access within the public bucket policy, including non-public delegation to specific accounts, is blocked. When set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span>:
 // * Only the bucket owner and AWS Services can access this buckets if it has a public policy.
-func (o PABTransformOutput) RestrictPublicBuckets() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v PABTransform) *bool { return v.RestrictPublicBuckets }).(pulumi.BoolPtrOutput)
+func (o PABHatchOutput) RestrictPublicBuckets() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v PABHatch) *bool { return v.RestrictPublicBuckets }).(pulumi.BoolPtrOutput)
 }
 
 // Whether to retain the public access block upon destruction. If set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span>, the resource is simply removed from state instead. This may be desirable in certain scenarios to prevent the removal of a public access block before deletion of the associated bucket.
-func (o PABTransformOutput) SkipDestroy() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v PABTransform) *bool { return v.SkipDestroy }).(pulumi.BoolPtrOutput)
+func (o PABHatchOutput) SkipDestroy() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v PABHatch) *bool { return v.SkipDestroy }).(pulumi.BoolPtrOutput)
 }
 
-type PABTransformPtrOutput struct{ *pulumi.OutputState }
+type PABHatchPtrOutput struct{ *pulumi.OutputState }
 
-func (PABTransformPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**PABTransform)(nil)).Elem()
+func (PABHatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**PABHatch)(nil)).Elem()
 }
 
-func (o PABTransformPtrOutput) ToPABTransformPtrOutput() PABTransformPtrOutput {
+func (o PABHatchPtrOutput) ToPABHatchPtrOutput() PABHatchPtrOutput {
 	return o
 }
 
-func (o PABTransformPtrOutput) ToPABTransformPtrOutputWithContext(ctx context.Context) PABTransformPtrOutput {
+func (o PABHatchPtrOutput) ToPABHatchPtrOutputWithContext(ctx context.Context) PABHatchPtrOutput {
 	return o
 }
 
-func (o PABTransformPtrOutput) Elem() PABTransformOutput {
-	return o.ApplyT(func(v *PABTransform) PABTransform {
+func (o PABHatchPtrOutput) Elem() PABHatchOutput {
+	return o.ApplyT(func(v *PABHatch) PABHatch {
 		if v != nil {
 			return *v
 		}
-		var ret PABTransform
+		var ret PABHatch
 		return ret
-	}).(PABTransformOutput)
+	}).(PABHatchOutput)
 }
 
 // Whether Amazon S3 should block public ACLs for this bucket. Defaults to <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>. Enabling this setting does not affect existing policies or ACLs. When set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span> causes the following behavior:
 // * PUT Bucket ACL and PUT Object ACL calls will fail if the specified ACL allows public access.
 // * PUT Object calls will fail if the request includes an object ACL.
-func (o PABTransformPtrOutput) BlockPublicAcls() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v *PABTransform) *bool {
+func (o PABHatchPtrOutput) BlockPublicAcls() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *PABHatch) *bool {
 		if v == nil {
 			return nil
 		}
@@ -13497,8 +13495,8 @@ func (o PABTransformPtrOutput) BlockPublicAcls() pulumi.BoolPtrOutput {
 
 // Whether Amazon S3 should block public bucket policies for this bucket. Defaults to <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>. Enabling this setting does not affect the existing bucket policy. When set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span> causes Amazon S3 to:
 // * Reject calls to PUT Bucket policy if the specified bucket policy allows public access.
-func (o PABTransformPtrOutput) BlockPublicPolicy() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v *PABTransform) *bool {
+func (o PABHatchPtrOutput) BlockPublicPolicy() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *PABHatch) *bool {
 		if v == nil {
 			return nil
 		}
@@ -13507,8 +13505,8 @@ func (o PABTransformPtrOutput) BlockPublicPolicy() pulumi.BoolPtrOutput {
 }
 
 // S3 Bucket to which this Public Access Block configuration should be applied.
-func (o PABTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PABTransform) *string {
+func (o PABHatchPtrOutput) Bucket() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PABHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -13518,8 +13516,8 @@ func (o PABTransformPtrOutput) Bucket() pulumi.StringPtrOutput {
 
 // Whether Amazon S3 should ignore public ACLs for this bucket. Defaults to <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>. Enabling this setting does not affect the persistence of any existing ACLs and doesn't prevent new public ACLs from being set. When set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span> causes Amazon S3 to:
 // * Ignore public ACLs on this bucket and any objects that it contains.
-func (o PABTransformPtrOutput) IgnorePublicAcls() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v *PABTransform) *bool {
+func (o PABHatchPtrOutput) IgnorePublicAcls() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *PABHatch) *bool {
 		if v == nil {
 			return nil
 		}
@@ -13528,8 +13526,8 @@ func (o PABTransformPtrOutput) IgnorePublicAcls() pulumi.BoolPtrOutput {
 }
 
 // Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
-func (o PABTransformPtrOutput) Region() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *PABTransform) *string {
+func (o PABHatchPtrOutput) Region() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PABHatch) *string {
 		if v == nil {
 			return nil
 		}
@@ -13539,8 +13537,8 @@ func (o PABTransformPtrOutput) Region() pulumi.StringPtrOutput {
 
 // Whether Amazon S3 should restrict public bucket policies for this bucket. Defaults to <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>. Enabling this setting does not affect the previously stored bucket policy, except that public and cross-account access within the public bucket policy, including non-public delegation to specific accounts, is blocked. When set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span>:
 // * Only the bucket owner and AWS Services can access this buckets if it has a public policy.
-func (o PABTransformPtrOutput) RestrictPublicBuckets() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v *PABTransform) *bool {
+func (o PABHatchPtrOutput) RestrictPublicBuckets() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *PABHatch) *bool {
 		if v == nil {
 			return nil
 		}
@@ -13549,8 +13547,8 @@ func (o PABTransformPtrOutput) RestrictPublicBuckets() pulumi.BoolPtrOutput {
 }
 
 // Whether to retain the public access block upon destruction. If set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span>, the resource is simply removed from state instead. This may be desirable in certain scenarios to prevent the removal of a public access block before deletion of the associated bucket.
-func (o PABTransformPtrOutput) SkipDestroy() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v *PABTransform) *bool {
+func (o PABHatchPtrOutput) SkipDestroy() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *PABHatch) *bool {
 		if v == nil {
 			return nil
 		}
@@ -13855,6 +13853,139 @@ func (o QueueDlqArgsPtrOutput) MaxReceiveCount() pulumi.IntPtrOutput {
 		}
 		return v.MaxReceiveCount
 	}).(pulumi.IntPtrOutput)
+}
+
+type QueueHatchArgs struct {
+	Queue *QueueOverrides `pulumi:"queue"`
+}
+
+// QueueHatchArgsInput is an input type that accepts QueueHatchArgsArgs and QueueHatchArgsOutput values.
+// You can construct a concrete instance of `QueueHatchArgsInput` via:
+//
+//	QueueHatchArgsArgs{...}
+type QueueHatchArgsInput interface {
+	pulumi.Input
+
+	ToQueueHatchArgsOutput() QueueHatchArgsOutput
+	ToQueueHatchArgsOutputWithContext(context.Context) QueueHatchArgsOutput
+}
+
+type QueueHatchArgsArgs struct {
+	Queue QueueOverridesPtrInput `pulumi:"queue"`
+}
+
+func (QueueHatchArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*QueueHatchArgs)(nil)).Elem()
+}
+
+func (i QueueHatchArgsArgs) ToQueueHatchArgsOutput() QueueHatchArgsOutput {
+	return i.ToQueueHatchArgsOutputWithContext(context.Background())
+}
+
+func (i QueueHatchArgsArgs) ToQueueHatchArgsOutputWithContext(ctx context.Context) QueueHatchArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(QueueHatchArgsOutput)
+}
+
+func (i QueueHatchArgsArgs) ToQueueHatchArgsPtrOutput() QueueHatchArgsPtrOutput {
+	return i.ToQueueHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i QueueHatchArgsArgs) ToQueueHatchArgsPtrOutputWithContext(ctx context.Context) QueueHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(QueueHatchArgsOutput).ToQueueHatchArgsPtrOutputWithContext(ctx)
+}
+
+// QueueHatchArgsPtrInput is an input type that accepts QueueHatchArgsArgs, QueueHatchArgsPtr and QueueHatchArgsPtrOutput values.
+// You can construct a concrete instance of `QueueHatchArgsPtrInput` via:
+//
+//	        QueueHatchArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type QueueHatchArgsPtrInput interface {
+	pulumi.Input
+
+	ToQueueHatchArgsPtrOutput() QueueHatchArgsPtrOutput
+	ToQueueHatchArgsPtrOutputWithContext(context.Context) QueueHatchArgsPtrOutput
+}
+
+type queueHatchArgsPtrType QueueHatchArgsArgs
+
+func QueueHatchArgsPtr(v *QueueHatchArgsArgs) QueueHatchArgsPtrInput {
+	return (*queueHatchArgsPtrType)(v)
+}
+
+func (*queueHatchArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**QueueHatchArgs)(nil)).Elem()
+}
+
+func (i *queueHatchArgsPtrType) ToQueueHatchArgsPtrOutput() QueueHatchArgsPtrOutput {
+	return i.ToQueueHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *queueHatchArgsPtrType) ToQueueHatchArgsPtrOutputWithContext(ctx context.Context) QueueHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(QueueHatchArgsPtrOutput)
+}
+
+type QueueHatchArgsOutput struct{ *pulumi.OutputState }
+
+func (QueueHatchArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*QueueHatchArgs)(nil)).Elem()
+}
+
+func (o QueueHatchArgsOutput) ToQueueHatchArgsOutput() QueueHatchArgsOutput {
+	return o
+}
+
+func (o QueueHatchArgsOutput) ToQueueHatchArgsOutputWithContext(ctx context.Context) QueueHatchArgsOutput {
+	return o
+}
+
+func (o QueueHatchArgsOutput) ToQueueHatchArgsPtrOutput() QueueHatchArgsPtrOutput {
+	return o.ToQueueHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (o QueueHatchArgsOutput) ToQueueHatchArgsPtrOutputWithContext(ctx context.Context) QueueHatchArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v QueueHatchArgs) *QueueHatchArgs {
+		return &v
+	}).(QueueHatchArgsPtrOutput)
+}
+
+func (o QueueHatchArgsOutput) Queue() QueueOverridesPtrOutput {
+	return o.ApplyT(func(v QueueHatchArgs) *QueueOverrides { return v.Queue }).(QueueOverridesPtrOutput)
+}
+
+type QueueHatchArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (QueueHatchArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**QueueHatchArgs)(nil)).Elem()
+}
+
+func (o QueueHatchArgsPtrOutput) ToQueueHatchArgsPtrOutput() QueueHatchArgsPtrOutput {
+	return o
+}
+
+func (o QueueHatchArgsPtrOutput) ToQueueHatchArgsPtrOutputWithContext(ctx context.Context) QueueHatchArgsPtrOutput {
+	return o
+}
+
+func (o QueueHatchArgsPtrOutput) Elem() QueueHatchArgsOutput {
+	return o.ApplyT(func(v *QueueHatchArgs) QueueHatchArgs {
+		if v != nil {
+			return *v
+		}
+		var ret QueueHatchArgs
+		return ret
+	}).(QueueHatchArgsOutput)
+}
+
+func (o QueueHatchArgsPtrOutput) Queue() QueueOverridesPtrOutput {
+	return o.ApplyT(func(v *QueueHatchArgs) *QueueOverrides {
+		if v == nil {
+			return nil
+		}
+		return v.Queue
+	}).(QueueOverridesPtrOutput)
 }
 
 // Lambda consumer configuration. Pass fn.arn and fn.roleArn from an Anvil Lambda component.
@@ -14493,139 +14624,6 @@ func (o QueueOverridesPtrOutput) VisibilityTimeoutSeconds() pulumi.IntPtrOutput 
 		}
 		return v.VisibilityTimeoutSeconds
 	}).(pulumi.IntPtrOutput)
-}
-
-type QueueTransformArgs struct {
-	Queue *QueueOverrides `pulumi:"queue"`
-}
-
-// QueueTransformArgsInput is an input type that accepts QueueTransformArgsArgs and QueueTransformArgsOutput values.
-// You can construct a concrete instance of `QueueTransformArgsInput` via:
-//
-//	QueueTransformArgsArgs{...}
-type QueueTransformArgsInput interface {
-	pulumi.Input
-
-	ToQueueTransformArgsOutput() QueueTransformArgsOutput
-	ToQueueTransformArgsOutputWithContext(context.Context) QueueTransformArgsOutput
-}
-
-type QueueTransformArgsArgs struct {
-	Queue QueueOverridesPtrInput `pulumi:"queue"`
-}
-
-func (QueueTransformArgsArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*QueueTransformArgs)(nil)).Elem()
-}
-
-func (i QueueTransformArgsArgs) ToQueueTransformArgsOutput() QueueTransformArgsOutput {
-	return i.ToQueueTransformArgsOutputWithContext(context.Background())
-}
-
-func (i QueueTransformArgsArgs) ToQueueTransformArgsOutputWithContext(ctx context.Context) QueueTransformArgsOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(QueueTransformArgsOutput)
-}
-
-func (i QueueTransformArgsArgs) ToQueueTransformArgsPtrOutput() QueueTransformArgsPtrOutput {
-	return i.ToQueueTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i QueueTransformArgsArgs) ToQueueTransformArgsPtrOutputWithContext(ctx context.Context) QueueTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(QueueTransformArgsOutput).ToQueueTransformArgsPtrOutputWithContext(ctx)
-}
-
-// QueueTransformArgsPtrInput is an input type that accepts QueueTransformArgsArgs, QueueTransformArgsPtr and QueueTransformArgsPtrOutput values.
-// You can construct a concrete instance of `QueueTransformArgsPtrInput` via:
-//
-//	        QueueTransformArgsArgs{...}
-//
-//	or:
-//
-//	        nil
-type QueueTransformArgsPtrInput interface {
-	pulumi.Input
-
-	ToQueueTransformArgsPtrOutput() QueueTransformArgsPtrOutput
-	ToQueueTransformArgsPtrOutputWithContext(context.Context) QueueTransformArgsPtrOutput
-}
-
-type queueTransformArgsPtrType QueueTransformArgsArgs
-
-func QueueTransformArgsPtr(v *QueueTransformArgsArgs) QueueTransformArgsPtrInput {
-	return (*queueTransformArgsPtrType)(v)
-}
-
-func (*queueTransformArgsPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**QueueTransformArgs)(nil)).Elem()
-}
-
-func (i *queueTransformArgsPtrType) ToQueueTransformArgsPtrOutput() QueueTransformArgsPtrOutput {
-	return i.ToQueueTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i *queueTransformArgsPtrType) ToQueueTransformArgsPtrOutputWithContext(ctx context.Context) QueueTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(QueueTransformArgsPtrOutput)
-}
-
-type QueueTransformArgsOutput struct{ *pulumi.OutputState }
-
-func (QueueTransformArgsOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*QueueTransformArgs)(nil)).Elem()
-}
-
-func (o QueueTransformArgsOutput) ToQueueTransformArgsOutput() QueueTransformArgsOutput {
-	return o
-}
-
-func (o QueueTransformArgsOutput) ToQueueTransformArgsOutputWithContext(ctx context.Context) QueueTransformArgsOutput {
-	return o
-}
-
-func (o QueueTransformArgsOutput) ToQueueTransformArgsPtrOutput() QueueTransformArgsPtrOutput {
-	return o.ToQueueTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (o QueueTransformArgsOutput) ToQueueTransformArgsPtrOutputWithContext(ctx context.Context) QueueTransformArgsPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v QueueTransformArgs) *QueueTransformArgs {
-		return &v
-	}).(QueueTransformArgsPtrOutput)
-}
-
-func (o QueueTransformArgsOutput) Queue() QueueOverridesPtrOutput {
-	return o.ApplyT(func(v QueueTransformArgs) *QueueOverrides { return v.Queue }).(QueueOverridesPtrOutput)
-}
-
-type QueueTransformArgsPtrOutput struct{ *pulumi.OutputState }
-
-func (QueueTransformArgsPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**QueueTransformArgs)(nil)).Elem()
-}
-
-func (o QueueTransformArgsPtrOutput) ToQueueTransformArgsPtrOutput() QueueTransformArgsPtrOutput {
-	return o
-}
-
-func (o QueueTransformArgsPtrOutput) ToQueueTransformArgsPtrOutputWithContext(ctx context.Context) QueueTransformArgsPtrOutput {
-	return o
-}
-
-func (o QueueTransformArgsPtrOutput) Elem() QueueTransformArgsOutput {
-	return o.ApplyT(func(v *QueueTransformArgs) QueueTransformArgs {
-		if v != nil {
-			return *v
-		}
-		var ret QueueTransformArgs
-		return ret
-	}).(QueueTransformArgsOutput)
-}
-
-func (o QueueTransformArgsPtrOutput) Queue() QueueOverridesPtrOutput {
-	return o.ApplyT(func(v *QueueTransformArgs) *QueueOverrides {
-		if v == nil {
-			return nil
-		}
-		return v.Queue
-	}).(QueueOverridesPtrOutput)
 }
 
 // SiteHstsArgs configures optional Strict-Transport-Security directives. Both are hard to undo — browsers remember them for the max-age (1 year).
@@ -16012,6 +16010,139 @@ func (o VpcS3FlowLogArgsPtrOutput) Lifecycle() S3FlowLogLifecyclePtrOutput {
 	}).(S3FlowLogLifecyclePtrOutput)
 }
 
+type WafHatchArgs struct {
+	Waf *WafOverrides `pulumi:"waf"`
+}
+
+// WafHatchArgsInput is an input type that accepts WafHatchArgsArgs and WafHatchArgsOutput values.
+// You can construct a concrete instance of `WafHatchArgsInput` via:
+//
+//	WafHatchArgsArgs{...}
+type WafHatchArgsInput interface {
+	pulumi.Input
+
+	ToWafHatchArgsOutput() WafHatchArgsOutput
+	ToWafHatchArgsOutputWithContext(context.Context) WafHatchArgsOutput
+}
+
+type WafHatchArgsArgs struct {
+	Waf WafOverridesPtrInput `pulumi:"waf"`
+}
+
+func (WafHatchArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*WafHatchArgs)(nil)).Elem()
+}
+
+func (i WafHatchArgsArgs) ToWafHatchArgsOutput() WafHatchArgsOutput {
+	return i.ToWafHatchArgsOutputWithContext(context.Background())
+}
+
+func (i WafHatchArgsArgs) ToWafHatchArgsOutputWithContext(ctx context.Context) WafHatchArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(WafHatchArgsOutput)
+}
+
+func (i WafHatchArgsArgs) ToWafHatchArgsPtrOutput() WafHatchArgsPtrOutput {
+	return i.ToWafHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i WafHatchArgsArgs) ToWafHatchArgsPtrOutputWithContext(ctx context.Context) WafHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(WafHatchArgsOutput).ToWafHatchArgsPtrOutputWithContext(ctx)
+}
+
+// WafHatchArgsPtrInput is an input type that accepts WafHatchArgsArgs, WafHatchArgsPtr and WafHatchArgsPtrOutput values.
+// You can construct a concrete instance of `WafHatchArgsPtrInput` via:
+//
+//	        WafHatchArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type WafHatchArgsPtrInput interface {
+	pulumi.Input
+
+	ToWafHatchArgsPtrOutput() WafHatchArgsPtrOutput
+	ToWafHatchArgsPtrOutputWithContext(context.Context) WafHatchArgsPtrOutput
+}
+
+type wafHatchArgsPtrType WafHatchArgsArgs
+
+func WafHatchArgsPtr(v *WafHatchArgsArgs) WafHatchArgsPtrInput {
+	return (*wafHatchArgsPtrType)(v)
+}
+
+func (*wafHatchArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**WafHatchArgs)(nil)).Elem()
+}
+
+func (i *wafHatchArgsPtrType) ToWafHatchArgsPtrOutput() WafHatchArgsPtrOutput {
+	return i.ToWafHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *wafHatchArgsPtrType) ToWafHatchArgsPtrOutputWithContext(ctx context.Context) WafHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(WafHatchArgsPtrOutput)
+}
+
+type WafHatchArgsOutput struct{ *pulumi.OutputState }
+
+func (WafHatchArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*WafHatchArgs)(nil)).Elem()
+}
+
+func (o WafHatchArgsOutput) ToWafHatchArgsOutput() WafHatchArgsOutput {
+	return o
+}
+
+func (o WafHatchArgsOutput) ToWafHatchArgsOutputWithContext(ctx context.Context) WafHatchArgsOutput {
+	return o
+}
+
+func (o WafHatchArgsOutput) ToWafHatchArgsPtrOutput() WafHatchArgsPtrOutput {
+	return o.ToWafHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (o WafHatchArgsOutput) ToWafHatchArgsPtrOutputWithContext(ctx context.Context) WafHatchArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v WafHatchArgs) *WafHatchArgs {
+		return &v
+	}).(WafHatchArgsPtrOutput)
+}
+
+func (o WafHatchArgsOutput) Waf() WafOverridesPtrOutput {
+	return o.ApplyT(func(v WafHatchArgs) *WafOverrides { return v.Waf }).(WafOverridesPtrOutput)
+}
+
+type WafHatchArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (WafHatchArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**WafHatchArgs)(nil)).Elem()
+}
+
+func (o WafHatchArgsPtrOutput) ToWafHatchArgsPtrOutput() WafHatchArgsPtrOutput {
+	return o
+}
+
+func (o WafHatchArgsPtrOutput) ToWafHatchArgsPtrOutputWithContext(ctx context.Context) WafHatchArgsPtrOutput {
+	return o
+}
+
+func (o WafHatchArgsPtrOutput) Elem() WafHatchArgsOutput {
+	return o.ApplyT(func(v *WafHatchArgs) WafHatchArgs {
+		if v != nil {
+			return *v
+		}
+		var ret WafHatchArgs
+		return ret
+	}).(WafHatchArgsOutput)
+}
+
+func (o WafHatchArgsPtrOutput) Waf() WafOverridesPtrOutput {
+	return o.ApplyT(func(v *WafHatchArgs) *WafOverrides {
+		if v == nil {
+			return nil
+		}
+		return v.Waf
+	}).(WafOverridesPtrOutput)
+}
+
 // WAF logging to CloudWatch Logs.
 type WafLoggingArgs struct {
 	// Turns logging on or off. Default: true.
@@ -17025,168 +17156,35 @@ func (o WafRateLimitArgsPtrOutput) WindowSeconds() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
-type WafTransformArgs struct {
-	Waf *WafOverrides `pulumi:"waf"`
-}
-
-// WafTransformArgsInput is an input type that accepts WafTransformArgsArgs and WafTransformArgsOutput values.
-// You can construct a concrete instance of `WafTransformArgsInput` via:
-//
-//	WafTransformArgsArgs{...}
-type WafTransformArgsInput interface {
-	pulumi.Input
-
-	ToWafTransformArgsOutput() WafTransformArgsOutput
-	ToWafTransformArgsOutputWithContext(context.Context) WafTransformArgsOutput
-}
-
-type WafTransformArgsArgs struct {
-	Waf WafOverridesPtrInput `pulumi:"waf"`
-}
-
-func (WafTransformArgsArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*WafTransformArgs)(nil)).Elem()
-}
-
-func (i WafTransformArgsArgs) ToWafTransformArgsOutput() WafTransformArgsOutput {
-	return i.ToWafTransformArgsOutputWithContext(context.Background())
-}
-
-func (i WafTransformArgsArgs) ToWafTransformArgsOutputWithContext(ctx context.Context) WafTransformArgsOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(WafTransformArgsOutput)
-}
-
-func (i WafTransformArgsArgs) ToWafTransformArgsPtrOutput() WafTransformArgsPtrOutput {
-	return i.ToWafTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i WafTransformArgsArgs) ToWafTransformArgsPtrOutputWithContext(ctx context.Context) WafTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(WafTransformArgsOutput).ToWafTransformArgsPtrOutputWithContext(ctx)
-}
-
-// WafTransformArgsPtrInput is an input type that accepts WafTransformArgsArgs, WafTransformArgsPtr and WafTransformArgsPtrOutput values.
-// You can construct a concrete instance of `WafTransformArgsPtrInput` via:
-//
-//	        WafTransformArgsArgs{...}
-//
-//	or:
-//
-//	        nil
-type WafTransformArgsPtrInput interface {
-	pulumi.Input
-
-	ToWafTransformArgsPtrOutput() WafTransformArgsPtrOutput
-	ToWafTransformArgsPtrOutputWithContext(context.Context) WafTransformArgsPtrOutput
-}
-
-type wafTransformArgsPtrType WafTransformArgsArgs
-
-func WafTransformArgsPtr(v *WafTransformArgsArgs) WafTransformArgsPtrInput {
-	return (*wafTransformArgsPtrType)(v)
-}
-
-func (*wafTransformArgsPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**WafTransformArgs)(nil)).Elem()
-}
-
-func (i *wafTransformArgsPtrType) ToWafTransformArgsPtrOutput() WafTransformArgsPtrOutput {
-	return i.ToWafTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i *wafTransformArgsPtrType) ToWafTransformArgsPtrOutputWithContext(ctx context.Context) WafTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(WafTransformArgsPtrOutput)
-}
-
-type WafTransformArgsOutput struct{ *pulumi.OutputState }
-
-func (WafTransformArgsOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*WafTransformArgs)(nil)).Elem()
-}
-
-func (o WafTransformArgsOutput) ToWafTransformArgsOutput() WafTransformArgsOutput {
-	return o
-}
-
-func (o WafTransformArgsOutput) ToWafTransformArgsOutputWithContext(ctx context.Context) WafTransformArgsOutput {
-	return o
-}
-
-func (o WafTransformArgsOutput) ToWafTransformArgsPtrOutput() WafTransformArgsPtrOutput {
-	return o.ToWafTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (o WafTransformArgsOutput) ToWafTransformArgsPtrOutputWithContext(ctx context.Context) WafTransformArgsPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v WafTransformArgs) *WafTransformArgs {
-		return &v
-	}).(WafTransformArgsPtrOutput)
-}
-
-func (o WafTransformArgsOutput) Waf() WafOverridesPtrOutput {
-	return o.ApplyT(func(v WafTransformArgs) *WafOverrides { return v.Waf }).(WafOverridesPtrOutput)
-}
-
-type WafTransformArgsPtrOutput struct{ *pulumi.OutputState }
-
-func (WafTransformArgsPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**WafTransformArgs)(nil)).Elem()
-}
-
-func (o WafTransformArgsPtrOutput) ToWafTransformArgsPtrOutput() WafTransformArgsPtrOutput {
-	return o
-}
-
-func (o WafTransformArgsPtrOutput) ToWafTransformArgsPtrOutputWithContext(ctx context.Context) WafTransformArgsPtrOutput {
-	return o
-}
-
-func (o WafTransformArgsPtrOutput) Elem() WafTransformArgsOutput {
-	return o.ApplyT(func(v *WafTransformArgs) WafTransformArgs {
-		if v != nil {
-			return *v
-		}
-		var ret WafTransformArgs
-		return ret
-	}).(WafTransformArgsOutput)
-}
-
-func (o WafTransformArgsPtrOutput) Waf() WafOverridesPtrOutput {
-	return o.ApplyT(func(v *WafTransformArgs) *WafOverrides {
-		if v == nil {
-			return nil
-		}
-		return v.Waf
-	}).(WafOverridesPtrOutput)
-}
-
 func init() {
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketAccelerateConfigurationTransformInput)(nil)).Elem(), BucketAccelerateConfigurationTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketAccelerateConfigurationTransformPtrInput)(nil)).Elem(), BucketAccelerateConfigurationTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketAclTransformInput)(nil)).Elem(), BucketAclTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketAclTransformPtrInput)(nil)).Elem(), BucketAclTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketCorsConfigurationTransformInput)(nil)).Elem(), BucketCorsConfigurationTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketCorsConfigurationTransformPtrInput)(nil)).Elem(), BucketCorsConfigurationTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketLifecycleConfigurationTransformInput)(nil)).Elem(), BucketLifecycleConfigurationTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketLifecycleConfigurationTransformPtrInput)(nil)).Elem(), BucketLifecycleConfigurationTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketLoggingTransformInput)(nil)).Elem(), BucketLoggingTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketLoggingTransformPtrInput)(nil)).Elem(), BucketLoggingTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketObjectLockConfigurationTransformInput)(nil)).Elem(), BucketObjectLockConfigurationTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketObjectLockConfigurationTransformPtrInput)(nil)).Elem(), BucketObjectLockConfigurationTransformArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketAccelerateConfigurationHatchInput)(nil)).Elem(), BucketAccelerateConfigurationHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketAccelerateConfigurationHatchPtrInput)(nil)).Elem(), BucketAccelerateConfigurationHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketAclHatchInput)(nil)).Elem(), BucketAclHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketAclHatchPtrInput)(nil)).Elem(), BucketAclHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketCorsConfigurationHatchInput)(nil)).Elem(), BucketCorsConfigurationHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketCorsConfigurationHatchPtrInput)(nil)).Elem(), BucketCorsConfigurationHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketHatchArgsInput)(nil)).Elem(), BucketHatchArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketHatchArgsPtrInput)(nil)).Elem(), BucketHatchArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketLifecycleConfigurationHatchInput)(nil)).Elem(), BucketLifecycleConfigurationHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketLifecycleConfigurationHatchPtrInput)(nil)).Elem(), BucketLifecycleConfigurationHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketLoggingHatchInput)(nil)).Elem(), BucketLoggingHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketLoggingHatchPtrInput)(nil)).Elem(), BucketLoggingHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketObjectLockConfigurationHatchInput)(nil)).Elem(), BucketObjectLockConfigurationHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketObjectLockConfigurationHatchPtrInput)(nil)).Elem(), BucketObjectLockConfigurationHatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*BucketOverridesInput)(nil)).Elem(), BucketOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*BucketOverridesPtrInput)(nil)).Elem(), BucketOverridesArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketPolicyTransformInput)(nil)).Elem(), BucketPolicyTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketPolicyTransformPtrInput)(nil)).Elem(), BucketPolicyTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketReplicationConfigTransformInput)(nil)).Elem(), BucketReplicationConfigTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketReplicationConfigTransformPtrInput)(nil)).Elem(), BucketReplicationConfigTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketRequestPaymentConfigurationTransformInput)(nil)).Elem(), BucketRequestPaymentConfigurationTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketRequestPaymentConfigurationTransformPtrInput)(nil)).Elem(), BucketRequestPaymentConfigurationTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketServerSideEncryptionConfigurationTransformInput)(nil)).Elem(), BucketServerSideEncryptionConfigurationTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketServerSideEncryptionConfigurationTransformPtrInput)(nil)).Elem(), BucketServerSideEncryptionConfigurationTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketTransformArgsInput)(nil)).Elem(), BucketTransformArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketTransformArgsPtrInput)(nil)).Elem(), BucketTransformArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketVersioningTransformInput)(nil)).Elem(), BucketVersioningTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketVersioningTransformPtrInput)(nil)).Elem(), BucketVersioningTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketWebsiteConfigurationTransformInput)(nil)).Elem(), BucketWebsiteConfigurationTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketWebsiteConfigurationTransformPtrInput)(nil)).Elem(), BucketWebsiteConfigurationTransformArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketPolicyHatchInput)(nil)).Elem(), BucketPolicyHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketPolicyHatchPtrInput)(nil)).Elem(), BucketPolicyHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketReplicationConfigHatchInput)(nil)).Elem(), BucketReplicationConfigHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketReplicationConfigHatchPtrInput)(nil)).Elem(), BucketReplicationConfigHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketRequestPaymentConfigurationHatchInput)(nil)).Elem(), BucketRequestPaymentConfigurationHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketRequestPaymentConfigurationHatchPtrInput)(nil)).Elem(), BucketRequestPaymentConfigurationHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketServerSideEncryptionConfigurationHatchInput)(nil)).Elem(), BucketServerSideEncryptionConfigurationHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketServerSideEncryptionConfigurationHatchPtrInput)(nil)).Elem(), BucketServerSideEncryptionConfigurationHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketVersioningHatchInput)(nil)).Elem(), BucketVersioningHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketVersioningHatchPtrInput)(nil)).Elem(), BucketVersioningHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketWebsiteConfigurationHatchInput)(nil)).Elem(), BucketWebsiteConfigurationHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketWebsiteConfigurationHatchPtrInput)(nil)).Elem(), BucketWebsiteConfigurationHatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolAppClientInput)(nil)).Elem(), CognitoUserPoolAppClientArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolAppClientPtrInput)(nil)).Elem(), CognitoUserPoolAppClientArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolAttributesInput)(nil)).Elem(), CognitoUserPoolAttributesArgs{})
@@ -17195,6 +17193,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolCustomAttributeArrayInput)(nil)).Elem(), CognitoUserPoolCustomAttributeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolEmailConfigurationInput)(nil)).Elem(), CognitoUserPoolEmailConfigurationArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolEmailConfigurationPtrInput)(nil)).Elem(), CognitoUserPoolEmailConfigurationArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolHatchArgsInput)(nil)).Elem(), CognitoUserPoolHatchArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolHatchArgsPtrInput)(nil)).Elem(), CognitoUserPoolHatchArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolHostedUiInput)(nil)).Elem(), CognitoUserPoolHostedUiArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolHostedUiPtrInput)(nil)).Elem(), CognitoUserPoolHostedUiArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolIdentityProviderInput)(nil)).Elem(), CognitoUserPoolIdentityProviderArgs{})
@@ -17207,8 +17207,6 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolPasswordPolicyPtrInput)(nil)).Elem(), CognitoUserPoolPasswordPolicyArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolTokenValidityInput)(nil)).Elem(), CognitoUserPoolTokenValidityArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolTokenValidityPtrInput)(nil)).Elem(), CognitoUserPoolTokenValidityArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolTransformArgsInput)(nil)).Elem(), CognitoUserPoolTransformArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolTransformArgsPtrInput)(nil)).Elem(), CognitoUserPoolTransformArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolWafInput)(nil)).Elem(), CognitoUserPoolWafArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*CognitoUserPoolWafPtrInput)(nil)).Elem(), CognitoUserPoolWafArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DSQLBackupArgsInput)(nil)).Elem(), DSQLBackupArgsArgs{})
@@ -17227,10 +17225,10 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DSQLTableArrayInput)(nil)).Elem(), DSQLTableArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DSQLVpcArgsInput)(nil)).Elem(), DSQLVpcArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DSQLVpcArgsPtrInput)(nil)).Elem(), DSQLVpcArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DsqlHatchArgsInput)(nil)).Elem(), DsqlHatchArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DsqlHatchArgsPtrInput)(nil)).Elem(), DsqlHatchArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DsqlOverridesInput)(nil)).Elem(), DsqlOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DsqlOverridesPtrInput)(nil)).Elem(), DsqlOverridesArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*DsqlTransformArgsInput)(nil)).Elem(), DsqlTransformArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*DsqlTransformArgsPtrInput)(nil)).Elem(), DsqlTransformArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DynamoDBGlobalSecondaryIndexInput)(nil)).Elem(), DynamoDBGlobalSecondaryIndexArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DynamoDBGlobalSecondaryIndexArrayInput)(nil)).Elem(), DynamoDBGlobalSecondaryIndexArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DynamoDBKeyAttributeInput)(nil)).Elem(), DynamoDBKeyAttributeArgs{})
@@ -17243,14 +17241,14 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DynamoDBStreamEventBridgeConsumerPtrInput)(nil)).Elem(), DynamoDBStreamEventBridgeConsumerArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DynamoDBStreamLambdaConsumerInput)(nil)).Elem(), DynamoDBStreamLambdaConsumerArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DynamoDBStreamLambdaConsumerPtrInput)(nil)).Elem(), DynamoDBStreamLambdaConsumerArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DynamoHatchArgsInput)(nil)).Elem(), DynamoHatchArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DynamoHatchArgsPtrInput)(nil)).Elem(), DynamoHatchArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DynamoOverridesInput)(nil)).Elem(), DynamoOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DynamoOverridesPtrInput)(nil)).Elem(), DynamoOverridesArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*DynamoTransformArgsInput)(nil)).Elem(), DynamoTransformArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*DynamoTransformArgsPtrInput)(nil)).Elem(), DynamoTransformArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*EventBridgeHatchArgsInput)(nil)).Elem(), EventBridgeHatchArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*EventBridgeHatchArgsPtrInput)(nil)).Elem(), EventBridgeHatchArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EventBridgeOverridesInput)(nil)).Elem(), EventBridgeOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EventBridgeOverridesPtrInput)(nil)).Elem(), EventBridgeOverridesArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*EventBridgeTransformArgsInput)(nil)).Elem(), EventBridgeTransformArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*EventBridgeTransformArgsPtrInput)(nil)).Elem(), EventBridgeTransformArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EventBusLambdaTargetArgsInput)(nil)).Elem(), EventBusLambdaTargetArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EventBusLambdaTargetArgsPtrInput)(nil)).Elem(), EventBusLambdaTargetArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*EventBusRuleInput)(nil)).Elem(), EventBusRuleArgs{})
@@ -17276,30 +17274,30 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*HttpApiStepFunctionsConsumerPtrInput)(nil)).Elem(), HttpApiStepFunctionsConsumerArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HttpApiThrottlingInput)(nil)).Elem(), HttpApiThrottlingArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HttpApiThrottlingPtrInput)(nil)).Elem(), HttpApiThrottlingArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*LambdaHatchArgsInput)(nil)).Elem(), LambdaHatchArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*LambdaHatchArgsPtrInput)(nil)).Elem(), LambdaHatchArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaOverridesInput)(nil)).Elem(), LambdaOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaOverridesPtrInput)(nil)).Elem(), LambdaOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaPermissionInput)(nil)).Elem(), LambdaPermissionArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaPermissionArrayInput)(nil)).Elem(), LambdaPermissionArray{})
-	pulumi.RegisterInputType(reflect.TypeOf((*LambdaTransformArgsInput)(nil)).Elem(), LambdaTransformArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*LambdaTransformArgsPtrInput)(nil)).Elem(), LambdaTransformArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaVpcArgsInput)(nil)).Elem(), LambdaVpcArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaVpcArgsPtrInput)(nil)).Elem(), LambdaVpcArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaVpcCidrArgsInput)(nil)).Elem(), LambdaVpcCidrArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaVpcCidrArgsArrayInput)(nil)).Elem(), LambdaVpcCidrArgsArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaVpcEndpointArgsInput)(nil)).Elem(), LambdaVpcEndpointArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaVpcEndpointArgsArrayInput)(nil)).Elem(), LambdaVpcEndpointArgsArray{})
-	pulumi.RegisterInputType(reflect.TypeOf((*PABTransformInput)(nil)).Elem(), PABTransformArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*PABTransformPtrInput)(nil)).Elem(), PABTransformArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PABHatchInput)(nil)).Elem(), PABHatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PABHatchPtrInput)(nil)).Elem(), PABHatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*QueueConsumerArgsInput)(nil)).Elem(), QueueConsumerArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*QueueConsumerArgsPtrInput)(nil)).Elem(), QueueConsumerArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*QueueDlqArgsInput)(nil)).Elem(), QueueDlqArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*QueueDlqArgsPtrInput)(nil)).Elem(), QueueDlqArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*QueueHatchArgsInput)(nil)).Elem(), QueueHatchArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*QueueHatchArgsPtrInput)(nil)).Elem(), QueueHatchArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*QueueLambdaConsumerArgsInput)(nil)).Elem(), QueueLambdaConsumerArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*QueueLambdaConsumerArgsPtrInput)(nil)).Elem(), QueueLambdaConsumerArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*QueueOverridesInput)(nil)).Elem(), QueueOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*QueueOverridesPtrInput)(nil)).Elem(), QueueOverridesArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*QueueTransformArgsInput)(nil)).Elem(), QueueTransformArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*QueueTransformArgsPtrInput)(nil)).Elem(), QueueTransformArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SiteHstsInput)(nil)).Elem(), SiteHstsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SiteHstsPtrInput)(nil)).Elem(), SiteHstsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SiteSecurityHeadersInput)(nil)).Elem(), SiteSecurityHeadersArgs{})
@@ -17318,6 +17316,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*VpcNatArgsPtrInput)(nil)).Elem(), VpcNatArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*VpcS3FlowLogArgsInput)(nil)).Elem(), VpcS3FlowLogArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*VpcS3FlowLogArgsPtrInput)(nil)).Elem(), VpcS3FlowLogArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*WafHatchArgsInput)(nil)).Elem(), WafHatchArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*WafHatchArgsPtrInput)(nil)).Elem(), WafHatchArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*WafLoggingArgsInput)(nil)).Elem(), WafLoggingArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*WafLoggingArgsPtrInput)(nil)).Elem(), WafLoggingArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*WafManagedRulesArgsInput)(nil)).Elem(), WafManagedRulesArgsArgs{})
@@ -17326,36 +17326,34 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*WafOverridesPtrInput)(nil)).Elem(), WafOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*WafRateLimitArgsInput)(nil)).Elem(), WafRateLimitArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*WafRateLimitArgsPtrInput)(nil)).Elem(), WafRateLimitArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*WafTransformArgsInput)(nil)).Elem(), WafTransformArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*WafTransformArgsPtrInput)(nil)).Elem(), WafTransformArgsArgs{})
-	pulumi.RegisterOutputType(BucketAccelerateConfigurationTransformOutput{})
-	pulumi.RegisterOutputType(BucketAccelerateConfigurationTransformPtrOutput{})
-	pulumi.RegisterOutputType(BucketAclTransformOutput{})
-	pulumi.RegisterOutputType(BucketAclTransformPtrOutput{})
-	pulumi.RegisterOutputType(BucketCorsConfigurationTransformOutput{})
-	pulumi.RegisterOutputType(BucketCorsConfigurationTransformPtrOutput{})
-	pulumi.RegisterOutputType(BucketLifecycleConfigurationTransformOutput{})
-	pulumi.RegisterOutputType(BucketLifecycleConfigurationTransformPtrOutput{})
-	pulumi.RegisterOutputType(BucketLoggingTransformOutput{})
-	pulumi.RegisterOutputType(BucketLoggingTransformPtrOutput{})
-	pulumi.RegisterOutputType(BucketObjectLockConfigurationTransformOutput{})
-	pulumi.RegisterOutputType(BucketObjectLockConfigurationTransformPtrOutput{})
+	pulumi.RegisterOutputType(BucketAccelerateConfigurationHatchOutput{})
+	pulumi.RegisterOutputType(BucketAccelerateConfigurationHatchPtrOutput{})
+	pulumi.RegisterOutputType(BucketAclHatchOutput{})
+	pulumi.RegisterOutputType(BucketAclHatchPtrOutput{})
+	pulumi.RegisterOutputType(BucketCorsConfigurationHatchOutput{})
+	pulumi.RegisterOutputType(BucketCorsConfigurationHatchPtrOutput{})
+	pulumi.RegisterOutputType(BucketHatchArgsOutput{})
+	pulumi.RegisterOutputType(BucketHatchArgsPtrOutput{})
+	pulumi.RegisterOutputType(BucketLifecycleConfigurationHatchOutput{})
+	pulumi.RegisterOutputType(BucketLifecycleConfigurationHatchPtrOutput{})
+	pulumi.RegisterOutputType(BucketLoggingHatchOutput{})
+	pulumi.RegisterOutputType(BucketLoggingHatchPtrOutput{})
+	pulumi.RegisterOutputType(BucketObjectLockConfigurationHatchOutput{})
+	pulumi.RegisterOutputType(BucketObjectLockConfigurationHatchPtrOutput{})
 	pulumi.RegisterOutputType(BucketOverridesOutput{})
 	pulumi.RegisterOutputType(BucketOverridesPtrOutput{})
-	pulumi.RegisterOutputType(BucketPolicyTransformOutput{})
-	pulumi.RegisterOutputType(BucketPolicyTransformPtrOutput{})
-	pulumi.RegisterOutputType(BucketReplicationConfigTransformOutput{})
-	pulumi.RegisterOutputType(BucketReplicationConfigTransformPtrOutput{})
-	pulumi.RegisterOutputType(BucketRequestPaymentConfigurationTransformOutput{})
-	pulumi.RegisterOutputType(BucketRequestPaymentConfigurationTransformPtrOutput{})
-	pulumi.RegisterOutputType(BucketServerSideEncryptionConfigurationTransformOutput{})
-	pulumi.RegisterOutputType(BucketServerSideEncryptionConfigurationTransformPtrOutput{})
-	pulumi.RegisterOutputType(BucketTransformArgsOutput{})
-	pulumi.RegisterOutputType(BucketTransformArgsPtrOutput{})
-	pulumi.RegisterOutputType(BucketVersioningTransformOutput{})
-	pulumi.RegisterOutputType(BucketVersioningTransformPtrOutput{})
-	pulumi.RegisterOutputType(BucketWebsiteConfigurationTransformOutput{})
-	pulumi.RegisterOutputType(BucketWebsiteConfigurationTransformPtrOutput{})
+	pulumi.RegisterOutputType(BucketPolicyHatchOutput{})
+	pulumi.RegisterOutputType(BucketPolicyHatchPtrOutput{})
+	pulumi.RegisterOutputType(BucketReplicationConfigHatchOutput{})
+	pulumi.RegisterOutputType(BucketReplicationConfigHatchPtrOutput{})
+	pulumi.RegisterOutputType(BucketRequestPaymentConfigurationHatchOutput{})
+	pulumi.RegisterOutputType(BucketRequestPaymentConfigurationHatchPtrOutput{})
+	pulumi.RegisterOutputType(BucketServerSideEncryptionConfigurationHatchOutput{})
+	pulumi.RegisterOutputType(BucketServerSideEncryptionConfigurationHatchPtrOutput{})
+	pulumi.RegisterOutputType(BucketVersioningHatchOutput{})
+	pulumi.RegisterOutputType(BucketVersioningHatchPtrOutput{})
+	pulumi.RegisterOutputType(BucketWebsiteConfigurationHatchOutput{})
+	pulumi.RegisterOutputType(BucketWebsiteConfigurationHatchPtrOutput{})
 	pulumi.RegisterOutputType(CognitoUserPoolAppClientOutput{})
 	pulumi.RegisterOutputType(CognitoUserPoolAppClientPtrOutput{})
 	pulumi.RegisterOutputType(CognitoUserPoolAttributesOutput{})
@@ -17364,6 +17362,8 @@ func init() {
 	pulumi.RegisterOutputType(CognitoUserPoolCustomAttributeArrayOutput{})
 	pulumi.RegisterOutputType(CognitoUserPoolEmailConfigurationOutput{})
 	pulumi.RegisterOutputType(CognitoUserPoolEmailConfigurationPtrOutput{})
+	pulumi.RegisterOutputType(CognitoUserPoolHatchArgsOutput{})
+	pulumi.RegisterOutputType(CognitoUserPoolHatchArgsPtrOutput{})
 	pulumi.RegisterOutputType(CognitoUserPoolHostedUiOutput{})
 	pulumi.RegisterOutputType(CognitoUserPoolHostedUiPtrOutput{})
 	pulumi.RegisterOutputType(CognitoUserPoolIdentityProviderOutput{})
@@ -17376,8 +17376,6 @@ func init() {
 	pulumi.RegisterOutputType(CognitoUserPoolPasswordPolicyPtrOutput{})
 	pulumi.RegisterOutputType(CognitoUserPoolTokenValidityOutput{})
 	pulumi.RegisterOutputType(CognitoUserPoolTokenValidityPtrOutput{})
-	pulumi.RegisterOutputType(CognitoUserPoolTransformArgsOutput{})
-	pulumi.RegisterOutputType(CognitoUserPoolTransformArgsPtrOutput{})
 	pulumi.RegisterOutputType(CognitoUserPoolWafOutput{})
 	pulumi.RegisterOutputType(CognitoUserPoolWafPtrOutput{})
 	pulumi.RegisterOutputType(DSQLBackupArgsOutput{})
@@ -17396,10 +17394,10 @@ func init() {
 	pulumi.RegisterOutputType(DSQLTableArrayOutput{})
 	pulumi.RegisterOutputType(DSQLVpcArgsOutput{})
 	pulumi.RegisterOutputType(DSQLVpcArgsPtrOutput{})
+	pulumi.RegisterOutputType(DsqlHatchArgsOutput{})
+	pulumi.RegisterOutputType(DsqlHatchArgsPtrOutput{})
 	pulumi.RegisterOutputType(DsqlOverridesOutput{})
 	pulumi.RegisterOutputType(DsqlOverridesPtrOutput{})
-	pulumi.RegisterOutputType(DsqlTransformArgsOutput{})
-	pulumi.RegisterOutputType(DsqlTransformArgsPtrOutput{})
 	pulumi.RegisterOutputType(DynamoDBGlobalSecondaryIndexOutput{})
 	pulumi.RegisterOutputType(DynamoDBGlobalSecondaryIndexArrayOutput{})
 	pulumi.RegisterOutputType(DynamoDBKeyAttributeOutput{})
@@ -17412,14 +17410,14 @@ func init() {
 	pulumi.RegisterOutputType(DynamoDBStreamEventBridgeConsumerPtrOutput{})
 	pulumi.RegisterOutputType(DynamoDBStreamLambdaConsumerOutput{})
 	pulumi.RegisterOutputType(DynamoDBStreamLambdaConsumerPtrOutput{})
+	pulumi.RegisterOutputType(DynamoHatchArgsOutput{})
+	pulumi.RegisterOutputType(DynamoHatchArgsPtrOutput{})
 	pulumi.RegisterOutputType(DynamoOverridesOutput{})
 	pulumi.RegisterOutputType(DynamoOverridesPtrOutput{})
-	pulumi.RegisterOutputType(DynamoTransformArgsOutput{})
-	pulumi.RegisterOutputType(DynamoTransformArgsPtrOutput{})
+	pulumi.RegisterOutputType(EventBridgeHatchArgsOutput{})
+	pulumi.RegisterOutputType(EventBridgeHatchArgsPtrOutput{})
 	pulumi.RegisterOutputType(EventBridgeOverridesOutput{})
 	pulumi.RegisterOutputType(EventBridgeOverridesPtrOutput{})
-	pulumi.RegisterOutputType(EventBridgeTransformArgsOutput{})
-	pulumi.RegisterOutputType(EventBridgeTransformArgsPtrOutput{})
 	pulumi.RegisterOutputType(EventBusLambdaTargetArgsOutput{})
 	pulumi.RegisterOutputType(EventBusLambdaTargetArgsPtrOutput{})
 	pulumi.RegisterOutputType(EventBusRuleOutput{})
@@ -17446,30 +17444,30 @@ func init() {
 	pulumi.RegisterOutputType(HttpApiStepFunctionsConsumerPtrOutput{})
 	pulumi.RegisterOutputType(HttpApiThrottlingOutput{})
 	pulumi.RegisterOutputType(HttpApiThrottlingPtrOutput{})
+	pulumi.RegisterOutputType(LambdaHatchArgsOutput{})
+	pulumi.RegisterOutputType(LambdaHatchArgsPtrOutput{})
 	pulumi.RegisterOutputType(LambdaOverridesOutput{})
 	pulumi.RegisterOutputType(LambdaOverridesPtrOutput{})
 	pulumi.RegisterOutputType(LambdaPermissionOutput{})
 	pulumi.RegisterOutputType(LambdaPermissionArrayOutput{})
-	pulumi.RegisterOutputType(LambdaTransformArgsOutput{})
-	pulumi.RegisterOutputType(LambdaTransformArgsPtrOutput{})
 	pulumi.RegisterOutputType(LambdaVpcArgsOutput{})
 	pulumi.RegisterOutputType(LambdaVpcArgsPtrOutput{})
 	pulumi.RegisterOutputType(LambdaVpcCidrArgsOutput{})
 	pulumi.RegisterOutputType(LambdaVpcCidrArgsArrayOutput{})
 	pulumi.RegisterOutputType(LambdaVpcEndpointArgsOutput{})
 	pulumi.RegisterOutputType(LambdaVpcEndpointArgsArrayOutput{})
-	pulumi.RegisterOutputType(PABTransformOutput{})
-	pulumi.RegisterOutputType(PABTransformPtrOutput{})
+	pulumi.RegisterOutputType(PABHatchOutput{})
+	pulumi.RegisterOutputType(PABHatchPtrOutput{})
 	pulumi.RegisterOutputType(QueueConsumerArgsOutput{})
 	pulumi.RegisterOutputType(QueueConsumerArgsPtrOutput{})
 	pulumi.RegisterOutputType(QueueDlqArgsOutput{})
 	pulumi.RegisterOutputType(QueueDlqArgsPtrOutput{})
+	pulumi.RegisterOutputType(QueueHatchArgsOutput{})
+	pulumi.RegisterOutputType(QueueHatchArgsPtrOutput{})
 	pulumi.RegisterOutputType(QueueLambdaConsumerArgsOutput{})
 	pulumi.RegisterOutputType(QueueLambdaConsumerArgsPtrOutput{})
 	pulumi.RegisterOutputType(QueueOverridesOutput{})
 	pulumi.RegisterOutputType(QueueOverridesPtrOutput{})
-	pulumi.RegisterOutputType(QueueTransformArgsOutput{})
-	pulumi.RegisterOutputType(QueueTransformArgsPtrOutput{})
 	pulumi.RegisterOutputType(SiteHstsOutput{})
 	pulumi.RegisterOutputType(SiteHstsPtrOutput{})
 	pulumi.RegisterOutputType(SiteSecurityHeadersOutput{})
@@ -17488,6 +17486,8 @@ func init() {
 	pulumi.RegisterOutputType(VpcNatArgsPtrOutput{})
 	pulumi.RegisterOutputType(VpcS3FlowLogArgsOutput{})
 	pulumi.RegisterOutputType(VpcS3FlowLogArgsPtrOutput{})
+	pulumi.RegisterOutputType(WafHatchArgsOutput{})
+	pulumi.RegisterOutputType(WafHatchArgsPtrOutput{})
 	pulumi.RegisterOutputType(WafLoggingArgsOutput{})
 	pulumi.RegisterOutputType(WafLoggingArgsPtrOutput{})
 	pulumi.RegisterOutputType(WafManagedRulesArgsOutput{})
@@ -17496,6 +17496,4 @@ func init() {
 	pulumi.RegisterOutputType(WafOverridesPtrOutput{})
 	pulumi.RegisterOutputType(WafRateLimitArgsOutput{})
 	pulumi.RegisterOutputType(WafRateLimitArgsPtrOutput{})
-	pulumi.RegisterOutputType(WafTransformArgsOutput{})
-	pulumi.RegisterOutputType(WafTransformArgsPtrOutput{})
 }

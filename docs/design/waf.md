@@ -70,7 +70,7 @@ above which AWS charges extra per request. With every group on ≈ 1,280.
 | `blockCountries` | — | ISO 3166 two-letter codes |
 | `clientIpHeader` | — | header with the visitor IP behind a proxy |
 | `logging` | `{ enabled: true, retentionDays: 30, includeAllowed: false }` | |
-| `transform.waf` | — | typed overrides on the WebACL (escape hatch, e.g. custom rules) |
+| `hatch.waf` | — | typed overrides on the WebACL (escape hatch, e.g. custom rules) |
 
 Outputs: `arn`, `webAclId`, `name`, `scope`, `logGroupName`.
 
@@ -107,7 +107,7 @@ send the header itself and choose its own IP.
 |---|---|---|
 | **Error** | invalid `scope` / `mode` | `invalid scope "<x>": must be "cloudfront" or "regional"` / `invalid mode "<x>": …` (`config.go`) |
 | **Error** | rate limit out of range / bad window | `invalid rateLimit.limit <n>: …` / `invalid rateLimit.windowSeconds <n>: must be 60, 120, 300 or 600` |
-| **Error** | unknown rule in `ruleOverrides` | `ruleOverrides: "<rule>" isn't a rule in any supported AWS managed rule group. Use the exact AWS rule name (e.g. "SizeRestrictions_BODY"), or transform.waf for anything else` |
+| **Error** | unknown rule in `ruleOverrides` | `ruleOverrides: "<rule>" isn't a rule in any supported AWS managed rule group. Use the exact AWS rule name (e.g. "SizeRestrictions_BODY"), or hatch.waf for anything else` |
 | **Error** | override for a disabled group | `ruleOverrides: "<rule>" belongs to managedRules.<group>, which is off` |
 | **Error** | bad action in `ruleOverrides` | `invalid ruleOverrides["<rule>"] "<x>": must be "count", "block" or "allow"` |
 | **Error** | bad IP/CIDR, country, retention | `invalid ipAllowList entry …` / `invalid blockCountries entry …` / `invalid logging.retentionDays …` |
@@ -149,7 +149,7 @@ send the header itself and choose its own IP.
 - **Behind Cloudflare you may not need it** — Cloudflare includes a WAF on every
   plan. Use `originProtection: true` on the site to stop CloudFront being
   reached around Cloudflare.
-- **Custom rules** go through `transform.waf` (typed WebACL overrides).
+- **Custom rules** go through `hatch.waf` (typed WebACL overrides).
 
 ## Future work
 

@@ -47,8 +47,8 @@ export class EventBus extends pulumi.ComponentResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
+            resourceInputs["hatch"] = args?.hatch;
             resourceInputs["rules"] = args?.rules;
-            resourceInputs["transform"] = args?.transform;
             resourceInputs["arn"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
         } else {
@@ -64,9 +64,9 @@ export class EventBus extends pulumi.ComponentResource {
  * The set of arguments for constructing a EventBus resource.
  */
 export interface EventBusArgs {
+    hatch?: pulumi.Input<inputs.aws.EventBridgeHatchArgsArgs>;
     /**
      * EventBridge rules on this bus. Each rule matches events by pattern and routes them to a target.
      */
     rules?: pulumi.Input<pulumi.Input<inputs.aws.EventBusRuleArgs>[]>;
-    transform?: pulumi.Input<inputs.aws.EventBridgeTransformArgsArgs>;
 }

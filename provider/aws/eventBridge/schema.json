@@ -3,15 +3,15 @@
     "anvil:aws:EventBus": {
       "description": "An Anvil-managed EventBridge event bus. Archives events for 7 days by default for replay and debugging. Rules route matching events to Lambda targets.",
       "inputProperties": {
+        "hatch": {
+          "$ref": "#/types/anvil:aws:EventBridgeHatchArgs"
+        },
         "rules": {
           "description": "EventBridge rules on this bus. Each rule matches events by pattern and routes them to a target.",
           "items": {
             "$ref": "#/types/anvil:aws:EventBusRule"
           },
           "type": "array"
-        },
-        "transform": {
-          "$ref": "#/types/anvil:aws:EventBridgeTransformArgs"
         }
       },
       "isComponent": true,
@@ -35,6 +35,14 @@
   "types": {
     "anvil:aws:EventArchiveOverrides": {
       "description": "Direct overrides for the underlying aws.cloudwatch.EventArchive resource. Use retentionDays to change the default 7 day retention.",
+      "type": "object"
+    },
+    "anvil:aws:EventBridgeHatchArgs": {
+      "properties": {
+        "eventBridge": {
+          "$ref": "#/types/anvil:aws:EventBridgeOverrides"
+        }
+      },
       "type": "object"
     },
     "anvil:aws:EventBridgeOverrides": {
@@ -79,10 +87,14 @@
       },
       "type": "object"
     },
-    "anvil:aws:EventBridgeTransformArgs": {
+    "anvil:aws:EventBusHatchArgs": {
+      "description": "Escape hatches for direct Pulumi AWS resource overrides.",
       "properties": {
-        "eventBridge": {
-          "$ref": "#/types/anvil:aws:EventBridgeOverrides"
+        "archive": {
+          "$ref": "#/types/anvil:aws:EventArchiveOverrides"
+        },
+        "bus": {
+          "$ref": "#/types/anvil:aws:EventBusOverrides"
         }
       },
       "type": "object"
@@ -162,18 +174,6 @@
         "lambda": {
           "$ref": "#/types/anvil:aws:EventBusLambdaTargetArgs",
           "description": "Invoke a Lambda function when events match the rule pattern. Anvil creates the EventBridge target and grants EventBridge permission to invoke the function."
-        }
-      },
-      "type": "object"
-    },
-    "anvil:aws:EventBusTransformArgs": {
-      "description": "Escape hatches for direct Pulumi AWS resource overrides.",
-      "properties": {
-        "archive": {
-          "$ref": "#/types/anvil:aws:EventArchiveOverrides"
-        },
-        "bus": {
-          "$ref": "#/types/anvil:aws:EventBusOverrides"
         }
       },
       "type": "object"

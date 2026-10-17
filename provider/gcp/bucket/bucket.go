@@ -1,7 +1,7 @@
 package storagebucket
 
 import (
-	"github.com/anvil-cloud/anvil/provider/internal/transform"
+	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	"github.com/pulumi/pulumi-gcp/sdk/v8/go/gcp/storage"
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
@@ -11,7 +11,7 @@ import (
 type StorageBucketArgs struct {
 	DataClassification string                            `pulumi:"dataClassification"`
 	Location           string                            `pulumi:"location"`
-	Transform          map[string]map[string]interface{} `pulumi:"transform,optional"`
+	Hatch              map[string]map[string]interface{} `pulumi:"hatch,optional"`
 }
 
 type StorageBucket struct {
@@ -35,7 +35,7 @@ func NewBucket(ctx *pulumi.Context, name string, args StorageBucketArgs, opts ..
 	isSensitive := args.DataClassification == "sensitive" || args.DataClassification == "restricted"
 
 	// Storage Bucket
-	bucketProps := transform.MergeTransform(args.Transform["storageBucket"], pulumi.Map{
+	bucketProps := hatch.Merge(args.Hatch["storageBucket"], pulumi.Map{
 		"location":                 pulumi.String(args.Location),
 		"forceDestroy":             pulumi.Bool(true),
 		"uniformBucketLevelAccess": pulumi.Bool(true),

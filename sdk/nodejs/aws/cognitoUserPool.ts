@@ -70,11 +70,11 @@ export class CognitoUserPool extends pulumi.ComponentResource {
             resourceInputs["appClient"] = args?.appClient;
             resourceInputs["attributes"] = args?.attributes;
             resourceInputs["emailConfiguration"] = args?.emailConfiguration;
+            resourceInputs["hatch"] = args?.hatch;
             resourceInputs["hostedUi"] = args?.hostedUi;
             resourceInputs["identityProviders"] = args?.identityProviders;
             resourceInputs["mfa"] = args?.mfa;
             resourceInputs["passwordPolicy"] = args?.passwordPolicy;
-            resourceInputs["transform"] = args?.transform;
             resourceInputs["waf"] = args?.waf;
             resourceInputs["appClientId"] = undefined /*out*/;
             resourceInputs["appClientSecret"] = undefined /*out*/;
@@ -102,7 +102,7 @@ export class CognitoUserPool extends pulumi.ComponentResource {
  */
 export interface CognitoUserPoolArgs {
     /**
-     * Default app client created with the user pool. Covers the 80% case of one application per pool. Use transform for additional clients.
+     * Default app client created with the user pool. Covers the 80% case of one application per pool. Use hatch for additional clients.
      */
     appClient?: pulumi.Input<inputs.aws.CognitoUserPoolAppClientArgs>;
     /**
@@ -113,6 +113,7 @@ export interface CognitoUserPoolArgs {
      * Email delivery configuration. Default: Cognito-managed email (5 emails/day limit). Set sesFromAddress for SES delivery in production.
      */
     emailConfiguration?: pulumi.Input<inputs.aws.CognitoUserPoolEmailConfigurationArgs>;
+    hatch?: pulumi.Input<inputs.aws.CognitoUserPoolHatchArgsArgs>;
     /**
      * Hosted UI / Managed Login configuration. Omit to use the Cognito user pools API directly without a hosted sign-in page.
      */
@@ -129,7 +130,6 @@ export interface CognitoUserPoolArgs {
      * Password policy for the user pool. Anvil enforces a secure baseline by default — override only to strengthen.
      */
     passwordPolicy?: pulumi.Input<inputs.aws.CognitoUserPoolPasswordPolicyArgs>;
-    transform?: pulumi.Input<inputs.aws.CognitoUserPoolTransformArgsArgs>;
     /**
      * Attaches a regional WAF WebACL to the user pool. AWS recommends a WAF for every public user pool — it protects sign-in and sign-up against credential stuffing, brute force, bots and SMS pumping. Use an Anvil Waf created with scope "regional" in the same region as the pool.
      */

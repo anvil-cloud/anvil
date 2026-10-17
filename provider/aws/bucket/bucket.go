@@ -1,8 +1,8 @@
 package bucket
 
 import (
+	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
-	"github.com/anvil-cloud/anvil/provider/internal/transform"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/s3"
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
@@ -50,7 +50,7 @@ type BucketArgs struct {
 
 	// StorageTransition controls when objects move from Standard storage to
 	// cheaper storage classes. Only applies when no custom lifecycle is
-	// provided via transform["lifecycleRules"] — custom lifecycles replace
+	// provided via hatch["lifecycleRules"] — custom lifecycles replace
 	// this setting entirely.
 	// Presets: "30d" | "90d" | "1y"
 	//   "30d" → IA at 30d, Glacier at 90d
@@ -66,7 +66,7 @@ type BucketArgs struct {
 	// Incurs storage cost. Default: 0 (disabled)
 	Retention int `pulumi:"retention,optional"`
 
-	Transform map[string]map[string]interface{} `pulumi:"transform,optional"`
+	Hatch map[string]map[string]interface{} `pulumi:"hatch,optional"`
 }
 
 type Bucket struct {
@@ -120,7 +120,7 @@ func NewBucket(ctx *pulumi.Context, name string, args BucketArgs, opts ...pulumi
 	useKMS := args.Encryption == "kms"
 	needsVersioning := isProduction || args.Versioning
 	versionRetentionDays := resolveDays(args.VersionRetention)
-	_, hasCustomLifecycle := args.Transform["lifecycleRules"]
+	_, hasCustomLifecycle := args.Hatch["lifecycleRules"]
 
 	physicalName := provider.PhysicalName(stage, name, "bucket", stageId)
 
@@ -133,7 +133,7 @@ func NewBucket(ctx *pulumi.Context, name string, args BucketArgs, opts ...pulumi
 
 	// ── 1. Base Bucket ─────────────────────────────────
 	// Tier 1: always created.
-	bucketProps := transform.MergeTransform(args.Transform["bucket"], pulumi.Map{
+	bucketProps := hatch.Merge(args.Hatch["bucket"], pulumi.Map{
 		"bucket":       pulumi.String(physicalName),
 		"forceDestroy": pulumi.Bool(true),
 		"tags": pulumi.StringMap{
@@ -150,7 +150,7 @@ func NewBucket(ctx *pulumi.Context, name string, args BucketArgs, opts ...pulumi
 	// ── 2. Public Access Block ─────────────────────────
 	// Tier 1: always on. Required by CIS, ISO 27017, SOC 2, NIST 800-53,
 	// ISO 27001. Free.
-	pabProps := transform.MergeTransform(args.Transform["publicAccessBlock"], pulumi.Map{
+	pabProps := hatch.Merge(args.Hatch["publicAccessBlock"], pulumi.Map{
 		"bucket":                res.ID(),
 		"blockPublicAcls":       pulumi.Bool(true),
 		"blockPublicPolicy":     pulumi.Bool(true),
@@ -170,7 +170,7 @@ func NewBucket(ctx *pulumi.Context, name string, args BucketArgs, opts ...pulumi
 		sseAlgorithm = "aws:kms"
 	}
 
-	encProps := transform.MergeTransform(args.Transform["serverSideEncryptionConfiguration"], pulumi.Map{
+	encProps := hatch.Merge(args.Hatch["serverSideEncryptionConfiguration"], pulumi.Map{
 		"bucket": res.ID(),
 		"rules": pulumi.Array{
 			pulumi.Map{
@@ -205,7 +205,7 @@ func NewBucket(ctx *pulumi.Context, name string, args BucketArgs, opts ...pulumi
 		}]
 	}`, bucketArn, bucketArn)
 
-	policyProps := transform.MergeTransform(args.Transform["policy"], pulumi.Map{
+	policyProps := hatch.Merge(args.Hatch["policy"], pulumi.Map{
 		"bucket": res.ID(),
 		"policy": tlsPolicy,
 	})
@@ -218,7 +218,7 @@ func NewBucket(ctx *pulumi.Context, name string, args BucketArgs, opts ...pulumi
 	// Tier 1: always on in production. Near-free (storage overhead only).
 	// Tier 2: opt-in for non-production via versioning: true.
 	if needsVersioning {
-		vProps := transform.MergeTransform(args.Transform["versioning"], pulumi.Map{
+		vProps := hatch.Merge(args.Hatch["versioning"], pulumi.Map{
 			"bucket": res.ID(),
 			"versioningConfiguration": pulumi.Map{
 				"status": pulumi.String("Enabled"),
@@ -234,7 +234,7 @@ func NewBucket(ctx *pulumi.Context, name string, args BucketArgs, opts ...pulumi
 	// Builds lifecycle rules from three independent concerns:
 	//   a) Multipart upload cleanup — always on, pure hygiene, free saving
 	//   b) Intelligent-Tiering OR StorageTransition presets — skipped if
-	//      user provides transform["lifecycleRules"] (their rules replace)
+	//      user provides hatch["lifecycleRules"] (their rules replace)
 	//   c) Version expiry — when versionRetention is set and versioning is on
 
 	lifecycleRules := pulumi.Array{
@@ -317,7 +317,7 @@ func NewBucket(ctx *pulumi.Context, name string, args BucketArgs, opts ...pulumi
 		})
 	}
 
-	lifecycleProps := transform.MergeTransform(args.Transform["lifecycleRules"], pulumi.Map{
+	lifecycleProps := hatch.Merge(args.Hatch["lifecycleRules"], pulumi.Map{
 		"bucket": res.ID(),
 		"rules":  lifecycleRules,
 	})
@@ -338,7 +338,7 @@ func NewBucket(ctx *pulumi.Context, name string, args BucketArgs, opts ...pulumi
 			targetBucket = res.ID().ToStringOutput()
 		}
 
-		logProps := transform.MergeTransform(args.Transform["logging"], pulumi.Map{
+		logProps := hatch.Merge(args.Hatch["logging"], pulumi.Map{
 			"bucket":       res.ID(),
 			"targetBucket": targetBucket,
 			"targetPrefix": pulumi.Sprintf("s3-access-logs/%s/", physicalName),
@@ -357,7 +357,7 @@ func NewBucket(ctx *pulumi.Context, name string, args BucketArgs, opts ...pulumi
 	// Note: Object Lock must be enabled at bucket creation. Changing this
 	// value after initial deploy requires bucket replacement.
 	if args.Retention > 0 {
-		lockProps := transform.MergeTransform(args.Transform["objectLockConfiguration"], pulumi.Map{
+		lockProps := hatch.Merge(args.Hatch["objectLockConfiguration"], pulumi.Map{
 			"bucket":            res.ID(),
 			"objectLockEnabled": pulumi.String("Enabled"),
 			"rule": pulumi.Map{

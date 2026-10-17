@@ -28,7 +28,7 @@ import { getActiveStack } from './stack';
  *
  *     const bucket = new anvil.aws.Bucket("events", {
  *       dataClassification: "internal",
- *       transform: {
+ *       hatch: {
  *         bucket: { bucket: `rules-${this.stage}-events` },
  *       },
  *     });

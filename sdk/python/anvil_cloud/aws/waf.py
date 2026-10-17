@@ -24,6 +24,7 @@ class WafArgs:
     def __init__(__self__, *,
                  block_countries: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  client_ip_header: Optional[pulumi.Input[_builtins.str]] = None,
+                 hatch: Optional[pulumi.Input['WafHatchArgsArgs']] = None,
                  ip_allow_list: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  ip_block_list: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  logging: Optional[pulumi.Input['WafLoggingArgsArgs']] = None,
@@ -31,8 +32,7 @@ class WafArgs:
                  mode: Optional[pulumi.Input['WafMode']] = None,
                  rate_limit: Optional[pulumi.Input['WafRateLimitArgsArgs']] = None,
                  rule_overrides: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
-                 scope: Optional[pulumi.Input['WafScope']] = None,
-                 transform: Optional[pulumi.Input['WafTransformArgsArgs']] = None):
+                 scope: Optional[pulumi.Input['WafScope']] = None):
         """
         The set of arguments for constructing a Waf resource.
 
@@ -51,6 +51,8 @@ class WafArgs:
             pulumi.set(__self__, "block_countries", block_countries)
         if client_ip_header is not None:
             pulumi.set(__self__, "client_ip_header", client_ip_header)
+        if hatch is not None:
+            pulumi.set(__self__, "hatch", hatch)
         if ip_allow_list is not None:
             pulumi.set(__self__, "ip_allow_list", ip_allow_list)
         if ip_block_list is not None:
@@ -67,8 +69,6 @@ class WafArgs:
             pulumi.set(__self__, "rule_overrides", rule_overrides)
         if scope is not None:
             pulumi.set(__self__, "scope", scope)
-        if transform is not None:
-            pulumi.set(__self__, "transform", transform)
 
     @_builtins.property
     @pulumi.getter(name="blockCountries")
@@ -93,6 +93,15 @@ class WafArgs:
     @client_ip_header.setter
     def client_ip_header(self, value: Optional[pulumi.Input[_builtins.str]]):
         pulumi.set(self, "client_ip_header", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def hatch(self) -> Optional[pulumi.Input['WafHatchArgsArgs']]:
+        return pulumi.get(self, "hatch")
+
+    @hatch.setter
+    def hatch(self, value: Optional[pulumi.Input['WafHatchArgsArgs']]):
+        pulumi.set(self, "hatch", value)
 
     @_builtins.property
     @pulumi.getter(name="ipAllowList")
@@ -190,15 +199,6 @@ class WafArgs:
     def scope(self, value: Optional[pulumi.Input['WafScope']]):
         pulumi.set(self, "scope", value)
 
-    @_builtins.property
-    @pulumi.getter
-    def transform(self) -> Optional[pulumi.Input['WafTransformArgsArgs']]:
-        return pulumi.get(self, "transform")
-
-    @transform.setter
-    def transform(self, value: Optional[pulumi.Input['WafTransformArgsArgs']]):
-        pulumi.set(self, "transform", value)
-
 
 @pulumi.type_token("anvil:aws:Waf")
 class Waf(pulumi.ComponentResource):
@@ -208,6 +208,7 @@ class Waf(pulumi.ComponentResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  block_countries: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  client_ip_header: Optional[pulumi.Input[_builtins.str]] = None,
+                 hatch: Optional[pulumi.Input[Union['WafHatchArgsArgs', 'WafHatchArgsArgsDict']]] = None,
                  ip_allow_list: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  ip_block_list: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  logging: Optional[pulumi.Input[Union['WafLoggingArgsArgs', 'WafLoggingArgsArgsDict']]] = None,
@@ -216,7 +217,6 @@ class Waf(pulumi.ComponentResource):
                  rate_limit: Optional[pulumi.Input[Union['WafRateLimitArgsArgs', 'WafRateLimitArgsArgsDict']]] = None,
                  rule_overrides: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  scope: Optional[pulumi.Input['WafScope']] = None,
-                 transform: Optional[pulumi.Input[Union['WafTransformArgsArgs', 'WafTransformArgsArgsDict']]] = None,
                  __props__=None):
         """
         An Anvil-managed AWS WAF WebACL with researched defaults: a per-client rate limit (2000 requests / 5 min) and AWS managed rule groups for IP reputation, known bad inputs, the OWASP core rule set and SQL injection. Starts in count mode — matches are logged, not blocked — until mode is set to "block". Attach it to a site with waf: { arn } or to a Cognito user pool with waf: { arn }.
@@ -262,6 +262,7 @@ class Waf(pulumi.ComponentResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  block_countries: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  client_ip_header: Optional[pulumi.Input[_builtins.str]] = None,
+                 hatch: Optional[pulumi.Input[Union['WafHatchArgsArgs', 'WafHatchArgsArgsDict']]] = None,
                  ip_allow_list: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  ip_block_list: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  logging: Optional[pulumi.Input[Union['WafLoggingArgsArgs', 'WafLoggingArgsArgsDict']]] = None,
@@ -270,7 +271,6 @@ class Waf(pulumi.ComponentResource):
                  rate_limit: Optional[pulumi.Input[Union['WafRateLimitArgsArgs', 'WafRateLimitArgsArgsDict']]] = None,
                  rule_overrides: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  scope: Optional[pulumi.Input['WafScope']] = None,
-                 transform: Optional[pulumi.Input[Union['WafTransformArgsArgs', 'WafTransformArgsArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -284,6 +284,7 @@ class Waf(pulumi.ComponentResource):
 
             __props__.__dict__["block_countries"] = block_countries
             __props__.__dict__["client_ip_header"] = client_ip_header
+            __props__.__dict__["hatch"] = hatch
             __props__.__dict__["ip_allow_list"] = ip_allow_list
             __props__.__dict__["ip_block_list"] = ip_block_list
             __props__.__dict__["logging"] = logging
@@ -292,7 +293,6 @@ class Waf(pulumi.ComponentResource):
             __props__.__dict__["rate_limit"] = rate_limit
             __props__.__dict__["rule_overrides"] = rule_overrides
             __props__.__dict__["scope"] = scope
-            __props__.__dict__["transform"] = transform
             __props__.__dict__["arn"] = None
             __props__.__dict__["log_group_name"] = None
             __props__.__dict__["name"] = None

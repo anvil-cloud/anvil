@@ -45,12 +45,12 @@ export class SvelteKitSite extends pulumi.ComponentResource {
         if (!opts.id) {
             resourceInputs["domain"] = args?.domain;
             resourceInputs["environment"] = args?.environment;
+            resourceInputs["hatch"] = args?.hatch;
             resourceInputs["originProtection"] = args?.originProtection;
             resourceInputs["path"] = args?.path;
             resourceInputs["protection"] = args?.protection;
             resourceInputs["runtimeEnvironment"] = args?.runtimeEnvironment;
             resourceInputs["securityHeaders"] = args?.securityHeaders;
-            resourceInputs["transform"] = args?.transform;
             resourceInputs["waf"] = args?.waf;
             resourceInputs["bucketName"] = undefined /*out*/;
             resourceInputs["cloudFrontDistributionId"] = undefined /*out*/;
@@ -80,6 +80,7 @@ export interface SvelteKitSiteArgs {
      * Environment vars available at BOTH build time and runtime. Values must be string literals since they're needed before the build runs.
      */
     environment?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+    hatch?: pulumi.Input<string>;
     /**
      * OriginProtection locks CloudFront to a CDN/proxy in front of it (Cloudflare, Fastly, Akamai, nginx, ...). Requests without the x-origin-secret header are rejected at the edge; configure the proxy to send it on every request with the originSecret output as the value. Protection defaults to "edge-oac" while it's enabled, so the server Function URL can't be reached around the proxy.
      */
@@ -97,7 +98,6 @@ export interface SvelteKitSiteArgs {
      * SecurityHeaders configures the security headers CloudFront adds to every response. On by default: Strict-Transport-Security (1 year), X-Content-Type-Options: nosniff, X-Frame-Options: SAMEORIGIN, Referrer-Policy: strict-origin-when-cross-origin, a Permissions-Policy that turns off camera, microphone, geolocation, USB and Topics, and Cross-Origin-Opener-Policy: same-origin-allow-popups. Headers your app sets itself take priority. Content-Security-Policy is left to SvelteKit's kit.csp.
      */
     securityHeaders?: pulumi.Input<inputs.aws.SiteSecurityHeadersArgs>;
-    transform?: pulumi.Input<string>;
     /**
      * Waf attaches a WAF WebACL to the site's CloudFront distribution. Protection defaults to "edge-oac" while it's attached.
      */

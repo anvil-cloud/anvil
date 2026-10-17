@@ -23,9 +23,9 @@ __all__ = ['DSQLArgs', 'DSQL']
 class DSQLArgs:
     def __init__(__self__, *,
                  backup: Optional[pulumi.Input['DSQLBackupArgsArgs']] = None,
+                 hatch: Optional[pulumi.Input['DsqlHatchArgsArgs']] = None,
                  multi_region: Optional[pulumi.Input['DSQLMultiRegionArgsArgs']] = None,
                  schemas: Optional[pulumi.Input[Sequence[pulumi.Input['DSQLSchemaArgs']]]] = None,
-                 transform: Optional[pulumi.Input['DsqlTransformArgsArgs']] = None,
                  vpc: Optional[pulumi.Input['DSQLVpcArgsArgs']] = None):
         """
         The set of arguments for constructing a DSQL resource.
@@ -37,12 +37,12 @@ class DSQLArgs:
         """
         if backup is not None:
             pulumi.set(__self__, "backup", backup)
+        if hatch is not None:
+            pulumi.set(__self__, "hatch", hatch)
         if multi_region is not None:
             pulumi.set(__self__, "multi_region", multi_region)
         if schemas is not None:
             pulumi.set(__self__, "schemas", schemas)
-        if transform is not None:
-            pulumi.set(__self__, "transform", transform)
         if vpc is not None:
             pulumi.set(__self__, "vpc", vpc)
 
@@ -57,6 +57,15 @@ class DSQLArgs:
     @backup.setter
     def backup(self, value: Optional[pulumi.Input['DSQLBackupArgsArgs']]):
         pulumi.set(self, "backup", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def hatch(self) -> Optional[pulumi.Input['DsqlHatchArgsArgs']]:
+        return pulumi.get(self, "hatch")
+
+    @hatch.setter
+    def hatch(self, value: Optional[pulumi.Input['DsqlHatchArgsArgs']]):
+        pulumi.set(self, "hatch", value)
 
     @_builtins.property
     @pulumi.getter(name="multiRegion")
@@ -84,15 +93,6 @@ class DSQLArgs:
 
     @_builtins.property
     @pulumi.getter
-    def transform(self) -> Optional[pulumi.Input['DsqlTransformArgsArgs']]:
-        return pulumi.get(self, "transform")
-
-    @transform.setter
-    def transform(self, value: Optional[pulumi.Input['DsqlTransformArgsArgs']]):
-        pulumi.set(self, "transform", value)
-
-    @_builtins.property
-    @pulumi.getter
     def vpc(self) -> Optional[pulumi.Input['DSQLVpcArgsArgs']]:
         """
         Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
@@ -111,9 +111,9 @@ class DSQL(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  backup: Optional[pulumi.Input[Union['DSQLBackupArgsArgs', 'DSQLBackupArgsArgsDict']]] = None,
+                 hatch: Optional[pulumi.Input[Union['DsqlHatchArgsArgs', 'DsqlHatchArgsArgsDict']]] = None,
                  multi_region: Optional[pulumi.Input[Union['DSQLMultiRegionArgsArgs', 'DSQLMultiRegionArgsArgsDict']]] = None,
                  schemas: Optional[pulumi.Input[Sequence[pulumi.Input[Union['DSQLSchemaArgs', 'DSQLSchemaArgsDict']]]]] = None,
-                 transform: Optional[pulumi.Input[Union['DsqlTransformArgsArgs', 'DsqlTransformArgsArgsDict']]] = None,
                  vpc: Optional[pulumi.Input[Union['DSQLVpcArgsArgs', 'DSQLVpcArgsArgsDict']]] = None,
                  __props__=None):
         """
@@ -153,9 +153,9 @@ class DSQL(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  backup: Optional[pulumi.Input[Union['DSQLBackupArgsArgs', 'DSQLBackupArgsArgsDict']]] = None,
+                 hatch: Optional[pulumi.Input[Union['DsqlHatchArgsArgs', 'DsqlHatchArgsArgsDict']]] = None,
                  multi_region: Optional[pulumi.Input[Union['DSQLMultiRegionArgsArgs', 'DSQLMultiRegionArgsArgsDict']]] = None,
                  schemas: Optional[pulumi.Input[Sequence[pulumi.Input[Union['DSQLSchemaArgs', 'DSQLSchemaArgsDict']]]]] = None,
-                 transform: Optional[pulumi.Input[Union['DsqlTransformArgsArgs', 'DsqlTransformArgsArgsDict']]] = None,
                  vpc: Optional[pulumi.Input[Union['DSQLVpcArgsArgs', 'DSQLVpcArgsArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -169,9 +169,9 @@ class DSQL(pulumi.ComponentResource):
             __props__ = DSQLArgs.__new__(DSQLArgs)
 
             __props__.__dict__["backup"] = backup
+            __props__.__dict__["hatch"] = hatch
             __props__.__dict__["multi_region"] = multi_region
             __props__.__dict__["schemas"] = schemas
-            __props__.__dict__["transform"] = transform
             __props__.__dict__["vpc"] = vpc
             __props__.__dict__["cluster_arns"] = None
             __props__.__dict__["endpoint"] = None

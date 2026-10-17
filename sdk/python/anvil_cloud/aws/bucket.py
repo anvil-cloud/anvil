@@ -22,10 +22,10 @@ __all__ = ['BucketArgs', 'Bucket']
 class BucketArgs:
     def __init__(__self__, *,
                  encryption: Optional[pulumi.Input[_builtins.str]] = None,
+                 hatch: Optional[pulumi.Input['BucketHatchArgsArgs']] = None,
                  logging: Optional[pulumi.Input[_builtins.bool]] = None,
                  retention: Optional[pulumi.Input[_builtins.int]] = None,
                  storage_transition: Optional[pulumi.Input[_builtins.str]] = None,
-                 transform: Optional[pulumi.Input['BucketTransformArgsArgs']] = None,
                  version_retention: Optional[pulumi.Input[_builtins.str]] = None,
                  versioning: Optional[pulumi.Input[_builtins.bool]] = None):
         """
@@ -34,20 +34,20 @@ class BucketArgs:
         :param pulumi.Input[_builtins.str] encryption: Upgrade at-rest encryption to SSE-KMS. Set to "kms" to enable. SSE-S3 (AES256) is always on by default at no cost. SSE-KMS incurs KMS API call cost and is required by HIPAA, PCI-DSS, FedRAMP, and IRAP.
         :param pulumi.Input[_builtins.bool] logging: Enable S3 server access logging to the centralised logging bucket created during `anvil bootstrap`. Required by most compliance frameworks for audit trails. Incurs storage cost. Default: false.
         :param pulumi.Input[_builtins.int] retention: Enable Object Lock with a retention period in days (COMPLIANCE mode). Objects cannot be deleted or overwritten until the period expires. Required by PCI-DSS (365), FedRAMP (1095), HIPAA (2190). Must be set at bucket creation — changing requires bucket replacement. Default: 0 (disabled).
-        :param pulumi.Input[_builtins.str] storage_transition: When to move objects to cheaper storage classes. Omit to use Intelligent-Tiering (recommended default). Only applies when no custom lifecycle is provided via transform.
+        :param pulumi.Input[_builtins.str] storage_transition: When to move objects to cheaper storage classes. Omit to use Intelligent-Tiering (recommended default). Only applies when no custom lifecycle is provided via hatch.
         :param pulumi.Input[_builtins.str] version_retention: How long non-current object versions are kept before automatic expiry. Strongly recommended when versioning is enabled to prevent unbounded storage growth. Default: keep forever.
         :param pulumi.Input[_builtins.bool] versioning: Enable versioning in non-production stages. Versioning is always enabled in production. Incurs additional storage cost per version. Default: false.
         """
         if encryption is not None:
             pulumi.set(__self__, "encryption", encryption)
+        if hatch is not None:
+            pulumi.set(__self__, "hatch", hatch)
         if logging is not None:
             pulumi.set(__self__, "logging", logging)
         if retention is not None:
             pulumi.set(__self__, "retention", retention)
         if storage_transition is not None:
             pulumi.set(__self__, "storage_transition", storage_transition)
-        if transform is not None:
-            pulumi.set(__self__, "transform", transform)
         if version_retention is not None:
             pulumi.set(__self__, "version_retention", version_retention)
         if versioning is not None:
@@ -64,6 +64,15 @@ class BucketArgs:
     @encryption.setter
     def encryption(self, value: Optional[pulumi.Input[_builtins.str]]):
         pulumi.set(self, "encryption", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def hatch(self) -> Optional[pulumi.Input['BucketHatchArgsArgs']]:
+        return pulumi.get(self, "hatch")
+
+    @hatch.setter
+    def hatch(self, value: Optional[pulumi.Input['BucketHatchArgsArgs']]):
+        pulumi.set(self, "hatch", value)
 
     @_builtins.property
     @pulumi.getter
@@ -93,22 +102,13 @@ class BucketArgs:
     @pulumi.getter(name="storageTransition")
     def storage_transition(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        When to move objects to cheaper storage classes. Omit to use Intelligent-Tiering (recommended default). Only applies when no custom lifecycle is provided via transform.
+        When to move objects to cheaper storage classes. Omit to use Intelligent-Tiering (recommended default). Only applies when no custom lifecycle is provided via hatch.
         """
         return pulumi.get(self, "storage_transition")
 
     @storage_transition.setter
     def storage_transition(self, value: Optional[pulumi.Input[_builtins.str]]):
         pulumi.set(self, "storage_transition", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def transform(self) -> Optional[pulumi.Input['BucketTransformArgsArgs']]:
-        return pulumi.get(self, "transform")
-
-    @transform.setter
-    def transform(self, value: Optional[pulumi.Input['BucketTransformArgsArgs']]):
-        pulumi.set(self, "transform", value)
 
     @_builtins.property
     @pulumi.getter(name="versionRetention")
@@ -142,10 +142,10 @@ class Bucket(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  encryption: Optional[pulumi.Input[_builtins.str]] = None,
+                 hatch: Optional[pulumi.Input[Union['BucketHatchArgsArgs', 'BucketHatchArgsArgsDict']]] = None,
                  logging: Optional[pulumi.Input[_builtins.bool]] = None,
                  retention: Optional[pulumi.Input[_builtins.int]] = None,
                  storage_transition: Optional[pulumi.Input[_builtins.str]] = None,
-                 transform: Optional[pulumi.Input[Union['BucketTransformArgsArgs', 'BucketTransformArgsArgsDict']]] = None,
                  version_retention: Optional[pulumi.Input[_builtins.str]] = None,
                  versioning: Optional[pulumi.Input[_builtins.bool]] = None,
                  __props__=None):
@@ -157,7 +157,7 @@ class Bucket(pulumi.ComponentResource):
         :param pulumi.Input[_builtins.str] encryption: Upgrade at-rest encryption to SSE-KMS. Set to "kms" to enable. SSE-S3 (AES256) is always on by default at no cost. SSE-KMS incurs KMS API call cost and is required by HIPAA, PCI-DSS, FedRAMP, and IRAP.
         :param pulumi.Input[_builtins.bool] logging: Enable S3 server access logging to the centralised logging bucket created during `anvil bootstrap`. Required by most compliance frameworks for audit trails. Incurs storage cost. Default: false.
         :param pulumi.Input[_builtins.int] retention: Enable Object Lock with a retention period in days (COMPLIANCE mode). Objects cannot be deleted or overwritten until the period expires. Required by PCI-DSS (365), FedRAMP (1095), HIPAA (2190). Must be set at bucket creation — changing requires bucket replacement. Default: 0 (disabled).
-        :param pulumi.Input[_builtins.str] storage_transition: When to move objects to cheaper storage classes. Omit to use Intelligent-Tiering (recommended default). Only applies when no custom lifecycle is provided via transform.
+        :param pulumi.Input[_builtins.str] storage_transition: When to move objects to cheaper storage classes. Omit to use Intelligent-Tiering (recommended default). Only applies when no custom lifecycle is provided via hatch.
         :param pulumi.Input[_builtins.str] version_retention: How long non-current object versions are kept before automatic expiry. Strongly recommended when versioning is enabled to prevent unbounded storage growth. Default: keep forever.
         :param pulumi.Input[_builtins.bool] versioning: Enable versioning in non-production stages. Versioning is always enabled in production. Incurs additional storage cost per version. Default: false.
         """
@@ -186,10 +186,10 @@ class Bucket(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  encryption: Optional[pulumi.Input[_builtins.str]] = None,
+                 hatch: Optional[pulumi.Input[Union['BucketHatchArgsArgs', 'BucketHatchArgsArgsDict']]] = None,
                  logging: Optional[pulumi.Input[_builtins.bool]] = None,
                  retention: Optional[pulumi.Input[_builtins.int]] = None,
                  storage_transition: Optional[pulumi.Input[_builtins.str]] = None,
-                 transform: Optional[pulumi.Input[Union['BucketTransformArgsArgs', 'BucketTransformArgsArgsDict']]] = None,
                  version_retention: Optional[pulumi.Input[_builtins.str]] = None,
                  versioning: Optional[pulumi.Input[_builtins.bool]] = None,
                  __props__=None):
@@ -204,10 +204,10 @@ class Bucket(pulumi.ComponentResource):
             __props__ = BucketArgs.__new__(BucketArgs)
 
             __props__.__dict__["encryption"] = encryption
+            __props__.__dict__["hatch"] = hatch
             __props__.__dict__["logging"] = logging
             __props__.__dict__["retention"] = retention
             __props__.__dict__["storage_transition"] = storage_transition
-            __props__.__dict__["transform"] = transform
             __props__.__dict__["version_retention"] = version_retention
             __props__.__dict__["versioning"] = versioning
             __props__.__dict__["arn"] = None

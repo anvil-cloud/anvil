@@ -24,10 +24,10 @@ class DynamoDBArgs:
     def __init__(__self__, *,
                  hash_key: pulumi.Input['DynamoDBKeyAttributeArgs'],
                  global_secondary_indexes: Optional[pulumi.Input[Sequence[pulumi.Input['DynamoDBGlobalSecondaryIndexArgs']]]] = None,
+                 hatch: Optional[pulumi.Input['DynamoHatchArgsArgs']] = None,
                  kms_key_arn: Optional[pulumi.Input[_builtins.str]] = None,
                  range_key: Optional[pulumi.Input['DynamoDBKeyAttributeArgs']] = None,
                  stream: Optional[pulumi.Input['DynamoDBStreamArgs']] = None,
-                 transform: Optional[pulumi.Input['DynamoTransformArgsArgs']] = None,
                  ttl_attribute: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a DynamoDB resource.
@@ -42,14 +42,14 @@ class DynamoDBArgs:
         pulumi.set(__self__, "hash_key", hash_key)
         if global_secondary_indexes is not None:
             pulumi.set(__self__, "global_secondary_indexes", global_secondary_indexes)
+        if hatch is not None:
+            pulumi.set(__self__, "hatch", hatch)
         if kms_key_arn is not None:
             pulumi.set(__self__, "kms_key_arn", kms_key_arn)
         if range_key is not None:
             pulumi.set(__self__, "range_key", range_key)
         if stream is not None:
             pulumi.set(__self__, "stream", stream)
-        if transform is not None:
-            pulumi.set(__self__, "transform", transform)
         if ttl_attribute is not None:
             pulumi.set(__self__, "ttl_attribute", ttl_attribute)
 
@@ -76,6 +76,15 @@ class DynamoDBArgs:
     @global_secondary_indexes.setter
     def global_secondary_indexes(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['DynamoDBGlobalSecondaryIndexArgs']]]]):
         pulumi.set(self, "global_secondary_indexes", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def hatch(self) -> Optional[pulumi.Input['DynamoHatchArgsArgs']]:
+        return pulumi.get(self, "hatch")
+
+    @hatch.setter
+    def hatch(self, value: Optional[pulumi.Input['DynamoHatchArgsArgs']]):
+        pulumi.set(self, "hatch", value)
 
     @_builtins.property
     @pulumi.getter(name="kmsKeyArn")
@@ -114,15 +123,6 @@ class DynamoDBArgs:
         pulumi.set(self, "stream", value)
 
     @_builtins.property
-    @pulumi.getter
-    def transform(self) -> Optional[pulumi.Input['DynamoTransformArgsArgs']]:
-        return pulumi.get(self, "transform")
-
-    @transform.setter
-    def transform(self, value: Optional[pulumi.Input['DynamoTransformArgsArgs']]):
-        pulumi.set(self, "transform", value)
-
-    @_builtins.property
     @pulumi.getter(name="ttlAttribute")
     def ttl_attribute(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
@@ -143,10 +143,10 @@ class DynamoDB(pulumi.ComponentResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  global_secondary_indexes: Optional[pulumi.Input[Sequence[pulumi.Input[Union['DynamoDBGlobalSecondaryIndexArgs', 'DynamoDBGlobalSecondaryIndexArgsDict']]]]] = None,
                  hash_key: Optional[pulumi.Input[Union['DynamoDBKeyAttributeArgs', 'DynamoDBKeyAttributeArgsDict']]] = None,
+                 hatch: Optional[pulumi.Input[Union['DynamoHatchArgsArgs', 'DynamoHatchArgsArgsDict']]] = None,
                  kms_key_arn: Optional[pulumi.Input[_builtins.str]] = None,
                  range_key: Optional[pulumi.Input[Union['DynamoDBKeyAttributeArgs', 'DynamoDBKeyAttributeArgsDict']]] = None,
                  stream: Optional[pulumi.Input[Union['DynamoDBStreamArgs', 'DynamoDBStreamArgsDict']]] = None,
-                 transform: Optional[pulumi.Input[Union['DynamoTransformArgsArgs', 'DynamoTransformArgsArgsDict']]] = None,
                  ttl_attribute: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         """
@@ -189,10 +189,10 @@ class DynamoDB(pulumi.ComponentResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  global_secondary_indexes: Optional[pulumi.Input[Sequence[pulumi.Input[Union['DynamoDBGlobalSecondaryIndexArgs', 'DynamoDBGlobalSecondaryIndexArgsDict']]]]] = None,
                  hash_key: Optional[pulumi.Input[Union['DynamoDBKeyAttributeArgs', 'DynamoDBKeyAttributeArgsDict']]] = None,
+                 hatch: Optional[pulumi.Input[Union['DynamoHatchArgsArgs', 'DynamoHatchArgsArgsDict']]] = None,
                  kms_key_arn: Optional[pulumi.Input[_builtins.str]] = None,
                  range_key: Optional[pulumi.Input[Union['DynamoDBKeyAttributeArgs', 'DynamoDBKeyAttributeArgsDict']]] = None,
                  stream: Optional[pulumi.Input[Union['DynamoDBStreamArgs', 'DynamoDBStreamArgsDict']]] = None,
-                 transform: Optional[pulumi.Input[Union['DynamoTransformArgsArgs', 'DynamoTransformArgsArgsDict']]] = None,
                  ttl_attribute: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -209,10 +209,10 @@ class DynamoDB(pulumi.ComponentResource):
             if hash_key is None and not opts.urn:
                 raise TypeError("Missing required property 'hash_key'")
             __props__.__dict__["hash_key"] = hash_key
+            __props__.__dict__["hatch"] = hatch
             __props__.__dict__["kms_key_arn"] = kms_key_arn
             __props__.__dict__["range_key"] = range_key
             __props__.__dict__["stream"] = stream
-            __props__.__dict__["transform"] = transform
             __props__.__dict__["ttl_attribute"] = ttl_attribute
             __props__.__dict__["stream_arn"] = None
             __props__.__dict__["table_arn"] = None

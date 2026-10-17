@@ -121,14 +121,14 @@ export default new App({
 });
 ```
 
-## Overrides
+## Escape hatch
 
-Every component accepts a `transform` argument to override the underlying resource config when you need to break from the defaults:
+Every component accepts a `hatch` argument — an escape hatch to override the underlying resource config when you need to break from the defaults:
 
 ```typescript
 const bucket = new anvil.aws.Bucket('custom', {
   dataClassification: 'non-sensitive',
-  transform: {
+  hatch: {
     bucket: { forceDestroy: true, tags: { env: 'dev' } },
   },
 });

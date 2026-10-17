@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
-	"github.com/anvil-cloud/anvil/provider/internal/transform"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/cloudwatch"
 	awslambda "github.com/pulumi/pulumi-aws/sdk/v7/go/aws/lambda"
 	p "github.com/pulumi/pulumi-go-provider"
@@ -68,7 +68,7 @@ type EventBusArgs struct {
 	// Each rule matches events by pattern and routes them to a target.
 	Rules []EventBusRule `pulumi:"rules,optional"`
 
-	Transform map[string]map[string]interface{} `pulumi:"transform,optional"`
+	Hatch map[string]map[string]interface{} `pulumi:"hatch,optional"`
 }
 
 // EventBus is the Anvil-managed EventBridge event bus component resource.
@@ -134,7 +134,7 @@ func NewEventBus(ctx *pulumi.Context, name string, args EventBusArgs, opts ...pu
 	physicalName := provider.PhysicalName(stage, name, "bus", stageId)
 
 	// ── 1. Event bus ───────────────────────────────────
-	busProps := transform.MergeTransform(args.Transform["bus"], pulumi.Map{
+	busProps := hatch.Merge(args.Hatch["bus"], pulumi.Map{
 		"name": pulumi.String(physicalName),
 		"tags": pulumi.StringMap{
 			"ManagedBy": pulumi.String("anvil"),
@@ -147,8 +147,8 @@ func NewEventBus(ctx *pulumi.Context, name string, args EventBusArgs, opts ...pu
 	}
 
 	// ── 2. Archive ─────────────────────────────────────
-	// Default 7 day retention. Override via transform["archive"].
-	archiveProps := transform.MergeTransform(args.Transform["archive"], pulumi.Map{
+	// Default 7 day retention. Override via hatch["archive"].
+	archiveProps := hatch.Merge(args.Hatch["archive"], pulumi.Map{
 		"name":           pulumi.Sprintf("%s-archive", physicalName),
 		"eventSourceArn": busRes.Arn,
 		"retentionDays":  pulumi.Int(7),
