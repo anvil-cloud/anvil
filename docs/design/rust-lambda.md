@@ -322,9 +322,9 @@ DSQL schemas. Existing packages are never edited to add it.
 
 ## DSQL client as a crate (`gen/db`)
 
-Today `codegen/rust.go` writes `gen/<schema>.rs` + `mod.rs`, with a comment
+`codegen/rust.go` used to write `gen/<schema>.rs` + `mod.rs`, with a comment
 listing the dependencies (and the tokio-postgres features) to copy into
-`Cargo.toml` by hand. That changes to a complete crate:
+`Cargo.toml` by hand. It now writes a complete crate:
 
 ```
 gen/db/
@@ -338,9 +338,22 @@ gen/db/
   regardless of the saved `--lang` targets. A TypeScript config with Rust
   Lambdas still auto-detects `typescript` for its own types; `gen/db` is
   produced alongside. `--lang rust` also produces the crate.
-- A workspace member, so it compiles once for every Lambda that uses it.
+- A workspace member, so it compiles once for every Lambda that uses it. The
+  first generate runs `cargo init --lib` on it (which adds it to `members`,
+  creating the root workspace if needed), then the generator replaces the
+  files.
 - Adding a `uuid` column and regenerating adds the right feature. No more
   trait-bound compile errors from a stale `Cargo.toml`.
+- Output is deterministic (schemas in sorted order). A module whose schema
+  was removed is deleted on regenerate; only files carrying the generated
+  header are removed, so hand-added files in `src/` survive.
+- New Lambdas get `db = { path = "…/gen/db" }` via `cargo add --path`.
+  Whether a Lambda's `cargo add` needs `--features` is decided by reading the
+  workspace manifest (does it already define `lambda_runtime` with
+  `tracing` and `tokio` with `macros`?), not by who created it.
+- Verified with real cargo (`ANVIL_RUST_E2E=1`): an empty project with a
+  schema and two Rust Lambdas gets the workspace, `gen/db` and both packages,
+  and the generated client compiles against the real `tokio-postgres`.
 
 ## CLI flow
 
@@ -372,13 +385,16 @@ Generation moves **before** the build:
 4. deploy
 ```
 
-Today the refresh runs after the deploy (step 6 in `deploy.go`). Moving it is
-required for Rust: a new Lambda depends on `gen/db`, which must exist before
-its first build. It also appears to fix a Node issue: the generated TS includes
-runtime query helpers, and a Lambda importing them is currently bundled before
-the refresh, so the deploy that changes a schema ships the previous helpers.
-Schemas come from the config (discovery), not deployed state, so generating
-first is safe.
+The refresh used to run after the deploy. Moving it is required for Rust: a
+new Lambda depends on `gen/db`, which must exist before its first build. It
+also fixes a Node issue: the generated TS includes runtime query helpers, and
+a Lambda importing them was bundled before the refresh, so the deploy that
+changed a schema shipped the previous helpers. Schemas come from the config
+(discovery), not deployed state, so generating first is safe.
+
+Because it now happens before the build, **a generation failure stops the
+deploy** (it used to be a warning after a finished deploy): shipping code
+built against stale generated types is worse than stopping.
 
 ## End-to-end
 

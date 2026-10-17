@@ -25,7 +25,7 @@ func TestScaffoldThenBuildReal(t *testing.T) {
 		{Name: "worker", Handler: "functions/worker"},
 	}
 
-	created, err := Rust(root, fns)
+	created, err := Rust(root, fns, RustOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func TestScaffoldThenBuildReal(t *testing.T) {
 
 	// Second run: everything exists, so nothing is created or changed.
 	before := read(t, filepath.Join(root, "Cargo.toml"))
-	again, err := Rust(root, fns)
+	again, err := Rust(root, fns, RustOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}

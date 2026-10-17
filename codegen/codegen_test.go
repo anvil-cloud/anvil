@@ -178,11 +178,77 @@ func TestRustGeneration(t *testing.T) {
 		t.Fatalf("Generate: %v", err)
 	}
 
-	assertFileContains(t, filepath.Join(outDir, "myapp.rs"), "pub struct UsersRow")
-	assertFileContains(t, filepath.Join(outDir, "myapp.rs"), "pub struct UsersInsert")
-	assertFileContains(t, filepath.Join(outDir, "myapp.rs"), "impl<'a> UsersQueries<'a>")
-	assertFileContains(t, filepath.Join(outDir, "myapp.rs"), "pub struct OrdersRow")
-	assertFileContains(t, filepath.Join(outDir, "mod.rs"), "pub mod myapp")
+	module := filepath.Join(outDir, "src", "myapp.rs")
+	assertFileContains(t, module, "pub struct UsersRow")
+	assertFileContains(t, module, "pub struct UsersInsert")
+	assertFileContains(t, module, "impl<'a> UsersQueries<'a>")
+	assertFileContains(t, module, "pub struct OrdersRow")
+	assertFileContains(t, filepath.Join(outDir, "src", "lib.rs"), "pub mod myapp;")
+
+	manifest := filepath.Join(outDir, "Cargo.toml")
+	assertFileContains(t, manifest, `name = "db"`)
+	assertFileContains(t, manifest, "tokio-postgres = { version = \"0.7\"")
+	assertFileContains(t, manifest, `serde = { version = "1", features = ["derive"] }`)
+
+	// The dependency list moved into Cargo.toml; no copy-me comment remains.
+	data, err := os.ReadFile(module)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(data), "Add these to your Cargo.toml") {
+		t.Error("module still carries the old Cargo.toml instructions")
+	}
+}
+
+func TestRustGenerationIsDeterministicAndPrunes(t *testing.T) {
+	sf, err := ParseSchemaFile(filepath.Join("testdata", "anvil.schema.json"))
+	if err != nil {
+		t.Fatalf("ParseSchemaFile: %v", err)
+	}
+
+	outDir := t.TempDir()
+	srcDir := filepath.Join(outDir, "src")
+	if err := os.MkdirAll(srcDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	stale := filepath.Join(srcDir, "dropped.rs")
+	handWritten := filepath.Join(srcDir, "helpers.rs")
+	if err := os.WriteFile(stale, []byte(rustGeneratedHeader+"\npub struct Old;\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(handWritten, []byte("// mine\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	gen := &RustGenerator{}
+	snapshot := func() string {
+		if err := gen.Generate(sf.DSQL, outDir); err != nil {
+			t.Fatalf("Generate: %v", err)
+		}
+		var b strings.Builder
+		for _, f := range []string{"Cargo.toml", "src/lib.rs", "src/myapp.rs"} {
+			data, err := os.ReadFile(filepath.Join(outDir, f))
+			if err != nil {
+				t.Fatal(err)
+			}
+			b.Write(data)
+		}
+		return b.String()
+	}
+
+	first := snapshot()
+	for i := 0; i < 5; i++ {
+		if snapshot() != first {
+			t.Fatal("generated crate differs between runs")
+		}
+	}
+
+	if _, err := os.Stat(stale); !os.IsNotExist(err) {
+		t.Error("module for a removed schema was not deleted")
+	}
+	if _, err := os.Stat(handWritten); err != nil {
+		t.Error("hand-written file in src/ was deleted")
+	}
 }
 
 func TestRunFromManifest(t *testing.T) {

@@ -10,7 +10,10 @@ import (
 // yet (today: Rust Lambdas) and prints what it created. It runs in
 // anvil generate and in anvil deploy before the build, since a missing
 // package can't be built. Existing code is never touched.
-func scaffoldFunctions(projectRoot string, functions []FunctionSpec) error {
+//
+// dbCrate is the generated DSQL client crate, if any: new Rust Lambdas get a
+// dependency on it.
+func scaffoldFunctions(projectRoot string, functions []FunctionSpec, dbCrate string) error {
 	var rust []scaffold.RustFunction
 	for _, fn := range functions {
 		if fn.Type == "anvil:aws:Lambda" && fn.Runtime == rustRuntime {
@@ -21,7 +24,7 @@ func scaffoldFunctions(projectRoot string, functions []FunctionSpec) error {
 		return nil
 	}
 
-	created, err := scaffold.Rust(projectRoot, rust)
+	created, err := scaffold.Rust(projectRoot, rust, scaffold.RustOptions{DBCrate: dbCrate})
 	for _, c := range created {
 		fmt.Printf("  created %s\n", c)
 	}

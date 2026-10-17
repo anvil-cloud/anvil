@@ -15,7 +15,7 @@ const defaultGenPath = "gen"
 
 // generateConfigKey is the Pulumi stack config key under which Anvil persists
 // the list of generate targets, so `anvil generate` (no flags) and the
-// post-deploy refresh can reproduce the same outputs.
+// generate step of every deploy can reproduce the same outputs.
 const generateConfigKey = "anvil:generate"
 
 // generateTarget is one language/output-path pair. A project can have several

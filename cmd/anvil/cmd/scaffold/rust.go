@@ -49,11 +49,19 @@ var (
 	}
 )
 
+// RustOptions tunes scaffolding.
+type RustOptions struct {
+	// DBCrate is the generated DSQL client crate's directory, when the
+	// project has DSQL schemas. New packages get a path dependency on it;
+	// existing packages are never edited to add one.
+	DBCrate string
+}
+
 // Rust scaffolds every Rust function whose handler doesn't exist yet and
 // returns one line per file or package it created, for the CLI to print.
 // Functions that already exist are skipped silently.
-func Rust(projectRoot string, fns []RustFunction) ([]string, error) {
-	s := &rustScaffolder{root: projectRoot}
+func Rust(projectRoot string, fns []RustFunction, opts RustOptions) ([]string, error) {
+	s := &rustScaffolder{root: projectRoot, opts: opts}
 	for _, fn := range fns {
 		if err := s.function(fn); err != nil {
 			return s.created, fmt.Errorf("lambda %q: %w", fn.Name, err)
@@ -64,12 +72,8 @@ func Rust(projectRoot string, fns []RustFunction) ([]string, error) {
 
 type rustScaffolder struct {
 	root    string
+	opts    RustOptions
 	created []string
-
-	// createdManifest is the workspace Cargo.toml this run created, if any.
-	// Its [workspace.dependencies] already carry the features new packages
-	// need; a workspace Anvil didn't create may not.
-	createdManifest string
 }
 
 func (s *rustScaffolder) function(fn RustFunction) error {
@@ -100,8 +104,13 @@ func (s *rustScaffolder) function(fn RustFunction) error {
 		return err
 	}
 
-	if err := s.addDependencies(path, workspace == s.createdManifest); err != nil {
+	if err := s.addDependencies(path, definesTemplateDeps(workspace)); err != nil {
 		return err
+	}
+	if s.opts.DBCrate != "" {
+		if err := runCargo(s.root, "add", "--manifest-path", filepath.Join(path, "Cargo.toml"), "--path", s.opts.DBCrate); err != nil {
+			return err
+		}
 	}
 
 	if !hadMain {
@@ -112,6 +121,36 @@ func (s *rustScaffolder) function(fn RustFunction) error {
 
 	s.note(fn.Handler + "/")
 	return nil
+}
+
+// RustCrate makes dir a library package in the project's Cargo workspace
+// (creating the workspace at the project root if there is none), for a
+// generated crate like gen/db. It returns what it created; nothing if dir
+// already has a Cargo.toml. The caller then writes the crate's files.
+func RustCrate(projectRoot, dir string) ([]string, error) {
+	if exists(filepath.Join(dir, "Cargo.toml")) {
+		return nil, nil
+	}
+
+	s := &rustScaffolder{root: projectRoot}
+	if _, err := s.ensureWorkspace(dir); err != nil {
+		return s.created, err
+	}
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return s.created, err
+	}
+	// cargo init adds it to the workspace's members; the generator then
+	// replaces the Cargo.toml and lib.rs it writes.
+	if err := runCargo(projectRoot, "init", "--lib", "--vcs", "none", dir); err != nil {
+		return s.created, err
+	}
+
+	rel, err := filepath.Rel(projectRoot, dir)
+	if err != nil {
+		rel = dir
+	}
+	s.note(filepath.ToSlash(rel) + "/")
+	return s.created, nil
 }
 
 // binFile handles a .rs handler: inside an existing package, Cargo finds
@@ -174,18 +213,35 @@ func (s *rustScaffolder) ensureWorkspace(path string) (string, error) {
 		s.note(".gitignore (+ /target)")
 	}
 
-	s.createdManifest = rootManifest
 	return rootManifest, nil
 }
 
-func (s *rustScaffolder) addDependencies(pkgDir string, ownWorkspace bool) error {
+// addDependencies adds the template's dependencies. cargo add inherits them
+// from [workspace.dependencies] when the workspace defines them; features are
+// passed only when it doesn't already enable the ones the template uses.
+func (s *rustScaffolder) addDependencies(pkgDir string, workspaceHasThem bool) error {
 	args := []string{"add", "--manifest-path", filepath.Join(pkgDir, "Cargo.toml"), "lambda_runtime", "tokio", "serde_json"}
-	if !ownWorkspace {
-		// A workspace Anvil didn't create may not define these with the
-		// features the template uses.
+	if !workspaceHasThem {
 		args = append(args, "--features", "lambda_runtime/tracing,tokio/macros")
 	}
 	return runCargo(s.root, args...)
+}
+
+var (
+	workspaceLambdaRuntime = regexp.MustCompile(`(?m)^\s*lambda_runtime\s*=.*"tracing"`)
+	workspaceTokio         = regexp.MustCompile(`(?m)^\s*tokio\s*=.*"macros"`)
+)
+
+// definesTemplateDeps reports whether a workspace manifest already defines
+// lambda_runtime and tokio with the features the handler template needs, as
+// the one Anvil creates does. A line-based check is enough for that shape;
+// anything else just gets the features passed explicitly, which is harmless.
+func definesTemplateDeps(manifest string) bool {
+	data, err := os.ReadFile(manifest)
+	if err != nil {
+		return false
+	}
+	return workspaceLambdaRuntime.Match(data) && workspaceTokio.Match(data)
 }
 
 func (s *rustScaffolder) note(rel string) {

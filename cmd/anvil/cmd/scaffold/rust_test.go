@@ -66,7 +66,7 @@ func TestRustCreatesWorkspaceAndPackages(t *testing.T) {
 	created, err := Rust(root, []RustFunction{
 		{Name: "api", Handler: "functions/api"},
 		{Name: "worker", Handler: "functions/worker"},
-	})
+	}, RustOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,7 +110,7 @@ func TestRustSkipsExistingCode(t *testing.T) {
 	write(t, filepath.Join(root, "functions/api/Cargo.toml"), "[package]\nname = \"api\"\n")
 	write(t, filepath.Join(root, "functions/api/src/main.rs"), "// user code\n")
 
-	created, err := Rust(root, []RustFunction{{Name: "api", Handler: "functions/api"}})
+	created, err := Rust(root, []RustFunction{{Name: "api", Handler: "functions/api"}}, RustOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +128,7 @@ func TestRustJoinsExistingWorkspace(t *testing.T) {
 	userManifest := "# user's workspace\n[workspace]\nmembers = []\n"
 	write(t, filepath.Join(root, "Cargo.toml"), userManifest)
 
-	created, err := Rust(root, []RustFunction{{Name: "api", Handler: "functions/api"}})
+	created, err := Rust(root, []RustFunction{{Name: "api", Handler: "functions/api"}}, RustOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -159,7 +159,7 @@ func TestRustKeepsAnExistingMainRS(t *testing.T) {
 	stubCargo(t, "rustc 1.93.1\n")
 	write(t, filepath.Join(root, "functions/api/src/main.rs"), "// started by hand\n")
 
-	if _, err := Rust(root, []RustFunction{{Name: "api", Handler: "functions/api"}}); err != nil {
+	if _, err := Rust(root, []RustFunction{{Name: "api", Handler: "functions/api"}}, RustOptions{}); err != nil {
 		t.Fatal(err)
 	}
 	if got := read(t, filepath.Join(root, "functions/api/src/main.rs")); got != "// started by hand\n" {
@@ -172,7 +172,7 @@ func TestRustStopsOnRootPackage(t *testing.T) {
 	calls := stubCargo(t, "rustc 1.93.1\n")
 	write(t, filepath.Join(root, "Cargo.toml"), "[package]\nname = \"app\"\n")
 
-	_, err := Rust(root, []RustFunction{{Name: "api", Handler: "functions/api"}})
+	_, err := Rust(root, []RustFunction{{Name: "api", Handler: "functions/api"}}, RustOptions{})
 	if err == nil || !strings.Contains(err.Error(), "is a package, not a workspace") {
 		t.Fatalf("error = %v", err)
 	}
@@ -190,7 +190,7 @@ func TestRustBinFile(t *testing.T) {
 		calls := stubCargo(t, "rustc 1.93.1\n")
 		write(t, filepath.Join(root, "functions/tools/Cargo.toml"), "[package]\nname = \"tools\"\n")
 
-		created, err := Rust(root, []RustFunction{{Name: "sync", Handler: "functions/tools/src/bin/sync.rs"}})
+		created, err := Rust(root, []RustFunction{{Name: "sync", Handler: "functions/tools/src/bin/sync.rs"}}, RustOptions{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -209,7 +209,7 @@ func TestRustBinFile(t *testing.T) {
 		root := t.TempDir()
 		stubCargo(t, "rustc 1.93.1\n")
 
-		_, err := Rust(root, []RustFunction{{Name: "sync", Handler: "functions/tools/src/bin/sync.rs"}})
+		_, err := Rust(root, []RustFunction{{Name: "sync", Handler: "functions/tools/src/bin/sync.rs"}}, RustOptions{})
 		if err == nil || !strings.Contains(err.Error(), `point handler at a package directory (e.g. "functions/sync")`) {
 			t.Fatalf("error = %v", err)
 		}
@@ -252,4 +252,62 @@ func TestIgnoreTargetLeavesExistingRule(t *testing.T) {
 	if err != nil || added {
 		t.Fatalf("added = %v, err = %v", added, err)
 	}
+}
+
+func TestRustAddsDBDependencyToNewPackagesOnly(t *testing.T) {
+	root := t.TempDir()
+	calls := stubCargo(t, "rustc 1.93.1\n")
+	write(t, filepath.Join(root, "Cargo.toml"), "[workspace]\nmembers = [\"functions/old\"]\n")
+	write(t, filepath.Join(root, "functions/old/Cargo.toml"), "[package]\nname = \"old\"\n")
+	db := filepath.Join(root, "gen", "db")
+
+	_, err := Rust(root, []RustFunction{
+		{Name: "old", Handler: "functions/old"},
+		{Name: "api", Handler: "functions/api"},
+	}, RustOptions{DBCrate: db})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var dbAdds []string
+	for _, c := range *calls {
+		joined := strings.Join(c, " ")
+		if c[0] == "add" && strings.Contains(joined, "--path "+db) {
+			dbAdds = append(dbAdds, joined)
+		}
+	}
+	if len(dbAdds) != 1 || !strings.Contains(dbAdds[0], filepath.Join(root, "functions/api/Cargo.toml")) {
+		t.Errorf("db dependency adds = %q, want exactly one, for the new package", dbAdds)
+	}
+}
+
+func TestRustCrate(t *testing.T) {
+	t.Run("creates the workspace and joins it", func(t *testing.T) {
+		root := t.TempDir()
+		calls := stubCargo(t, "rustc 1.93.1\n")
+		db := filepath.Join(root, "gen", "db")
+
+		created, err := RustCrate(root, db)
+		if err != nil {
+			t.Fatal(err)
+		}
+		want := []string{"Cargo.toml (workspace)", "rust-toolchain.toml", ".gitignore (+ /target)", "gen/db/"}
+		if !reflect.DeepEqual(created, want) {
+			t.Errorf("created = %q, want %q", created, want)
+		}
+		if len(*calls) != 1 || strings.Join((*calls)[0], " ") != "init --lib --vcs none "+db {
+			t.Errorf("cargo calls = %q, want one cargo init --lib", *calls)
+		}
+	})
+
+	t.Run("existing crate is left alone", func(t *testing.T) {
+		root := t.TempDir()
+		calls := stubCargo(t, "rustc 1.93.1\n")
+		write(t, filepath.Join(root, "gen/db/Cargo.toml"), "[package]\nname = \"db\"\n")
+
+		created, err := RustCrate(root, filepath.Join(root, "gen", "db"))
+		if err != nil || len(created) != 0 || len(*calls) != 0 {
+			t.Errorf("created %q, calls %q, err %v; want nothing", created, *calls, err)
+		}
+	})
 }

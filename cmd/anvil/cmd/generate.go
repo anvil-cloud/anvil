@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/anvil-cloud/anvil/cmd/anvil/cmd/scaffold"
 	"github.com/anvil-cloud/anvil/codegen"
 	"github.com/spf13/cobra"
 )
@@ -31,8 +32,10 @@ preview (no real resources created) to discover functions and schemas, then:
     the --path you provide).
 
 Each invocation with --lang/--path is remembered per stage, so a later bare
-"anvil generate" — and the automatic post-deploy refresh — reproduce every
-configured language and output path.
+"anvil generate" — and every anvil deploy, which generates before building —
+reproduce every configured language and output path. With Rust Lambdas, the
+Rust client is always generated too, as a crate in gen/db that new Lambdas
+depend on.
 
 Supported languages: typescript, python, go, rust`,
 	RunE: runGenerate,
@@ -100,13 +103,48 @@ func generateTargetsFor(projectRoot, stage string, explicit bool) ([]generateTar
 	return []generateTarget{{Lang: normalizeLang(rt.Name), Path: defaultGenPath}}, nil
 }
 
-// runGenerateTargets generates code for each target from the manifest schemas.
+// generateProject makes generated code match the program, and runs before
+// any build so builds always see current code: typed database clients for
+// every target (plus the gen/db crate whenever there are Rust Lambdas, which
+// depend on it), then packages for any Rust Lambda that doesn't exist yet.
 // verb labels each output line (e.g. "Generated" or "Updated").
-func runGenerateTargets(projectRoot string, targets []generateTarget, entries []codegen.ManifestSchemaEntry, verb string) error {
+func generateProject(projectRoot string, targets []generateTarget, functions []FunctionSpec, manifest *buildManifest, verb string) error {
+	var dbCrate string
+	if manifest != nil && len(manifest.Schemas) > 0 {
+		if hasRustFunctions(functions) {
+			targets = withRustTarget(targets)
+		}
+		var err error
+		dbCrate, err = runGenerateTargets(projectRoot, targets, manifestEntries(manifest), verb)
+		if err != nil {
+			return err
+		}
+	}
+	return scaffoldFunctions(projectRoot, functions, dbCrate)
+}
+
+// withRustTarget adds the Rust client at the default path unless a Rust
+// target is already configured. It is implied by having Rust Lambdas, so it
+// is never saved to the stage's generate config.
+func withRustTarget(targets []generateTarget) []generateTarget {
 	for _, t := range targets {
-		gen, ok := generators[normalizeLang(t.Lang)]
+		if normalizeLang(t.Lang) == "rust" {
+			return targets
+		}
+	}
+	return append(append([]generateTarget{}, targets...), generateTarget{Lang: "rust", Path: defaultGenPath})
+}
+
+// runGenerateTargets generates code for each target from the manifest
+// schemas. The Rust client is a crate in <path>/db, joined to the Cargo
+// workspace (created at the project root if needed); its directory is
+// returned so new Rust Lambdas can depend on it.
+func runGenerateTargets(projectRoot string, targets []generateTarget, entries []codegen.ManifestSchemaEntry, verb string) (dbCrate string, err error) {
+	for _, t := range targets {
+		lang := normalizeLang(t.Lang)
+		gen, ok := generators[lang]
 		if !ok {
-			return fmt.Errorf("unsupported language %q — supported: typescript, python, go, rust", t.Lang)
+			return "", fmt.Errorf("unsupported language %q — supported: typescript, python, go, rust", t.Lang)
 		}
 
 		outDir := t.Path
@@ -114,31 +152,26 @@ func runGenerateTargets(projectRoot string, targets []generateTarget, entries []
 			outDir = filepath.Join(projectRoot, t.Path)
 		}
 
+		if lang == "rust" {
+			outDir = filepath.Join(outDir, codegen.RustCrateName)
+			created, err := scaffold.RustCrate(projectRoot, outDir)
+			for _, c := range created {
+				fmt.Printf("  created %s\n", c)
+			}
+			if err != nil {
+				return "", err
+			}
+			if dbCrate == "" {
+				dbCrate = outDir
+			}
+		}
+
 		if err := codegen.RunFromManifest(entries, gen, outDir); err != nil {
-			return err
+			return "", err
 		}
 		fmt.Printf("  %s %s types in %s\n", verb, gen.Name(), outDir)
 	}
-	return nil
-}
-
-// refreshGeneratedTypes regenerates typed database client code from the build
-// manifest after a deploy, using the stage's saved generate config (falling back
-// to the auto-detected language at gen/). Errors are non-fatal.
-func refreshGeneratedTypes(manifest *buildManifest, stage string) {
-	projectRoot, err := findProjectRoot()
-	if err != nil {
-		return
-	}
-
-	targets, err := generateTargetsFor(projectRoot, stage, false)
-	if err != nil {
-		return
-	}
-
-	if err := runGenerateTargets(projectRoot, targets, manifestEntries(manifest), "Updated"); err != nil {
-		fmt.Printf("  ⚠️  Schema codegen refresh failed: %s\n", err)
-	}
+	return dbCrate, nil
 }
 
 func runGenerate(cmd *cobra.Command, args []string) error {
@@ -171,28 +204,20 @@ func runGenerate(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("discovery failed: %w", err)
 	}
 
-	// Create any declared Rust Lambda packages that don't exist yet.
-	if err := scaffoldFunctions(projectRoot, functions); err != nil {
-		return err
-	}
-
 	manifest, err := readFullManifest()
 	if err != nil {
 		return err
 	}
-	if manifest == nil || len(manifest.Schemas) == 0 {
-		if hasRustFunctions(functions) {
-			return nil // scaffolding was the work
-		}
+	if (manifest == nil || len(manifest.Schemas) == 0) && !hasRustFunctions(functions) {
 		return fmt.Errorf("nothing to generate — no Rust Lambdas or DSQL schemas found in your program")
 	}
 
-	if err := runGenerateTargets(projectRoot, targets, manifestEntries(manifest), "Generated"); err != nil {
+	if err := generateProject(projectRoot, targets, functions, manifest, "Generated"); err != nil {
 		return err
 	}
 
-	// Remember an explicit invocation so future bare runs and the post-deploy
-	// refresh reproduce the same language/path. Non-fatal on failure.
+	// Remember an explicit invocation so future bare runs and every deploy
+	// reproduce the same language/path. Non-fatal on failure.
 	if explicit {
 		saved, _ := loadGenerateTargets(projectRoot, stage)
 		for _, t := range targets {
