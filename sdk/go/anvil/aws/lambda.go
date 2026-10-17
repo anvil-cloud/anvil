@@ -34,9 +34,6 @@ func NewLambda(ctx *pulumi.Context,
 		return nil, errors.New("missing one or more required arguments")
 	}
 
-	if args.Handler == nil {
-		return nil, errors.New("invalid value for required argument 'Handler'")
-	}
 	if args.Runtime == nil {
 		return nil, errors.New("invalid value for required argument 'Runtime'")
 	}
@@ -54,12 +51,10 @@ type lambdaArgs struct {
 	Architecture *LambdaArchitecture `pulumi:"architecture"`
 	// Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
 	Encryption *string `pulumi:"encryption"`
-	// Path to the function's entry point file, relative to the project root. e.g. "functions/api/index.ts". Omit to deploy a blank Lambda placeholder.
-	Entry *string `pulumi:"entry"`
 	// Environment variables available to the function at runtime. Supports plain strings and Pulumi outputs.
 	Environment map[string]string `pulumi:"environment"`
-	// The exported function name in the entry file. e.g. "handler" for `export const handler = ...`
-	Handler string           `pulumi:"handler"`
+	// Where the function's code is, relative to the project root, in the usual Lambda form. Node: <file without extension>.<export>, e.g. "functions/api/index.handler" for `export const handler` in functions/api/index.ts; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
+	Handler *string          `pulumi:"handler"`
 	Hatch   *LambdaHatchArgs `pulumi:"hatch"`
 	// CloudWatch log group retention period. Default: "1y" (satisfies SOC 2, ISO 27001, PCI-DSS baseline).
 	LogRetention *LambdaLogRetention `pulumi:"logRetention"`
@@ -67,7 +62,7 @@ type lambdaArgs struct {
 	Memory *int `pulumi:"memory"`
 	// Inline IAM permissions added to the execution role. Use for ad-hoc access not covered by the grant system.
 	Permissions []LambdaPermission `pulumi:"permissions"`
-	// The Lambda runtime identifier.
+	// The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
 	Runtime LambdaRuntime `pulumi:"runtime"`
 	// Timeout in seconds. Valid: 1 to 900. Default: 5.
 	Timeout *int `pulumi:"timeout"`
@@ -85,12 +80,10 @@ type LambdaArgs struct {
 	Architecture LambdaArchitecturePtrInput
 	// Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
 	Encryption pulumi.StringPtrInput
-	// Path to the function's entry point file, relative to the project root. e.g. "functions/api/index.ts". Omit to deploy a blank Lambda placeholder.
-	Entry pulumi.StringPtrInput
 	// Environment variables available to the function at runtime. Supports plain strings and Pulumi outputs.
 	Environment pulumi.StringMapInput
-	// The exported function name in the entry file. e.g. "handler" for `export const handler = ...`
-	Handler pulumi.StringInput
+	// Where the function's code is, relative to the project root, in the usual Lambda form. Node: <file without extension>.<export>, e.g. "functions/api/index.handler" for `export const handler` in functions/api/index.ts; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
+	Handler pulumi.StringPtrInput
 	Hatch   LambdaHatchArgsPtrInput
 	// CloudWatch log group retention period. Default: "1y" (satisfies SOC 2, ISO 27001, PCI-DSS baseline).
 	LogRetention LambdaLogRetentionPtrInput
@@ -98,7 +91,7 @@ type LambdaArgs struct {
 	Memory pulumi.IntPtrInput
 	// Inline IAM permissions added to the execution role. Use for ad-hoc access not covered by the grant system.
 	Permissions LambdaPermissionArrayInput
-	// The Lambda runtime identifier.
+	// The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
 	Runtime LambdaRuntimeInput
 	// Timeout in seconds. Valid: 1 to 900. Default: 5.
 	Timeout pulumi.IntPtrInput

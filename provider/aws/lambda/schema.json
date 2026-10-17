@@ -10,10 +10,6 @@
           "description": "Upgrade environment variable encryption to SSE-KMS. Set to \"kms\" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch[\"lambda\"].",
           "type": "string"
         },
-        "entry": {
-          "description": "Path to the function's entry point file, relative to the project root. e.g. \"functions/api/index.ts\". Omit to deploy a blank Lambda placeholder.",
-          "type": "string"
-        },
         "environment": {
           "additionalProperties": {
             "type": "string"
@@ -22,7 +18,7 @@
           "type": "object"
         },
         "handler": {
-          "description": "The exported function name in the entry file. e.g. \"handler\" for `export const handler = ...`",
+          "description": "Where the function's code is, relative to the project root, in the usual Lambda form. Node: \u003cfile without extension\u003e.\u003cexport\u003e, e.g. \"functions/api/index.handler\" for `export const handler` in functions/api/index.ts; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. \"functions/api\".",
           "type": "string"
         },
         "hatch": {
@@ -45,7 +41,7 @@
         },
         "runtime": {
           "$ref": "#/types/anvil:aws:LambdaRuntime",
-          "description": "The Lambda runtime identifier."
+          "description": "The Lambda runtime. \"rust\" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry."
         },
         "timeout": {
           "description": "Timeout in seconds. Valid: 1 to 900. Default: 5.",
@@ -93,8 +89,7 @@
         "roleArn"
       ],
       "requiredInputs": [
-        "runtime",
-        "handler"
+        "runtime"
       ]
     }
   },
@@ -444,6 +439,10 @@
         {
           "description": "Node.js 22 (LTS)",
           "value": "nodejs22.x"
+        },
+        {
+          "description": "Rust on provided.al2023, built with cargo lambda. Requires entry.",
+          "value": "rust"
         }
       ],
       "type": "string"

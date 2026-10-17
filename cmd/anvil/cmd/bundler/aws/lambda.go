@@ -31,7 +31,7 @@ func BuildLambda(functionName, entryPoint, architecture string, forceCache bool)
 	// No entry point — deploy a minimal handler returning 200.
 	if entryPoint == "" {
 		blank := bundler.BlankBundle()
-		if err := bundler.ZipFile(zipPath, "index.js", blank.JS); err != nil {
+		if err := bundler.ZipFile(zipPath, "index.js", blank.JS, 0o644); err != nil {
 			return nil, fmt.Errorf("failed to create blank zip for %s: %w", functionName, err)
 		}
 		return &BuildResult{FunctionName: functionName, ZipPath: zipPath}, nil
@@ -79,7 +79,7 @@ func BuildLambda(functionName, entryPoint, architecture string, forceCache bool)
 	// ── Zip ────────────────────────────────────────────
 	// AWS Lambda expects the handler file at the root of the zip.
 	// esbuild produces a single bundled file — always named index.js.
-	if err := bundler.ZipFile(zipPath, "index.js", result.JS); err != nil {
+	if err := bundler.ZipFile(zipPath, "index.js", result.JS, 0o644); err != nil {
 		return nil, fmt.Errorf("failed to zip %s: %w", functionName, err)
 	}
 

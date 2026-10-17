@@ -49,6 +49,26 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("function discovery failed: %w", err)
 	}
 
+	// ── Step 1b: Generate ──────────────────────────────
+	// Before the build, so it bundles current code: typed database clients
+	// (incl. the gen/db crate Rust Lambdas use) from the schemas discovery
+	// just read, and packages for any declared Rust Lambda that doesn't exist
+	// yet. Existing user code is never touched.
+	projectRoot, err := findProjectRoot()
+	if err != nil {
+		return err
+	}
+	discovered, err := readFullManifest()
+	if err != nil {
+		return err
+	}
+	// Fails only with nothing saved and no detectable language; Rust Lambdas
+	// still get gen/db, since generateProject adds the Rust target.
+	targets, _ := generateTargetsFor(projectRoot, stage, false)
+	if err := generateProject(projectRoot, targets, functions, discovered, "Updated"); err != nil {
+		return fmt.Errorf("generate failed: %w", err)
+	}
+
 	// ── Step 2: Load real deploy stack ────────────────
 	s, err := loadStack(ctx, stage)
 	if err != nil {
@@ -142,13 +162,6 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 	// Fire and forget: a scan failure never fails a completed deploy.
 	if compliance != nil && compliance.ScanOnDeploy {
 		startDeployScan(ctx, stage, compliance)
-	}
-
-	// ── Step 6: Refresh generated types ───────────────
-	// Re-read the manifest written during discovery (step 1) and regenerate
-	// typed database client code so generated types stay in sync after deploy.
-	if manifest, err := readFullManifest(); err == nil && manifest != nil && len(manifest.Schemas) > 0 {
-		refreshGeneratedTypes(manifest, stage)
 	}
 
 	return nil

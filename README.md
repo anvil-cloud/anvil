@@ -56,8 +56,7 @@ export default new anvil.App({
 
     const handler = new anvil.aws.Lambda('orders', {
       runtime: 'nodejs22.x',
-      entry: 'functions/orders.ts',
-      handler: 'handler',
+      handler: 'functions/orders.handler',
       environment: { DSQL_ENDPOINT: db.endpoint },
     });
     db.grantConnect(handler, { schemas: [{ schema: 'shop', roleName: 'app_role' }] });
@@ -110,8 +109,7 @@ run(ctx) {
 
   const resize = new anvil.aws.Lambda('resize', {
     runtime: 'nodejs22.x',
-    entry: 'functions/resize/index.ts',
-    handler: 'handler',
+    handler: 'functions/resize/index.handler',
   });
 
   // Read-only, and objects only under incoming/

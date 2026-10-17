@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/anvil-cloud/anvil/cmd/anvil/cmd/bundler"
 	awsbundler "github.com/anvil-cloud/anvil/cmd/anvil/cmd/bundler/aws"
 	"github.com/pulumi/pulumi/sdk/v3/go/auto"
 	"github.com/pulumi/pulumi/sdk/v3/go/auto/optpreview"
@@ -21,8 +22,8 @@ type FunctionSpec struct {
 	Name         string `json:"name"`
 	Type         string `json:"type"`
 	Runtime      string `json:"runtime"`
-	Entry        string `json:"entry"`
 	Handler      string `json:"handler"`
+	Entry        string `json:"entry"`
 	Architecture string `json:"architecture"`
 }
 
@@ -174,7 +175,16 @@ func buildFunctions(functions []FunctionSpec, forceCache bool, partial bool) (ma
 	artifacts := make(map[string]string)
 	var errs []error
 
+	// Rust functions build together: one cargo lambda run per workspace and
+	// architecture, so they're collected and built after the loop.
+	var rust []awsbundler.RustFunction
+
 	for _, fn := range functions {
+		if fn.Type == "anvil:aws:Lambda" && fn.Runtime == rustRuntime {
+			rust = append(rust, awsbundler.RustFunction{Name: fn.Name, Handler: fn.Entry, Architecture: fn.Architecture})
+			continue
+		}
+
 		result, err := buildFunction(fn, forceCache)
 		if err != nil {
 			errs = append(errs, fmt.Errorf("%s: %w", fn.Name, err))
@@ -186,6 +196,30 @@ func buildFunctions(functions []FunctionSpec, forceCache bool, partial bool) (ma
 		artifacts[fn.Name] = result.ZipPath
 	}
 
+	// --force-cache reuses existing artifacts for Rust too.
+	if forceCache {
+		var unbuilt []awsbundler.RustFunction
+		for _, fn := range rust {
+			zipPath := bundler.ZipFilePath(fn.Name)
+			if _, err := os.Stat(zipPath); err == nil {
+				fmt.Printf("  ⚡ %s — --force-cache skipping rebuild\n", fn.Name)
+				artifacts[fn.Name] = zipPath
+				continue
+			}
+			unbuilt = append(unbuilt, fn)
+		}
+		rust = unbuilt
+	}
+
+	results, failed := awsbundler.BuildRustLambdas(rust)
+	for _, fn := range rust { // manifest order, so errors print stably
+		if err, ok := failed[fn.Name]; ok {
+			errs = append(errs, fmt.Errorf("%s: %w", fn.Name, err))
+			continue
+		}
+		artifacts[fn.Name] = results[fn.Name].ZipPath
+	}
+
 	return artifacts, errs
 }
 
@@ -194,12 +228,20 @@ func buildFunctions(functions []FunctionSpec, forceCache bool, partial bool) (ma
 func buildFunction(fn FunctionSpec, forceCache bool) (*awsbundler.BuildResult, error) {
 	switch {
 	case fn.Type == "anvil:aws:Lambda" && isNodeRuntime(fn.Runtime):
-		return awsbundler.BuildLambda(fn.Name, fn.Entry, fn.Architecture, forceCache)
+		// The manifest's entry is the handler's path without extension.
+		entryFile, err := bundler.ResolveNodeEntry(fn.Entry)
+		if err != nil {
+			return nil, fmt.Errorf("handler %q: %w", fn.Handler, err)
+		}
+		return awsbundler.BuildLambda(fn.Name, entryFile, fn.Architecture, forceCache)
 
 	default:
 		return nil, fmt.Errorf("unsupported runtime %q for type %q", fn.Runtime, fn.Type)
 	}
 }
+
+// rustRuntime is the Lambda runtime value for Rust functions.
+const rustRuntime = "rust"
 
 // isNodeRuntime returns true for Node.js runtime identifiers.
 func isNodeRuntime(runtime string) bool {

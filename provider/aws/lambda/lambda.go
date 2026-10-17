@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
+	"strings"
 
 	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
@@ -123,17 +125,18 @@ func (t *lambdaEndpointTarget) SecurityGroupOutput() pulumi.StringOutput {
 
 // LambdaArgs defines the inputs for an Anvil-managed Lambda function.
 type LambdaArgs struct {
-	// Entry is the path to the function's entry point file, relative to
-	// the anvil.config.ts directory. e.g. "backend/index.ts".
-	// Omit to deploy a blank Lambda placeholder.
-	Entry string `pulumi:"entry,optional"`
-
-	// Runtime is the Lambda runtime identifier. e.g. "nodejs24.x"
-	Runtime string `pulumi:"runtime,optional"`
-
-	// Handler is the exported function name in the entry file.
-	// e.g. "handler" for a function exported as `export const handler = ...`
+	// Handler says where the function's code is, relative to the
+	// anvil.config.ts directory, in the usual Lambda form.
+	//   Node: "<file without extension>.<export>",
+	//         e.g. "functions/api/index.handler" for `export const handler`
+	//         in functions/api/index.ts. Omit to deploy a blank placeholder.
+	//   Rust: required. A Cargo package directory or a .rs file,
+	//         e.g. "functions/api".
 	Handler string `pulumi:"handler,optional"`
+
+	// Runtime is the Lambda runtime: a Node identifier such as "nodejs24.x",
+	// or "rust" (see rustRuntime).
+	Runtime string `pulumi:"runtime,optional"`
 
 	// Memory is the amount of memory in MB. Default: 1024.
 	Memory int `pulumi:"memory,optional"`
@@ -243,10 +246,121 @@ const blankHandler = `exports.handler = async () => ({
 });
 `
 
+// Lambda has no managed Rust runtime: a Rust function is an executable named
+// bootstrap, run on the OS-only provided.al2023 runtime. Users write
+// runtime: "rust"; the CLI builds the bootstrap with cargo lambda.
+const (
+	rustRuntime       = "rust"
+	rustLambdaRuntime = "provided.al2023"
+	rustHandler       = "bootstrap"
+)
+
+// validateArgs rejects argument combinations that can't be deployed. It runs
+// in build mode too, so mistakes surface during discovery, before any build.
+func validateArgs(name string, args LambdaArgs) error {
+	if args.Runtime == rustRuntime {
+		if args.Handler == "" {
+			return fmt.Errorf("lambda %q: runtime %q requires handler, e.g. handler: \"functions/%s\"", name, rustRuntime, name)
+		}
+		return nil
+	}
+
+	if args.Handler != "" {
+		if _, _, err := parseNodeHandler(args.Handler); err != nil {
+			return fmt.Errorf("lambda %q: %w", name, err)
+		}
+	}
+	return nil
+}
+
+// nodeExtensions are the source extensions a Node handler's file can have.
+// A handler is written without one, so a handler ending in one of these is
+// almost certainly the file path by mistake.
+var nodeExtensions = map[string]bool{
+	"ts": true, "tsx": true, "mts": true, "cts": true,
+	"js": true, "jsx": true, "mjs": true, "cjs": true,
+}
+
+var jsIdentifier = regexp.MustCompile(`^[A-Za-z_$][A-Za-z0-9_$]*$`)
+
+// parseNodeHandler splits a Node handler "functions/api/index.handler" into
+// the source path without extension ("functions/api/index") and the export
+// name ("handler").
+func parseNodeHandler(handler string) (path, export string, err error) {
+	dot := strings.LastIndex(handler, ".")
+	// The dot must be inside the file name (after the last "/"), with a
+	// non-empty name before it and an export after it.
+	if dot <= strings.LastIndex(handler, "/")+1 || dot == len(handler)-1 {
+		return "", "", fmt.Errorf("handler %q must be <file>.<export>, e.g. \"functions/api/index.handler\"", handler)
+	}
+
+	path, export = handler[:dot], handler[dot+1:]
+	if nodeExtensions[export] {
+		return "", "", fmt.Errorf("handler %q ends in a file extension; write the export name instead, e.g. \"%s.handler\"", handler, path)
+	}
+	if !jsIdentifier.MatchString(export) {
+		return "", "", fmt.Errorf("handler %q: %q is not a valid export name", handler, export)
+	}
+	return path, export, nil
+}
+
+// codePath is the code location the CLI builds from: the source path without
+// extension for Node (the CLI finds the file), or the handler as-is for Rust.
+func codePath(args LambdaArgs) string {
+	if args.Runtime == rustRuntime {
+		return args.Handler
+	}
+	path, _, _ := parseNodeHandler(args.Handler) // validated in validateArgs
+	return path
+}
+
+// resolveRuntime maps the user's runtime and handler to the runtime and
+// handler Lambda expects. The Node bundle is always index.js, so only the
+// export name carries over; Rust is always the bootstrap executable.
+func resolveRuntime(args LambdaArgs) (runtime, handler string) {
+	if args.Runtime == rustRuntime {
+		return rustLambdaRuntime, rustHandler
+	}
+
+	export := "handler" // the blank placeholder's export
+	if args.Handler != "" {
+		_, export, _ = parseNodeHandler(args.Handler) // validated in validateArgs
+	}
+	return args.Runtime, "index." + export
+}
+
+// codeArchive returns the function's deployment package: the zip the CLI
+// built, or a placeholder when there is none.
+func codeArchive(ctx *pulumi.Context, name string, args LambdaArgs, zipPath string) (pulumi.Archive, error) {
+	if zipPath != "" {
+		return pulumi.NewFileArchive(zipPath), nil
+	}
+
+	if args.Runtime == rustRuntime {
+		// A Rust function always has a handler, so a missing zip means it was
+		// never built. A preview can still show the plan; a deploy must not
+		// ship a function that can't start.
+		if ctx.DryRun() {
+			return pulumi.NewAssetArchive(map[string]interface{}{
+				rustHandler: pulumi.NewStringAsset(""),
+			}), nil
+		}
+		return nil, fmt.Errorf("lambda %q: no build artifact for this Rust function — deploy with anvil deploy, which builds it first", name)
+	}
+
+	return pulumi.NewAssetArchive(map[string]interface{}{
+		"index.js": pulumi.NewStringAsset(blankHandler),
+	}), nil
+}
+
 func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi.ResourceOption) (*Lambda, error) {
+	if err := validateArgs(name, args); err != nil {
+		return nil, err
+	}
+
 	if os.Getenv("ANVIL_BUILD_MODE") == "true" {
 		l := &Lambda{name: name}
-		if args.Entry != "" {
+		if args.Handler != "" {
 			if err := appendToManifest(name, args); err != nil {
 				return nil, fmt.Errorf("build manifest write failed for %s: %w", name, err)
 			}
@@ -306,12 +420,7 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 		architecture = "arm64"
 	}
 
-	runtime := args.Runtime
-
-	handler := args.Handler
-	if handler == "" {
-		handler = "handler"
-	}
+	runtime, handler := resolveRuntime(args)
 
 	logRetentionDays := resolveDays(args.LogRetention)
 
@@ -491,13 +600,9 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 	}
 
 	// ── 6. Lambda Function ─────────────────────────────
-	var codeArchive pulumi.Archive
-	if zipPath != "" {
-		codeArchive = pulumi.NewFileArchive(zipPath)
-	} else {
-		codeArchive = pulumi.NewAssetArchive(map[string]interface{}{
-			"index.js": pulumi.NewStringAsset(blankHandler),
-		})
+	code, err := codeArchive(ctx, name, args, zipPath)
+	if err != nil {
+		return nil, err
 	}
 
 	lambdaMap := pulumi.Map{
@@ -508,7 +613,7 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 		"memorySize":    pulumi.Int(memory),
 		"timeout":       pulumi.Int(timeout),
 		"architectures": pulumi.StringArray{pulumi.String(architecture)},
-		"code":          codeArchive,
+		"code":          code,
 		"tracingConfig": pulumi.Map{
 			"mode": pulumi.String(tracingMode),
 		},
@@ -594,11 +699,12 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 // ── Build manifest ─────────────────────────────────────────
 
 type manifestEntry struct {
-	Name         string `json:"name"`
-	Type         string `json:"type"`
-	Runtime      string `json:"runtime"`
+	Name    string `json:"name"`
+	Type    string `json:"type"`
+	Runtime string `json:"runtime"`
+	Handler string `json:"handler"`
+	// Entry is the code location the CLI builds from (see codePath).
 	Entry        string `json:"entry"`
-	Handler      string `json:"handler"`
 	Architecture string `json:"architecture"`
 }
 
@@ -636,8 +742,8 @@ func appendToManifest(name string, args LambdaArgs) error {
 		Name:         name,
 		Type:         "anvil:aws:Lambda",
 		Runtime:      args.Runtime,
-		Entry:        args.Entry,
 		Handler:      args.Handler,
+		Entry:        codePath(args),
 		Architecture: architecture,
 	})
 

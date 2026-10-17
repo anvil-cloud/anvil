@@ -52,8 +52,7 @@ func main() {
 
             fn, err := anvilaws.NewLambda(ctx.PulumiCtx(), "processor", &anvilaws.LambdaArgs{
                 Runtime: pulumi.String("nodejs20.x"),
-                Handler: pulumi.String("index.handler"),
-                Code:    pulumi.String("./src"),
+                Handler: pulumi.String("src/index.handler"),
             })
             if err != nil {
                 return err

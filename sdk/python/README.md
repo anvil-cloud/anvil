@@ -36,7 +36,7 @@ its **logical name** — even one declared **later** in the program:
 def infra(ctx: anvil.Context):
     fn = anvil.aws.Lambda("processor",
         runtime=LambdaRuntime.NODEJS20_X,
-        handler="index.handler",
+        handler="src/index.handler",
         environment={
             # forward reference — `db` is declared below
             "DSQL_ENDPOINT": ctx.ref("db").endpoint,
@@ -77,8 +77,7 @@ def infra(ctx: anvil.Context):
 
     fn = anvil.aws.Lambda("processor",
         runtime="nodejs20.x",
-        handler="index.handler",
-        code="./src",
+        handler="src/index.handler",
     )
 
     # Grants the Lambda read access to the bucket and scopes down to specific bucket paths.
