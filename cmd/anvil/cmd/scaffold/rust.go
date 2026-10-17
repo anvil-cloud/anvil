@@ -11,7 +11,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -21,9 +20,12 @@ type RustFunction struct {
 	Handler string // package directory or .rs file, relative to the project root
 }
 
-// minRustVersion is the oldest toolchain the generated workspace supports:
-// edition 2024 needs 1.85 (lambda_runtime itself needs 1.84).
-var minRustVersion = [3]int{1, 85, 0}
+// pinnedRustVersion is the toolchain new workspaces pin in
+// rust-toolchain.toml (and their rust-version). Fixed rather than copied from
+// the host's rustc, so every new project starts on the same Rust; rustup
+// installs it on first use. Bump it deliberately with Anvil releases. It
+// must stay >= 1.85 (edition 2024).
+const pinnedRustVersion = "1.99.1"
 
 // Hooks for tests.
 var (
@@ -39,13 +41,6 @@ var (
 			return fmt.Errorf("cargo %s failed: %s", args[0], strings.TrimSpace(stderr.String()))
 		}
 		return nil
-	}
-	rustcVersion = func() (string, error) {
-		out, err := exec.Command("rustc", "--version").Output()
-		if err != nil {
-			return "", fmt.Errorf("Rust Lambdas need the Rust toolchain (rustc not found): https://rustup.rs")
-		}
-		return string(out), nil
 	}
 )
 
@@ -189,19 +184,14 @@ func (s *rustScaffolder) ensureWorkspace(path string) (string, error) {
 			"Add a [workspace] section to it (with the Lambda packages in members), or move it into its own directory")
 	}
 
-	version, err := toolchainVersion()
-	if err != nil {
-		return "", err
-	}
-
-	if err := os.WriteFile(rootManifest, []byte(workspaceManifest(version)), 0o644); err != nil {
+	if err := os.WriteFile(rootManifest, []byte(workspaceManifest(pinnedRustVersion)), 0o644); err != nil {
 		return "", err
 	}
 	s.note("Cargo.toml (workspace)")
 
 	toolchain := filepath.Join(s.root, "rust-toolchain.toml")
 	if !exists(toolchain) {
-		if err := os.WriteFile(toolchain, []byte(toolchainFile(version)), 0o644); err != nil {
+		if err := os.WriteFile(toolchain, []byte(toolchainFile(pinnedRustVersion)), 0o644); err != nil {
 			return "", err
 		}
 		s.note("rust-toolchain.toml")
@@ -339,34 +329,6 @@ func packageAbove(file string) (string, error) {
 			return "", fmt.Errorf("no package found")
 		}
 	}
-}
-
-// ── Toolchain ──────────────────────────────────────────────
-
-var rustcVersionRe = regexp.MustCompile(`rustc (\d+)\.(\d+)\.(\d+)`)
-
-// toolchainVersion is the host's rustc version, which the generated
-// rust-toolchain.toml pins: it's already installed, and it's what the user
-// is developing with. It must be new enough for edition 2024.
-func toolchainVersion() (string, error) {
-	out, err := rustcVersion()
-	if err != nil {
-		return "", err
-	}
-	m := rustcVersionRe.FindStringSubmatch(out)
-	if m == nil {
-		return "", fmt.Errorf("could not read the Rust version from %q", strings.TrimSpace(out))
-	}
-
-	var v [3]int
-	for i := range v {
-		v[i], _ = strconv.Atoi(m[i+1])
-	}
-	if v[0] < minRustVersion[0] || (v[0] == minRustVersion[0] && v[1] < minRustVersion[1]) {
-		return "", fmt.Errorf("Rust %d.%d.%d is too old for Rust Lambdas (edition 2024 needs %d.%d or newer): run `rustup update`",
-			v[0], v[1], v[2], minRustVersion[0], minRustVersion[1])
-	}
-	return fmt.Sprintf("%d.%d.%d", v[0], v[1], v[2]), nil
 }
 
 // ── .gitignore ─────────────────────────────────────────────

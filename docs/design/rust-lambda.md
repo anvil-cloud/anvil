@@ -291,10 +291,14 @@ targets = ["aarch64-unknown-linux-gnu", "x86_64-unknown-linux-gnu"]
   is too old for its bundled rust-analyzer; rustup installs the listed
   components on first use.
 
-- **Pinned,** so laptop and CI compile with the same Rust. Anvil pins the
-  host's current `rustc` version (already installed, and what the user
-  develops with) when it creates the file, and never bumps it afterwards.
-  Older than 1.85 is an error asking for `rustup update`.
+- **Pinned,** so laptop and CI compile with the same Rust: a fixed version
+  in Anvil (`pinnedRustVersion`, currently 1.99.1), not the host's `rustc`,
+  so every new project starts on the same toolchain. rustup installs it on
+  first use; Anvil bumps it deliberately and never edits an existing file.
+- **Requires cargo-lambda ≥ 1.9.2** for arm64: Rust 1.99 passes
+  `-Wl,--fix-cortex-a53-843419` when linking aarch64-linux, which older
+  cargo-zigbuild (cargo-lambda 1.8.x bundles 0.19.7) hands to Zig, and Zig
+  rejects it. The pinned Docker image is 1.9.2.
 - **`targets`** makes rustup install the cross-compile targets automatically;
   otherwise the first build fails until the user installs them.
 - **Overriding:** the file is user-owned (create-only), so editing `channel`

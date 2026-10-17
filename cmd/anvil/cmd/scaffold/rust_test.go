@@ -11,12 +11,12 @@ import (
 // stubCargo replaces cargo with a fake that records calls; `cargo init`
 // creates what the real one would (Cargo.toml + hello-world main.rs, unless
 // main.rs exists).
-func stubCargo(t *testing.T, rustc string) *[][]string {
+func stubCargo(t *testing.T) *[][]string {
 	t.Helper()
 	var calls [][]string
 
-	origCargo, origRustc := runCargo, rustcVersion
-	t.Cleanup(func() { runCargo, rustcVersion = origCargo, origRustc })
+	origCargo := runCargo
+	t.Cleanup(func() { runCargo = origCargo })
 
 	runCargo = func(dir string, args ...string) error {
 		calls = append(calls, args)
@@ -35,7 +35,6 @@ func stubCargo(t *testing.T, rustc string) *[][]string {
 		}
 		return nil
 	}
-	rustcVersion = func() (string, error) { return rustc, nil }
 	return &calls
 }
 
@@ -60,7 +59,7 @@ func read(t *testing.T, path string) string {
 
 func TestRustCreatesWorkspaceAndPackages(t *testing.T) {
 	root := t.TempDir()
-	calls := stubCargo(t, "rustc 1.93.1 (01f6ddf75 2026-02-11)\n")
+	calls := stubCargo(t)
 	write(t, filepath.Join(root, ".gitignore"), ".anvil/\nnode_modules/") // no trailing newline
 
 	created, err := Rust(root, []RustFunction{
@@ -77,7 +76,7 @@ func TestRustCreatesWorkspaceAndPackages(t *testing.T) {
 	}
 
 	manifest := read(t, filepath.Join(root, "Cargo.toml"))
-	for _, s := range []string{`resolver = "3"`, `edition = "2024"`, `rust-version = "1.93.1"`, `lambda_runtime = { version = "1", features = ["tracing"] }`} {
+	for _, s := range []string{`resolver = "3"`, `edition = "2024"`, `rust-version = "1.99.1"`, `lambda_runtime = { version = "1", features = ["tracing"] }`} {
 		if !strings.Contains(manifest, s) {
 			t.Errorf("workspace Cargo.toml missing %q", s)
 		}
@@ -85,7 +84,7 @@ func TestRustCreatesWorkspaceAndPackages(t *testing.T) {
 	if strings.Contains(manifest, "[profile.release]") {
 		t.Error("workspace Cargo.toml must not set a release profile (cargo lambda's defaults apply)")
 	}
-	if tc := read(t, filepath.Join(root, "rust-toolchain.toml")); !strings.Contains(tc, `channel = "1.93.1"`) || !strings.Contains(tc, "aarch64-unknown-linux-gnu") ||
+	if tc := read(t, filepath.Join(root, "rust-toolchain.toml")); !strings.Contains(tc, `channel = "1.99.1"`) || !strings.Contains(tc, "aarch64-unknown-linux-gnu") ||
 		!strings.Contains(tc, `components = ["rust-analyzer", "rustfmt", "clippy"]`) {
 		t.Errorf("rust-toolchain.toml = %q", tc)
 	}
@@ -106,7 +105,7 @@ func TestRustCreatesWorkspaceAndPackages(t *testing.T) {
 
 func TestRustSkipsExistingCode(t *testing.T) {
 	root := t.TempDir()
-	calls := stubCargo(t, "rustc 1.93.1\n")
+	calls := stubCargo(t)
 	write(t, filepath.Join(root, "Cargo.toml"), "[workspace]\nmembers = [\"functions/api\"]\n")
 	write(t, filepath.Join(root, "functions/api/Cargo.toml"), "[package]\nname = \"api\"\n")
 	write(t, filepath.Join(root, "functions/api/src/main.rs"), "// user code\n")
@@ -125,7 +124,7 @@ func TestRustSkipsExistingCode(t *testing.T) {
 
 func TestRustJoinsExistingWorkspace(t *testing.T) {
 	root := t.TempDir()
-	calls := stubCargo(t, "rustc 1.93.1\n")
+	calls := stubCargo(t)
 	userManifest := "# user's workspace\n[workspace]\nmembers = []\n"
 	write(t, filepath.Join(root, "Cargo.toml"), userManifest)
 
@@ -157,7 +156,7 @@ func TestRustJoinsExistingWorkspace(t *testing.T) {
 
 func TestRustKeepsAnExistingMainRS(t *testing.T) {
 	root := t.TempDir()
-	stubCargo(t, "rustc 1.93.1\n")
+	stubCargo(t)
 	write(t, filepath.Join(root, "functions/api/src/main.rs"), "// started by hand\n")
 
 	if _, err := Rust(root, []RustFunction{{Name: "api", Handler: "functions/api"}}, RustOptions{}); err != nil {
@@ -170,7 +169,7 @@ func TestRustKeepsAnExistingMainRS(t *testing.T) {
 
 func TestRustStopsOnRootPackage(t *testing.T) {
 	root := t.TempDir()
-	calls := stubCargo(t, "rustc 1.93.1\n")
+	calls := stubCargo(t)
 	write(t, filepath.Join(root, "Cargo.toml"), "[package]\nname = \"app\"\n")
 
 	_, err := Rust(root, []RustFunction{{Name: "api", Handler: "functions/api"}}, RustOptions{})
@@ -188,7 +187,7 @@ func TestRustStopsOnRootPackage(t *testing.T) {
 func TestRustBinFile(t *testing.T) {
 	t.Run("created inside an existing package", func(t *testing.T) {
 		root := t.TempDir()
-		calls := stubCargo(t, "rustc 1.93.1\n")
+		calls := stubCargo(t)
 		write(t, filepath.Join(root, "functions/tools/Cargo.toml"), "[package]\nname = \"tools\"\n")
 
 		created, err := Rust(root, []RustFunction{{Name: "sync", Handler: "functions/tools/src/bin/sync.rs"}}, RustOptions{})
@@ -208,42 +207,13 @@ func TestRustBinFile(t *testing.T) {
 
 	t.Run("no package to put it in", func(t *testing.T) {
 		root := t.TempDir()
-		stubCargo(t, "rustc 1.93.1\n")
+		stubCargo(t)
 
 		_, err := Rust(root, []RustFunction{{Name: "sync", Handler: "functions/tools/src/bin/sync.rs"}}, RustOptions{})
 		if err == nil || !strings.Contains(err.Error(), `point handler at a package directory (e.g. "functions/sync")`) {
 			t.Fatalf("error = %v", err)
 		}
 	})
-}
-
-func TestToolchainVersion(t *testing.T) {
-	tests := []struct {
-		rustc   string
-		want    string
-		wantErr string
-	}{
-		{"rustc 1.93.1 (01f6ddf75 2026-02-11)", "1.93.1", ""},
-		{"rustc 1.85.0 (4d91de4e4 2025-02-17)", "1.85.0", ""},
-		{"rustc 2.0.0", "2.0.0", ""},
-		{"rustc 1.84.1 (e71f9a9a9 2025-01-27)", "", "too old"},
-		{"something else", "", "could not read the Rust version"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.rustc, func(t *testing.T) {
-			stubCargo(t, tt.rustc)
-			got, err := toolchainVersion()
-			if tt.wantErr != "" {
-				if err == nil || !strings.Contains(err.Error(), tt.wantErr) {
-					t.Fatalf("error = %v, want %q", err, tt.wantErr)
-				}
-				return
-			}
-			if err != nil || got != tt.want {
-				t.Errorf("got %q, %v; want %q", got, err, tt.want)
-			}
-		})
-	}
 }
 
 func TestIgnoreTargetLeavesExistingRule(t *testing.T) {
@@ -257,7 +227,7 @@ func TestIgnoreTargetLeavesExistingRule(t *testing.T) {
 
 func TestRustAddsDBDependencyToNewPackagesOnly(t *testing.T) {
 	root := t.TempDir()
-	calls := stubCargo(t, "rustc 1.93.1\n")
+	calls := stubCargo(t)
 	write(t, filepath.Join(root, "Cargo.toml"), "[workspace]\nmembers = [\"functions/old\"]\n")
 	write(t, filepath.Join(root, "functions/old/Cargo.toml"), "[package]\nname = \"old\"\n")
 	db := filepath.Join(root, "gen", "db")
@@ -285,7 +255,7 @@ func TestRustAddsDBDependencyToNewPackagesOnly(t *testing.T) {
 func TestRustCrate(t *testing.T) {
 	t.Run("creates the workspace and joins it", func(t *testing.T) {
 		root := t.TempDir()
-		calls := stubCargo(t, "rustc 1.93.1\n")
+		calls := stubCargo(t)
 		db := filepath.Join(root, "gen", "db")
 
 		created, err := RustCrate(root, db)
@@ -303,7 +273,7 @@ func TestRustCrate(t *testing.T) {
 
 	t.Run("existing crate is left alone", func(t *testing.T) {
 		root := t.TempDir()
-		calls := stubCargo(t, "rustc 1.93.1\n")
+		calls := stubCargo(t)
 		write(t, filepath.Join(root, "gen/db/Cargo.toml"), "[package]\nname = \"db\"\n")
 
 		created, err := RustCrate(root, filepath.Join(root, "gen", "db"))
@@ -338,7 +308,7 @@ func TestPackageName(t *testing.T) {
 
 func TestRustNamesPackageAfterTheLambda(t *testing.T) {
 	root := t.TempDir()
-	calls := stubCargo(t, "rustc 1.93.1\n")
+	calls := stubCargo(t)
 
 	if _, err := Rust(root, []RustFunction{{Name: "testRust", Handler: "backend/functions/test"}}, RustOptions{}); err != nil {
 		t.Fatal(err)
