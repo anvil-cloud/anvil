@@ -17,34 +17,34 @@ from ._enums import *
 import pulumi_aws
 
 __all__ = [
-    'BucketAccelerateConfigurationTransformArgs',
-    'BucketAccelerateConfigurationTransformArgsDict',
-    'BucketAclTransformArgs',
-    'BucketAclTransformArgsDict',
-    'BucketCorsConfigurationTransformArgs',
-    'BucketCorsConfigurationTransformArgsDict',
-    'BucketLifecycleConfigurationTransformArgs',
-    'BucketLifecycleConfigurationTransformArgsDict',
-    'BucketLoggingTransformArgs',
-    'BucketLoggingTransformArgsDict',
-    'BucketObjectLockConfigurationTransformArgs',
-    'BucketObjectLockConfigurationTransformArgsDict',
+    'BucketAccelerateConfigurationHatchArgs',
+    'BucketAccelerateConfigurationHatchArgsDict',
+    'BucketAclHatchArgs',
+    'BucketAclHatchArgsDict',
+    'BucketCorsConfigurationHatchArgs',
+    'BucketCorsConfigurationHatchArgsDict',
+    'BucketHatchArgsArgs',
+    'BucketHatchArgsArgsDict',
+    'BucketLifecycleConfigurationHatchArgs',
+    'BucketLifecycleConfigurationHatchArgsDict',
+    'BucketLoggingHatchArgs',
+    'BucketLoggingHatchArgsDict',
+    'BucketObjectLockConfigurationHatchArgs',
+    'BucketObjectLockConfigurationHatchArgsDict',
     'BucketOverridesArgs',
     'BucketOverridesArgsDict',
-    'BucketPolicyTransformArgs',
-    'BucketPolicyTransformArgsDict',
-    'BucketReplicationConfigTransformArgs',
-    'BucketReplicationConfigTransformArgsDict',
-    'BucketRequestPaymentConfigurationTransformArgs',
-    'BucketRequestPaymentConfigurationTransformArgsDict',
-    'BucketServerSideEncryptionConfigurationTransformArgs',
-    'BucketServerSideEncryptionConfigurationTransformArgsDict',
-    'BucketTransformArgsArgs',
-    'BucketTransformArgsArgsDict',
-    'BucketVersioningTransformArgs',
-    'BucketVersioningTransformArgsDict',
-    'BucketWebsiteConfigurationTransformArgs',
-    'BucketWebsiteConfigurationTransformArgsDict',
+    'BucketPolicyHatchArgs',
+    'BucketPolicyHatchArgsDict',
+    'BucketReplicationConfigHatchArgs',
+    'BucketReplicationConfigHatchArgsDict',
+    'BucketRequestPaymentConfigurationHatchArgs',
+    'BucketRequestPaymentConfigurationHatchArgsDict',
+    'BucketServerSideEncryptionConfigurationHatchArgs',
+    'BucketServerSideEncryptionConfigurationHatchArgsDict',
+    'BucketVersioningHatchArgs',
+    'BucketVersioningHatchArgsDict',
+    'BucketWebsiteConfigurationHatchArgs',
+    'BucketWebsiteConfigurationHatchArgsDict',
     'CognitoUserPoolAppClientArgs',
     'CognitoUserPoolAppClientArgsDict',
     'CognitoUserPoolAttributesArgs',
@@ -53,6 +53,8 @@ __all__ = [
     'CognitoUserPoolCustomAttributeArgsDict',
     'CognitoUserPoolEmailConfigurationArgs',
     'CognitoUserPoolEmailConfigurationArgsDict',
+    'CognitoUserPoolHatchArgsArgs',
+    'CognitoUserPoolHatchArgsArgsDict',
     'CognitoUserPoolHostedUiArgs',
     'CognitoUserPoolHostedUiArgsDict',
     'CognitoUserPoolIdentityProviderArgs',
@@ -65,8 +67,6 @@ __all__ = [
     'CognitoUserPoolPasswordPolicyArgsDict',
     'CognitoUserPoolTokenValidityArgs',
     'CognitoUserPoolTokenValidityArgsDict',
-    'CognitoUserPoolTransformArgsArgs',
-    'CognitoUserPoolTransformArgsArgsDict',
     'CognitoUserPoolWafArgs',
     'CognitoUserPoolWafArgsDict',
     'DSQLBackupArgsArgs',
@@ -85,10 +85,10 @@ __all__ = [
     'DSQLTableArgsDict',
     'DSQLVpcArgsArgs',
     'DSQLVpcArgsArgsDict',
+    'DsqlHatchArgsArgs',
+    'DsqlHatchArgsArgsDict',
     'DsqlOverridesArgs',
     'DsqlOverridesArgsDict',
-    'DsqlTransformArgsArgs',
-    'DsqlTransformArgsArgsDict',
     'DynamoDBGlobalSecondaryIndexArgs',
     'DynamoDBGlobalSecondaryIndexArgsDict',
     'DynamoDBKeyAttributeArgs',
@@ -101,14 +101,14 @@ __all__ = [
     'DynamoDBStreamLambdaConsumerArgsDict',
     'DynamoDBStreamArgs',
     'DynamoDBStreamArgsDict',
+    'DynamoHatchArgsArgs',
+    'DynamoHatchArgsArgsDict',
     'DynamoOverridesArgs',
     'DynamoOverridesArgsDict',
-    'DynamoTransformArgsArgs',
-    'DynamoTransformArgsArgsDict',
+    'EventBridgeHatchArgsArgs',
+    'EventBridgeHatchArgsArgsDict',
     'EventBridgeOverridesArgs',
     'EventBridgeOverridesArgsDict',
-    'EventBridgeTransformArgsArgs',
-    'EventBridgeTransformArgsArgsDict',
     'EventBusLambdaTargetArgsArgs',
     'EventBusLambdaTargetArgsArgsDict',
     'EventBusRulePatternArgs',
@@ -137,30 +137,30 @@ __all__ = [
     'HttpApiStepFunctionsConsumerArgsDict',
     'HttpApiThrottlingArgs',
     'HttpApiThrottlingArgsDict',
+    'LambdaHatchArgsArgs',
+    'LambdaHatchArgsArgsDict',
     'LambdaOverridesArgs',
     'LambdaOverridesArgsDict',
     'LambdaPermissionArgs',
     'LambdaPermissionArgsDict',
-    'LambdaTransformArgsArgs',
-    'LambdaTransformArgsArgsDict',
     'LambdaVpcArgsArgs',
     'LambdaVpcArgsArgsDict',
     'LambdaVpcCidrArgsArgs',
     'LambdaVpcCidrArgsArgsDict',
     'LambdaVpcEndpointArgsArgs',
     'LambdaVpcEndpointArgsArgsDict',
-    'PABTransformArgs',
-    'PABTransformArgsDict',
+    'PABHatchArgs',
+    'PABHatchArgsDict',
     'QueueConsumerArgsArgs',
     'QueueConsumerArgsArgsDict',
     'QueueDlqArgsArgs',
     'QueueDlqArgsArgsDict',
+    'QueueHatchArgsArgs',
+    'QueueHatchArgsArgsDict',
     'QueueLambdaConsumerArgsArgs',
     'QueueLambdaConsumerArgsArgsDict',
     'QueueOverridesArgs',
     'QueueOverridesArgsDict',
-    'QueueTransformArgsArgs',
-    'QueueTransformArgsArgsDict',
     'SiteHstsArgs',
     'SiteHstsArgsDict',
     'SiteSecurityHeadersArgs',
@@ -179,6 +179,8 @@ __all__ = [
     'VpcNatArgsArgsDict',
     'VpcS3FlowLogArgsArgs',
     'VpcS3FlowLogArgsArgsDict',
+    'WafHatchArgsArgs',
+    'WafHatchArgsArgsDict',
     'WafLoggingArgsArgs',
     'WafLoggingArgsArgsDict',
     'WafManagedRulesArgsArgs',
@@ -187,11 +189,9 @@ __all__ = [
     'WafOverridesArgsDict',
     'WafRateLimitArgsArgs',
     'WafRateLimitArgsArgsDict',
-    'WafTransformArgsArgs',
-    'WafTransformArgsArgsDict',
 ]
 
-class BucketAccelerateConfigurationTransformArgsDict(TypedDict):
+class BucketAccelerateConfigurationHatchArgsDict(TypedDict):
     bucket: NotRequired[pulumi.Input[_builtins.str]]
     """
     Name of the bucket.
@@ -210,7 +210,7 @@ class BucketAccelerateConfigurationTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class BucketAccelerateConfigurationTransformArgs:
+class BucketAccelerateConfigurationHatchArgs:
     def __init__(__self__, *,
                  bucket: Optional[pulumi.Input[_builtins.str]] = None,
                  expected_bucket_owner: Optional[pulumi.Input[_builtins.str]] = None,
@@ -284,7 +284,7 @@ class BucketAccelerateConfigurationTransformArgs:
         pulumi.set(self, "status", value)
 
 
-class BucketAclTransformArgsDict(TypedDict):
+class BucketAclHatchArgsDict(TypedDict):
     access_control_policy: NotRequired[pulumi.Input['pulumi_aws.s3.BucketAclAccessControlPolicyArgsDict']]
     """
     Configuration block that sets the ACL permissions for an object per grantee. See below.
@@ -307,7 +307,7 @@ class BucketAclTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class BucketAclTransformArgs:
+class BucketAclHatchArgs:
     def __init__(__self__, *,
                  access_control_policy: Optional[pulumi.Input['pulumi_aws.s3.BucketAclAccessControlPolicyArgs']] = None,
                  acl: Optional[pulumi.Input[_builtins.str]] = None,
@@ -397,7 +397,7 @@ class BucketAclTransformArgs:
         pulumi.set(self, "region", value)
 
 
-class BucketCorsConfigurationTransformArgsDict(TypedDict):
+class BucketCorsConfigurationHatchArgsDict(TypedDict):
     bucket: NotRequired[pulumi.Input[_builtins.str]]
     """
     Name of the bucket.
@@ -416,7 +416,7 @@ class BucketCorsConfigurationTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class BucketCorsConfigurationTransformArgs:
+class BucketCorsConfigurationHatchArgs:
     def __init__(__self__, *,
                  bucket: Optional[pulumi.Input[_builtins.str]] = None,
                  cors_rules: Optional[pulumi.Input[Sequence[pulumi.Input['pulumi_aws.s3.BucketCorsConfigurationCorsRuleArgs']]]] = None,
@@ -490,7 +490,209 @@ class BucketCorsConfigurationTransformArgs:
         pulumi.set(self, "region", value)
 
 
-class BucketLifecycleConfigurationTransformArgsDict(TypedDict):
+class BucketHatchArgsArgsDict(TypedDict):
+    acceleration_status: NotRequired[pulumi.Input['BucketAccelerateConfigurationHatchArgsDict']]
+    acl: NotRequired[pulumi.Input['BucketAclHatchArgsDict']]
+    bucket: NotRequired[pulumi.Input['BucketOverridesArgsDict']]
+    cors_rules: NotRequired[pulumi.Input['BucketCorsConfigurationHatchArgsDict']]
+    grants: NotRequired[pulumi.Input['BucketAclHatchArgsDict']]
+    lifecycle_rules: NotRequired[pulumi.Input['BucketLifecycleConfigurationHatchArgsDict']]
+    logging: NotRequired[pulumi.Input['BucketLoggingHatchArgsDict']]
+    object_lock_configuration: NotRequired[pulumi.Input['BucketObjectLockConfigurationHatchArgsDict']]
+    policy: NotRequired[pulumi.Input['BucketPolicyHatchArgsDict']]
+    public_access_block: NotRequired[pulumi.Input['PABHatchArgsDict']]
+    replication_configuration: NotRequired[pulumi.Input['BucketReplicationConfigHatchArgsDict']]
+    request_payer: NotRequired[pulumi.Input['BucketRequestPaymentConfigurationHatchArgsDict']]
+    server_side_encryption_configuration: NotRequired[pulumi.Input['BucketServerSideEncryptionConfigurationHatchArgsDict']]
+    versioning: NotRequired[pulumi.Input['BucketVersioningHatchArgsDict']]
+    website: NotRequired[pulumi.Input['BucketWebsiteConfigurationHatchArgsDict']]
+
+@pulumi.input_type
+class BucketHatchArgsArgs:
+    def __init__(__self__, *,
+                 acceleration_status: Optional[pulumi.Input['BucketAccelerateConfigurationHatchArgs']] = None,
+                 acl: Optional[pulumi.Input['BucketAclHatchArgs']] = None,
+                 bucket: Optional[pulumi.Input['BucketOverridesArgs']] = None,
+                 cors_rules: Optional[pulumi.Input['BucketCorsConfigurationHatchArgs']] = None,
+                 grants: Optional[pulumi.Input['BucketAclHatchArgs']] = None,
+                 lifecycle_rules: Optional[pulumi.Input['BucketLifecycleConfigurationHatchArgs']] = None,
+                 logging: Optional[pulumi.Input['BucketLoggingHatchArgs']] = None,
+                 object_lock_configuration: Optional[pulumi.Input['BucketObjectLockConfigurationHatchArgs']] = None,
+                 policy: Optional[pulumi.Input['BucketPolicyHatchArgs']] = None,
+                 public_access_block: Optional[pulumi.Input['PABHatchArgs']] = None,
+                 replication_configuration: Optional[pulumi.Input['BucketReplicationConfigHatchArgs']] = None,
+                 request_payer: Optional[pulumi.Input['BucketRequestPaymentConfigurationHatchArgs']] = None,
+                 server_side_encryption_configuration: Optional[pulumi.Input['BucketServerSideEncryptionConfigurationHatchArgs']] = None,
+                 versioning: Optional[pulumi.Input['BucketVersioningHatchArgs']] = None,
+                 website: Optional[pulumi.Input['BucketWebsiteConfigurationHatchArgs']] = None):
+        if acceleration_status is not None:
+            pulumi.set(__self__, "acceleration_status", acceleration_status)
+        if acl is not None:
+            pulumi.set(__self__, "acl", acl)
+        if bucket is not None:
+            pulumi.set(__self__, "bucket", bucket)
+        if cors_rules is not None:
+            pulumi.set(__self__, "cors_rules", cors_rules)
+        if grants is not None:
+            pulumi.set(__self__, "grants", grants)
+        if lifecycle_rules is not None:
+            pulumi.set(__self__, "lifecycle_rules", lifecycle_rules)
+        if logging is not None:
+            pulumi.set(__self__, "logging", logging)
+        if object_lock_configuration is not None:
+            pulumi.set(__self__, "object_lock_configuration", object_lock_configuration)
+        if policy is not None:
+            pulumi.set(__self__, "policy", policy)
+        if public_access_block is not None:
+            pulumi.set(__self__, "public_access_block", public_access_block)
+        if replication_configuration is not None:
+            pulumi.set(__self__, "replication_configuration", replication_configuration)
+        if request_payer is not None:
+            pulumi.set(__self__, "request_payer", request_payer)
+        if server_side_encryption_configuration is not None:
+            pulumi.set(__self__, "server_side_encryption_configuration", server_side_encryption_configuration)
+        if versioning is not None:
+            pulumi.set(__self__, "versioning", versioning)
+        if website is not None:
+            pulumi.set(__self__, "website", website)
+
+    @_builtins.property
+    @pulumi.getter(name="accelerationStatus")
+    def acceleration_status(self) -> Optional[pulumi.Input['BucketAccelerateConfigurationHatchArgs']]:
+        return pulumi.get(self, "acceleration_status")
+
+    @acceleration_status.setter
+    def acceleration_status(self, value: Optional[pulumi.Input['BucketAccelerateConfigurationHatchArgs']]):
+        pulumi.set(self, "acceleration_status", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def acl(self) -> Optional[pulumi.Input['BucketAclHatchArgs']]:
+        return pulumi.get(self, "acl")
+
+    @acl.setter
+    def acl(self, value: Optional[pulumi.Input['BucketAclHatchArgs']]):
+        pulumi.set(self, "acl", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def bucket(self) -> Optional[pulumi.Input['BucketOverridesArgs']]:
+        return pulumi.get(self, "bucket")
+
+    @bucket.setter
+    def bucket(self, value: Optional[pulumi.Input['BucketOverridesArgs']]):
+        pulumi.set(self, "bucket", value)
+
+    @_builtins.property
+    @pulumi.getter(name="corsRules")
+    def cors_rules(self) -> Optional[pulumi.Input['BucketCorsConfigurationHatchArgs']]:
+        return pulumi.get(self, "cors_rules")
+
+    @cors_rules.setter
+    def cors_rules(self, value: Optional[pulumi.Input['BucketCorsConfigurationHatchArgs']]):
+        pulumi.set(self, "cors_rules", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def grants(self) -> Optional[pulumi.Input['BucketAclHatchArgs']]:
+        return pulumi.get(self, "grants")
+
+    @grants.setter
+    def grants(self, value: Optional[pulumi.Input['BucketAclHatchArgs']]):
+        pulumi.set(self, "grants", value)
+
+    @_builtins.property
+    @pulumi.getter(name="lifecycleRules")
+    def lifecycle_rules(self) -> Optional[pulumi.Input['BucketLifecycleConfigurationHatchArgs']]:
+        return pulumi.get(self, "lifecycle_rules")
+
+    @lifecycle_rules.setter
+    def lifecycle_rules(self, value: Optional[pulumi.Input['BucketLifecycleConfigurationHatchArgs']]):
+        pulumi.set(self, "lifecycle_rules", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def logging(self) -> Optional[pulumi.Input['BucketLoggingHatchArgs']]:
+        return pulumi.get(self, "logging")
+
+    @logging.setter
+    def logging(self, value: Optional[pulumi.Input['BucketLoggingHatchArgs']]):
+        pulumi.set(self, "logging", value)
+
+    @_builtins.property
+    @pulumi.getter(name="objectLockConfiguration")
+    def object_lock_configuration(self) -> Optional[pulumi.Input['BucketObjectLockConfigurationHatchArgs']]:
+        return pulumi.get(self, "object_lock_configuration")
+
+    @object_lock_configuration.setter
+    def object_lock_configuration(self, value: Optional[pulumi.Input['BucketObjectLockConfigurationHatchArgs']]):
+        pulumi.set(self, "object_lock_configuration", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def policy(self) -> Optional[pulumi.Input['BucketPolicyHatchArgs']]:
+        return pulumi.get(self, "policy")
+
+    @policy.setter
+    def policy(self, value: Optional[pulumi.Input['BucketPolicyHatchArgs']]):
+        pulumi.set(self, "policy", value)
+
+    @_builtins.property
+    @pulumi.getter(name="publicAccessBlock")
+    def public_access_block(self) -> Optional[pulumi.Input['PABHatchArgs']]:
+        return pulumi.get(self, "public_access_block")
+
+    @public_access_block.setter
+    def public_access_block(self, value: Optional[pulumi.Input['PABHatchArgs']]):
+        pulumi.set(self, "public_access_block", value)
+
+    @_builtins.property
+    @pulumi.getter(name="replicationConfiguration")
+    def replication_configuration(self) -> Optional[pulumi.Input['BucketReplicationConfigHatchArgs']]:
+        return pulumi.get(self, "replication_configuration")
+
+    @replication_configuration.setter
+    def replication_configuration(self, value: Optional[pulumi.Input['BucketReplicationConfigHatchArgs']]):
+        pulumi.set(self, "replication_configuration", value)
+
+    @_builtins.property
+    @pulumi.getter(name="requestPayer")
+    def request_payer(self) -> Optional[pulumi.Input['BucketRequestPaymentConfigurationHatchArgs']]:
+        return pulumi.get(self, "request_payer")
+
+    @request_payer.setter
+    def request_payer(self, value: Optional[pulumi.Input['BucketRequestPaymentConfigurationHatchArgs']]):
+        pulumi.set(self, "request_payer", value)
+
+    @_builtins.property
+    @pulumi.getter(name="serverSideEncryptionConfiguration")
+    def server_side_encryption_configuration(self) -> Optional[pulumi.Input['BucketServerSideEncryptionConfigurationHatchArgs']]:
+        return pulumi.get(self, "server_side_encryption_configuration")
+
+    @server_side_encryption_configuration.setter
+    def server_side_encryption_configuration(self, value: Optional[pulumi.Input['BucketServerSideEncryptionConfigurationHatchArgs']]):
+        pulumi.set(self, "server_side_encryption_configuration", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def versioning(self) -> Optional[pulumi.Input['BucketVersioningHatchArgs']]:
+        return pulumi.get(self, "versioning")
+
+    @versioning.setter
+    def versioning(self, value: Optional[pulumi.Input['BucketVersioningHatchArgs']]):
+        pulumi.set(self, "versioning", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def website(self) -> Optional[pulumi.Input['BucketWebsiteConfigurationHatchArgs']]:
+        return pulumi.get(self, "website")
+
+    @website.setter
+    def website(self, value: Optional[pulumi.Input['BucketWebsiteConfigurationHatchArgs']]):
+        pulumi.set(self, "website", value)
+
+
+class BucketLifecycleConfigurationHatchArgsDict(TypedDict):
     bucket: NotRequired[pulumi.Input[_builtins.str]]
     """
     Name of the source S3 bucket you want Amazon S3 to monitor.
@@ -514,7 +716,7 @@ class BucketLifecycleConfigurationTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class BucketLifecycleConfigurationTransformArgs:
+class BucketLifecycleConfigurationHatchArgs:
     def __init__(__self__, *,
                  bucket: Optional[pulumi.Input[_builtins.str]] = None,
                  expected_bucket_owner: Optional[pulumi.Input[_builtins.str]] = None,
@@ -616,7 +818,7 @@ class BucketLifecycleConfigurationTransformArgs:
         pulumi.set(self, "transition_default_minimum_object_size", value)
 
 
-class BucketLoggingTransformArgsDict(TypedDict):
+class BucketLoggingHatchArgsDict(TypedDict):
     bucket: NotRequired[pulumi.Input[_builtins.str]]
     """
     Name of the bucket.
@@ -647,7 +849,7 @@ class BucketLoggingTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class BucketLoggingTransformArgs:
+class BucketLoggingHatchArgs:
     def __init__(__self__, *,
                  bucket: Optional[pulumi.Input[_builtins.str]] = None,
                  expected_bucket_owner: Optional[pulumi.Input[_builtins.str]] = None,
@@ -769,7 +971,7 @@ class BucketLoggingTransformArgs:
         pulumi.set(self, "target_prefix", value)
 
 
-class BucketObjectLockConfigurationTransformArgsDict(TypedDict):
+class BucketObjectLockConfigurationHatchArgsDict(TypedDict):
     bucket: NotRequired[pulumi.Input[_builtins.str]]
     """
     Name of the bucket.
@@ -797,7 +999,7 @@ class BucketObjectLockConfigurationTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class BucketObjectLockConfigurationTransformArgs:
+class BucketObjectLockConfigurationHatchArgs:
     def __init__(__self__, *,
                  bucket: Optional[pulumi.Input[_builtins.str]] = None,
                  expected_bucket_owner: Optional[pulumi.Input[_builtins.str]] = None,
@@ -1040,7 +1242,7 @@ class BucketOverridesArgs:
         pulumi.set(self, "tags", value)
 
 
-class BucketPolicyTransformArgsDict(TypedDict):
+class BucketPolicyHatchArgsDict(TypedDict):
     bucket: NotRequired[pulumi.Input[_builtins.str]]
     """
     Name of the bucket to which to apply the policy.
@@ -1055,7 +1257,7 @@ class BucketPolicyTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class BucketPolicyTransformArgs:
+class BucketPolicyHatchArgs:
     def __init__(__self__, *,
                  bucket: Optional[pulumi.Input[_builtins.str]] = None,
                  policy: Optional[pulumi.Input[Union[_builtins.str, 'pulumi_aws.s3.PolicyDocumentArgs']]] = None,
@@ -1109,7 +1311,7 @@ class BucketPolicyTransformArgs:
         pulumi.set(self, "region", value)
 
 
-class BucketReplicationConfigTransformArgsDict(TypedDict):
+class BucketReplicationConfigHatchArgsDict(TypedDict):
     bucket: NotRequired[pulumi.Input[_builtins.str]]
     """
     Name of the source S3 bucket you want Amazon S3 to monitor.
@@ -1140,7 +1342,7 @@ class BucketReplicationConfigTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class BucketReplicationConfigTransformArgs:
+class BucketReplicationConfigHatchArgs:
     def __init__(__self__, *,
                  bucket: Optional[pulumi.Input[_builtins.str]] = None,
                  region: Optional[pulumi.Input[_builtins.str]] = None,
@@ -1242,7 +1444,7 @@ class BucketReplicationConfigTransformArgs:
         pulumi.set(self, "token", value)
 
 
-class BucketRequestPaymentConfigurationTransformArgsDict(TypedDict):
+class BucketRequestPaymentConfigurationHatchArgsDict(TypedDict):
     bucket: NotRequired[pulumi.Input[_builtins.str]]
     """
     Name of the bucket.
@@ -1261,7 +1463,7 @@ class BucketRequestPaymentConfigurationTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class BucketRequestPaymentConfigurationTransformArgs:
+class BucketRequestPaymentConfigurationHatchArgs:
     def __init__(__self__, *,
                  bucket: Optional[pulumi.Input[_builtins.str]] = None,
                  expected_bucket_owner: Optional[pulumi.Input[_builtins.str]] = None,
@@ -1335,7 +1537,7 @@ class BucketRequestPaymentConfigurationTransformArgs:
         pulumi.set(self, "region", value)
 
 
-class BucketServerSideEncryptionConfigurationTransformArgsDict(TypedDict):
+class BucketServerSideEncryptionConfigurationHatchArgsDict(TypedDict):
     bucket: NotRequired[pulumi.Input[_builtins.str]]
     """
     ID (name) of the bucket.
@@ -1354,7 +1556,7 @@ class BucketServerSideEncryptionConfigurationTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class BucketServerSideEncryptionConfigurationTransformArgs:
+class BucketServerSideEncryptionConfigurationHatchArgs:
     def __init__(__self__, *,
                  bucket: Optional[pulumi.Input[_builtins.str]] = None,
                  expected_bucket_owner: Optional[pulumi.Input[_builtins.str]] = None,
@@ -1428,209 +1630,7 @@ class BucketServerSideEncryptionConfigurationTransformArgs:
         pulumi.set(self, "rules", value)
 
 
-class BucketTransformArgsArgsDict(TypedDict):
-    acceleration_status: NotRequired[pulumi.Input['BucketAccelerateConfigurationTransformArgsDict']]
-    acl: NotRequired[pulumi.Input['BucketAclTransformArgsDict']]
-    bucket: NotRequired[pulumi.Input['BucketOverridesArgsDict']]
-    cors_rules: NotRequired[pulumi.Input['BucketCorsConfigurationTransformArgsDict']]
-    grants: NotRequired[pulumi.Input['BucketAclTransformArgsDict']]
-    lifecycle_rules: NotRequired[pulumi.Input['BucketLifecycleConfigurationTransformArgsDict']]
-    logging: NotRequired[pulumi.Input['BucketLoggingTransformArgsDict']]
-    object_lock_configuration: NotRequired[pulumi.Input['BucketObjectLockConfigurationTransformArgsDict']]
-    policy: NotRequired[pulumi.Input['BucketPolicyTransformArgsDict']]
-    public_access_block: NotRequired[pulumi.Input['PABTransformArgsDict']]
-    replication_configuration: NotRequired[pulumi.Input['BucketReplicationConfigTransformArgsDict']]
-    request_payer: NotRequired[pulumi.Input['BucketRequestPaymentConfigurationTransformArgsDict']]
-    server_side_encryption_configuration: NotRequired[pulumi.Input['BucketServerSideEncryptionConfigurationTransformArgsDict']]
-    versioning: NotRequired[pulumi.Input['BucketVersioningTransformArgsDict']]
-    website: NotRequired[pulumi.Input['BucketWebsiteConfigurationTransformArgsDict']]
-
-@pulumi.input_type
-class BucketTransformArgsArgs:
-    def __init__(__self__, *,
-                 acceleration_status: Optional[pulumi.Input['BucketAccelerateConfigurationTransformArgs']] = None,
-                 acl: Optional[pulumi.Input['BucketAclTransformArgs']] = None,
-                 bucket: Optional[pulumi.Input['BucketOverridesArgs']] = None,
-                 cors_rules: Optional[pulumi.Input['BucketCorsConfigurationTransformArgs']] = None,
-                 grants: Optional[pulumi.Input['BucketAclTransformArgs']] = None,
-                 lifecycle_rules: Optional[pulumi.Input['BucketLifecycleConfigurationTransformArgs']] = None,
-                 logging: Optional[pulumi.Input['BucketLoggingTransformArgs']] = None,
-                 object_lock_configuration: Optional[pulumi.Input['BucketObjectLockConfigurationTransformArgs']] = None,
-                 policy: Optional[pulumi.Input['BucketPolicyTransformArgs']] = None,
-                 public_access_block: Optional[pulumi.Input['PABTransformArgs']] = None,
-                 replication_configuration: Optional[pulumi.Input['BucketReplicationConfigTransformArgs']] = None,
-                 request_payer: Optional[pulumi.Input['BucketRequestPaymentConfigurationTransformArgs']] = None,
-                 server_side_encryption_configuration: Optional[pulumi.Input['BucketServerSideEncryptionConfigurationTransformArgs']] = None,
-                 versioning: Optional[pulumi.Input['BucketVersioningTransformArgs']] = None,
-                 website: Optional[pulumi.Input['BucketWebsiteConfigurationTransformArgs']] = None):
-        if acceleration_status is not None:
-            pulumi.set(__self__, "acceleration_status", acceleration_status)
-        if acl is not None:
-            pulumi.set(__self__, "acl", acl)
-        if bucket is not None:
-            pulumi.set(__self__, "bucket", bucket)
-        if cors_rules is not None:
-            pulumi.set(__self__, "cors_rules", cors_rules)
-        if grants is not None:
-            pulumi.set(__self__, "grants", grants)
-        if lifecycle_rules is not None:
-            pulumi.set(__self__, "lifecycle_rules", lifecycle_rules)
-        if logging is not None:
-            pulumi.set(__self__, "logging", logging)
-        if object_lock_configuration is not None:
-            pulumi.set(__self__, "object_lock_configuration", object_lock_configuration)
-        if policy is not None:
-            pulumi.set(__self__, "policy", policy)
-        if public_access_block is not None:
-            pulumi.set(__self__, "public_access_block", public_access_block)
-        if replication_configuration is not None:
-            pulumi.set(__self__, "replication_configuration", replication_configuration)
-        if request_payer is not None:
-            pulumi.set(__self__, "request_payer", request_payer)
-        if server_side_encryption_configuration is not None:
-            pulumi.set(__self__, "server_side_encryption_configuration", server_side_encryption_configuration)
-        if versioning is not None:
-            pulumi.set(__self__, "versioning", versioning)
-        if website is not None:
-            pulumi.set(__self__, "website", website)
-
-    @_builtins.property
-    @pulumi.getter(name="accelerationStatus")
-    def acceleration_status(self) -> Optional[pulumi.Input['BucketAccelerateConfigurationTransformArgs']]:
-        return pulumi.get(self, "acceleration_status")
-
-    @acceleration_status.setter
-    def acceleration_status(self, value: Optional[pulumi.Input['BucketAccelerateConfigurationTransformArgs']]):
-        pulumi.set(self, "acceleration_status", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def acl(self) -> Optional[pulumi.Input['BucketAclTransformArgs']]:
-        return pulumi.get(self, "acl")
-
-    @acl.setter
-    def acl(self, value: Optional[pulumi.Input['BucketAclTransformArgs']]):
-        pulumi.set(self, "acl", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def bucket(self) -> Optional[pulumi.Input['BucketOverridesArgs']]:
-        return pulumi.get(self, "bucket")
-
-    @bucket.setter
-    def bucket(self, value: Optional[pulumi.Input['BucketOverridesArgs']]):
-        pulumi.set(self, "bucket", value)
-
-    @_builtins.property
-    @pulumi.getter(name="corsRules")
-    def cors_rules(self) -> Optional[pulumi.Input['BucketCorsConfigurationTransformArgs']]:
-        return pulumi.get(self, "cors_rules")
-
-    @cors_rules.setter
-    def cors_rules(self, value: Optional[pulumi.Input['BucketCorsConfigurationTransformArgs']]):
-        pulumi.set(self, "cors_rules", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def grants(self) -> Optional[pulumi.Input['BucketAclTransformArgs']]:
-        return pulumi.get(self, "grants")
-
-    @grants.setter
-    def grants(self, value: Optional[pulumi.Input['BucketAclTransformArgs']]):
-        pulumi.set(self, "grants", value)
-
-    @_builtins.property
-    @pulumi.getter(name="lifecycleRules")
-    def lifecycle_rules(self) -> Optional[pulumi.Input['BucketLifecycleConfigurationTransformArgs']]:
-        return pulumi.get(self, "lifecycle_rules")
-
-    @lifecycle_rules.setter
-    def lifecycle_rules(self, value: Optional[pulumi.Input['BucketLifecycleConfigurationTransformArgs']]):
-        pulumi.set(self, "lifecycle_rules", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def logging(self) -> Optional[pulumi.Input['BucketLoggingTransformArgs']]:
-        return pulumi.get(self, "logging")
-
-    @logging.setter
-    def logging(self, value: Optional[pulumi.Input['BucketLoggingTransformArgs']]):
-        pulumi.set(self, "logging", value)
-
-    @_builtins.property
-    @pulumi.getter(name="objectLockConfiguration")
-    def object_lock_configuration(self) -> Optional[pulumi.Input['BucketObjectLockConfigurationTransformArgs']]:
-        return pulumi.get(self, "object_lock_configuration")
-
-    @object_lock_configuration.setter
-    def object_lock_configuration(self, value: Optional[pulumi.Input['BucketObjectLockConfigurationTransformArgs']]):
-        pulumi.set(self, "object_lock_configuration", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def policy(self) -> Optional[pulumi.Input['BucketPolicyTransformArgs']]:
-        return pulumi.get(self, "policy")
-
-    @policy.setter
-    def policy(self, value: Optional[pulumi.Input['BucketPolicyTransformArgs']]):
-        pulumi.set(self, "policy", value)
-
-    @_builtins.property
-    @pulumi.getter(name="publicAccessBlock")
-    def public_access_block(self) -> Optional[pulumi.Input['PABTransformArgs']]:
-        return pulumi.get(self, "public_access_block")
-
-    @public_access_block.setter
-    def public_access_block(self, value: Optional[pulumi.Input['PABTransformArgs']]):
-        pulumi.set(self, "public_access_block", value)
-
-    @_builtins.property
-    @pulumi.getter(name="replicationConfiguration")
-    def replication_configuration(self) -> Optional[pulumi.Input['BucketReplicationConfigTransformArgs']]:
-        return pulumi.get(self, "replication_configuration")
-
-    @replication_configuration.setter
-    def replication_configuration(self, value: Optional[pulumi.Input['BucketReplicationConfigTransformArgs']]):
-        pulumi.set(self, "replication_configuration", value)
-
-    @_builtins.property
-    @pulumi.getter(name="requestPayer")
-    def request_payer(self) -> Optional[pulumi.Input['BucketRequestPaymentConfigurationTransformArgs']]:
-        return pulumi.get(self, "request_payer")
-
-    @request_payer.setter
-    def request_payer(self, value: Optional[pulumi.Input['BucketRequestPaymentConfigurationTransformArgs']]):
-        pulumi.set(self, "request_payer", value)
-
-    @_builtins.property
-    @pulumi.getter(name="serverSideEncryptionConfiguration")
-    def server_side_encryption_configuration(self) -> Optional[pulumi.Input['BucketServerSideEncryptionConfigurationTransformArgs']]:
-        return pulumi.get(self, "server_side_encryption_configuration")
-
-    @server_side_encryption_configuration.setter
-    def server_side_encryption_configuration(self, value: Optional[pulumi.Input['BucketServerSideEncryptionConfigurationTransformArgs']]):
-        pulumi.set(self, "server_side_encryption_configuration", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def versioning(self) -> Optional[pulumi.Input['BucketVersioningTransformArgs']]:
-        return pulumi.get(self, "versioning")
-
-    @versioning.setter
-    def versioning(self, value: Optional[pulumi.Input['BucketVersioningTransformArgs']]):
-        pulumi.set(self, "versioning", value)
-
-    @_builtins.property
-    @pulumi.getter
-    def website(self) -> Optional[pulumi.Input['BucketWebsiteConfigurationTransformArgs']]:
-        return pulumi.get(self, "website")
-
-    @website.setter
-    def website(self, value: Optional[pulumi.Input['BucketWebsiteConfigurationTransformArgs']]):
-        pulumi.set(self, "website", value)
-
-
-class BucketVersioningTransformArgsDict(TypedDict):
+class BucketVersioningHatchArgsDict(TypedDict):
     bucket: NotRequired[pulumi.Input[_builtins.str]]
     """
     Name of the S3 bucket.
@@ -1653,7 +1653,7 @@ class BucketVersioningTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class BucketVersioningTransformArgs:
+class BucketVersioningHatchArgs:
     def __init__(__self__, *,
                  bucket: Optional[pulumi.Input[_builtins.str]] = None,
                  expected_bucket_owner: Optional[pulumi.Input[_builtins.str]] = None,
@@ -1743,7 +1743,7 @@ class BucketVersioningTransformArgs:
         pulumi.set(self, "versioning_configuration", value)
 
 
-class BucketWebsiteConfigurationTransformArgsDict(TypedDict):
+class BucketWebsiteConfigurationHatchArgsDict(TypedDict):
     bucket: NotRequired[pulumi.Input[_builtins.str]]
     """
     Name of the bucket.
@@ -1779,7 +1779,7 @@ class BucketWebsiteConfigurationTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class BucketWebsiteConfigurationTransformArgs:
+class BucketWebsiteConfigurationHatchArgs:
     def __init__(__self__, *,
                  bucket: Optional[pulumi.Input[_builtins.str]] = None,
                  error_document: Optional[pulumi.Input['pulumi_aws.s3.BucketWebsiteConfigurationErrorDocumentArgs']] = None,
@@ -2272,6 +2272,26 @@ class CognitoUserPoolEmailConfigurationArgs:
     @ses_from_address.setter
     def ses_from_address(self, value: Optional[pulumi.Input[_builtins.str]]):
         pulumi.set(self, "ses_from_address", value)
+
+
+class CognitoUserPoolHatchArgsArgsDict(TypedDict):
+    cognito_user_pool: NotRequired[pulumi.Input['CognitoUserPoolOverridesArgsDict']]
+
+@pulumi.input_type
+class CognitoUserPoolHatchArgsArgs:
+    def __init__(__self__, *,
+                 cognito_user_pool: Optional[pulumi.Input['CognitoUserPoolOverridesArgs']] = None):
+        if cognito_user_pool is not None:
+            pulumi.set(__self__, "cognito_user_pool", cognito_user_pool)
+
+    @_builtins.property
+    @pulumi.getter(name="cognitoUserPool")
+    def cognito_user_pool(self) -> Optional[pulumi.Input['CognitoUserPoolOverridesArgs']]:
+        return pulumi.get(self, "cognito_user_pool")
+
+    @cognito_user_pool.setter
+    def cognito_user_pool(self, value: Optional[pulumi.Input['CognitoUserPoolOverridesArgs']]):
+        pulumi.set(self, "cognito_user_pool", value)
 
 
 class CognitoUserPoolHostedUiArgsDict(TypedDict):
@@ -3391,26 +3411,6 @@ class CognitoUserPoolTokenValidityArgs:
         pulumi.set(self, "refresh_token_validity", value)
 
 
-class CognitoUserPoolTransformArgsArgsDict(TypedDict):
-    cognito_user_pool: NotRequired[pulumi.Input['CognitoUserPoolOverridesArgsDict']]
-
-@pulumi.input_type
-class CognitoUserPoolTransformArgsArgs:
-    def __init__(__self__, *,
-                 cognito_user_pool: Optional[pulumi.Input['CognitoUserPoolOverridesArgs']] = None):
-        if cognito_user_pool is not None:
-            pulumi.set(__self__, "cognito_user_pool", cognito_user_pool)
-
-    @_builtins.property
-    @pulumi.getter(name="cognitoUserPool")
-    def cognito_user_pool(self) -> Optional[pulumi.Input['CognitoUserPoolOverridesArgs']]:
-        return pulumi.get(self, "cognito_user_pool")
-
-    @cognito_user_pool.setter
-    def cognito_user_pool(self, value: Optional[pulumi.Input['CognitoUserPoolOverridesArgs']]):
-        pulumi.set(self, "cognito_user_pool", value)
-
-
 class CognitoUserPoolWafArgsDict(TypedDict):
     """
     Attaches a WAF to the user pool.
@@ -4142,6 +4142,26 @@ class DSQLVpcArgsArgs:
         pulumi.set(self, "has_nat", value)
 
 
+class DsqlHatchArgsArgsDict(TypedDict):
+    dsql: NotRequired[pulumi.Input['DsqlOverridesArgsDict']]
+
+@pulumi.input_type
+class DsqlHatchArgsArgs:
+    def __init__(__self__, *,
+                 dsql: Optional[pulumi.Input['DsqlOverridesArgs']] = None):
+        if dsql is not None:
+            pulumi.set(__self__, "dsql", dsql)
+
+    @_builtins.property
+    @pulumi.getter
+    def dsql(self) -> Optional[pulumi.Input['DsqlOverridesArgs']]:
+        return pulumi.get(self, "dsql")
+
+    @dsql.setter
+    def dsql(self, value: Optional[pulumi.Input['DsqlOverridesArgs']]):
+        pulumi.set(self, "dsql", value)
+
+
 class DsqlOverridesArgsDict(TypedDict):
     deletion_protection_enabled: NotRequired[pulumi.Input[_builtins.bool]]
     """
@@ -4288,26 +4308,6 @@ class DsqlOverridesArgs:
     @timeouts.setter
     def timeouts(self, value: Optional[pulumi.Input['pulumi_aws.dsql.ClusterTimeoutsArgs']]):
         pulumi.set(self, "timeouts", value)
-
-
-class DsqlTransformArgsArgsDict(TypedDict):
-    dsql: NotRequired[pulumi.Input['DsqlOverridesArgsDict']]
-
-@pulumi.input_type
-class DsqlTransformArgsArgs:
-    def __init__(__self__, *,
-                 dsql: Optional[pulumi.Input['DsqlOverridesArgs']] = None):
-        if dsql is not None:
-            pulumi.set(__self__, "dsql", dsql)
-
-    @_builtins.property
-    @pulumi.getter
-    def dsql(self) -> Optional[pulumi.Input['DsqlOverridesArgs']]:
-        return pulumi.get(self, "dsql")
-
-    @dsql.setter
-    def dsql(self, value: Optional[pulumi.Input['DsqlOverridesArgs']]):
-        pulumi.set(self, "dsql", value)
 
 
 class DynamoDBGlobalSecondaryIndexArgsDict(TypedDict):
@@ -4722,6 +4722,26 @@ class DynamoDBStreamArgs:
     @starting_position.setter
     def starting_position(self, value: Optional[pulumi.Input['DynamoDBStreamStartingPosition']]):
         pulumi.set(self, "starting_position", value)
+
+
+class DynamoHatchArgsArgsDict(TypedDict):
+    dynamo: NotRequired[pulumi.Input['DynamoOverridesArgsDict']]
+
+@pulumi.input_type
+class DynamoHatchArgsArgs:
+    def __init__(__self__, *,
+                 dynamo: Optional[pulumi.Input['DynamoOverridesArgs']] = None):
+        if dynamo is not None:
+            pulumi.set(__self__, "dynamo", dynamo)
+
+    @_builtins.property
+    @pulumi.getter
+    def dynamo(self) -> Optional[pulumi.Input['DynamoOverridesArgs']]:
+        return pulumi.get(self, "dynamo")
+
+    @dynamo.setter
+    def dynamo(self, value: Optional[pulumi.Input['DynamoOverridesArgs']]):
+        pulumi.set(self, "dynamo", value)
 
 
 class DynamoOverridesArgsDict(TypedDict):
@@ -5291,24 +5311,24 @@ class DynamoOverridesArgs:
         pulumi.set(self, "write_capacity", value)
 
 
-class DynamoTransformArgsArgsDict(TypedDict):
-    dynamo: NotRequired[pulumi.Input['DynamoOverridesArgsDict']]
+class EventBridgeHatchArgsArgsDict(TypedDict):
+    event_bridge: NotRequired[pulumi.Input['EventBridgeOverridesArgsDict']]
 
 @pulumi.input_type
-class DynamoTransformArgsArgs:
+class EventBridgeHatchArgsArgs:
     def __init__(__self__, *,
-                 dynamo: Optional[pulumi.Input['DynamoOverridesArgs']] = None):
-        if dynamo is not None:
-            pulumi.set(__self__, "dynamo", dynamo)
+                 event_bridge: Optional[pulumi.Input['EventBridgeOverridesArgs']] = None):
+        if event_bridge is not None:
+            pulumi.set(__self__, "event_bridge", event_bridge)
 
     @_builtins.property
-    @pulumi.getter
-    def dynamo(self) -> Optional[pulumi.Input['DynamoOverridesArgs']]:
-        return pulumi.get(self, "dynamo")
+    @pulumi.getter(name="eventBridge")
+    def event_bridge(self) -> Optional[pulumi.Input['EventBridgeOverridesArgs']]:
+        return pulumi.get(self, "event_bridge")
 
-    @dynamo.setter
-    def dynamo(self, value: Optional[pulumi.Input['DynamoOverridesArgs']]):
-        pulumi.set(self, "dynamo", value)
+    @event_bridge.setter
+    def event_bridge(self, value: Optional[pulumi.Input['EventBridgeOverridesArgs']]):
+        pulumi.set(self, "event_bridge", value)
 
 
 class EventBridgeOverridesArgsDict(TypedDict):
@@ -5484,26 +5504,6 @@ class EventBridgeOverridesArgs:
     @tags.setter
     def tags(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "tags", value)
-
-
-class EventBridgeTransformArgsArgsDict(TypedDict):
-    event_bridge: NotRequired[pulumi.Input['EventBridgeOverridesArgsDict']]
-
-@pulumi.input_type
-class EventBridgeTransformArgsArgs:
-    def __init__(__self__, *,
-                 event_bridge: Optional[pulumi.Input['EventBridgeOverridesArgs']] = None):
-        if event_bridge is not None:
-            pulumi.set(__self__, "event_bridge", event_bridge)
-
-    @_builtins.property
-    @pulumi.getter(name="eventBridge")
-    def event_bridge(self) -> Optional[pulumi.Input['EventBridgeOverridesArgs']]:
-        return pulumi.get(self, "event_bridge")
-
-    @event_bridge.setter
-    def event_bridge(self, value: Optional[pulumi.Input['EventBridgeOverridesArgs']]):
-        pulumi.set(self, "event_bridge", value)
 
 
 class EventBusLambdaTargetArgsArgsDict(TypedDict):
@@ -6466,6 +6466,26 @@ class HttpApiThrottlingArgs:
         pulumi.set(self, "rate_limit", value)
 
 
+class LambdaHatchArgsArgsDict(TypedDict):
+    lambda_: NotRequired[pulumi.Input['LambdaOverridesArgsDict']]
+
+@pulumi.input_type
+class LambdaHatchArgsArgs:
+    def __init__(__self__, *,
+                 lambda_: Optional[pulumi.Input['LambdaOverridesArgs']] = None):
+        if lambda_ is not None:
+            pulumi.set(__self__, "lambda_", lambda_)
+
+    @_builtins.property
+    @pulumi.getter(name="lambda")
+    def lambda_(self) -> Optional[pulumi.Input['LambdaOverridesArgs']]:
+        return pulumi.get(self, "lambda_")
+
+    @lambda_.setter
+    def lambda_(self, value: Optional[pulumi.Input['LambdaOverridesArgs']]):
+        pulumi.set(self, "lambda_", value)
+
+
 class LambdaOverridesArgsDict(TypedDict):
     architectures: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
     """
@@ -7336,26 +7356,6 @@ class LambdaPermissionArgs:
         pulumi.set(self, "resource", value)
 
 
-class LambdaTransformArgsArgsDict(TypedDict):
-    lambda_: NotRequired[pulumi.Input['LambdaOverridesArgsDict']]
-
-@pulumi.input_type
-class LambdaTransformArgsArgs:
-    def __init__(__self__, *,
-                 lambda_: Optional[pulumi.Input['LambdaOverridesArgs']] = None):
-        if lambda_ is not None:
-            pulumi.set(__self__, "lambda_", lambda_)
-
-    @_builtins.property
-    @pulumi.getter(name="lambda")
-    def lambda_(self) -> Optional[pulumi.Input['LambdaOverridesArgs']]:
-        return pulumi.get(self, "lambda_")
-
-    @lambda_.setter
-    def lambda_(self, value: Optional[pulumi.Input['LambdaOverridesArgs']]):
-        pulumi.set(self, "lambda_", value)
-
-
 class LambdaVpcArgsArgsDict(TypedDict):
     private_subnet_ids: Any
     """
@@ -7562,7 +7562,7 @@ class LambdaVpcEndpointArgsArgs:
         pulumi.set(self, "security_group_id", value)
 
 
-class PABTransformArgsDict(TypedDict):
+class PABHatchArgsDict(TypedDict):
     block_public_acls: NotRequired[pulumi.Input[_builtins.bool]]
     """
     Whether Amazon S3 should block public ACLs for this bucket. Defaults to <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>. Enabling this setting does not affect existing policies or ACLs. When set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span> causes the following behavior:
@@ -7598,7 +7598,7 @@ class PABTransformArgsDict(TypedDict):
     """
 
 @pulumi.input_type
-class PABTransformArgs:
+class PABHatchArgs:
     def __init__(__self__, *,
                  block_public_acls: Optional[pulumi.Input[_builtins.bool]] = None,
                  block_public_policy: Optional[pulumi.Input[_builtins.bool]] = None,
@@ -7812,6 +7812,26 @@ class QueueDlqArgsArgs:
     @max_receive_count.setter
     def max_receive_count(self, value: Optional[pulumi.Input[_builtins.int]]):
         pulumi.set(self, "max_receive_count", value)
+
+
+class QueueHatchArgsArgsDict(TypedDict):
+    queue: NotRequired[pulumi.Input['QueueOverridesArgsDict']]
+
+@pulumi.input_type
+class QueueHatchArgsArgs:
+    def __init__(__self__, *,
+                 queue: Optional[pulumi.Input['QueueOverridesArgs']] = None):
+        if queue is not None:
+            pulumi.set(__self__, "queue", queue)
+
+    @_builtins.property
+    @pulumi.getter
+    def queue(self) -> Optional[pulumi.Input['QueueOverridesArgs']]:
+        return pulumi.get(self, "queue")
+
+    @queue.setter
+    def queue(self, value: Optional[pulumi.Input['QueueOverridesArgs']]):
+        pulumi.set(self, "queue", value)
 
 
 class QueueLambdaConsumerArgsArgsDict(TypedDict):
@@ -8253,26 +8273,6 @@ class QueueOverridesArgs:
     @visibility_timeout_seconds.setter
     def visibility_timeout_seconds(self, value: Optional[pulumi.Input[_builtins.int]]):
         pulumi.set(self, "visibility_timeout_seconds", value)
-
-
-class QueueTransformArgsArgsDict(TypedDict):
-    queue: NotRequired[pulumi.Input['QueueOverridesArgsDict']]
-
-@pulumi.input_type
-class QueueTransformArgsArgs:
-    def __init__(__self__, *,
-                 queue: Optional[pulumi.Input['QueueOverridesArgs']] = None):
-        if queue is not None:
-            pulumi.set(__self__, "queue", queue)
-
-    @_builtins.property
-    @pulumi.getter
-    def queue(self) -> Optional[pulumi.Input['QueueOverridesArgs']]:
-        return pulumi.get(self, "queue")
-
-    @queue.setter
-    def queue(self, value: Optional[pulumi.Input['QueueOverridesArgs']]):
-        pulumi.set(self, "queue", value)
 
 
 class SiteHstsArgsDict(TypedDict):
@@ -8748,6 +8748,26 @@ class VpcS3FlowLogArgsArgs:
     @lifecycle.setter
     def lifecycle(self, value: pulumi.Input['S3FlowLogLifecycle']):
         pulumi.set(self, "lifecycle", value)
+
+
+class WafHatchArgsArgsDict(TypedDict):
+    waf: NotRequired[pulumi.Input['WafOverridesArgsDict']]
+
+@pulumi.input_type
+class WafHatchArgsArgs:
+    def __init__(__self__, *,
+                 waf: Optional[pulumi.Input['WafOverridesArgs']] = None):
+        if waf is not None:
+            pulumi.set(__self__, "waf", waf)
+
+    @_builtins.property
+    @pulumi.getter
+    def waf(self) -> Optional[pulumi.Input['WafOverridesArgs']]:
+        return pulumi.get(self, "waf")
+
+    @waf.setter
+    def waf(self, value: Optional[pulumi.Input['WafOverridesArgs']]):
+        pulumi.set(self, "waf", value)
 
 
 class WafLoggingArgsArgsDict(TypedDict):
@@ -9359,25 +9379,5 @@ class WafRateLimitArgsArgs:
     @window_seconds.setter
     def window_seconds(self, value: Optional[pulumi.Input[_builtins.int]]):
         pulumi.set(self, "window_seconds", value)
-
-
-class WafTransformArgsArgsDict(TypedDict):
-    waf: NotRequired[pulumi.Input['WafOverridesArgsDict']]
-
-@pulumi.input_type
-class WafTransformArgsArgs:
-    def __init__(__self__, *,
-                 waf: Optional[pulumi.Input['WafOverridesArgs']] = None):
-        if waf is not None:
-            pulumi.set(__self__, "waf", waf)
-
-    @_builtins.property
-    @pulumi.getter
-    def waf(self) -> Optional[pulumi.Input['WafOverridesArgs']]:
-        return pulumi.get(self, "waf")
-
-    @waf.setter
-    def waf(self, value: Optional[pulumi.Input['WafOverridesArgs']]):
-        pulumi.set(self, "waf", value)
 
 

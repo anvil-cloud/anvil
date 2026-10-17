@@ -49,10 +49,10 @@ export class Function extends pulumi.ComponentResource {
                 throw new Error("Missing required property 'runtime'");
             }
             resourceInputs["entryPoint"] = args?.entryPoint;
+            resourceInputs["hatch"] = args?.hatch;
             resourceInputs["location"] = args?.location;
             resourceInputs["name"] = args?.name;
             resourceInputs["runtime"] = args?.runtime;
-            resourceInputs["transform"] = args?.transform;
         } else {
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
@@ -68,6 +68,7 @@ export interface FunctionArgs {
      * The name of the function to execute.
      */
     entryPoint: pulumi.Input<string>;
+    hatch?: pulumi.Input<inputs.gcp.FunctionHatchArgsArgs>;
     /**
      * The GCP region to deploy to (e.g. us-central1).
      */
@@ -80,5 +81,4 @@ export interface FunctionArgs {
      * The runtime to use (e.g. nodejs20, python312, go122).
      */
     runtime: pulumi.Input<string>;
-    transform?: pulumi.Input<inputs.gcp.FunctionTransformArgsArgs>;
 }

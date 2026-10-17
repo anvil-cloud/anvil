@@ -23,12 +23,12 @@ class SvelteKitSiteArgs:
     def __init__(__self__, *,
                  domain: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 hatch: Optional[pulumi.Input[_builtins.str]] = None,
                  origin_protection: Optional[pulumi.Input[_builtins.bool]] = None,
                  path: Optional[pulumi.Input[_builtins.str]] = None,
                  protection: Optional[pulumi.Input['SiteProtection']] = None,
                  runtime_environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  security_headers: Optional[pulumi.Input['SiteSecurityHeadersArgs']] = None,
-                 transform: Optional[pulumi.Input[_builtins.str]] = None,
                  waf: Optional[pulumi.Input['SiteWafArgs']] = None):
         """
         The set of arguments for constructing a SvelteKitSite resource.
@@ -44,6 +44,8 @@ class SvelteKitSiteArgs:
             pulumi.set(__self__, "domain", domain)
         if environment is not None:
             pulumi.set(__self__, "environment", environment)
+        if hatch is not None:
+            pulumi.set(__self__, "hatch", hatch)
         if origin_protection is not None:
             pulumi.set(__self__, "origin_protection", origin_protection)
         if path is not None:
@@ -54,8 +56,6 @@ class SvelteKitSiteArgs:
             pulumi.set(__self__, "runtime_environment", runtime_environment)
         if security_headers is not None:
             pulumi.set(__self__, "security_headers", security_headers)
-        if transform is not None:
-            pulumi.set(__self__, "transform", transform)
         if waf is not None:
             pulumi.set(__self__, "waf", waf)
 
@@ -79,6 +79,15 @@ class SvelteKitSiteArgs:
     @environment.setter
     def environment(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "environment", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def hatch(self) -> Optional[pulumi.Input[_builtins.str]]:
+        return pulumi.get(self, "hatch")
+
+    @hatch.setter
+    def hatch(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "hatch", value)
 
     @_builtins.property
     @pulumi.getter(name="originProtection")
@@ -139,15 +148,6 @@ class SvelteKitSiteArgs:
 
     @_builtins.property
     @pulumi.getter
-    def transform(self) -> Optional[pulumi.Input[_builtins.str]]:
-        return pulumi.get(self, "transform")
-
-    @transform.setter
-    def transform(self, value: Optional[pulumi.Input[_builtins.str]]):
-        pulumi.set(self, "transform", value)
-
-    @_builtins.property
-    @pulumi.getter
     def waf(self) -> Optional[pulumi.Input['SiteWafArgs']]:
         """
         Waf attaches a WAF WebACL to the site's CloudFront distribution. Protection defaults to "edge-oac" while it's attached.
@@ -167,12 +167,12 @@ class SvelteKitSite(pulumi.ComponentResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  domain: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 hatch: Optional[pulumi.Input[_builtins.str]] = None,
                  origin_protection: Optional[pulumi.Input[_builtins.bool]] = None,
                  path: Optional[pulumi.Input[_builtins.str]] = None,
                  protection: Optional[pulumi.Input['SiteProtection']] = None,
                  runtime_environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  security_headers: Optional[pulumi.Input[Union['SiteSecurityHeadersArgs', 'SiteSecurityHeadersArgsDict']]] = None,
-                 transform: Optional[pulumi.Input[_builtins.str]] = None,
                  waf: Optional[pulumi.Input[Union['SiteWafArgs', 'SiteWafArgsDict']]] = None,
                  __props__=None):
         """
@@ -213,12 +213,12 @@ class SvelteKitSite(pulumi.ComponentResource):
                  opts: Optional[pulumi.ResourceOptions] = None,
                  domain: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 hatch: Optional[pulumi.Input[_builtins.str]] = None,
                  origin_protection: Optional[pulumi.Input[_builtins.bool]] = None,
                  path: Optional[pulumi.Input[_builtins.str]] = None,
                  protection: Optional[pulumi.Input['SiteProtection']] = None,
                  runtime_environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  security_headers: Optional[pulumi.Input[Union['SiteSecurityHeadersArgs', 'SiteSecurityHeadersArgsDict']]] = None,
-                 transform: Optional[pulumi.Input[_builtins.str]] = None,
                  waf: Optional[pulumi.Input[Union['SiteWafArgs', 'SiteWafArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -233,12 +233,12 @@ class SvelteKitSite(pulumi.ComponentResource):
 
             __props__.__dict__["domain"] = domain
             __props__.__dict__["environment"] = environment
+            __props__.__dict__["hatch"] = hatch
             __props__.__dict__["origin_protection"] = origin_protection
             __props__.__dict__["path"] = path
             __props__.__dict__["protection"] = protection
             __props__.__dict__["runtime_environment"] = runtime_environment
             __props__.__dict__["security_headers"] = security_headers
-            __props__.__dict__["transform"] = transform
             __props__.__dict__["waf"] = waf
             __props__.__dict__["bucket_name"] = None
             __props__.__dict__["cloud_front_distribution_id"] = None

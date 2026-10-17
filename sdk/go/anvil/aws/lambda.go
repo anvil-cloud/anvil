@@ -52,14 +52,15 @@ func NewLambda(ctx *pulumi.Context,
 type lambdaArgs struct {
 	// CPU architecture. Default: arm64 (Graviton).
 	Architecture *LambdaArchitecture `pulumi:"architecture"`
-	// Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via transform["lambda"].
+	// Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
 	Encryption *string `pulumi:"encryption"`
 	// Path to the function's entry point file, relative to the project root. e.g. "functions/api/index.ts". Omit to deploy a blank Lambda placeholder.
 	Entry *string `pulumi:"entry"`
 	// Environment variables available to the function at runtime. Supports plain strings and Pulumi outputs.
 	Environment map[string]string `pulumi:"environment"`
 	// The exported function name in the entry file. e.g. "handler" for `export const handler = ...`
-	Handler string `pulumi:"handler"`
+	Handler string           `pulumi:"handler"`
+	Hatch   *LambdaHatchArgs `pulumi:"hatch"`
 	// CloudWatch log group retention period. Default: "1y" (satisfies SOC 2, ISO 27001, PCI-DSS baseline).
 	LogRetention *LambdaLogRetention `pulumi:"logRetention"`
 	// Memory in MB. Valid: 128 to 32768 in 1MB increments. Default: 1024.
@@ -71,8 +72,7 @@ type lambdaArgs struct {
 	// Timeout in seconds. Valid: 1 to 900. Default: 5.
 	Timeout *int `pulumi:"timeout"`
 	// Enable AWS X-Ray tracing. Incurs per-trace cost (~$5/million traces). Default: false.
-	Tracing   *bool                `pulumi:"tracing"`
-	Transform *LambdaTransformArgs `pulumi:"transform"`
+	Tracing *bool `pulumi:"tracing"`
 	// Enable a direct HTTPS endpoint for the function. Auth mode is AWS_IAM - never public. Default: false.
 	Url *bool `pulumi:"url"`
 	// Places the Lambda inside a VPC for access to private resources such as RDS or ElastiCache. Anvil creates a dedicated security group with zero inbound and zero outbound rules. Nothing is reachable until explicitly granted via the grant system.
@@ -83,7 +83,7 @@ type lambdaArgs struct {
 type LambdaArgs struct {
 	// CPU architecture. Default: arm64 (Graviton).
 	Architecture LambdaArchitecturePtrInput
-	// Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via transform["lambda"].
+	// Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
 	Encryption pulumi.StringPtrInput
 	// Path to the function's entry point file, relative to the project root. e.g. "functions/api/index.ts". Omit to deploy a blank Lambda placeholder.
 	Entry pulumi.StringPtrInput
@@ -91,6 +91,7 @@ type LambdaArgs struct {
 	Environment pulumi.StringMapInput
 	// The exported function name in the entry file. e.g. "handler" for `export const handler = ...`
 	Handler pulumi.StringInput
+	Hatch   LambdaHatchArgsPtrInput
 	// CloudWatch log group retention period. Default: "1y" (satisfies SOC 2, ISO 27001, PCI-DSS baseline).
 	LogRetention LambdaLogRetentionPtrInput
 	// Memory in MB. Valid: 128 to 32768 in 1MB increments. Default: 1024.
@@ -102,8 +103,7 @@ type LambdaArgs struct {
 	// Timeout in seconds. Valid: 1 to 900. Default: 5.
 	Timeout pulumi.IntPtrInput
 	// Enable AWS X-Ray tracing. Incurs per-trace cost (~$5/million traces). Default: false.
-	Tracing   pulumi.BoolPtrInput
-	Transform LambdaTransformArgsPtrInput
+	Tracing pulumi.BoolPtrInput
 	// Enable a direct HTTPS endpoint for the function. Auth mode is AWS_IAM - never public. Default: false.
 	Url pulumi.BoolPtrInput
 	// Places the Lambda inside a VPC for access to private resources such as RDS or ElastiCache. Anvil creates a dedicated security group with zero inbound and zero outbound rules. Nothing is reachable until explicitly granted via the grant system.

@@ -112,14 +112,14 @@ def infra(ctx: anvil.Context):
 anvil.App(run=infra)
 ```
 
-## Overrides
+## Escape hatch
 
-Every component accepts a `transform` argument to override the underlying resource config when you need to break from the defaults:
+Every component accepts a `hatch` argument — an escape hatch to override the underlying resource config when you need to break from the defaults:
 
 ```python
 bucket = anvil.aws.Bucket("custom",
     data_classification="non-sensitive",
-    transform=anvil.aws.BucketTransformArgsArgs(
+    hatch=anvil.aws.BucketHatchArgsArgs(
         overrides=anvil.aws.BucketOverridesArgs(
             force_destroy=True,
             tags={"env": "dev"},

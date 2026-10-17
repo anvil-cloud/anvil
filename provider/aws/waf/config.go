@@ -193,7 +193,7 @@ func resolveConfig(args WafArgs) (config, error) {
 		}
 		if _, ok := ruleToGroup[rule]; !ok {
 			return cfg, fmt.Errorf("ruleOverrides: %q isn't a rule in any supported AWS managed rule group. "+
-				"Use the exact AWS rule name (e.g. \"SizeRestrictions_BODY\"), or transform.waf for anything else", rule)
+				"Use the exact AWS rule name (e.g. \"SizeRestrictions_BODY\"), or hatch.waf for anything else", rule)
 		}
 		overrides[rule] = action
 	}

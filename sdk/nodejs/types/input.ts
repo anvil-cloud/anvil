@@ -10,7 +10,7 @@ import * as pulumiAws from "@pulumi/aws";
 import * as pulumiGcp from "@pulumi/gcp";
 
 export namespace aws {
-    export interface BucketAccelerateConfigurationTransformArgs {
+    export interface BucketAccelerateConfigurationHatchArgs {
         /**
          * Name of the bucket.
          */
@@ -31,7 +31,7 @@ export namespace aws {
         status?: pulumi.Input<string>;
     }
 
-    export interface BucketAclTransformArgs {
+    export interface BucketAclHatchArgs {
         /**
          * Configuration block that sets the ACL permissions for an object per grantee. See below.
          */
@@ -56,7 +56,7 @@ export namespace aws {
         region?: pulumi.Input<string>;
     }
 
-    export interface BucketCorsConfigurationTransformArgs {
+    export interface BucketCorsConfigurationHatchArgs {
         /**
          * Name of the bucket.
          */
@@ -77,7 +77,25 @@ export namespace aws {
         region?: pulumi.Input<string>;
     }
 
-    export interface BucketLifecycleConfigurationTransformArgs {
+    export interface BucketHatchArgsArgs {
+        accelerationStatus?: pulumi.Input<inputs.aws.BucketAccelerateConfigurationHatchArgs>;
+        acl?: pulumi.Input<inputs.aws.BucketAclHatchArgs>;
+        bucket?: pulumi.Input<inputs.aws.BucketOverridesArgs>;
+        corsRules?: pulumi.Input<inputs.aws.BucketCorsConfigurationHatchArgs>;
+        grants?: pulumi.Input<inputs.aws.BucketAclHatchArgs>;
+        lifecycleRules?: pulumi.Input<inputs.aws.BucketLifecycleConfigurationHatchArgs>;
+        logging?: pulumi.Input<inputs.aws.BucketLoggingHatchArgs>;
+        objectLockConfiguration?: pulumi.Input<inputs.aws.BucketObjectLockConfigurationHatchArgs>;
+        policy?: pulumi.Input<inputs.aws.BucketPolicyHatchArgs>;
+        publicAccessBlock?: pulumi.Input<inputs.aws.PABHatchArgs>;
+        replicationConfiguration?: pulumi.Input<inputs.aws.BucketReplicationConfigHatchArgs>;
+        requestPayer?: pulumi.Input<inputs.aws.BucketRequestPaymentConfigurationHatchArgs>;
+        serverSideEncryptionConfiguration?: pulumi.Input<inputs.aws.BucketServerSideEncryptionConfigurationHatchArgs>;
+        versioning?: pulumi.Input<inputs.aws.BucketVersioningHatchArgs>;
+        website?: pulumi.Input<inputs.aws.BucketWebsiteConfigurationHatchArgs>;
+    }
+
+    export interface BucketLifecycleConfigurationHatchArgs {
         /**
          * Name of the source S3 bucket you want Amazon S3 to monitor.
          */
@@ -103,7 +121,7 @@ export namespace aws {
         transitionDefaultMinimumObjectSize?: pulumi.Input<string>;
     }
 
-    export interface BucketLoggingTransformArgs {
+    export interface BucketLoggingHatchArgs {
         /**
          * Name of the bucket.
          */
@@ -136,7 +154,7 @@ export namespace aws {
         targetPrefix?: pulumi.Input<string>;
     }
 
-    export interface BucketObjectLockConfigurationTransformArgs {
+    export interface BucketObjectLockConfigurationHatchArgs {
         /**
          * Name of the bucket.
          */
@@ -195,7 +213,7 @@ export namespace aws {
         tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     }
 
-    export interface BucketPolicyTransformArgs {
+    export interface BucketPolicyHatchArgs {
         /**
          * Name of the bucket to which to apply the policy.
          */
@@ -210,7 +228,7 @@ export namespace aws {
         region?: pulumi.Input<string>;
     }
 
-    export interface BucketReplicationConfigTransformArgs {
+    export interface BucketReplicationConfigHatchArgs {
         /**
          * Name of the source S3 bucket you want Amazon S3 to monitor.
          */
@@ -241,7 +259,7 @@ export namespace aws {
         token?: pulumi.Input<string>;
     }
 
-    export interface BucketRequestPaymentConfigurationTransformArgs {
+    export interface BucketRequestPaymentConfigurationHatchArgs {
         /**
          * Name of the bucket.
          */
@@ -262,7 +280,7 @@ export namespace aws {
         region?: pulumi.Input<string>;
     }
 
-    export interface BucketServerSideEncryptionConfigurationTransformArgs {
+    export interface BucketServerSideEncryptionConfigurationHatchArgs {
         /**
          * ID (name) of the bucket.
          */
@@ -283,25 +301,7 @@ export namespace aws {
         rules?: pulumi.Input<pulumi.Input<pulumiAws.types.input.s3.BucketServerSideEncryptionConfigurationRule>[]>;
     }
 
-    export interface BucketTransformArgsArgs {
-        accelerationStatus?: pulumi.Input<inputs.aws.BucketAccelerateConfigurationTransformArgs>;
-        acl?: pulumi.Input<inputs.aws.BucketAclTransformArgs>;
-        bucket?: pulumi.Input<inputs.aws.BucketOverridesArgs>;
-        corsRules?: pulumi.Input<inputs.aws.BucketCorsConfigurationTransformArgs>;
-        grants?: pulumi.Input<inputs.aws.BucketAclTransformArgs>;
-        lifecycleRules?: pulumi.Input<inputs.aws.BucketLifecycleConfigurationTransformArgs>;
-        logging?: pulumi.Input<inputs.aws.BucketLoggingTransformArgs>;
-        objectLockConfiguration?: pulumi.Input<inputs.aws.BucketObjectLockConfigurationTransformArgs>;
-        policy?: pulumi.Input<inputs.aws.BucketPolicyTransformArgs>;
-        publicAccessBlock?: pulumi.Input<inputs.aws.PABTransformArgs>;
-        replicationConfiguration?: pulumi.Input<inputs.aws.BucketReplicationConfigTransformArgs>;
-        requestPayer?: pulumi.Input<inputs.aws.BucketRequestPaymentConfigurationTransformArgs>;
-        serverSideEncryptionConfiguration?: pulumi.Input<inputs.aws.BucketServerSideEncryptionConfigurationTransformArgs>;
-        versioning?: pulumi.Input<inputs.aws.BucketVersioningTransformArgs>;
-        website?: pulumi.Input<inputs.aws.BucketWebsiteConfigurationTransformArgs>;
-    }
-
-    export interface BucketVersioningTransformArgs {
+    export interface BucketVersioningHatchArgs {
         /**
          * Name of the S3 bucket.
          */
@@ -326,7 +326,7 @@ export namespace aws {
         versioningConfiguration?: pulumi.Input<pulumiAws.types.input.s3.BucketVersioningVersioningConfiguration>;
     }
 
-    export interface BucketWebsiteConfigurationTransformArgs {
+    export interface BucketWebsiteConfigurationHatchArgs {
         /**
          * Name of the bucket.
          */
@@ -446,6 +446,10 @@ export namespace aws {
          * Verified SES sender address (e.g. noreply@myapp.com). Setting this switches delivery to SES, removing the 50 emails/day limit. The address must be verified in SES in the same region as the user pool.
          */
         sesFromAddress?: pulumi.Input<string>;
+    }
+
+    export interface CognitoUserPoolHatchArgsArgs {
+        cognitoUserPool?: pulumi.Input<inputs.aws.CognitoUserPoolOverridesArgs>;
     }
 
     /**
@@ -689,10 +693,6 @@ export namespace aws {
         refreshTokenValidity?: pulumi.Input<number>;
     }
 
-    export interface CognitoUserPoolTransformArgsArgs {
-        cognitoUserPool?: pulumi.Input<inputs.aws.CognitoUserPoolOverridesArgs>;
-    }
-
     /**
      * Attaches a WAF to the user pool.
      */
@@ -871,6 +871,10 @@ export namespace aws {
         vpcId: any;
     }
 
+    export interface DsqlHatchArgsArgs {
+        dsql?: pulumi.Input<inputs.aws.DsqlOverridesArgs>;
+    }
+
     export interface DsqlOverridesArgs {
         /**
          * Whether deletion protection is enabled in this cluster.
@@ -899,10 +903,6 @@ export namespace aws {
          */
         tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
         timeouts?: pulumi.Input<pulumiAws.types.input.dsql.ClusterTimeouts>;
-    }
-
-    export interface DsqlTransformArgsArgs {
-        dsql?: pulumi.Input<inputs.aws.DsqlOverridesArgs>;
     }
 
     /**
@@ -1007,6 +1007,10 @@ export namespace aws {
          * ARN of the Lambda execution role. Anvil attaches an inline policy granting stream read permissions (GetRecords, GetShardIterator, DescribeStream, ListStreams).
          */
         lambdaRoleArn: pulumi.Input<string>;
+    }
+
+    export interface DynamoHatchArgsArgs {
+        dynamo?: pulumi.Input<inputs.aws.DynamoOverridesArgs>;
     }
 
     export interface DynamoOverridesArgs {
@@ -1126,8 +1130,8 @@ export namespace aws {
         writeCapacity?: pulumi.Input<number>;
     }
 
-    export interface DynamoTransformArgsArgs {
-        dynamo?: pulumi.Input<inputs.aws.DynamoOverridesArgs>;
+    export interface EventBridgeHatchArgsArgs {
+        eventBridge?: pulumi.Input<inputs.aws.EventBridgeOverridesArgs>;
     }
 
     export interface EventBridgeOverridesArgs {
@@ -1165,10 +1169,6 @@ export namespace aws {
          * Map of tags assigned to the resource. If configured with a provider <span pulumi-lang-nodejs="`defaultTags`" pulumi-lang-dotnet="`DefaultTags`" pulumi-lang-go="`defaultTags`" pulumi-lang-python="`default_tags`" pulumi-lang-yaml="`defaultTags`" pulumi-lang-java="`defaultTags`">`default_tags`</span> configuration block present, tags with matching keys will overwrite those defined at the provider-level.
          */
         tags?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
-    }
-
-    export interface EventBridgeTransformArgsArgs {
-        eventBridge?: pulumi.Input<inputs.aws.EventBridgeOverridesArgs>;
     }
 
     /**
@@ -1411,6 +1411,10 @@ export namespace aws {
         rateLimit?: pulumi.Input<number>;
     }
 
+    export interface LambdaHatchArgsArgs {
+        lambda?: pulumi.Input<inputs.aws.LambdaOverridesArgs>;
+    }
+
     export interface LambdaOverridesArgs {
         /**
          * Instruction set architecture for your Lambda function. Valid values are `[<span pulumi-lang-nodejs=""x8664"" pulumi-lang-dotnet=""X8664"" pulumi-lang-go=""x8664"" pulumi-lang-python=""x86_64"" pulumi-lang-yaml=""x8664"" pulumi-lang-java=""x8664"">"x86_64"</span>]` and `["arm64"]`. Default is `[<span pulumi-lang-nodejs=""x8664"" pulumi-lang-dotnet=""X8664"" pulumi-lang-go=""x8664"" pulumi-lang-python=""x86_64"" pulumi-lang-yaml=""x8664"" pulumi-lang-java=""x8664"">"x86_64"</span>]`. Removing this attribute, function's architecture stays the same.
@@ -1585,10 +1589,6 @@ export namespace aws {
         resource?: any;
     }
 
-    export interface LambdaTransformArgsArgs {
-        lambda?: pulumi.Input<inputs.aws.LambdaOverridesArgs>;
-    }
-
     export interface LambdaVpcArgsArgs {
         /**
          * CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.
@@ -1637,7 +1637,7 @@ export namespace aws {
         securityGroupId: any;
     }
 
-    export interface PABTransformArgs {
+    export interface PABHatchArgs {
         /**
          * Whether Amazon S3 should block public ACLs for this bucket. Defaults to <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>. Enabling this setting does not affect existing policies or ACLs. When set to <span pulumi-lang-nodejs="`true`" pulumi-lang-dotnet="`True`" pulumi-lang-go="`true`" pulumi-lang-python="`true`" pulumi-lang-yaml="`true`" pulumi-lang-java="`true`">`true`</span> causes the following behavior:
          * * PUT Bucket ACL and PUT Object ACL calls will fail if the specified ACL allows public access.
@@ -1695,6 +1695,10 @@ export namespace aws {
          * How many times a message can be received before being moved to the DLQ. Default: 3.
          */
         maxReceiveCount?: pulumi.Input<number>;
+    }
+
+    export interface QueueHatchArgsArgs {
+        queue?: pulumi.Input<inputs.aws.QueueOverridesArgs>;
     }
 
     /**
@@ -1788,10 +1792,6 @@ export namespace aws {
          * Visibility timeout for the queue. An integer from 0 to 43200 (12 hours). The default for this attribute is 30. For more information about visibility timeout, see [AWS docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/AboutVT.html).
          */
         visibilityTimeoutSeconds?: pulumi.Input<number>;
-    }
-
-    export interface QueueTransformArgsArgs {
-        queue?: pulumi.Input<inputs.aws.QueueOverridesArgs>;
     }
 
     /**
@@ -1907,6 +1907,10 @@ export namespace aws {
          * Storage tiering policy for flow log retention.
          */
         lifecycle: pulumi.Input<enums.aws.S3FlowLogLifecycle>;
+    }
+
+    export interface WafHatchArgsArgs {
+        waf?: pulumi.Input<inputs.aws.WafOverridesArgs>;
     }
 
     /**
@@ -2041,13 +2045,13 @@ export namespace aws {
          */
         windowSeconds?: pulumi.Input<number>;
     }
-
-    export interface WafTransformArgsArgs {
-        waf?: pulumi.Input<inputs.aws.WafOverridesArgs>;
-    }
 }
 
 export namespace gcp {
+    export interface BucketHatchArgsArgs {
+        bucket?: pulumi.Input<inputs.gcp.BucketOverridesArgs>;
+    }
+
     export interface BucketOverridesArgs {
         /**
          * The bucket's [Autoclass](https://cloud.google.com/storage/docs/autoclass) configuration.  Structure is documented below.
@@ -2150,8 +2154,8 @@ export namespace gcp {
         website?: pulumi.Input<pulumiGcp.types.input.storage.BucketWebsite>;
     }
 
-    export interface BucketTransformArgsArgs {
-        bucket?: pulumi.Input<inputs.gcp.BucketOverridesArgs>;
+    export interface FunctionHatchArgsArgs {
+        function?: pulumi.Input<inputs.gcp.FunctionOverridesArgs>;
     }
 
     export interface FunctionOverridesArgs {
@@ -2202,9 +2206,5 @@ export namespace gcp {
          * Structure is documented below.
          */
         serviceConfig?: pulumi.Input<pulumiGcp.types.input.cloudfunctionsv2.FunctionServiceConfig>;
-    }
-
-    export interface FunctionTransformArgsArgs {
-        function?: pulumi.Input<inputs.gcp.FunctionOverridesArgs>;
     }
 }

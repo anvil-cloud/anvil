@@ -64,9 +64,9 @@ export class DSQL extends pulumi.ComponentResource {
         opts = opts || {};
         if (!opts.id) {
             resourceInputs["backup"] = args?.backup;
+            resourceInputs["hatch"] = args?.hatch;
             resourceInputs["multiRegion"] = args?.multiRegion;
             resourceInputs["schemas"] = args?.schemas;
-            resourceInputs["transform"] = args?.transform;
             resourceInputs["vpc"] = args?.vpc;
             resourceInputs["clusterArns"] = undefined /*out*/;
             resourceInputs["endpoint"] = undefined /*out*/;
@@ -95,6 +95,7 @@ export interface DSQLArgs {
      * AWS Backup configuration. Omit to disable. When set, Anvil opts in the DSQL resource type per region, creates a backup plan with retention and schedule, and for multi-region clusters automatically adds cross-region copy rules.
      */
     backup?: pulumi.Input<inputs.aws.DSQLBackupArgsArgs>;
+    hatch?: pulumi.Input<inputs.aws.DsqlHatchArgsArgs>;
     /**
      * Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region.
      */
@@ -103,7 +104,6 @@ export interface DSQLArgs {
      * Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
      */
     schemas?: pulumi.Input<pulumi.Input<inputs.aws.DSQLSchemaArgs>[]>;
-    transform?: pulumi.Input<inputs.aws.DsqlTransformArgsArgs>;
     /**
      * Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
      */

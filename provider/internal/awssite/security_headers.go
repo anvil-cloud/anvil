@@ -3,7 +3,7 @@ package awssite
 import (
 	"fmt"
 
-	"github.com/anvil-cloud/anvil/provider/internal/transform"
+	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	"github.com/anvil-cloud/anvil/provider/sites"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/cloudfront"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -175,7 +175,7 @@ func CreateSecurityHeadersPolicy(ctx *pulumi.Context, parent pulumi.Resource, na
 	if len(custom) > 0 {
 		props["customHeadersConfig"] = pulumi.Map{"items": custom}
 	}
-	props = transform.MergeTransform(overrides, props)
+	props = hatch.Merge(overrides, props)
 
 	policy := &cloudfront.ResponseHeadersPolicy{}
 	err := ctx.RegisterResource("aws:cloudfront/responseHeadersPolicy:ResponseHeadersPolicy", name+"-security-headers",

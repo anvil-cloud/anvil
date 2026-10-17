@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
-	"github.com/anvil-cloud/anvil/provider/internal/transform"
 	awsdynamodb "github.com/pulumi/pulumi-aws/sdk/v7/go/aws/dynamodb"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"
 	awslambda "github.com/pulumi/pulumi-aws/sdk/v7/go/aws/lambda"
@@ -92,9 +92,9 @@ type DynamoDBArgs struct {
 	// CMK costs ~$1/month + API call charges.
 	KmsKeyArn string `pulumi:"kmsKeyArn,optional"`
 
-	// Transform allows low-level overrides of the underlying DynamoDB table resource.
+	// Hatch is the escape hatch for low-level overrides of the underlying DynamoDB table resource.
 	// Keys: "dynamo". Use sparingly — Anvil's defaults should cover most cases.
-	Transform map[string]map[string]interface{} `pulumi:"transform,optional"`
+	Hatch map[string]map[string]interface{} `pulumi:"hatch,optional"`
 }
 
 // ── Component ──────────────────────────────────────────────────────────────
@@ -244,9 +244,9 @@ func NewDynamoDB(ctx *pulumi.Context, name string, args DynamoDBArgs, opts ...pu
 		}
 	}
 
-	tablePropsTransformed := transform.MergeTransform(args.Transform["dynamo"], tableMap)
+	tablePropsMerged := hatch.Merge(args.Hatch["dynamo"], tableMap)
 	tableRes := &awsdynamodb.Table{}
-	if err := ctx.RegisterResource("aws:dynamodb/table:Table", name, tablePropsTransformed, tableRes, pulumi.Parent(d)); err != nil {
+	if err := ctx.RegisterResource("aws:dynamodb/table:Table", name, tablePropsMerged, tableRes, pulumi.Parent(d)); err != nil {
 		return nil, fmt.Errorf("creating DynamoDB table %q: %w", name, err)
 	}
 	d.table = tableRes
@@ -507,7 +507,7 @@ func wireEventBridgeConsumer(
 //
 // PROVISIONED BILLING (docs):
 //   Default is PAY_PER_REQUEST (serverless, no capacity planning).
-//   PROVISIONED mode is available as a transform for workloads with predictable
+//   PROVISIONED mode is available via the hatch for workloads with predictable
 //   traffic needing cost optimisation. When using PROVISIONED, GSIs require
 //   their own read/write capacity units — call this out clearly in docs as it
 //   is a common source of confusion for users migrating from PAY_PER_REQUEST.

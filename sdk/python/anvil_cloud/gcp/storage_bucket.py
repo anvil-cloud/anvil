@@ -23,7 +23,7 @@ class StorageBucketArgs:
     def __init__(__self__, *,
                  data_classification: pulumi.Input[_builtins.str],
                  location: pulumi.Input[_builtins.str],
-                 transform: Optional[pulumi.Input['BucketTransformArgsArgs']] = None):
+                 hatch: Optional[pulumi.Input['BucketHatchArgsArgs']] = None):
         """
         The set of arguments for constructing a StorageBucket resource.
 
@@ -32,8 +32,8 @@ class StorageBucketArgs:
         """
         pulumi.set(__self__, "data_classification", data_classification)
         pulumi.set(__self__, "location", location)
-        if transform is not None:
-            pulumi.set(__self__, "transform", transform)
+        if hatch is not None:
+            pulumi.set(__self__, "hatch", hatch)
 
     @_builtins.property
     @pulumi.getter(name="dataClassification")
@@ -61,12 +61,12 @@ class StorageBucketArgs:
 
     @_builtins.property
     @pulumi.getter
-    def transform(self) -> Optional[pulumi.Input['BucketTransformArgsArgs']]:
-        return pulumi.get(self, "transform")
+    def hatch(self) -> Optional[pulumi.Input['BucketHatchArgsArgs']]:
+        return pulumi.get(self, "hatch")
 
-    @transform.setter
-    def transform(self, value: Optional[pulumi.Input['BucketTransformArgsArgs']]):
-        pulumi.set(self, "transform", value)
+    @hatch.setter
+    def hatch(self, value: Optional[pulumi.Input['BucketHatchArgsArgs']]):
+        pulumi.set(self, "hatch", value)
 
 
 @pulumi.type_token("anvil:gcp:StorageBucket")
@@ -76,8 +76,8 @@ class StorageBucket(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  data_classification: Optional[pulumi.Input[_builtins.str]] = None,
+                 hatch: Optional[pulumi.Input[Union['BucketHatchArgsArgs', 'BucketHatchArgsArgsDict']]] = None,
                  location: Optional[pulumi.Input[_builtins.str]] = None,
-                 transform: Optional[pulumi.Input[Union['BucketTransformArgsArgs', 'BucketTransformArgsArgsDict']]] = None,
                  __props__=None):
         """
         Create a StorageBucket resource with the given unique name, props, and options.
@@ -112,8 +112,8 @@ class StorageBucket(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  data_classification: Optional[pulumi.Input[_builtins.str]] = None,
+                 hatch: Optional[pulumi.Input[Union['BucketHatchArgsArgs', 'BucketHatchArgsArgsDict']]] = None,
                  location: Optional[pulumi.Input[_builtins.str]] = None,
-                 transform: Optional[pulumi.Input[Union['BucketTransformArgsArgs', 'BucketTransformArgsArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -128,10 +128,10 @@ class StorageBucket(pulumi.ComponentResource):
             if data_classification is None and not opts.urn:
                 raise TypeError("Missing required property 'data_classification'")
             __props__.__dict__["data_classification"] = data_classification
+            __props__.__dict__["hatch"] = hatch
             if location is None and not opts.urn:
                 raise TypeError("Missing required property 'location'")
             __props__.__dict__["location"] = location
-            __props__.__dict__["transform"] = transform
         super(StorageBucket, __self__).__init__(
             'anvil:gcp:StorageBucket',
             resource_name,

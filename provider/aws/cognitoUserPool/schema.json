@@ -5,7 +5,7 @@
       "inputProperties": {
         "appClient": {
           "$ref": "#/types/anvil:aws:CognitoUserPoolAppClient",
-          "description": "Default app client created with the user pool. Covers the 80% case of one application per pool. Use transform for additional clients."
+          "description": "Default app client created with the user pool. Covers the 80% case of one application per pool. Use hatch for additional clients."
         },
         "attributes": {
           "$ref": "#/types/anvil:aws:CognitoUserPoolAttributes",
@@ -14,6 +14,9 @@
         "emailConfiguration": {
           "$ref": "#/types/anvil:aws:CognitoUserPoolEmailConfiguration",
           "description": "Email delivery configuration. Default: Cognito-managed email (5 emails/day limit). Set sesFromAddress for SES delivery in production."
+        },
+        "hatch": {
+          "$ref": "#/types/anvil:aws:CognitoUserPoolHatchArgs"
         },
         "hostedUi": {
           "$ref": "#/types/anvil:aws:CognitoUserPoolHostedUi",
@@ -33,9 +36,6 @@
         "passwordPolicy": {
           "$ref": "#/types/anvil:aws:CognitoUserPoolPasswordPolicy",
           "description": "Password policy for the user pool. Anvil enforces a secure baseline by default — override only to strengthen."
-        },
-        "transform": {
-          "$ref": "#/types/anvil:aws:CognitoUserPoolTransformArgs"
         },
         "waf": {
           "$ref": "#/types/anvil:aws:CognitoUserPoolWaf",
@@ -230,6 +230,14 @@
         "sesFromAddress": {
           "description": "Verified SES sender address (e.g. noreply@myapp.com). Setting this switches delivery to SES, removing the 50 emails/day limit. The address must be verified in SES in the same region as the user pool.",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:CognitoUserPoolHatchArgs": {
+      "properties": {
+        "cognitoUserPool": {
+          "$ref": "#/types/anvil:aws:CognitoUserPoolOverrides"
         }
       },
       "type": "object"
@@ -578,14 +586,6 @@
         "refreshTokenValidity": {
           "description": "Refresh token validity in days. Default: 30.",
           "type": "integer"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:aws:CognitoUserPoolTransformArgs": {
-      "properties": {
-        "cognitoUserPool": {
-          "$ref": "#/types/anvil:aws:CognitoUserPoolOverrides"
         }
       },
       "type": "object"

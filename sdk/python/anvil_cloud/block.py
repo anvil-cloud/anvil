@@ -32,7 +32,7 @@ class Block(pulumi.ComponentResource):
 
                 bucket = anvil.aws.Bucket("events",
                     data_classification="internal",
-                    transform={"bucket": {"bucket": f"rules-{self.stage}-events"}},
+                    hatch={"bucket": {"bucket": f"rules-{self.stage}-events"}},
                 )
     """
 

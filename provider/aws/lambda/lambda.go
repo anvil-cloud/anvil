@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
-	"github.com/anvil-cloud/anvil/provider/internal/transform"
 	"github.com/anvil-cloud/anvil/provider/internal/vpcsg"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/cloudwatch"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"
@@ -169,7 +169,7 @@ type LambdaArgs struct {
 	// Set to "kms" to enable.
 	Encryption string `pulumi:"encryption,optional"`
 
-	Transform map[string]map[string]interface{} `pulumi:"transform,optional"`
+	Hatch map[string]map[string]interface{} `pulumi:"hatch,optional"`
 }
 
 type Lambda struct {
@@ -329,7 +329,7 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 
 	// ── 1. CloudWatch Log Group ────────────────────────
 	logGroupName := fmt.Sprintf("/aws/lambda/%s", physicalName)
-	logGroupProps := transform.MergeTransform(args.Transform["logGroup"], pulumi.Map{
+	logGroupProps := hatch.Merge(args.Hatch["logGroup"], pulumi.Map{
 		"name":            pulumi.String(logGroupName),
 		"retentionInDays": pulumi.Int(logRetentionDays),
 		"tags": pulumi.StringMap{
@@ -353,7 +353,7 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 	}`
 
 	role := &iam.Role{}
-	roleProps := transform.MergeTransform(args.Transform["role"], pulumi.Map{
+	roleProps := hatch.Merge(args.Hatch["role"], pulumi.Map{
 		"name":             pulumi.String(provider.PhysicalName(stage, name, "role", stageId)),
 		"assumeRolePolicy": pulumi.String(assumeRolePolicy),
 		"tags": pulumi.StringMap{
@@ -539,10 +539,10 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 	}
 
 	if args.Encryption == "kms" {
-		ctx.Log.Info("KMS encryption enabled for environment variables. Supply kmsKeyArn via transform[\"lambda\"].", nil)
+		ctx.Log.Info("KMS encryption enabled for environment variables. Supply kmsKeyArn via hatch[\"lambda\"].", nil)
 	}
 
-	lambdaProps := transform.MergeTransform(args.Transform["lambda"], lambdaMap)
+	lambdaProps := hatch.Merge(args.Hatch["lambda"], lambdaMap)
 
 	// DependsOn basicExec ensures IAM has fully propagated before Lambda is
 	// created. Without this, AWS may reject the function with
@@ -560,7 +560,7 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 	// ── 7. Function URL ────────────────────────────────
 	var functionUrl pulumi.StringOutput
 	if args.URL {
-		urlProps := transform.MergeTransform(args.Transform["url"], pulumi.Map{
+		urlProps := hatch.Merge(args.Hatch["url"], pulumi.Map{
 			"functionName":      res.Name,
 			"authorizationType": pulumi.String("AWS_IAM"),
 		})

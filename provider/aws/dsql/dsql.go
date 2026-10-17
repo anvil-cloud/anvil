@@ -8,8 +8,8 @@ import (
 
 	dsqlbootstrap "github.com/anvil-cloud/anvil/provider/aws/dsql/bootstrap"
 	dsqlgrant "github.com/anvil-cloud/anvil/provider/aws/dsqlgrant"
+	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
-	"github.com/anvil-cloud/anvil/provider/internal/transform"
 	"github.com/anvil-cloud/anvil/provider/internal/vpcsg"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws"
 	awsbackup "github.com/pulumi/pulumi-aws/sdk/v7/go/aws/backup"
@@ -187,10 +187,10 @@ type DSQLArgs struct {
 	// When omitted, no backup resources are created.
 	Backup *DSQLBackupArgs `pulumi:"backup,optional"`
 
-	// Transform allows low-level overrides of the underlying aws.dsql.Cluster.
+	// Hatch is the escape hatch for low-level overrides of the underlying aws.dsql.Cluster.
 	// Keys: "cluster". Use for KMS key ARN and other cluster-level settings
 	// not exposed by the Anvil API.
-	Transform map[string]map[string]interface{} `pulumi:"transform,optional"`
+	Hatch map[string]map[string]interface{} `pulumi:"hatch,optional"`
 }
 
 // ── Component ──────────────────────────────────────────────────────────────
@@ -386,7 +386,7 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 			}
 		}
 
-		clusterProps := transform.MergeTransform(args.Transform["cluster"], clusterMap)
+		clusterProps := hatch.Merge(args.Hatch["cluster"], clusterMap)
 		clusterRes := &awsdsql.Cluster{}
 
 		clusterOpts := append(resourceOpts(region), pulumi.Protect(true))
@@ -1587,7 +1587,7 @@ func appendSchemasToManifest(name string, schemas []DSQLSchemaArgs) error {
 // ── 2. THE API (single source of truth) ─────────────────────────────────────
 //
 //   new anvil.aws.DSQL("orders", {
-//     // optional: multiRegion, vpc, backup, transform
+//     // optional: multiRegion, vpc, backup, hatch
 //     schemas: [
 //       {
 //         name: "myapp",                              // schema (namespace)

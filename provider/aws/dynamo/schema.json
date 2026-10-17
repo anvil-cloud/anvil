@@ -14,6 +14,9 @@
           "$ref": "#/types/anvil:aws:DynamoDBKeyAttribute",
           "description": "Primary hash (partition) key. Required."
         },
+        "hatch": {
+          "$ref": "#/types/anvil:aws:DynamoHatchArgs"
+        },
         "kmsKeyArn": {
           "description": "Tier 2 opt-in. ARN of a KMS CMK for encryption at rest. If omitted, AWS_OWNED_KMS is used (Tier 1 default — always on, zero cost). Use this for compliance workloads requiring key rotation control, audit trail, or the ability to revoke access by disabling the key.",
           "type": "string"
@@ -25,9 +28,6 @@
         "stream": {
           "$ref": "#/types/anvil:aws:DynamoDBStream",
           "description": "DynamoDB Streams configuration. Opt-in. Enables change data capture on the table."
-        },
-        "transform": {
-          "$ref": "#/types/anvil:aws:DynamoTransformArgs"
         },
         "ttlAttribute": {
           "description": "Name of the attribute used for TTL (time-to-live). Items with this attribute set to a past Unix timestamp are automatically deleted by DynamoDB.",
@@ -254,6 +254,14 @@
       ],
       "type": "string"
     },
+    "anvil:aws:DynamoHatchArgs": {
+      "properties": {
+        "dynamo": {
+          "$ref": "#/types/anvil:aws:DynamoOverrides"
+        }
+      },
+      "type": "object"
+    },
     "anvil:aws:DynamoOverrides": {
       "properties": {
         "attributes": {
@@ -384,14 +392,6 @@
         "writeCapacity": {
           "description": "Number of write units for this table. If the \u003cspan pulumi-lang-nodejs=\"`billingMode`\" pulumi-lang-dotnet=\"`BillingMode`\" pulumi-lang-go=\"`billingMode`\" pulumi-lang-python=\"`billing_mode`\" pulumi-lang-yaml=\"`billingMode`\" pulumi-lang-java=\"`billingMode`\"\u003e`billing_mode`\u003c/span\u003e is `PROVISIONED`, this field is required.\n",
           "type": "integer"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:aws:DynamoTransformArgs": {
-      "properties": {
-        "dynamo": {
-          "$ref": "#/types/anvil:aws:DynamoOverrides"
         }
       },
       "type": "object"

@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
-	"github.com/anvil-cloud/anvil/provider/internal/transform"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/cognito"
 	awsconfig "github.com/pulumi/pulumi-aws/sdk/v7/go/aws/config"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"
@@ -149,7 +149,7 @@ type CognitoUserPoolArgs struct {
 	// Waf attaches a regional WAF WebACL to the user pool.
 	Waf *CognitoUserPoolWafArgs `pulumi:"waf,optional"`
 
-	Transform map[string]map[string]interface{} `pulumi:"transform,optional"`
+	Hatch map[string]map[string]interface{} `pulumi:"hatch,optional"`
 }
 
 // ── Component ──────────────────────────────────────────────────────────────
@@ -407,7 +407,7 @@ func NewCognitoUserPool(ctx *pulumi.Context, name string, args CognitoUserPoolAr
 		poolMap["schemas"] = schemaAttrs
 	}
 
-	poolProps := transform.MergeTransform(args.Transform["userPool"], poolMap)
+	poolProps := hatch.Merge(args.Hatch["userPool"], poolMap)
 
 	pool := &cognito.UserPool{}
 	if err := ctx.RegisterResource("aws:cognito/userPool:UserPool", name, poolProps, pool, pulumi.Parent(comp)); err != nil {
@@ -587,7 +587,7 @@ func NewCognitoUserPool(ctx *pulumi.Context, name string, args CognitoUserPoolAr
 		// AWS explicitly recommends SRP as the secure password auth mechanism.
 		// ALLOW_REFRESH_TOKEN_AUTH is required for session continuation.
 		// To enable additional flows (e.g. ALLOW_USER_AUTH for passkeys/OTP),
-		// use transform.userPoolClient.explicitAuthFlows.
+		// use hatch.userPoolClient.explicitAuthFlows.
 		"explicitAuthFlows": pulumi.StringArray{
 			pulumi.String("ALLOW_USER_SRP_AUTH"),
 			pulumi.String("ALLOW_REFRESH_TOKEN_AUTH"),
@@ -600,7 +600,7 @@ func NewCognitoUserPool(ctx *pulumi.Context, name string, args CognitoUserPoolAr
 		clientMap["logoutUrls"] = logoutUrls
 	}
 
-	clientProps := transform.MergeTransform(args.Transform["userPoolClient"], clientMap)
+	clientProps := hatch.Merge(args.Hatch["userPoolClient"], clientMap)
 	client := &cognito.UserPoolClient{}
 	if err := ctx.RegisterResource("aws:cognito/userPoolClient:UserPoolClient", name+"-client", clientProps, client,
 		pulumi.Parent(comp),
@@ -619,7 +619,7 @@ func NewCognitoUserPool(ctx *pulumi.Context, name string, args CognitoUserPoolAr
 		// Managed Login v2 is the AWS-recommended default as of 2024.
 		// It supports passkeys, email OTP, SMS OTP, localisation, and a modern
 		// responsive design. Opt out to classic hosted UI via
-		// transform.userPoolDomain.managedLoginVersion = 1 — only needed if you
+		// hatch.userPoolDomain.managedLoginVersion = 1 — only needed if you
 		// use custom authentication challenge Lambda triggers, which v2 does not support.
 		domainMap := pulumi.Map{
 			"userPoolId":          pool.ID(),
@@ -636,7 +636,7 @@ func NewCognitoUserPool(ctx *pulumi.Context, name string, args CognitoUserPoolAr
 			}
 		}
 
-		domainProps := transform.MergeTransform(args.Transform["userPoolDomain"], domainMap)
+		domainProps := hatch.Merge(args.Hatch["userPoolDomain"], domainMap)
 		domainRes := &cognito.UserPoolDomain{}
 		if err := ctx.RegisterResource("aws:cognito/userPoolDomain:UserPoolDomain", name+"-domain", domainProps, domainRes,
 			pulumi.Parent(comp),

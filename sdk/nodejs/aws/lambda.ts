@@ -67,13 +67,13 @@ export class Lambda extends pulumi.ComponentResource {
             resourceInputs["entry"] = args?.entry;
             resourceInputs["environment"] = args?.environment;
             resourceInputs["handler"] = args?.handler;
+            resourceInputs["hatch"] = args?.hatch;
             resourceInputs["logRetention"] = args?.logRetention;
             resourceInputs["memory"] = args?.memory;
             resourceInputs["permissions"] = args?.permissions;
             resourceInputs["runtime"] = args?.runtime;
             resourceInputs["timeout"] = args?.timeout;
             resourceInputs["tracing"] = args?.tracing;
-            resourceInputs["transform"] = args?.transform;
             resourceInputs["url"] = args?.url;
             resourceInputs["vpc"] = args?.vpc;
             resourceInputs["arn"] = undefined /*out*/;
@@ -102,7 +102,7 @@ export interface LambdaArgs {
      */
     architecture?: pulumi.Input<enums.aws.LambdaArchitecture>;
     /**
-     * Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via transform["lambda"].
+     * Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
      */
     encryption?: pulumi.Input<string>;
     /**
@@ -117,6 +117,7 @@ export interface LambdaArgs {
      * The exported function name in the entry file. e.g. "handler" for `export const handler = ...`
      */
     handler: pulumi.Input<string>;
+    hatch?: pulumi.Input<inputs.aws.LambdaHatchArgsArgs>;
     /**
      * CloudWatch log group retention period. Default: "1y" (satisfies SOC 2, ISO 27001, PCI-DSS baseline).
      */
@@ -141,7 +142,6 @@ export interface LambdaArgs {
      * Enable AWS X-Ray tracing. Incurs per-trace cost (~$5/million traces). Default: false.
      */
     tracing?: pulumi.Input<boolean>;
-    transform?: pulumi.Input<inputs.aws.LambdaTransformArgsArgs>;
     /**
      * Enable a direct HTTPS endpoint for the function. Auth mode is AWS_IAM - never public. Default: false.
      */

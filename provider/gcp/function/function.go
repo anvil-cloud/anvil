@@ -1,7 +1,7 @@
 package function
 
 import (
-	"github.com/anvil-cloud/anvil/provider/internal/transform"
+	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	"github.com/pulumi/pulumi-gcp/sdk/v8/go/gcp/cloudfunctionsv2"
 	p "github.com/pulumi/pulumi-go-provider"
 	"github.com/pulumi/pulumi-go-provider/infer"
@@ -13,7 +13,7 @@ type FunctionArgs struct {
 	Location   string                            `pulumi:"location"`
 	Runtime    string                            `pulumi:"runtime"`
 	EntryPoint string                            `pulumi:"entryPoint"`
-	Transform  map[string]map[string]interface{} `pulumi:"transform,optional"`
+	Hatch      map[string]map[string]interface{} `pulumi:"hatch,optional"`
 }
 
 type Function struct {
@@ -36,7 +36,7 @@ func NewFunction(ctx *pulumi.Context, name string, args FunctionArgs, opts ...pu
 	}
 
 	// Cloud Function (2nd gen)
-	functionProps := transform.MergeTransform(args.Transform["function"], pulumi.Map{
+	functionProps := hatch.Merge(args.Hatch["function"], pulumi.Map{
 		"name":     pulumi.String(args.Name),
 		"location": pulumi.String(args.Location),
 		"buildConfig": pulumi.Map{

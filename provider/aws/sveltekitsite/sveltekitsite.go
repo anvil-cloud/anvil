@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/anvil-cloud/anvil/provider/internal/awssite"
-	"github.com/anvil-cloud/anvil/provider/internal/transform"
+	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	"github.com/anvil-cloud/anvil/provider/sites"
 	"github.com/anvil-cloud/anvil/provider/sites/sveltekit"
 	p "github.com/pulumi/pulumi-go-provider"
@@ -31,8 +31,8 @@ type SvelteKitSiteArgs struct {
 	// Only available at request time, NOT during build/prerendering.
 	RuntimeEnvironment map[string]pulumi.StringInput `pulumi:"runtimeEnvironment,optional"`
 
-	Domain    string                            `pulumi:"domain,optional"`
-	Transform map[string]map[string]interface{} `pulumi:"transform,optional"`
+	Domain string                            `pulumi:"domain,optional"`
+	Hatch  map[string]map[string]interface{} `pulumi:"hatch,optional"`
 
 	// OriginProtection locks CloudFront to a CDN/proxy in front of it
 	// (Cloudflare, Fastly, Akamai, nginx, ...). Requests without the
@@ -105,7 +105,7 @@ func NewSvelteKitSite(ctx *pulumi.Context, name string, args SvelteKitSiteArgs, 
 		Waf:              args.Waf,
 		OriginProtection: args.OriginProtection,
 		SecurityHeaders:  args.SecurityHeaders,
-		Transform:        args.Transform,
+		Hatch:            args.Hatch,
 	})
 	if err != nil {
 		return nil, err
@@ -127,7 +127,7 @@ func NewSvelteKitSite(ctx *pulumi.Context, name string, args SvelteKitSiteArgs, 
 	}
 
 	// ── S3 Bucket ────────────────────────────────────────────────
-	bucketProps := transform.MergeTransform(args.Transform["bucket"], pulumi.Map{
+	bucketProps := hatch.Merge(args.Hatch["bucket"], pulumi.Map{
 		"forceDestroy": pulumi.Bool(true),
 		"tags": pulumi.StringMap{
 			"ManagedBy": pulumi.String("anvil"),
@@ -179,7 +179,7 @@ func NewSvelteKitSite(ctx *pulumi.Context, name string, args SvelteKitSiteArgs, 
 
 	region, _ := ctx.GetConfig("aws:region")
 
-	lambdaProps := transform.MergeTransform(args.Transform["function"], pulumi.Map{
+	lambdaProps := hatch.Merge(args.Hatch["function"], pulumi.Map{
 		"runtime":       pulumi.String("nodejs22.x"),
 		"handler":       pulumi.String("run.sh"),
 		"role":          roleResult.Role.Arn,

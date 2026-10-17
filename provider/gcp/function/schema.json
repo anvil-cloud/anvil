@@ -6,6 +6,9 @@
           "description": "The name of the function to execute.",
           "type": "string"
         },
+        "hatch": {
+          "$ref": "#/types/anvil:gcp:FunctionHatchArgs"
+        },
         "location": {
           "description": "The GCP region to deploy to (e.g. us-central1).",
           "type": "string"
@@ -17,9 +20,6 @@
         "runtime": {
           "description": "The runtime to use (e.g. nodejs20, python312, go122).",
           "type": "string"
-        },
-        "transform": {
-          "$ref": "#/types/anvil:gcp:FunctionTransformArgs"
         }
       },
       "isComponent": true,
@@ -32,6 +32,61 @@
     }
   },
   "types": {
+    "anvil:gcp:FunctionHatch": {
+      "properties": {
+        "buildConfig": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionBuildConfig:FunctionBuildConfig",
+          "description": "Describes the Build step of the function that builds a container\nfrom the given source.\nStructure is documented below.\n"
+        },
+        "description": {
+          "description": "User-provided description of a function.\n",
+          "type": "string"
+        },
+        "eventTrigger": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionEventTrigger:FunctionEventTrigger",
+          "description": "An Eventarc trigger managed by Google Cloud Functions that fires events in\nresponse to a condition in another service.\nStructure is documented below.\n"
+        },
+        "kmsKeyName": {
+          "description": "Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources.\nIt must match the pattern projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}.\n",
+          "type": "string"
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "A set of key/value label pairs associated with this Cloud Function.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field \u003cspan pulumi-lang-nodejs=\"`effectiveLabels`\" pulumi-lang-dotnet=\"`EffectiveLabels`\" pulumi-lang-go=\"`effectiveLabels`\" pulumi-lang-python=\"`effective_labels`\" pulumi-lang-yaml=\"`effectiveLabels`\" pulumi-lang-java=\"`effectiveLabels`\"\u003e`effective_labels`\u003c/span\u003e for all of the labels present on the resource.\n",
+          "type": "object"
+        },
+        "location": {
+          "description": "The location of this cloud function.\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "name": {
+          "description": "A user-defined name of the function. Function names must\nbe unique globally and match pattern `projects/*/locations/*/functions/*`.\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "project": {
+          "description": "The ID of the project in which the resource belongs.\nIf it is not provided, the provider project is used.\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "serviceConfig": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionServiceConfig:FunctionServiceConfig",
+          "description": "Describes the Service being deployed.\nStructure is documented below.\n"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:gcp:FunctionHatchArgs": {
+      "properties": {
+        "function": {
+          "$ref": "#/types/anvil:gcp:FunctionOverrides"
+        }
+      },
+      "type": "object"
+    },
     "anvil:gcp:FunctionOverrides": {
       "properties": {
         "buildConfig": {
@@ -75,61 +130,6 @@
         "serviceConfig": {
           "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionServiceConfig:FunctionServiceConfig",
           "description": "Describes the Service being deployed.\nStructure is documented below.\n"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:gcp:FunctionTransform": {
-      "properties": {
-        "buildConfig": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionBuildConfig:FunctionBuildConfig",
-          "description": "Describes the Build step of the function that builds a container\nfrom the given source.\nStructure is documented below.\n"
-        },
-        "description": {
-          "description": "User-provided description of a function.\n",
-          "type": "string"
-        },
-        "eventTrigger": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionEventTrigger:FunctionEventTrigger",
-          "description": "An Eventarc trigger managed by Google Cloud Functions that fires events in\nresponse to a condition in another service.\nStructure is documented below.\n"
-        },
-        "kmsKeyName": {
-          "description": "Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources.\nIt must match the pattern projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}.\n",
-          "type": "string"
-        },
-        "labels": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "A set of key/value label pairs associated with this Cloud Function.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field \u003cspan pulumi-lang-nodejs=\"`effectiveLabels`\" pulumi-lang-dotnet=\"`EffectiveLabels`\" pulumi-lang-go=\"`effectiveLabels`\" pulumi-lang-python=\"`effective_labels`\" pulumi-lang-yaml=\"`effectiveLabels`\" pulumi-lang-java=\"`effectiveLabels`\"\u003e`effective_labels`\u003c/span\u003e for all of the labels present on the resource.\n",
-          "type": "object"
-        },
-        "location": {
-          "description": "The location of this cloud function.\n",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "name": {
-          "description": "A user-defined name of the function. Function names must\nbe unique globally and match pattern `projects/*/locations/*/functions/*`.\n",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "project": {
-          "description": "The ID of the project in which the resource belongs.\nIf it is not provided, the provider project is used.\n",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "serviceConfig": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionServiceConfig:FunctionServiceConfig",
-          "description": "Describes the Service being deployed.\nStructure is documented below.\n"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:gcp:FunctionTransformArgs": {
-      "properties": {
-        "function": {
-          "$ref": "#/types/anvil:gcp:FunctionOverrides"
         }
       },
       "type": "object"

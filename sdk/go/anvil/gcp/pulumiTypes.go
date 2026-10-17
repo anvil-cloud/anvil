@@ -15,6 +15,193 @@ import (
 
 var _ = internal.GetEnvOrDefault
 
+type BucketHatch struct {
+	// The bucket's [Autoclass](https://cloud.google.com/storage/docs/autoclass) configuration.  Structure is documented below.
+	Autoclass *storage.BucketAutoclass `pulumi:"autoclass"`
+	// The bucket's [Cross-Origin Resource Sharing (CORS)](https://www.w3.org/TR/cors/) configuration. Multiple blocks of this type are permitted. Structure is documented below.
+	Cors []storage.BucketCor `pulumi:"cors"`
+	// The bucket's custom location configuration, which specifies the individual regions that comprise a dual-region bucket. If the bucket is designated a single or multi-region, the parameters are empty. Structure is documented below.
+	CustomPlacementConfig *storage.BucketCustomPlacementConfig `pulumi:"customPlacementConfig"`
+	// Whether or not to automatically apply an eventBasedHold to new objects added to the bucket.
+	DefaultEventBasedHold *bool `pulumi:"defaultEventBasedHold"`
+	// Enables [object retention](https://cloud.google.com/storage/docs/object-lock) on a storage bucket.
+	EnableObjectRetention *bool `pulumi:"enableObjectRetention"`
+	// The bucket's encryption configuration. Structure is documented below.
+	Encryption *storage.BucketEncryption `pulumi:"encryption"`
+	// When true, before deleting a bucket, delete all objects within the bucket, or Anywhere Caches caching data for that bucket. Otherwise, buckets with objects/caches will fail. Anywhere Cache requires additional permissions to interact with and will be assumed not present when the provider is not permissioned, attempting to delete the bucket anyways. This may result in the objects in the bucket getting destroyed but not the bucket itself if there is a cache in use with the bucket. Force deletion may take a long time to delete buckets with lots of objects or with any Anywhere Caches (80m+).
+	ForceDestroy *bool `pulumi:"forceDestroy"`
+	// The bucket's hierarchical namespace policy, which defines the bucket capability to handle folders in logical structure. Structure is documented below. To use this configuration, <span pulumi-lang-nodejs="`uniformBucketLevelAccess`" pulumi-lang-dotnet="`UniformBucketLevelAccess`" pulumi-lang-go="`uniformBucketLevelAccess`" pulumi-lang-python="`uniform_bucket_level_access`" pulumi-lang-yaml="`uniformBucketLevelAccess`" pulumi-lang-java="`uniformBucketLevelAccess`">`uniform_bucket_level_access`</span> must be enabled on bucket.
+	HierarchicalNamespace *storage.BucketHierarchicalNamespace `pulumi:"hierarchicalNamespace"`
+	// The bucket IP filtering configuration. Specifies the network sources that can access the bucket, as well as its underlying objects. Structure is documented below.
+	IpFilter *storage.BucketIpFilter `pulumi:"ipFilter"`
+	// A map of key/value label pairs to assign to the bucket.
+	Labels map[string]string `pulumi:"labels"`
+	// The bucket's [Lifecycle Rules](https://cloud.google.com/storage/docs/lifecycle#configuration) configuration. Multiple blocks of this type are permitted. Structure is documented below.
+	LifecycleRules []storage.BucketLifecycleRule `pulumi:"lifecycleRules"`
+	// The [GCS location](https://cloud.google.com/storage/docs/bucket-locations).
+	//
+	// ***
+	Location *string `pulumi:"location"`
+	// The bucket's [Access & Storage Logs](https://cloud.google.com/storage/docs/access-logs) configuration. Structure is documented below.
+	Logging *storage.BucketLogging `pulumi:"logging"`
+	// The name of the bucket. Bucket names must be in lowercase and no more than 63 characters long. You can find the complete list of bucket naming rules [here](https://cloud.google.com/storage/docs/buckets#naming).
+	Name *string `pulumi:"name"`
+	// The ID of the project in which the resource belongs. If it
+	// is not provided, the provider project is used.
+	Project *string `pulumi:"project"`
+	// Prevents public access to a bucket. Acceptable values are "inherited" or "enforced". If "inherited", the bucket uses [public access prevention](https://cloud.google.com/storage/docs/public-access-prevention) only if the bucket is subject to the public access prevention organization policy constraint. Defaults to "inherited".
+	PublicAccessPrevention *string `pulumi:"publicAccessPrevention"`
+	// Enables [Requester Pays](https://cloud.google.com/storage/docs/requester-pays) on a storage bucket.
+	RequesterPays *bool `pulumi:"requesterPays"`
+	// Configuration of the bucket's data retention policy for how long objects in the bucket should be retained. Structure is documented below.
+	RetentionPolicy *storage.BucketRetentionPolicy `pulumi:"retentionPolicy"`
+	// The recovery point objective for cross-region replication of the bucket. Applicable only for dual and multi-region buckets. `"DEFAULT"` sets default replication. `"ASYNC_TURBO"` value enables turbo replication, valid for dual-region buckets only. See [Turbo Replication](https://cloud.google.com/storage/docs/managing-turbo-replication) for more information. If rpo is not specified at bucket creation, it defaults to `"DEFAULT"` for dual and multi-region buckets. **NOTE** If used with single-region bucket, It will throw an error.
+	Rpo *string `pulumi:"rpo"`
+	// The bucket's soft delete policy, which defines the period of time that soft-deleted objects will be retained, and cannot be permanently deleted. If the block is not provided, Server side value will be kept which means removal of block won't generate any terraform change. Structure is documented below.
+	SoftDeletePolicy *storage.BucketSoftDeletePolicy `pulumi:"softDeletePolicy"`
+	// The [Storage Class](https://cloud.google.com/storage/docs/storage-classes) of the new bucket. Supported values include: `STANDARD`, `MULTI_REGIONAL`, `REGIONAL`, `NEARLINE`, `COLDLINE`, `ARCHIVE`.
+	StorageClass *string `pulumi:"storageClass"`
+	// Enables [Uniform bucket-level access](https://cloud.google.com/storage/docs/uniform-bucket-level-access) access to a bucket.
+	UniformBucketLevelAccess *bool `pulumi:"uniformBucketLevelAccess"`
+	// The bucket's [Versioning](https://cloud.google.com/storage/docs/object-versioning) configuration.  Structure is documented below.
+	Versioning *storage.BucketVersioning `pulumi:"versioning"`
+	// Configuration if the bucket acts as a website. Structure is documented below.
+	Website *storage.BucketWebsite `pulumi:"website"`
+}
+
+type BucketHatchArgs struct {
+	Bucket *BucketOverrides `pulumi:"bucket"`
+}
+
+// BucketHatchArgsInput is an input type that accepts BucketHatchArgsArgs and BucketHatchArgsOutput values.
+// You can construct a concrete instance of `BucketHatchArgsInput` via:
+//
+//	BucketHatchArgsArgs{...}
+type BucketHatchArgsInput interface {
+	pulumi.Input
+
+	ToBucketHatchArgsOutput() BucketHatchArgsOutput
+	ToBucketHatchArgsOutputWithContext(context.Context) BucketHatchArgsOutput
+}
+
+type BucketHatchArgsArgs struct {
+	Bucket BucketOverridesPtrInput `pulumi:"bucket"`
+}
+
+func (BucketHatchArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketHatchArgs)(nil)).Elem()
+}
+
+func (i BucketHatchArgsArgs) ToBucketHatchArgsOutput() BucketHatchArgsOutput {
+	return i.ToBucketHatchArgsOutputWithContext(context.Background())
+}
+
+func (i BucketHatchArgsArgs) ToBucketHatchArgsOutputWithContext(ctx context.Context) BucketHatchArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketHatchArgsOutput)
+}
+
+func (i BucketHatchArgsArgs) ToBucketHatchArgsPtrOutput() BucketHatchArgsPtrOutput {
+	return i.ToBucketHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i BucketHatchArgsArgs) ToBucketHatchArgsPtrOutputWithContext(ctx context.Context) BucketHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketHatchArgsOutput).ToBucketHatchArgsPtrOutputWithContext(ctx)
+}
+
+// BucketHatchArgsPtrInput is an input type that accepts BucketHatchArgsArgs, BucketHatchArgsPtr and BucketHatchArgsPtrOutput values.
+// You can construct a concrete instance of `BucketHatchArgsPtrInput` via:
+//
+//	        BucketHatchArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type BucketHatchArgsPtrInput interface {
+	pulumi.Input
+
+	ToBucketHatchArgsPtrOutput() BucketHatchArgsPtrOutput
+	ToBucketHatchArgsPtrOutputWithContext(context.Context) BucketHatchArgsPtrOutput
+}
+
+type bucketHatchArgsPtrType BucketHatchArgsArgs
+
+func BucketHatchArgsPtr(v *BucketHatchArgsArgs) BucketHatchArgsPtrInput {
+	return (*bucketHatchArgsPtrType)(v)
+}
+
+func (*bucketHatchArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketHatchArgs)(nil)).Elem()
+}
+
+func (i *bucketHatchArgsPtrType) ToBucketHatchArgsPtrOutput() BucketHatchArgsPtrOutput {
+	return i.ToBucketHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *bucketHatchArgsPtrType) ToBucketHatchArgsPtrOutputWithContext(ctx context.Context) BucketHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(BucketHatchArgsPtrOutput)
+}
+
+type BucketHatchArgsOutput struct{ *pulumi.OutputState }
+
+func (BucketHatchArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*BucketHatchArgs)(nil)).Elem()
+}
+
+func (o BucketHatchArgsOutput) ToBucketHatchArgsOutput() BucketHatchArgsOutput {
+	return o
+}
+
+func (o BucketHatchArgsOutput) ToBucketHatchArgsOutputWithContext(ctx context.Context) BucketHatchArgsOutput {
+	return o
+}
+
+func (o BucketHatchArgsOutput) ToBucketHatchArgsPtrOutput() BucketHatchArgsPtrOutput {
+	return o.ToBucketHatchArgsPtrOutputWithContext(context.Background())
+}
+
+func (o BucketHatchArgsOutput) ToBucketHatchArgsPtrOutputWithContext(ctx context.Context) BucketHatchArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketHatchArgs) *BucketHatchArgs {
+		return &v
+	}).(BucketHatchArgsPtrOutput)
+}
+
+func (o BucketHatchArgsOutput) Bucket() BucketOverridesPtrOutput {
+	return o.ApplyT(func(v BucketHatchArgs) *BucketOverrides { return v.Bucket }).(BucketOverridesPtrOutput)
+}
+
+type BucketHatchArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (BucketHatchArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**BucketHatchArgs)(nil)).Elem()
+}
+
+func (o BucketHatchArgsPtrOutput) ToBucketHatchArgsPtrOutput() BucketHatchArgsPtrOutput {
+	return o
+}
+
+func (o BucketHatchArgsPtrOutput) ToBucketHatchArgsPtrOutputWithContext(ctx context.Context) BucketHatchArgsPtrOutput {
+	return o
+}
+
+func (o BucketHatchArgsPtrOutput) Elem() BucketHatchArgsOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) BucketHatchArgs {
+		if v != nil {
+			return *v
+		}
+		var ret BucketHatchArgs
+		return ret
+	}).(BucketHatchArgsOutput)
+}
+
+func (o BucketHatchArgsPtrOutput) Bucket() BucketOverridesPtrOutput {
+	return o.ApplyT(func(v *BucketHatchArgs) *BucketOverrides {
+		if v == nil {
+			return nil
+		}
+		return v.Bucket
+	}).(BucketOverridesPtrOutput)
+}
+
 type BucketOverrides struct {
 	// The bucket's [Autoclass](https://cloud.google.com/storage/docs/autoclass) configuration.  Structure is documented below.
 	Autoclass *storage.BucketAutoclass `pulumi:"autoclass"`
@@ -601,191 +788,169 @@ func (o BucketOverridesPtrOutput) Website() storage.BucketWebsitePtrOutput {
 	}).(storage.BucketWebsitePtrOutput)
 }
 
-type BucketTransform struct {
-	// The bucket's [Autoclass](https://cloud.google.com/storage/docs/autoclass) configuration.  Structure is documented below.
-	Autoclass *storage.BucketAutoclass `pulumi:"autoclass"`
-	// The bucket's [Cross-Origin Resource Sharing (CORS)](https://www.w3.org/TR/cors/) configuration. Multiple blocks of this type are permitted. Structure is documented below.
-	Cors []storage.BucketCor `pulumi:"cors"`
-	// The bucket's custom location configuration, which specifies the individual regions that comprise a dual-region bucket. If the bucket is designated a single or multi-region, the parameters are empty. Structure is documented below.
-	CustomPlacementConfig *storage.BucketCustomPlacementConfig `pulumi:"customPlacementConfig"`
-	// Whether or not to automatically apply an eventBasedHold to new objects added to the bucket.
-	DefaultEventBasedHold *bool `pulumi:"defaultEventBasedHold"`
-	// Enables [object retention](https://cloud.google.com/storage/docs/object-lock) on a storage bucket.
-	EnableObjectRetention *bool `pulumi:"enableObjectRetention"`
-	// The bucket's encryption configuration. Structure is documented below.
-	Encryption *storage.BucketEncryption `pulumi:"encryption"`
-	// When true, before deleting a bucket, delete all objects within the bucket, or Anywhere Caches caching data for that bucket. Otherwise, buckets with objects/caches will fail. Anywhere Cache requires additional permissions to interact with and will be assumed not present when the provider is not permissioned, attempting to delete the bucket anyways. This may result in the objects in the bucket getting destroyed but not the bucket itself if there is a cache in use with the bucket. Force deletion may take a long time to delete buckets with lots of objects or with any Anywhere Caches (80m+).
-	ForceDestroy *bool `pulumi:"forceDestroy"`
-	// The bucket's hierarchical namespace policy, which defines the bucket capability to handle folders in logical structure. Structure is documented below. To use this configuration, <span pulumi-lang-nodejs="`uniformBucketLevelAccess`" pulumi-lang-dotnet="`UniformBucketLevelAccess`" pulumi-lang-go="`uniformBucketLevelAccess`" pulumi-lang-python="`uniform_bucket_level_access`" pulumi-lang-yaml="`uniformBucketLevelAccess`" pulumi-lang-java="`uniformBucketLevelAccess`">`uniform_bucket_level_access`</span> must be enabled on bucket.
-	HierarchicalNamespace *storage.BucketHierarchicalNamespace `pulumi:"hierarchicalNamespace"`
-	// The bucket IP filtering configuration. Specifies the network sources that can access the bucket, as well as its underlying objects. Structure is documented below.
-	IpFilter *storage.BucketIpFilter `pulumi:"ipFilter"`
-	// A map of key/value label pairs to assign to the bucket.
-	Labels map[string]string `pulumi:"labels"`
-	// The bucket's [Lifecycle Rules](https://cloud.google.com/storage/docs/lifecycle#configuration) configuration. Multiple blocks of this type are permitted. Structure is documented below.
-	LifecycleRules []storage.BucketLifecycleRule `pulumi:"lifecycleRules"`
-	// The [GCS location](https://cloud.google.com/storage/docs/bucket-locations).
+type FunctionHatch struct {
+	// Describes the Build step of the function that builds a container
+	// from the given source.
+	// Structure is documented below.
+	BuildConfig *cloudfunctionsv2.FunctionBuildConfig `pulumi:"buildConfig"`
+	// User-provided description of a function.
+	Description *string `pulumi:"description"`
+	// An Eventarc trigger managed by Google Cloud Functions that fires events in
+	// response to a condition in another service.
+	// Structure is documented below.
+	EventTrigger *cloudfunctionsv2.FunctionEventTrigger `pulumi:"eventTrigger"`
+	// Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources.
+	// It must match the pattern projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}.
+	KmsKeyName *string `pulumi:"kmsKeyName"`
+	// A set of key/value label pairs associated with this Cloud Function.
 	//
-	// ***
+	// **Note**: This field is non-authoritative, and will only manage the labels present in your configuration.
+	// Please refer to the field <span pulumi-lang-nodejs="`effectiveLabels`" pulumi-lang-dotnet="`EffectiveLabels`" pulumi-lang-go="`effectiveLabels`" pulumi-lang-python="`effective_labels`" pulumi-lang-yaml="`effectiveLabels`" pulumi-lang-java="`effectiveLabels`">`effective_labels`</span> for all of the labels present on the resource.
+	Labels map[string]string `pulumi:"labels"`
+	// The location of this cloud function.
 	Location *string `pulumi:"location"`
-	// The bucket's [Access & Storage Logs](https://cloud.google.com/storage/docs/access-logs) configuration. Structure is documented below.
-	Logging *storage.BucketLogging `pulumi:"logging"`
-	// The name of the bucket. Bucket names must be in lowercase and no more than 63 characters long. You can find the complete list of bucket naming rules [here](https://cloud.google.com/storage/docs/buckets#naming).
+	// A user-defined name of the function. Function names must
+	// be unique globally and match pattern `projects/*/locations/*/functions/*`.
 	Name *string `pulumi:"name"`
-	// The ID of the project in which the resource belongs. If it
-	// is not provided, the provider project is used.
+	// The ID of the project in which the resource belongs.
+	// If it is not provided, the provider project is used.
 	Project *string `pulumi:"project"`
-	// Prevents public access to a bucket. Acceptable values are "inherited" or "enforced". If "inherited", the bucket uses [public access prevention](https://cloud.google.com/storage/docs/public-access-prevention) only if the bucket is subject to the public access prevention organization policy constraint. Defaults to "inherited".
-	PublicAccessPrevention *string `pulumi:"publicAccessPrevention"`
-	// Enables [Requester Pays](https://cloud.google.com/storage/docs/requester-pays) on a storage bucket.
-	RequesterPays *bool `pulumi:"requesterPays"`
-	// Configuration of the bucket's data retention policy for how long objects in the bucket should be retained. Structure is documented below.
-	RetentionPolicy *storage.BucketRetentionPolicy `pulumi:"retentionPolicy"`
-	// The recovery point objective for cross-region replication of the bucket. Applicable only for dual and multi-region buckets. `"DEFAULT"` sets default replication. `"ASYNC_TURBO"` value enables turbo replication, valid for dual-region buckets only. See [Turbo Replication](https://cloud.google.com/storage/docs/managing-turbo-replication) for more information. If rpo is not specified at bucket creation, it defaults to `"DEFAULT"` for dual and multi-region buckets. **NOTE** If used with single-region bucket, It will throw an error.
-	Rpo *string `pulumi:"rpo"`
-	// The bucket's soft delete policy, which defines the period of time that soft-deleted objects will be retained, and cannot be permanently deleted. If the block is not provided, Server side value will be kept which means removal of block won't generate any terraform change. Structure is documented below.
-	SoftDeletePolicy *storage.BucketSoftDeletePolicy `pulumi:"softDeletePolicy"`
-	// The [Storage Class](https://cloud.google.com/storage/docs/storage-classes) of the new bucket. Supported values include: `STANDARD`, `MULTI_REGIONAL`, `REGIONAL`, `NEARLINE`, `COLDLINE`, `ARCHIVE`.
-	StorageClass *string `pulumi:"storageClass"`
-	// Enables [Uniform bucket-level access](https://cloud.google.com/storage/docs/uniform-bucket-level-access) access to a bucket.
-	UniformBucketLevelAccess *bool `pulumi:"uniformBucketLevelAccess"`
-	// The bucket's [Versioning](https://cloud.google.com/storage/docs/object-versioning) configuration.  Structure is documented below.
-	Versioning *storage.BucketVersioning `pulumi:"versioning"`
-	// Configuration if the bucket acts as a website. Structure is documented below.
-	Website *storage.BucketWebsite `pulumi:"website"`
+	// Describes the Service being deployed.
+	// Structure is documented below.
+	ServiceConfig *cloudfunctionsv2.FunctionServiceConfig `pulumi:"serviceConfig"`
 }
 
-type BucketTransformArgs struct {
-	Bucket *BucketOverrides `pulumi:"bucket"`
+type FunctionHatchArgs struct {
+	Function *FunctionOverrides `pulumi:"function"`
 }
 
-// BucketTransformArgsInput is an input type that accepts BucketTransformArgsArgs and BucketTransformArgsOutput values.
-// You can construct a concrete instance of `BucketTransformArgsInput` via:
+// FunctionHatchArgsInput is an input type that accepts FunctionHatchArgsArgs and FunctionHatchArgsOutput values.
+// You can construct a concrete instance of `FunctionHatchArgsInput` via:
 //
-//	BucketTransformArgsArgs{...}
-type BucketTransformArgsInput interface {
+//	FunctionHatchArgsArgs{...}
+type FunctionHatchArgsInput interface {
 	pulumi.Input
 
-	ToBucketTransformArgsOutput() BucketTransformArgsOutput
-	ToBucketTransformArgsOutputWithContext(context.Context) BucketTransformArgsOutput
+	ToFunctionHatchArgsOutput() FunctionHatchArgsOutput
+	ToFunctionHatchArgsOutputWithContext(context.Context) FunctionHatchArgsOutput
 }
 
-type BucketTransformArgsArgs struct {
-	Bucket BucketOverridesPtrInput `pulumi:"bucket"`
+type FunctionHatchArgsArgs struct {
+	Function FunctionOverridesPtrInput `pulumi:"function"`
 }
 
-func (BucketTransformArgsArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketTransformArgs)(nil)).Elem()
+func (FunctionHatchArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*FunctionHatchArgs)(nil)).Elem()
 }
 
-func (i BucketTransformArgsArgs) ToBucketTransformArgsOutput() BucketTransformArgsOutput {
-	return i.ToBucketTransformArgsOutputWithContext(context.Background())
+func (i FunctionHatchArgsArgs) ToFunctionHatchArgsOutput() FunctionHatchArgsOutput {
+	return i.ToFunctionHatchArgsOutputWithContext(context.Background())
 }
 
-func (i BucketTransformArgsArgs) ToBucketTransformArgsOutputWithContext(ctx context.Context) BucketTransformArgsOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketTransformArgsOutput)
+func (i FunctionHatchArgsArgs) ToFunctionHatchArgsOutputWithContext(ctx context.Context) FunctionHatchArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(FunctionHatchArgsOutput)
 }
 
-func (i BucketTransformArgsArgs) ToBucketTransformArgsPtrOutput() BucketTransformArgsPtrOutput {
-	return i.ToBucketTransformArgsPtrOutputWithContext(context.Background())
+func (i FunctionHatchArgsArgs) ToFunctionHatchArgsPtrOutput() FunctionHatchArgsPtrOutput {
+	return i.ToFunctionHatchArgsPtrOutputWithContext(context.Background())
 }
 
-func (i BucketTransformArgsArgs) ToBucketTransformArgsPtrOutputWithContext(ctx context.Context) BucketTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketTransformArgsOutput).ToBucketTransformArgsPtrOutputWithContext(ctx)
+func (i FunctionHatchArgsArgs) ToFunctionHatchArgsPtrOutputWithContext(ctx context.Context) FunctionHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(FunctionHatchArgsOutput).ToFunctionHatchArgsPtrOutputWithContext(ctx)
 }
 
-// BucketTransformArgsPtrInput is an input type that accepts BucketTransformArgsArgs, BucketTransformArgsPtr and BucketTransformArgsPtrOutput values.
-// You can construct a concrete instance of `BucketTransformArgsPtrInput` via:
+// FunctionHatchArgsPtrInput is an input type that accepts FunctionHatchArgsArgs, FunctionHatchArgsPtr and FunctionHatchArgsPtrOutput values.
+// You can construct a concrete instance of `FunctionHatchArgsPtrInput` via:
 //
-//	        BucketTransformArgsArgs{...}
+//	        FunctionHatchArgsArgs{...}
 //
 //	or:
 //
 //	        nil
-type BucketTransformArgsPtrInput interface {
+type FunctionHatchArgsPtrInput interface {
 	pulumi.Input
 
-	ToBucketTransformArgsPtrOutput() BucketTransformArgsPtrOutput
-	ToBucketTransformArgsPtrOutputWithContext(context.Context) BucketTransformArgsPtrOutput
+	ToFunctionHatchArgsPtrOutput() FunctionHatchArgsPtrOutput
+	ToFunctionHatchArgsPtrOutputWithContext(context.Context) FunctionHatchArgsPtrOutput
 }
 
-type bucketTransformArgsPtrType BucketTransformArgsArgs
+type functionHatchArgsPtrType FunctionHatchArgsArgs
 
-func BucketTransformArgsPtr(v *BucketTransformArgsArgs) BucketTransformArgsPtrInput {
-	return (*bucketTransformArgsPtrType)(v)
+func FunctionHatchArgsPtr(v *FunctionHatchArgsArgs) FunctionHatchArgsPtrInput {
+	return (*functionHatchArgsPtrType)(v)
 }
 
-func (*bucketTransformArgsPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketTransformArgs)(nil)).Elem()
+func (*functionHatchArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**FunctionHatchArgs)(nil)).Elem()
 }
 
-func (i *bucketTransformArgsPtrType) ToBucketTransformArgsPtrOutput() BucketTransformArgsPtrOutput {
-	return i.ToBucketTransformArgsPtrOutputWithContext(context.Background())
+func (i *functionHatchArgsPtrType) ToFunctionHatchArgsPtrOutput() FunctionHatchArgsPtrOutput {
+	return i.ToFunctionHatchArgsPtrOutputWithContext(context.Background())
 }
 
-func (i *bucketTransformArgsPtrType) ToBucketTransformArgsPtrOutputWithContext(ctx context.Context) BucketTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(BucketTransformArgsPtrOutput)
+func (i *functionHatchArgsPtrType) ToFunctionHatchArgsPtrOutputWithContext(ctx context.Context) FunctionHatchArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(FunctionHatchArgsPtrOutput)
 }
 
-type BucketTransformArgsOutput struct{ *pulumi.OutputState }
+type FunctionHatchArgsOutput struct{ *pulumi.OutputState }
 
-func (BucketTransformArgsOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*BucketTransformArgs)(nil)).Elem()
+func (FunctionHatchArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*FunctionHatchArgs)(nil)).Elem()
 }
 
-func (o BucketTransformArgsOutput) ToBucketTransformArgsOutput() BucketTransformArgsOutput {
+func (o FunctionHatchArgsOutput) ToFunctionHatchArgsOutput() FunctionHatchArgsOutput {
 	return o
 }
 
-func (o BucketTransformArgsOutput) ToBucketTransformArgsOutputWithContext(ctx context.Context) BucketTransformArgsOutput {
+func (o FunctionHatchArgsOutput) ToFunctionHatchArgsOutputWithContext(ctx context.Context) FunctionHatchArgsOutput {
 	return o
 }
 
-func (o BucketTransformArgsOutput) ToBucketTransformArgsPtrOutput() BucketTransformArgsPtrOutput {
-	return o.ToBucketTransformArgsPtrOutputWithContext(context.Background())
+func (o FunctionHatchArgsOutput) ToFunctionHatchArgsPtrOutput() FunctionHatchArgsPtrOutput {
+	return o.ToFunctionHatchArgsPtrOutputWithContext(context.Background())
 }
 
-func (o BucketTransformArgsOutput) ToBucketTransformArgsPtrOutputWithContext(ctx context.Context) BucketTransformArgsPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v BucketTransformArgs) *BucketTransformArgs {
+func (o FunctionHatchArgsOutput) ToFunctionHatchArgsPtrOutputWithContext(ctx context.Context) FunctionHatchArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v FunctionHatchArgs) *FunctionHatchArgs {
 		return &v
-	}).(BucketTransformArgsPtrOutput)
+	}).(FunctionHatchArgsPtrOutput)
 }
 
-func (o BucketTransformArgsOutput) Bucket() BucketOverridesPtrOutput {
-	return o.ApplyT(func(v BucketTransformArgs) *BucketOverrides { return v.Bucket }).(BucketOverridesPtrOutput)
+func (o FunctionHatchArgsOutput) Function() FunctionOverridesPtrOutput {
+	return o.ApplyT(func(v FunctionHatchArgs) *FunctionOverrides { return v.Function }).(FunctionOverridesPtrOutput)
 }
 
-type BucketTransformArgsPtrOutput struct{ *pulumi.OutputState }
+type FunctionHatchArgsPtrOutput struct{ *pulumi.OutputState }
 
-func (BucketTransformArgsPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**BucketTransformArgs)(nil)).Elem()
+func (FunctionHatchArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**FunctionHatchArgs)(nil)).Elem()
 }
 
-func (o BucketTransformArgsPtrOutput) ToBucketTransformArgsPtrOutput() BucketTransformArgsPtrOutput {
+func (o FunctionHatchArgsPtrOutput) ToFunctionHatchArgsPtrOutput() FunctionHatchArgsPtrOutput {
 	return o
 }
 
-func (o BucketTransformArgsPtrOutput) ToBucketTransformArgsPtrOutputWithContext(ctx context.Context) BucketTransformArgsPtrOutput {
+func (o FunctionHatchArgsPtrOutput) ToFunctionHatchArgsPtrOutputWithContext(ctx context.Context) FunctionHatchArgsPtrOutput {
 	return o
 }
 
-func (o BucketTransformArgsPtrOutput) Elem() BucketTransformArgsOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) BucketTransformArgs {
+func (o FunctionHatchArgsPtrOutput) Elem() FunctionHatchArgsOutput {
+	return o.ApplyT(func(v *FunctionHatchArgs) FunctionHatchArgs {
 		if v != nil {
 			return *v
 		}
-		var ret BucketTransformArgs
+		var ret FunctionHatchArgs
 		return ret
-	}).(BucketTransformArgsOutput)
+	}).(FunctionHatchArgsOutput)
 }
 
-func (o BucketTransformArgsPtrOutput) Bucket() BucketOverridesPtrOutput {
-	return o.ApplyT(func(v *BucketTransformArgs) *BucketOverrides {
+func (o FunctionHatchArgsPtrOutput) Function() FunctionOverridesPtrOutput {
+	return o.ApplyT(func(v *FunctionHatchArgs) *FunctionOverrides {
 		if v == nil {
 			return nil
 		}
-		return v.Bucket
-	}).(BucketOverridesPtrOutput)
+		return v.Function
+	}).(FunctionOverridesPtrOutput)
 }
 
 type FunctionOverrides struct {
@@ -1121,186 +1286,21 @@ func (o FunctionOverridesPtrOutput) ServiceConfig() cloudfunctionsv2.FunctionSer
 	}).(cloudfunctionsv2.FunctionServiceConfigPtrOutput)
 }
 
-type FunctionTransform struct {
-	// Describes the Build step of the function that builds a container
-	// from the given source.
-	// Structure is documented below.
-	BuildConfig *cloudfunctionsv2.FunctionBuildConfig `pulumi:"buildConfig"`
-	// User-provided description of a function.
-	Description *string `pulumi:"description"`
-	// An Eventarc trigger managed by Google Cloud Functions that fires events in
-	// response to a condition in another service.
-	// Structure is documented below.
-	EventTrigger *cloudfunctionsv2.FunctionEventTrigger `pulumi:"eventTrigger"`
-	// Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources.
-	// It must match the pattern projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}.
-	KmsKeyName *string `pulumi:"kmsKeyName"`
-	// A set of key/value label pairs associated with this Cloud Function.
-	//
-	// **Note**: This field is non-authoritative, and will only manage the labels present in your configuration.
-	// Please refer to the field <span pulumi-lang-nodejs="`effectiveLabels`" pulumi-lang-dotnet="`EffectiveLabels`" pulumi-lang-go="`effectiveLabels`" pulumi-lang-python="`effective_labels`" pulumi-lang-yaml="`effectiveLabels`" pulumi-lang-java="`effectiveLabels`">`effective_labels`</span> for all of the labels present on the resource.
-	Labels map[string]string `pulumi:"labels"`
-	// The location of this cloud function.
-	Location *string `pulumi:"location"`
-	// A user-defined name of the function. Function names must
-	// be unique globally and match pattern `projects/*/locations/*/functions/*`.
-	Name *string `pulumi:"name"`
-	// The ID of the project in which the resource belongs.
-	// If it is not provided, the provider project is used.
-	Project *string `pulumi:"project"`
-	// Describes the Service being deployed.
-	// Structure is documented below.
-	ServiceConfig *cloudfunctionsv2.FunctionServiceConfig `pulumi:"serviceConfig"`
-}
-
-type FunctionTransformArgs struct {
-	Function *FunctionOverrides `pulumi:"function"`
-}
-
-// FunctionTransformArgsInput is an input type that accepts FunctionTransformArgsArgs and FunctionTransformArgsOutput values.
-// You can construct a concrete instance of `FunctionTransformArgsInput` via:
-//
-//	FunctionTransformArgsArgs{...}
-type FunctionTransformArgsInput interface {
-	pulumi.Input
-
-	ToFunctionTransformArgsOutput() FunctionTransformArgsOutput
-	ToFunctionTransformArgsOutputWithContext(context.Context) FunctionTransformArgsOutput
-}
-
-type FunctionTransformArgsArgs struct {
-	Function FunctionOverridesPtrInput `pulumi:"function"`
-}
-
-func (FunctionTransformArgsArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*FunctionTransformArgs)(nil)).Elem()
-}
-
-func (i FunctionTransformArgsArgs) ToFunctionTransformArgsOutput() FunctionTransformArgsOutput {
-	return i.ToFunctionTransformArgsOutputWithContext(context.Background())
-}
-
-func (i FunctionTransformArgsArgs) ToFunctionTransformArgsOutputWithContext(ctx context.Context) FunctionTransformArgsOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(FunctionTransformArgsOutput)
-}
-
-func (i FunctionTransformArgsArgs) ToFunctionTransformArgsPtrOutput() FunctionTransformArgsPtrOutput {
-	return i.ToFunctionTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i FunctionTransformArgsArgs) ToFunctionTransformArgsPtrOutputWithContext(ctx context.Context) FunctionTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(FunctionTransformArgsOutput).ToFunctionTransformArgsPtrOutputWithContext(ctx)
-}
-
-// FunctionTransformArgsPtrInput is an input type that accepts FunctionTransformArgsArgs, FunctionTransformArgsPtr and FunctionTransformArgsPtrOutput values.
-// You can construct a concrete instance of `FunctionTransformArgsPtrInput` via:
-//
-//	        FunctionTransformArgsArgs{...}
-//
-//	or:
-//
-//	        nil
-type FunctionTransformArgsPtrInput interface {
-	pulumi.Input
-
-	ToFunctionTransformArgsPtrOutput() FunctionTransformArgsPtrOutput
-	ToFunctionTransformArgsPtrOutputWithContext(context.Context) FunctionTransformArgsPtrOutput
-}
-
-type functionTransformArgsPtrType FunctionTransformArgsArgs
-
-func FunctionTransformArgsPtr(v *FunctionTransformArgsArgs) FunctionTransformArgsPtrInput {
-	return (*functionTransformArgsPtrType)(v)
-}
-
-func (*functionTransformArgsPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**FunctionTransformArgs)(nil)).Elem()
-}
-
-func (i *functionTransformArgsPtrType) ToFunctionTransformArgsPtrOutput() FunctionTransformArgsPtrOutput {
-	return i.ToFunctionTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (i *functionTransformArgsPtrType) ToFunctionTransformArgsPtrOutputWithContext(ctx context.Context) FunctionTransformArgsPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(FunctionTransformArgsPtrOutput)
-}
-
-type FunctionTransformArgsOutput struct{ *pulumi.OutputState }
-
-func (FunctionTransformArgsOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*FunctionTransformArgs)(nil)).Elem()
-}
-
-func (o FunctionTransformArgsOutput) ToFunctionTransformArgsOutput() FunctionTransformArgsOutput {
-	return o
-}
-
-func (o FunctionTransformArgsOutput) ToFunctionTransformArgsOutputWithContext(ctx context.Context) FunctionTransformArgsOutput {
-	return o
-}
-
-func (o FunctionTransformArgsOutput) ToFunctionTransformArgsPtrOutput() FunctionTransformArgsPtrOutput {
-	return o.ToFunctionTransformArgsPtrOutputWithContext(context.Background())
-}
-
-func (o FunctionTransformArgsOutput) ToFunctionTransformArgsPtrOutputWithContext(ctx context.Context) FunctionTransformArgsPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v FunctionTransformArgs) *FunctionTransformArgs {
-		return &v
-	}).(FunctionTransformArgsPtrOutput)
-}
-
-func (o FunctionTransformArgsOutput) Function() FunctionOverridesPtrOutput {
-	return o.ApplyT(func(v FunctionTransformArgs) *FunctionOverrides { return v.Function }).(FunctionOverridesPtrOutput)
-}
-
-type FunctionTransformArgsPtrOutput struct{ *pulumi.OutputState }
-
-func (FunctionTransformArgsPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**FunctionTransformArgs)(nil)).Elem()
-}
-
-func (o FunctionTransformArgsPtrOutput) ToFunctionTransformArgsPtrOutput() FunctionTransformArgsPtrOutput {
-	return o
-}
-
-func (o FunctionTransformArgsPtrOutput) ToFunctionTransformArgsPtrOutputWithContext(ctx context.Context) FunctionTransformArgsPtrOutput {
-	return o
-}
-
-func (o FunctionTransformArgsPtrOutput) Elem() FunctionTransformArgsOutput {
-	return o.ApplyT(func(v *FunctionTransformArgs) FunctionTransformArgs {
-		if v != nil {
-			return *v
-		}
-		var ret FunctionTransformArgs
-		return ret
-	}).(FunctionTransformArgsOutput)
-}
-
-func (o FunctionTransformArgsPtrOutput) Function() FunctionOverridesPtrOutput {
-	return o.ApplyT(func(v *FunctionTransformArgs) *FunctionOverrides {
-		if v == nil {
-			return nil
-		}
-		return v.Function
-	}).(FunctionOverridesPtrOutput)
-}
-
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketHatchArgsInput)(nil)).Elem(), BucketHatchArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*BucketHatchArgsPtrInput)(nil)).Elem(), BucketHatchArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*BucketOverridesInput)(nil)).Elem(), BucketOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*BucketOverridesPtrInput)(nil)).Elem(), BucketOverridesArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketTransformArgsInput)(nil)).Elem(), BucketTransformArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*BucketTransformArgsPtrInput)(nil)).Elem(), BucketTransformArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*FunctionHatchArgsInput)(nil)).Elem(), FunctionHatchArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*FunctionHatchArgsPtrInput)(nil)).Elem(), FunctionHatchArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*FunctionOverridesInput)(nil)).Elem(), FunctionOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*FunctionOverridesPtrInput)(nil)).Elem(), FunctionOverridesArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*FunctionTransformArgsInput)(nil)).Elem(), FunctionTransformArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*FunctionTransformArgsPtrInput)(nil)).Elem(), FunctionTransformArgsArgs{})
+	pulumi.RegisterOutputType(BucketHatchArgsOutput{})
+	pulumi.RegisterOutputType(BucketHatchArgsPtrOutput{})
 	pulumi.RegisterOutputType(BucketOverridesOutput{})
 	pulumi.RegisterOutputType(BucketOverridesPtrOutput{})
-	pulumi.RegisterOutputType(BucketTransformArgsOutput{})
-	pulumi.RegisterOutputType(BucketTransformArgsPtrOutput{})
+	pulumi.RegisterOutputType(FunctionHatchArgsOutput{})
+	pulumi.RegisterOutputType(FunctionHatchArgsPtrOutput{})
 	pulumi.RegisterOutputType(FunctionOverridesOutput{})
 	pulumi.RegisterOutputType(FunctionOverridesPtrOutput{})
-	pulumi.RegisterOutputType(FunctionTransformArgsOutput{})
-	pulumi.RegisterOutputType(FunctionTransformArgsPtrOutput{})
 }

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
-	"github.com/anvil-cloud/anvil/provider/internal/transform"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/cloudwatch"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/wafv2"
 	p "github.com/pulumi/pulumi-go-provider"
@@ -76,7 +76,7 @@ type WafArgs struct {
 	ClientIpHeader string               `pulumi:"clientIpHeader,optional"`
 	Logging        *WafLoggingArgs      `pulumi:"logging,optional"`
 
-	Transform map[string]map[string]interface{} `pulumi:"transform,optional"`
+	Hatch map[string]map[string]interface{} `pulumi:"hatch,optional"`
 }
 
 // Waf is the Anvil-managed WAF component resource.
@@ -316,7 +316,7 @@ func NewWaf(ctx *pulumi.Context, name string, args WafArgs, opts ...pulumi.Resou
 	}
 
 	// ── WebACL ──
-	aclProps := transform.MergeTransform(args.Transform["waf"], inRegion(pulumi.Map{
+	aclProps := hatch.Merge(args.Hatch["waf"], inRegion(pulumi.Map{
 		"name":             pulumi.String(physicalName),
 		"scope":            pulumi.String(wafScope),
 		"description":      pulumi.String(description(fmt.Sprintf("Anvil WAF %s, stage %s", name, stage))),

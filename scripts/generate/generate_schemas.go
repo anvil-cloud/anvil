@@ -293,8 +293,8 @@ func main() {
 		anvilNs := fmt.Sprintf("anvil:%s:", comp.cloud)
 
 		cleanInputs := make(map[string]interface{})
-		extraTransforms := make(map[string]map[string]interface{})
-		transformArgsProps := make(map[string]interface{})
+		extraHatches := make(map[string]map[string]interface{})
+		hatchArgsProps := make(map[string]interface{})
 
 		// ── Generic Deprecation Replacement ──
 		deprecationRegex := buildDeprecationRegex(upstreamProvider)
@@ -323,9 +323,9 @@ func main() {
 					rewriteRefs(sidecarInputs, upstreamProvider, pinnedVersion)
 
 					replacementName := extractResourceName(replacementToken)
-					typeName := fmt.Sprintf("%s%sTransform", anvilNs, replacementName)
+					typeName := fmt.Sprintf("%s%sHatch", anvilNs, replacementName)
 
-					extraTransforms[k] = map[string]interface{}{
+					extraHatches[k] = map[string]interface{}{
 						"typeName":   typeName,
 						"properties": sidecarInputs,
 					}
@@ -334,23 +334,23 @@ func main() {
 		}
 
 		// ── Provider-Specific Extras ──
-		addProviderSpecificTransforms(comp.cloud, upstreamToken, upstreamResources, anvilTypes, anvilNs, transformArgsProps, upstreamProvider, pinnedVersion)
+		addProviderSpecificHatches(comp.cloud, upstreamToken, upstreamResources, anvilTypes, anvilNs, hatchArgsProps, upstreamProvider, pinnedVersion)
 
 		// ── Final Wiring ──
 		rewriteRefs(cleanInputs, upstreamProvider, pinnedVersion)
 
-		transformTypeName := fmt.Sprintf("%s%sOverrides", anvilNs, anvilResourceName)
-		anvilTypes[transformTypeName] = map[string]interface{}{"type": "object", "properties": cleanInputs}
-		transformArgsProps[comp.folder] = map[string]interface{}{"$ref": fmt.Sprintf("#/types/%s", transformTypeName)}
+		hatchTypeName := fmt.Sprintf("%s%sOverrides", anvilNs, anvilResourceName)
+		anvilTypes[hatchTypeName] = map[string]interface{}{"type": "object", "properties": cleanInputs}
+		hatchArgsProps[comp.folder] = map[string]interface{}{"$ref": fmt.Sprintf("#/types/%s", hatchTypeName)}
 
-		for key, data := range extraTransforms {
+		for key, data := range extraHatches {
 			typeName := data["typeName"].(string)
 			anvilTypes[typeName] = map[string]interface{}{"type": "object", "properties": data["properties"]}
-			transformArgsProps[key] = map[string]interface{}{"$ref": fmt.Sprintf("#/types/%s", typeName)}
+			hatchArgsProps[key] = map[string]interface{}{"$ref": fmt.Sprintf("#/types/%s", typeName)}
 		}
 
-		transformArgsTypeName := fmt.Sprintf("%s%sTransformArgs", anvilNs, anvilResourceName)
-		anvilTypes[transformArgsTypeName] = map[string]interface{}{"type": "object", "properties": transformArgsProps}
+		hatchArgsTypeName := fmt.Sprintf("%s%sHatchArgs", anvilNs, anvilResourceName)
+		anvilTypes[hatchArgsTypeName] = map[string]interface{}{"type": "object", "properties": hatchArgsProps}
 
 		if resources, ok := anvilSchema["resources"].(map[string]interface{}); ok {
 			var resKey string
@@ -364,19 +364,19 @@ func main() {
 
 			if resObj, ok := resources[resKey].(map[string]interface{}); ok {
 				if inputs, ok := resObj["inputProperties"].(map[string]interface{}); ok {
-					inputs["transform"] = map[string]interface{}{"$ref": fmt.Sprintf("#/types/%s", transformArgsTypeName)}
+					inputs["hatch"] = map[string]interface{}{"$ref": fmt.Sprintf("#/types/%s", hatchArgsTypeName)}
 				}
 			}
 		}
 
-		staleKey := fmt.Sprintf("%sTransformArgs", anvilNs)
-		if staleKey != transformArgsTypeName {
+		staleKey := fmt.Sprintf("%sHatchArgs", anvilNs)
+		if staleKey != hatchArgsTypeName {
 			delete(anvilTypes, staleKey)
 		}
 
 		finalJson, _ := json.MarshalIndent(anvilSchema, "", "  ")
 		os.WriteFile(comp.schemaPath, finalJson, 0644)
-		fmt.Printf("   ✅ Success! Mapped %d additional transforms.\n\n", len(extraTransforms))
+		fmt.Printf("   ✅ Success! Mapped %d additional hatch types.\n\n", len(extraHatches))
 	}
 
 	// ── Final Summary ──
@@ -493,15 +493,15 @@ func pruneCache(results []componentResult) {
 
 // ── Provider-Specific Extras ──
 
-// addProviderSpecificTransforms handles companion resources that can't be discovered
+// addProviderSpecificHatches handles companion resources that can't be discovered
 // through the generic deprecation replacement logic.
-func addProviderSpecificTransforms(
+func addProviderSpecificHatches(
 	cloud string,
 	upstreamToken string,
 	upstreamResources map[string]interface{},
 	anvilTypes map[string]interface{},
 	anvilNs string,
-	transformArgsProps map[string]interface{},
+	hatchArgsProps map[string]interface{},
 	upstreamProvider string,
 	pinnedVersion string,
 ) {
@@ -513,9 +513,9 @@ func addProviderSpecificTransforms(
 			pab := pabRaw.(map[string]interface{})
 			if pabInputs, ok := pab["inputProperties"].(map[string]interface{}); ok {
 				rewriteRefs(pabInputs, upstreamProvider, pinnedVersion)
-				typeName := fmt.Sprintf("%sPABTransform", anvilNs)
+				typeName := fmt.Sprintf("%sPABHatch", anvilNs)
 				anvilTypes[typeName] = map[string]interface{}{"type": "object", "properties": pabInputs}
-				transformArgsProps["publicAccessBlock"] = map[string]interface{}{"$ref": fmt.Sprintf("#/types/%s", typeName)}
+				hatchArgsProps["publicAccessBlock"] = map[string]interface{}{"$ref": fmt.Sprintf("#/types/%s", typeName)}
 			}
 		}
 
@@ -850,7 +850,7 @@ func expandTokensWithSidecars(tokens []string, allResources map[string]interface
 }
 
 // getCompanionTokens returns any hardcoded companion resource tokens for a given primary token.
-// This is the counterpart to addProviderSpecificTransforms — ensures companions are included in the trimmed cache.
+// This is the counterpart to addProviderSpecificHatches — ensures companions are included in the trimmed cache.
 func getCompanionTokens(primaryToken string) []string {
 	switch primaryToken {
 	case "aws:s3/bucket:Bucket":

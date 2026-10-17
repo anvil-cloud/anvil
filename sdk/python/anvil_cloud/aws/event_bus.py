@@ -21,17 +21,26 @@ __all__ = ['EventBusArgs', 'EventBus']
 @pulumi.input_type
 class EventBusArgs:
     def __init__(__self__, *,
-                 rules: Optional[pulumi.Input[Sequence[pulumi.Input['EventBusRuleArgs']]]] = None,
-                 transform: Optional[pulumi.Input['EventBridgeTransformArgsArgs']] = None):
+                 hatch: Optional[pulumi.Input['EventBridgeHatchArgsArgs']] = None,
+                 rules: Optional[pulumi.Input[Sequence[pulumi.Input['EventBusRuleArgs']]]] = None):
         """
         The set of arguments for constructing a EventBus resource.
 
         :param pulumi.Input[Sequence[pulumi.Input['EventBusRuleArgs']]] rules: EventBridge rules on this bus. Each rule matches events by pattern and routes them to a target.
         """
+        if hatch is not None:
+            pulumi.set(__self__, "hatch", hatch)
         if rules is not None:
             pulumi.set(__self__, "rules", rules)
-        if transform is not None:
-            pulumi.set(__self__, "transform", transform)
+
+    @_builtins.property
+    @pulumi.getter
+    def hatch(self) -> Optional[pulumi.Input['EventBridgeHatchArgsArgs']]:
+        return pulumi.get(self, "hatch")
+
+    @hatch.setter
+    def hatch(self, value: Optional[pulumi.Input['EventBridgeHatchArgsArgs']]):
+        pulumi.set(self, "hatch", value)
 
     @_builtins.property
     @pulumi.getter
@@ -45,15 +54,6 @@ class EventBusArgs:
     def rules(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['EventBusRuleArgs']]]]):
         pulumi.set(self, "rules", value)
 
-    @_builtins.property
-    @pulumi.getter
-    def transform(self) -> Optional[pulumi.Input['EventBridgeTransformArgsArgs']]:
-        return pulumi.get(self, "transform")
-
-    @transform.setter
-    def transform(self, value: Optional[pulumi.Input['EventBridgeTransformArgsArgs']]):
-        pulumi.set(self, "transform", value)
-
 
 @pulumi.type_token("anvil:aws:EventBus")
 class EventBus(pulumi.ComponentResource):
@@ -61,8 +61,8 @@ class EventBus(pulumi.ComponentResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 hatch: Optional[pulumi.Input[Union['EventBridgeHatchArgsArgs', 'EventBridgeHatchArgsArgsDict']]] = None,
                  rules: Optional[pulumi.Input[Sequence[pulumi.Input[Union['EventBusRuleArgs', 'EventBusRuleArgsDict']]]]] = None,
-                 transform: Optional[pulumi.Input[Union['EventBridgeTransformArgsArgs', 'EventBridgeTransformArgsArgsDict']]] = None,
                  __props__=None):
         """
         An Anvil-managed EventBridge event bus. Archives events for 7 days by default for replay and debugging. Rules route matching events to Lambda targets.
@@ -97,8 +97,8 @@ class EventBus(pulumi.ComponentResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 hatch: Optional[pulumi.Input[Union['EventBridgeHatchArgsArgs', 'EventBridgeHatchArgsArgsDict']]] = None,
                  rules: Optional[pulumi.Input[Sequence[pulumi.Input[Union['EventBusRuleArgs', 'EventBusRuleArgsDict']]]]] = None,
-                 transform: Optional[pulumi.Input[Union['EventBridgeTransformArgsArgs', 'EventBridgeTransformArgsArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -110,8 +110,8 @@ class EventBus(pulumi.ComponentResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = EventBusArgs.__new__(EventBusArgs)
 
+            __props__.__dict__["hatch"] = hatch
             __props__.__dict__["rules"] = rules
-            __props__.__dict__["transform"] = transform
             __props__.__dict__["arn"] = None
             __props__.__dict__["name"] = None
         super(EventBus, __self__).__init__(

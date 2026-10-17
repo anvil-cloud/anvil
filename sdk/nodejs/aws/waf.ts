@@ -61,6 +61,7 @@ export class Waf extends pulumi.ComponentResource {
         if (!opts.id) {
             resourceInputs["blockCountries"] = args?.blockCountries;
             resourceInputs["clientIpHeader"] = args?.clientIpHeader;
+            resourceInputs["hatch"] = args?.hatch;
             resourceInputs["ipAllowList"] = args?.ipAllowList;
             resourceInputs["ipBlockList"] = args?.ipBlockList;
             resourceInputs["logging"] = args?.logging;
@@ -69,7 +70,6 @@ export class Waf extends pulumi.ComponentResource {
             resourceInputs["rateLimit"] = args?.rateLimit;
             resourceInputs["ruleOverrides"] = args?.ruleOverrides;
             resourceInputs["scope"] = args?.scope;
-            resourceInputs["transform"] = args?.transform;
             resourceInputs["arn"] = undefined /*out*/;
             resourceInputs["logGroupName"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
@@ -98,6 +98,7 @@ export interface WafArgs {
      * Header carrying the real visitor IP when the site sits behind a proxy, e.g. "CF-Connecting-IP" for Cloudflare. The rate limit, IP lists and country blocking then use the visitor's IP instead of the proxy's. AWS's ipReputation and anonymousIp rule groups can't read this header, so they default to off when it's set.
      */
     clientIpHeader?: pulumi.Input<string>;
+    hatch?: pulumi.Input<inputs.aws.WafHatchArgsArgs>;
     /**
      * IP addresses or CIDRs (IPv4 and IPv6) that are always allowed, skipping every other rule — e.g. office networks or uptime monitors.
      */
@@ -130,5 +131,4 @@ export interface WafArgs {
      * What the WAF protects. "cloudfront" (default): sites and other CloudFront distributions; created in us-east-1 as AWS requires. "regional": regional resources such as Cognito user pools; created in the stack's region.
      */
     scope?: pulumi.Input<enums.aws.WafScope>;
-    transform?: pulumi.Input<inputs.aws.WafTransformArgsArgs>;
 }

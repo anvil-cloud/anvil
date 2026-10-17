@@ -49,6 +49,9 @@
           "description": "Upgrade at-rest encryption to SSE-KMS. Set to \"kms\" to enable. SSE-S3 (AES256) is always on by default at no cost. SSE-KMS incurs KMS API call cost and is required by HIPAA, PCI-DSS, FedRAMP, and IRAP.",
           "type": "string"
         },
+        "hatch": {
+          "$ref": "#/types/anvil:aws:BucketHatchArgs"
+        },
         "logging": {
           "description": "Enable S3 server access logging to the centralised logging bucket created during `anvil bootstrap`. Required by most compliance frameworks for audit trails. Incurs storage cost. Default: false.",
           "type": "boolean"
@@ -58,7 +61,7 @@
           "type": "integer"
         },
         "storageTransition": {
-          "description": "When to move objects to cheaper storage classes. Omit to use Intelligent-Tiering (recommended default). Only applies when no custom lifecycle is provided via transform.",
+          "description": "When to move objects to cheaper storage classes. Omit to use Intelligent-Tiering (recommended default). Only applies when no custom lifecycle is provided via hatch.",
           "enum": [
             {
               "description": "Standard → IA at 30 days, Glacier at 90 days",
@@ -74,9 +77,6 @@
             }
           ],
           "type": "string"
-        },
-        "transform": {
-          "$ref": "#/types/anvil:aws:BucketTransformArgs"
         },
         "versionRetention": {
           "description": "How long non-current object versions are kept before automatic expiry. Strongly recommended when versioning is enabled to prevent unbounded storage growth. Default: keep forever.",
@@ -169,7 +169,7 @@
       "inputProperties": {
         "appClient": {
           "$ref": "#/types/anvil:aws:CognitoUserPoolAppClient",
-          "description": "Default app client created with the user pool. Covers the 80% case of one application per pool. Use transform for additional clients."
+          "description": "Default app client created with the user pool. Covers the 80% case of one application per pool. Use hatch for additional clients."
         },
         "attributes": {
           "$ref": "#/types/anvil:aws:CognitoUserPoolAttributes",
@@ -178,6 +178,9 @@
         "emailConfiguration": {
           "$ref": "#/types/anvil:aws:CognitoUserPoolEmailConfiguration",
           "description": "Email delivery configuration. Default: Cognito-managed email (5 emails/day limit). Set sesFromAddress for SES delivery in production."
+        },
+        "hatch": {
+          "$ref": "#/types/anvil:aws:CognitoUserPoolHatchArgs"
         },
         "hostedUi": {
           "$ref": "#/types/anvil:aws:CognitoUserPoolHostedUi",
@@ -197,9 +200,6 @@
         "passwordPolicy": {
           "$ref": "#/types/anvil:aws:CognitoUserPoolPasswordPolicy",
           "description": "Password policy for the user pool. Anvil enforces a secure baseline by default — override only to strengthen."
-        },
-        "transform": {
-          "$ref": "#/types/anvil:aws:CognitoUserPoolTransformArgs"
         },
         "waf": {
           "$ref": "#/types/anvil:aws:CognitoUserPoolWaf",
@@ -310,6 +310,9 @@
           "$ref": "#/types/anvil:aws:DSQLBackupArgs",
           "description": "AWS Backup configuration. Omit to disable. When set, Anvil opts in the DSQL resource type per region, creates a backup plan with retention and schedule, and for multi-region clusters automatically adds cross-region copy rules."
         },
+        "hatch": {
+          "$ref": "#/types/anvil:aws:DsqlHatchArgs"
+        },
         "multiRegion": {
           "$ref": "#/types/anvil:aws:DSQLMultiRegionArgs",
           "description": "Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region."
@@ -320,9 +323,6 @@
             "$ref": "#/types/anvil:aws:DSQLSchema"
           },
           "type": "array"
-        },
-        "transform": {
-          "$ref": "#/types/anvil:aws:DsqlTransformArgs"
         },
         "vpc": {
           "$ref": "#/types/anvil:aws:DSQLVpcArgs",
@@ -426,6 +426,9 @@
           "$ref": "#/types/anvil:aws:DynamoDBKeyAttribute",
           "description": "Primary hash (partition) key. Required."
         },
+        "hatch": {
+          "$ref": "#/types/anvil:aws:DynamoHatchArgs"
+        },
         "kmsKeyArn": {
           "description": "Tier 2 opt-in. ARN of a KMS CMK for encryption at rest. If omitted, AWS_OWNED_KMS is used (Tier 1 default — always on, zero cost). Use this for compliance workloads requiring key rotation control, audit trail, or the ability to revoke access by disabling the key.",
           "type": "string"
@@ -437,9 +440,6 @@
         "stream": {
           "$ref": "#/types/anvil:aws:DynamoDBStream",
           "description": "DynamoDB Streams configuration. Opt-in. Enables change data capture on the table."
-        },
-        "transform": {
-          "$ref": "#/types/anvil:aws:DynamoTransformArgs"
         },
         "ttlAttribute": {
           "description": "Name of the attribute used for TTL (time-to-live). Items with this attribute set to a past Unix timestamp are automatically deleted by DynamoDB.",
@@ -472,15 +472,15 @@
     "anvil:aws:EventBus": {
       "description": "An Anvil-managed EventBridge event bus. Archives events for 7 days by default for replay and debugging. Rules route matching events to Lambda targets.",
       "inputProperties": {
+        "hatch": {
+          "$ref": "#/types/anvil:aws:EventBridgeHatchArgs"
+        },
         "rules": {
           "description": "EventBridge rules on this bus. Each rule matches events by pattern and routes them to a target.",
           "items": {
             "$ref": "#/types/anvil:aws:EventBusRule"
           },
           "type": "array"
-        },
-        "transform": {
-          "$ref": "#/types/anvil:aws:EventBridgeTransformArgs"
         }
       },
       "isComponent": true,
@@ -567,7 +567,7 @@
           "description": "CPU architecture. Default: arm64 (Graviton)."
         },
         "encryption": {
-          "description": "Upgrade environment variable encryption to SSE-KMS. Set to \"kms\" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via transform[\"lambda\"].",
+          "description": "Upgrade environment variable encryption to SSE-KMS. Set to \"kms\" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch[\"lambda\"].",
           "type": "string"
         },
         "entry": {
@@ -584,6 +584,9 @@
         "handler": {
           "description": "The exported function name in the entry file. e.g. \"handler\" for `export const handler = ...`",
           "type": "string"
+        },
+        "hatch": {
+          "$ref": "#/types/anvil:aws:LambdaHatchArgs"
         },
         "logRetention": {
           "$ref": "#/types/anvil:aws:LambdaLogRetention",
@@ -611,9 +614,6 @@
         "tracing": {
           "description": "Enable AWS X-Ray tracing. Incurs per-trace cost (~$5/million traces). Default: false.",
           "type": "boolean"
-        },
-        "transform": {
-          "$ref": "#/types/anvil:aws:LambdaTransformArgs"
         },
         "url": {
           "description": "Enable a direct HTTPS endpoint for the function. Auth mode is AWS_IAM - never public. Default: false.",
@@ -702,8 +702,8 @@
           "description": "Creates a FIFO queue when true. FIFO queues guarantee message ordering and exactly-once processing but have lower throughput (~3,000 msg/s vs unlimited for standard). Use for financial transactions, inventory updates, or any workflow where ordering or deduplication matters. Default: false.",
           "type": "boolean"
         },
-        "transform": {
-          "$ref": "#/types/anvil:aws:QueueTransformArgs"
+        "hatch": {
+          "$ref": "#/types/anvil:aws:QueueHatchArgs"
         }
       },
       "isComponent": true,
@@ -750,6 +750,9 @@
           "description": "Environment vars available at BOTH build time and runtime. Values must be string literals since they're needed before the build runs.",
           "type": "object"
         },
+        "hatch": {
+          "type": "string"
+        },
         "originProtection": {
           "description": "OriginProtection locks CloudFront to a CDN/proxy in front of it (Cloudflare, Fastly, Akamai, nginx, ...). Requests without the x-origin-secret header are rejected at the edge; configure the proxy to send it on every request with the originSecret output as the value. Protection defaults to \"edge-oac\" while it's enabled, so the server Function URL can't be reached around the proxy.",
           "type": "boolean"
@@ -771,9 +774,6 @@
         "securityHeaders": {
           "$ref": "#/types/anvil:aws:SiteSecurityHeaders",
           "description": "SecurityHeaders configures the security headers CloudFront adds to every response. On by default: Strict-Transport-Security (1 year), X-Content-Type-Options: nosniff, X-Frame-Options: SAMEORIGIN, Referrer-Policy: strict-origin-when-cross-origin, a Permissions-Policy that turns off camera, microphone, geolocation, USB and Topics, and Cross-Origin-Opener-Policy: same-origin-allow-popups. Headers your app sets itself take priority. Content-Security-Policy is left to SvelteKit's kit.csp."
-        },
-        "transform": {
-          "type": "string"
         },
         "waf": {
           "$ref": "#/types/anvil:aws:SiteWaf",
@@ -941,6 +941,9 @@
           "description": "Header carrying the real visitor IP when the site sits behind a proxy, e.g. \"CF-Connecting-IP\" for Cloudflare. The rate limit, IP lists and country blocking then use the visitor's IP instead of the proxy's. AWS's ipReputation and anonymousIp rule groups can't read this header, so they default to off when it's set.",
           "type": "string"
         },
+        "hatch": {
+          "$ref": "#/types/anvil:aws:WafHatchArgs"
+        },
         "ipAllowList": {
           "description": "IP addresses or CIDRs (IPv4 and IPv6) that are always allowed, skipping every other rule — e.g. office networks or uptime monitors.",
           "items": {
@@ -981,9 +984,6 @@
         "scope": {
           "$ref": "#/types/anvil:aws:WafScope",
           "description": "What the WAF protects. \"cloudfront\" (default): sites and other CloudFront distributions; created in us-east-1 as AWS requires. \"regional\": regional resources such as Cognito user pools; created in the stack's region."
-        },
-        "transform": {
-          "$ref": "#/types/anvil:aws:WafTransformArgs"
         }
       },
       "isComponent": true,
@@ -1024,6 +1024,9 @@
           "description": "The name of the function to execute.",
           "type": "string"
         },
+        "hatch": {
+          "$ref": "#/types/anvil:gcp:FunctionHatchArgs"
+        },
         "location": {
           "description": "The GCP region to deploy to (e.g. us-central1).",
           "type": "string"
@@ -1035,9 +1038,6 @@
         "runtime": {
           "description": "The runtime to use (e.g. nodejs20, python312, go122).",
           "type": "string"
-        },
-        "transform": {
-          "$ref": "#/types/anvil:gcp:FunctionTransformArgs"
         }
       },
       "isComponent": true,
@@ -1054,12 +1054,12 @@
           "description": "Data classification level for the bucket.",
           "type": "string"
         },
+        "hatch": {
+          "$ref": "#/types/anvil:gcp:BucketHatchArgs"
+        },
         "location": {
           "description": "The GCS location (e.g. US, EU, us-central1).",
           "type": "string"
-        },
-        "transform": {
-          "$ref": "#/types/anvil:gcp:BucketTransformArgs"
         }
       },
       "isComponent": true,
@@ -1070,7 +1070,7 @@
     }
   },
   "types": {
-    "anvil:aws:BucketAccelerateConfigurationTransform": {
+    "anvil:aws:BucketAccelerateConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket.\n",
@@ -1094,7 +1094,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketAclTransform": {
+    "anvil:aws:BucketAclHatch": {
       "properties": {
         "accessControlPolicy": {
           "$ref": "/aws/v7.23.0/schema.json#/types/aws:s3/BucketAclAccessControlPolicy:BucketAclAccessControlPolicy",
@@ -1121,7 +1121,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketCorsConfigurationTransform": {
+    "anvil:aws:BucketCorsConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket.\n",
@@ -1147,7 +1147,92 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketLifecycleConfigurationTransform": {
+    "anvil:aws:BucketHatch": {
+      "properties": {
+        "bucket": {
+          "description": "Name of the bucket.\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "bucketPrefix": {
+          "description": "Creates a unique bucket name beginning with the specified prefix.\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "forceDestroy": {
+          "description": "Boolean that indicates all objects should be deleted from the bucket when the bucket is destroyed.\n",
+          "type": "boolean"
+        },
+        "objectLockEnabled": {
+          "description": "Indicates whether this bucket has an Object Lock configuration enabled.\n",
+          "type": "boolean",
+          "willReplaceOnChanges": true
+        },
+        "region": {
+          "description": "Region where this resource will be managed.\n",
+          "type": "string"
+        },
+        "tags": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of tags to assign to the bucket.\n",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:BucketHatchArgs": {
+      "properties": {
+        "accelerationStatus": {
+          "$ref": "#/types/anvil:aws:BucketAccelerateConfigurationHatch"
+        },
+        "acl": {
+          "$ref": "#/types/anvil:aws:BucketAclHatch"
+        },
+        "bucket": {
+          "$ref": "#/types/anvil:aws:BucketOverrides"
+        },
+        "corsRules": {
+          "$ref": "#/types/anvil:aws:BucketCorsConfigurationHatch"
+        },
+        "grants": {
+          "$ref": "#/types/anvil:aws:BucketAclHatch"
+        },
+        "lifecycleRules": {
+          "$ref": "#/types/anvil:aws:BucketLifecycleConfigurationHatch"
+        },
+        "logging": {
+          "$ref": "#/types/anvil:aws:BucketLoggingHatch"
+        },
+        "objectLockConfiguration": {
+          "$ref": "#/types/anvil:aws:BucketObjectLockConfigurationHatch"
+        },
+        "policy": {
+          "$ref": "#/types/anvil:aws:BucketPolicyHatch"
+        },
+        "publicAccessBlock": {
+          "$ref": "#/types/anvil:aws:PABHatch"
+        },
+        "replicationConfiguration": {
+          "$ref": "#/types/anvil:aws:BucketReplicationConfigHatch"
+        },
+        "requestPayer": {
+          "$ref": "#/types/anvil:aws:BucketRequestPaymentConfigurationHatch"
+        },
+        "serverSideEncryptionConfiguration": {
+          "$ref": "#/types/anvil:aws:BucketServerSideEncryptionConfigurationHatch"
+        },
+        "versioning": {
+          "$ref": "#/types/anvil:aws:BucketVersioningHatch"
+        },
+        "website": {
+          "$ref": "#/types/anvil:aws:BucketWebsiteConfigurationHatch"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:BucketLifecycleConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the source S3 bucket you want Amazon S3 to monitor.\n",
@@ -1179,7 +1264,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketLoggingTransform": {
+    "anvil:aws:BucketLoggingHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket.\n",
@@ -1217,7 +1302,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketObjectLockConfigurationTransform": {
+    "anvil:aws:BucketObjectLockConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket.\n",
@@ -1291,7 +1376,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketPolicyTransform": {
+    "anvil:aws:BucketPolicyHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket to which to apply the policy.\n",
@@ -1318,7 +1403,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketReplicationConfigTransform": {
+    "anvil:aws:BucketReplicationConfigHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the source S3 bucket you want Amazon S3 to monitor.\n",
@@ -1348,7 +1433,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketRequestPaymentConfigurationTransform": {
+    "anvil:aws:BucketRequestPaymentConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket.\n",
@@ -1372,7 +1457,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketServerSideEncryptionConfigurationTransform": {
+    "anvil:aws:BucketServerSideEncryptionConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "ID (name) of the bucket.\n",
@@ -1398,92 +1483,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketTransform": {
-      "properties": {
-        "bucket": {
-          "description": "Name of the bucket.\n",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "bucketPrefix": {
-          "description": "Creates a unique bucket name beginning with the specified prefix.\n",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "forceDestroy": {
-          "description": "Boolean that indicates all objects should be deleted from the bucket when the bucket is destroyed.\n",
-          "type": "boolean"
-        },
-        "objectLockEnabled": {
-          "description": "Indicates whether this bucket has an Object Lock configuration enabled.\n",
-          "type": "boolean",
-          "willReplaceOnChanges": true
-        },
-        "region": {
-          "description": "Region where this resource will be managed.\n",
-          "type": "string"
-        },
-        "tags": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Map of tags to assign to the bucket.\n",
-          "type": "object"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:aws:BucketTransformArgs": {
-      "properties": {
-        "accelerationStatus": {
-          "$ref": "#/types/anvil:aws:BucketAccelerateConfigurationTransform"
-        },
-        "acl": {
-          "$ref": "#/types/anvil:aws:BucketAclTransform"
-        },
-        "bucket": {
-          "$ref": "#/types/anvil:aws:BucketOverrides"
-        },
-        "corsRules": {
-          "$ref": "#/types/anvil:aws:BucketCorsConfigurationTransform"
-        },
-        "grants": {
-          "$ref": "#/types/anvil:aws:BucketAclTransform"
-        },
-        "lifecycleRules": {
-          "$ref": "#/types/anvil:aws:BucketLifecycleConfigurationTransform"
-        },
-        "logging": {
-          "$ref": "#/types/anvil:aws:BucketLoggingTransform"
-        },
-        "objectLockConfiguration": {
-          "$ref": "#/types/anvil:aws:BucketObjectLockConfigurationTransform"
-        },
-        "policy": {
-          "$ref": "#/types/anvil:aws:BucketPolicyTransform"
-        },
-        "publicAccessBlock": {
-          "$ref": "#/types/anvil:aws:PABTransform"
-        },
-        "replicationConfiguration": {
-          "$ref": "#/types/anvil:aws:BucketReplicationConfigTransform"
-        },
-        "requestPayer": {
-          "$ref": "#/types/anvil:aws:BucketRequestPaymentConfigurationTransform"
-        },
-        "serverSideEncryptionConfiguration": {
-          "$ref": "#/types/anvil:aws:BucketServerSideEncryptionConfigurationTransform"
-        },
-        "versioning": {
-          "$ref": "#/types/anvil:aws:BucketVersioningTransform"
-        },
-        "website": {
-          "$ref": "#/types/anvil:aws:BucketWebsiteConfigurationTransform"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:aws:BucketVersioningTransform": {
+    "anvil:aws:BucketVersioningHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the S3 bucket.\n",
@@ -1510,7 +1510,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketWebsiteConfigurationTransform": {
+    "anvil:aws:BucketWebsiteConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket.\n",
@@ -1698,6 +1698,14 @@
         "sesFromAddress": {
           "description": "Verified SES sender address (e.g. noreply@myapp.com). Setting this switches delivery to SES, removing the 50 emails/day limit. The address must be verified in SES in the same region as the user pool.",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:CognitoUserPoolHatchArgs": {
+      "properties": {
+        "cognitoUserPool": {
+          "$ref": "#/types/anvil:aws:CognitoUserPoolOverrides"
         }
       },
       "type": "object"
@@ -2050,14 +2058,6 @@
       },
       "type": "object"
     },
-    "anvil:aws:CognitoUserPoolTransformArgs": {
-      "properties": {
-        "cognitoUserPool": {
-          "$ref": "#/types/anvil:aws:CognitoUserPoolOverrides"
-        }
-      },
-      "type": "object"
-    },
     "anvil:aws:CognitoUserPoolUsernameAttribute": {
       "enum": [
         {
@@ -2260,6 +2260,14 @@
       ],
       "type": "string"
     },
+    "anvil:aws:DSQLHatchArgs": {
+      "properties": {
+        "cluster": {
+          "$ref": "#/types/anvil:aws:DSQLOverrides"
+        }
+      },
+      "type": "object"
+    },
     "anvil:aws:DSQLIndex": {
       "description": "A secondary index on a table. Created with CREATE INDEX ASYNC (DSQL requirement); the build runs in the background.",
       "properties": {
@@ -2414,14 +2422,6 @@
       ],
       "type": "object"
     },
-    "anvil:aws:DSQLTransformArgs": {
-      "properties": {
-        "cluster": {
-          "$ref": "#/types/anvil:aws:DSQLOverrides"
-        }
-      },
-      "type": "object"
-    },
     "anvil:aws:DSQLVpcArgs": {
       "description": "VPC configuration for DSQL. When set without hasNat, Anvil creates interface VPC endpoints per region so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.",
       "properties": {
@@ -2442,6 +2442,14 @@
         "vpcId",
         "privateSubnetIds"
       ],
+      "type": "object"
+    },
+    "anvil:aws:DsqlHatchArgs": {
+      "properties": {
+        "dsql": {
+          "$ref": "#/types/anvil:aws:DsqlOverrides"
+        }
+      },
       "type": "object"
     },
     "anvil:aws:DsqlOverrides": {
@@ -2475,14 +2483,6 @@
         },
         "timeouts": {
           "$ref": "/aws/v7.29.0/schema.json#/types/aws:dsql/ClusterTimeouts:ClusterTimeouts"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:aws:DsqlTransformArgs": {
-      "properties": {
-        "dsql": {
-          "$ref": "#/types/anvil:aws:DsqlOverrides"
         }
       },
       "type": "object"
@@ -2682,6 +2682,14 @@
       ],
       "type": "string"
     },
+    "anvil:aws:DynamoHatchArgs": {
+      "properties": {
+        "dynamo": {
+          "$ref": "#/types/anvil:aws:DynamoOverrides"
+        }
+      },
+      "type": "object"
+    },
     "anvil:aws:DynamoOverrides": {
       "properties": {
         "attributes": {
@@ -2816,16 +2824,16 @@
       },
       "type": "object"
     },
-    "anvil:aws:DynamoTransformArgs": {
-      "properties": {
-        "dynamo": {
-          "$ref": "#/types/anvil:aws:DynamoOverrides"
-        }
-      },
-      "type": "object"
-    },
     "anvil:aws:EventArchiveOverrides": {
       "description": "Direct overrides for the underlying aws.cloudwatch.EventArchive resource. Use retentionDays to change the default 7 day retention.",
+      "type": "object"
+    },
+    "anvil:aws:EventBridgeHatchArgs": {
+      "properties": {
+        "eventBridge": {
+          "$ref": "#/types/anvil:aws:EventBridgeOverrides"
+        }
+      },
       "type": "object"
     },
     "anvil:aws:EventBridgeOverrides": {
@@ -2870,10 +2878,14 @@
       },
       "type": "object"
     },
-    "anvil:aws:EventBridgeTransformArgs": {
+    "anvil:aws:EventBusHatchArgs": {
+      "description": "Escape hatches for direct Pulumi AWS resource overrides.",
       "properties": {
-        "eventBridge": {
-          "$ref": "#/types/anvil:aws:EventBridgeOverrides"
+        "archive": {
+          "$ref": "#/types/anvil:aws:EventArchiveOverrides"
+        },
+        "bus": {
+          "$ref": "#/types/anvil:aws:EventBusOverrides"
         }
       },
       "type": "object"
@@ -2953,18 +2965,6 @@
         "lambda": {
           "$ref": "#/types/anvil:aws:EventBusLambdaTargetArgs",
           "description": "Invoke a Lambda function when events match the rule pattern. Anvil creates the EventBridge target and grants EventBridge permission to invoke the function."
-        }
-      },
-      "type": "object"
-    },
-    "anvil:aws:EventBusTransformArgs": {
-      "description": "Escape hatches for direct Pulumi AWS resource overrides.",
-      "properties": {
-        "archive": {
-          "$ref": "#/types/anvil:aws:EventArchiveOverrides"
-        },
-        "bus": {
-          "$ref": "#/types/anvil:aws:EventBusOverrides"
         }
       },
       "type": "object"
@@ -3249,6 +3249,89 @@
       ],
       "type": "string"
     },
+    "anvil:aws:LambdaHatch": {
+      "properties": {
+        "architectures": {
+          "description": "Instruction set architecture for your Lambda function.\n",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "code": {
+          "$ref": "pulumi.json#/Archive",
+          "description": "Path to the function's deployment package within the local filesystem.\n"
+        },
+        "codeSha256": {
+          "description": "Base64-encoded representation the source code package file.\n",
+          "type": "string"
+        },
+        "handler": {
+          "description": "Function entry point in your code.\n",
+          "type": "string"
+        },
+        "kmsKeyArn": {
+          "description": "ARN of the AWS Key Management Service key used to encrypt environment variables.\n",
+          "type": "string"
+        },
+        "layers": {
+          "description": "List of Lambda Layer Version ARNs (maximum of 5) to attach to your Lambda Function.\n",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "memorySize": {
+          "description": "Amount of memory in MB your Lambda Function can use at runtime.\n",
+          "type": "integer"
+        },
+        "name": {
+          "description": "Unique name for your Lambda Function.\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "reservedConcurrentExecutions": {
+          "description": "Amount of reserved concurrent executions for this lambda function.\n",
+          "type": "integer"
+        },
+        "runtime": {
+          "description": "Identifier of the function's runtime.\n",
+          "type": "string"
+        },
+        "sourceCodeHash": {
+          "description": "User-defined hash of the source code package file.\n",
+          "type": "string"
+        },
+        "tags": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Key-value map of tags for the Lambda function.\n",
+          "type": "object"
+        },
+        "timeout": {
+          "description": "Amount of time your Lambda Function has to run in seconds.\n",
+          "type": "integer"
+        },
+        "tracingConfig": {
+          "$ref": "/aws/v7.23.0/schema.json#/types/aws:lambda/FunctionTracingConfig:FunctionTracingConfig",
+          "description": "Configuration block for X-Ray tracing. See below.\n"
+        },
+        "vpcConfig": {
+          "$ref": "/aws/v7.23.0/schema.json#/types/aws:lambda/FunctionVpcConfig:FunctionVpcConfig",
+          "description": "Configuration block for VPC. See below.\n"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:LambdaHatchArgs": {
+      "properties": {
+        "lambda": {
+          "$ref": "#/types/anvil:aws:LambdaOverrides"
+        }
+      },
+      "type": "object"
+    },
     "anvil:aws:LambdaLogRetention": {
       "enum": [
         {
@@ -3502,89 +3585,6 @@
       ],
       "type": "string"
     },
-    "anvil:aws:LambdaTransform": {
-      "properties": {
-        "architectures": {
-          "description": "Instruction set architecture for your Lambda function.\n",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "code": {
-          "$ref": "pulumi.json#/Archive",
-          "description": "Path to the function's deployment package within the local filesystem.\n"
-        },
-        "codeSha256": {
-          "description": "Base64-encoded representation the source code package file.\n",
-          "type": "string"
-        },
-        "handler": {
-          "description": "Function entry point in your code.\n",
-          "type": "string"
-        },
-        "kmsKeyArn": {
-          "description": "ARN of the AWS Key Management Service key used to encrypt environment variables.\n",
-          "type": "string"
-        },
-        "layers": {
-          "description": "List of Lambda Layer Version ARNs (maximum of 5) to attach to your Lambda Function.\n",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "memorySize": {
-          "description": "Amount of memory in MB your Lambda Function can use at runtime.\n",
-          "type": "integer"
-        },
-        "name": {
-          "description": "Unique name for your Lambda Function.\n",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "reservedConcurrentExecutions": {
-          "description": "Amount of reserved concurrent executions for this lambda function.\n",
-          "type": "integer"
-        },
-        "runtime": {
-          "description": "Identifier of the function's runtime.\n",
-          "type": "string"
-        },
-        "sourceCodeHash": {
-          "description": "User-defined hash of the source code package file.\n",
-          "type": "string"
-        },
-        "tags": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Key-value map of tags for the Lambda function.\n",
-          "type": "object"
-        },
-        "timeout": {
-          "description": "Amount of time your Lambda Function has to run in seconds.\n",
-          "type": "integer"
-        },
-        "tracingConfig": {
-          "$ref": "/aws/v7.23.0/schema.json#/types/aws:lambda/FunctionTracingConfig:FunctionTracingConfig",
-          "description": "Configuration block for X-Ray tracing. See below.\n"
-        },
-        "vpcConfig": {
-          "$ref": "/aws/v7.23.0/schema.json#/types/aws:lambda/FunctionVpcConfig:FunctionVpcConfig",
-          "description": "Configuration block for VPC. See below.\n"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:aws:LambdaTransformArgs": {
-      "properties": {
-        "lambda": {
-          "$ref": "#/types/anvil:aws:LambdaOverrides"
-        }
-      },
-      "type": "object"
-    },
     "anvil:aws:LambdaVpcArgs": {
       "properties": {
         "cidrs": {
@@ -3658,7 +3658,7 @@
       ],
       "type": "object"
     },
-    "anvil:aws:PABTransform": {
+    "anvil:aws:PABHatch": {
       "properties": {
         "blockPublicAcls": {
           "description": "Whether Amazon S3 should block public ACLs for this bucket. Defaults to \u003cspan pulumi-lang-nodejs=\"`false`\" pulumi-lang-dotnet=\"`False`\" pulumi-lang-go=\"`false`\" pulumi-lang-python=\"`false`\" pulumi-lang-yaml=\"`false`\" pulumi-lang-java=\"`false`\"\u003e`false`\u003c/span\u003e. Enabling this setting does not affect existing policies or ACLs. When set to \u003cspan pulumi-lang-nodejs=\"`true`\" pulumi-lang-dotnet=\"`True`\" pulumi-lang-go=\"`true`\" pulumi-lang-python=\"`true`\" pulumi-lang-yaml=\"`true`\" pulumi-lang-java=\"`true`\"\u003e`true`\u003c/span\u003e causes the following behavior:\n* PUT Bucket ACL and PUT Object ACL calls will fail if the specified ACL allows public access.\n* PUT Object calls will fail if the request includes an object ACL.\n",
@@ -3712,6 +3712,14 @@
         "maxReceiveCount": {
           "description": "How many times a message can be received before being moved to the DLQ. Default: 3.",
           "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:QueueHatchArgs": {
+      "properties": {
+        "queue": {
+          "$ref": "#/types/anvil:aws:QueueOverrides"
         }
       },
       "type": "object"
@@ -3817,14 +3825,6 @@
         "visibilityTimeoutSeconds": {
           "description": "Visibility timeout for the queue. An integer from 0 to 43200 (12 hours). The default for this attribute is 30. For more information about visibility timeout, see [AWS docs](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/AboutVT.html).\n",
           "type": "integer"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:aws:QueueTransformArgs": {
-      "properties": {
-        "queue": {
-          "$ref": "#/types/anvil:aws:QueueOverrides"
         }
       },
       "type": "object"
@@ -4084,6 +4084,14 @@
       ],
       "type": "object"
     },
+    "anvil:aws:WafHatchArgs": {
+      "properties": {
+        "waf": {
+          "$ref": "#/types/anvil:aws:WafOverrides"
+        }
+      },
+      "type": "object"
+    },
     "anvil:aws:WafLoggingArgs": {
       "description": "WAF logging to CloudWatch Logs.",
       "properties": {
@@ -4266,10 +4274,125 @@
       ],
       "type": "string"
     },
-    "anvil:aws:WafTransformArgs": {
+    "anvil:gcp:BucketHatch": {
       "properties": {
-        "waf": {
-          "$ref": "#/types/anvil:aws:WafOverrides"
+        "autoclass": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketAutoclass:BucketAutoclass",
+          "description": "The bucket's [Autoclass](https://cloud.google.com/storage/docs/autoclass) configuration.  Structure is documented below.\n"
+        },
+        "cors": {
+          "description": "The bucket's [Cross-Origin Resource Sharing (CORS)](https://www.w3.org/TR/cors/) configuration. Multiple blocks of this type are permitted. Structure is documented below.\n",
+          "items": {
+            "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketCor:BucketCor"
+          },
+          "type": "array"
+        },
+        "customPlacementConfig": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketCustomPlacementConfig:BucketCustomPlacementConfig",
+          "description": "The bucket's custom location configuration, which specifies the individual regions that comprise a dual-region bucket. If the bucket is designated a single or multi-region, the parameters are empty. Structure is documented below.\n"
+        },
+        "defaultEventBasedHold": {
+          "description": "Whether or not to automatically apply an eventBasedHold to new objects added to the bucket.\n",
+          "type": "boolean"
+        },
+        "enableObjectRetention": {
+          "description": "Enables [object retention](https://cloud.google.com/storage/docs/object-lock) on a storage bucket.\n",
+          "type": "boolean",
+          "willReplaceOnChanges": true
+        },
+        "encryption": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketEncryption:BucketEncryption",
+          "description": "The bucket's encryption configuration. Structure is documented below.\n"
+        },
+        "forceDestroy": {
+          "description": "When true, before deleting a bucket, delete all objects within the bucket, or Anywhere Caches caching data for that bucket. Otherwise, buckets with objects/caches will fail. Anywhere Cache requires additional permissions to interact with and will be assumed not present when the provider is not permissioned, attempting to delete the bucket anyways. This may result in the objects in the bucket getting destroyed but not the bucket itself if there is a cache in use with the bucket. Force deletion may take a long time to delete buckets with lots of objects or with any Anywhere Caches (80m+).\n",
+          "type": "boolean"
+        },
+        "hierarchicalNamespace": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketHierarchicalNamespace:BucketHierarchicalNamespace",
+          "description": "The bucket's hierarchical namespace policy, which defines the bucket capability to handle folders in logical structure. Structure is documented below. To use this configuration, \u003cspan pulumi-lang-nodejs=\"`uniformBucketLevelAccess`\" pulumi-lang-dotnet=\"`UniformBucketLevelAccess`\" pulumi-lang-go=\"`uniformBucketLevelAccess`\" pulumi-lang-python=\"`uniform_bucket_level_access`\" pulumi-lang-yaml=\"`uniformBucketLevelAccess`\" pulumi-lang-java=\"`uniformBucketLevelAccess`\"\u003e`uniform_bucket_level_access`\u003c/span\u003e must be enabled on bucket.\n",
+          "willReplaceOnChanges": true
+        },
+        "ipFilter": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketIpFilter:BucketIpFilter",
+          "description": "The bucket IP filtering configuration. Specifies the network sources that can access the bucket, as well as its underlying objects. Structure is documented below.\n"
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "A map of key/value label pairs to assign to the bucket.\n",
+          "type": "object"
+        },
+        "lifecycleRules": {
+          "description": "The bucket's [Lifecycle Rules](https://cloud.google.com/storage/docs/lifecycle#configuration) configuration. Multiple blocks of this type are permitted. Structure is documented below.\n",
+          "items": {
+            "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketLifecycleRule:BucketLifecycleRule"
+          },
+          "type": "array"
+        },
+        "location": {
+          "description": "The [GCS location](https://cloud.google.com/storage/docs/bucket-locations).\n\n- - -\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "logging": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketLogging:BucketLogging",
+          "description": "The bucket's [Access \u0026 Storage Logs](https://cloud.google.com/storage/docs/access-logs) configuration. Structure is documented below.\n"
+        },
+        "name": {
+          "description": "The name of the bucket. Bucket names must be in lowercase and no more than 63 characters long. You can find the complete list of bucket naming rules [here](https://cloud.google.com/storage/docs/buckets#naming).\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "project": {
+          "description": "The ID of the project in which the resource belongs. If it\nis not provided, the provider project is used.\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "publicAccessPrevention": {
+          "description": "Prevents public access to a bucket. Acceptable values are \"inherited\" or \"enforced\". If \"inherited\", the bucket uses [public access prevention](https://cloud.google.com/storage/docs/public-access-prevention) only if the bucket is subject to the public access prevention organization policy constraint. Defaults to \"inherited\".\n",
+          "type": "string"
+        },
+        "requesterPays": {
+          "description": "Enables [Requester Pays](https://cloud.google.com/storage/docs/requester-pays) on a storage bucket.\n",
+          "type": "boolean"
+        },
+        "retentionPolicy": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketRetentionPolicy:BucketRetentionPolicy",
+          "description": "Configuration of the bucket's data retention policy for how long objects in the bucket should be retained. Structure is documented below.\n"
+        },
+        "rpo": {
+          "description": "The recovery point objective for cross-region replication of the bucket. Applicable only for dual and multi-region buckets. `\"DEFAULT\"` sets default replication. `\"ASYNC_TURBO\"` value enables turbo replication, valid for dual-region buckets only. See [Turbo Replication](https://cloud.google.com/storage/docs/managing-turbo-replication) for more information. If rpo is not specified at bucket creation, it defaults to `\"DEFAULT\"` for dual and multi-region buckets. **NOTE** If used with single-region bucket, It will throw an error.\n",
+          "type": "string"
+        },
+        "softDeletePolicy": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketSoftDeletePolicy:BucketSoftDeletePolicy",
+          "description": "The bucket's soft delete policy, which defines the period of time that soft-deleted objects will be retained, and cannot be permanently deleted. If the block is not provided, Server side value will be kept which means removal of block won't generate any terraform change. Structure is documented below.\n"
+        },
+        "storageClass": {
+          "description": "The [Storage Class](https://cloud.google.com/storage/docs/storage-classes) of the new bucket. Supported values include: `STANDARD`, `MULTI_REGIONAL`, `REGIONAL`, `NEARLINE`, `COLDLINE`, `ARCHIVE`.\n",
+          "type": "string"
+        },
+        "uniformBucketLevelAccess": {
+          "description": "Enables [Uniform bucket-level access](https://cloud.google.com/storage/docs/uniform-bucket-level-access) access to a bucket.\n",
+          "type": "boolean"
+        },
+        "versioning": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketVersioning:BucketVersioning",
+          "description": "The bucket's [Versioning](https://cloud.google.com/storage/docs/object-versioning) configuration.  Structure is documented below.\n"
+        },
+        "website": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketWebsite:BucketWebsite",
+          "description": "Configuration if the bucket acts as a website. Structure is documented below.\n"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:gcp:BucketHatchArgs": {
+      "properties": {
+        "bucket": {
+          "$ref": "#/types/anvil:gcp:BucketOverrides"
         }
       },
       "type": "object"
@@ -4389,125 +4512,57 @@
       },
       "type": "object"
     },
-    "anvil:gcp:BucketTransform": {
+    "anvil:gcp:FunctionHatch": {
       "properties": {
-        "autoclass": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketAutoclass:BucketAutoclass",
-          "description": "The bucket's [Autoclass](https://cloud.google.com/storage/docs/autoclass) configuration.  Structure is documented below.\n"
+        "buildConfig": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionBuildConfig:FunctionBuildConfig",
+          "description": "Describes the Build step of the function that builds a container\nfrom the given source.\nStructure is documented below.\n"
         },
-        "cors": {
-          "description": "The bucket's [Cross-Origin Resource Sharing (CORS)](https://www.w3.org/TR/cors/) configuration. Multiple blocks of this type are permitted. Structure is documented below.\n",
-          "items": {
-            "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketCor:BucketCor"
-          },
-          "type": "array"
+        "description": {
+          "description": "User-provided description of a function.\n",
+          "type": "string"
         },
-        "customPlacementConfig": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketCustomPlacementConfig:BucketCustomPlacementConfig",
-          "description": "The bucket's custom location configuration, which specifies the individual regions that comprise a dual-region bucket. If the bucket is designated a single or multi-region, the parameters are empty. Structure is documented below.\n"
+        "eventTrigger": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionEventTrigger:FunctionEventTrigger",
+          "description": "An Eventarc trigger managed by Google Cloud Functions that fires events in\nresponse to a condition in another service.\nStructure is documented below.\n"
         },
-        "defaultEventBasedHold": {
-          "description": "Whether or not to automatically apply an eventBasedHold to new objects added to the bucket.\n",
-          "type": "boolean"
-        },
-        "enableObjectRetention": {
-          "description": "Enables [object retention](https://cloud.google.com/storage/docs/object-lock) on a storage bucket.\n",
-          "type": "boolean",
-          "willReplaceOnChanges": true
-        },
-        "encryption": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketEncryption:BucketEncryption",
-          "description": "The bucket's encryption configuration. Structure is documented below.\n"
-        },
-        "forceDestroy": {
-          "description": "When true, before deleting a bucket, delete all objects within the bucket, or Anywhere Caches caching data for that bucket. Otherwise, buckets with objects/caches will fail. Anywhere Cache requires additional permissions to interact with and will be assumed not present when the provider is not permissioned, attempting to delete the bucket anyways. This may result in the objects in the bucket getting destroyed but not the bucket itself if there is a cache in use with the bucket. Force deletion may take a long time to delete buckets with lots of objects or with any Anywhere Caches (80m+).\n",
-          "type": "boolean"
-        },
-        "hierarchicalNamespace": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketHierarchicalNamespace:BucketHierarchicalNamespace",
-          "description": "The bucket's hierarchical namespace policy, which defines the bucket capability to handle folders in logical structure. Structure is documented below. To use this configuration, \u003cspan pulumi-lang-nodejs=\"`uniformBucketLevelAccess`\" pulumi-lang-dotnet=\"`UniformBucketLevelAccess`\" pulumi-lang-go=\"`uniformBucketLevelAccess`\" pulumi-lang-python=\"`uniform_bucket_level_access`\" pulumi-lang-yaml=\"`uniformBucketLevelAccess`\" pulumi-lang-java=\"`uniformBucketLevelAccess`\"\u003e`uniform_bucket_level_access`\u003c/span\u003e must be enabled on bucket.\n",
-          "willReplaceOnChanges": true
-        },
-        "ipFilter": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketIpFilter:BucketIpFilter",
-          "description": "The bucket IP filtering configuration. Specifies the network sources that can access the bucket, as well as its underlying objects. Structure is documented below.\n"
+        "kmsKeyName": {
+          "description": "Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources.\nIt must match the pattern projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}.\n",
+          "type": "string"
         },
         "labels": {
           "additionalProperties": {
             "type": "string"
           },
-          "description": "A map of key/value label pairs to assign to the bucket.\n",
+          "description": "A set of key/value label pairs associated with this Cloud Function.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field \u003cspan pulumi-lang-nodejs=\"`effectiveLabels`\" pulumi-lang-dotnet=\"`EffectiveLabels`\" pulumi-lang-go=\"`effectiveLabels`\" pulumi-lang-python=\"`effective_labels`\" pulumi-lang-yaml=\"`effectiveLabels`\" pulumi-lang-java=\"`effectiveLabels`\"\u003e`effective_labels`\u003c/span\u003e for all of the labels present on the resource.\n",
           "type": "object"
         },
-        "lifecycleRules": {
-          "description": "The bucket's [Lifecycle Rules](https://cloud.google.com/storage/docs/lifecycle#configuration) configuration. Multiple blocks of this type are permitted. Structure is documented below.\n",
-          "items": {
-            "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketLifecycleRule:BucketLifecycleRule"
-          },
-          "type": "array"
-        },
         "location": {
-          "description": "The [GCS location](https://cloud.google.com/storage/docs/bucket-locations).\n\n- - -\n",
+          "description": "The location of this cloud function.\n",
           "type": "string",
           "willReplaceOnChanges": true
         },
-        "logging": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketLogging:BucketLogging",
-          "description": "The bucket's [Access \u0026 Storage Logs](https://cloud.google.com/storage/docs/access-logs) configuration. Structure is documented below.\n"
-        },
         "name": {
-          "description": "The name of the bucket. Bucket names must be in lowercase and no more than 63 characters long. You can find the complete list of bucket naming rules [here](https://cloud.google.com/storage/docs/buckets#naming).\n",
+          "description": "A user-defined name of the function. Function names must\nbe unique globally and match pattern `projects/*/locations/*/functions/*`.\n",
           "type": "string",
           "willReplaceOnChanges": true
         },
         "project": {
-          "description": "The ID of the project in which the resource belongs. If it\nis not provided, the provider project is used.\n",
+          "description": "The ID of the project in which the resource belongs.\nIf it is not provided, the provider project is used.\n",
           "type": "string",
           "willReplaceOnChanges": true
         },
-        "publicAccessPrevention": {
-          "description": "Prevents public access to a bucket. Acceptable values are \"inherited\" or \"enforced\". If \"inherited\", the bucket uses [public access prevention](https://cloud.google.com/storage/docs/public-access-prevention) only if the bucket is subject to the public access prevention organization policy constraint. Defaults to \"inherited\".\n",
-          "type": "string"
-        },
-        "requesterPays": {
-          "description": "Enables [Requester Pays](https://cloud.google.com/storage/docs/requester-pays) on a storage bucket.\n",
-          "type": "boolean"
-        },
-        "retentionPolicy": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketRetentionPolicy:BucketRetentionPolicy",
-          "description": "Configuration of the bucket's data retention policy for how long objects in the bucket should be retained. Structure is documented below.\n"
-        },
-        "rpo": {
-          "description": "The recovery point objective for cross-region replication of the bucket. Applicable only for dual and multi-region buckets. `\"DEFAULT\"` sets default replication. `\"ASYNC_TURBO\"` value enables turbo replication, valid for dual-region buckets only. See [Turbo Replication](https://cloud.google.com/storage/docs/managing-turbo-replication) for more information. If rpo is not specified at bucket creation, it defaults to `\"DEFAULT\"` for dual and multi-region buckets. **NOTE** If used with single-region bucket, It will throw an error.\n",
-          "type": "string"
-        },
-        "softDeletePolicy": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketSoftDeletePolicy:BucketSoftDeletePolicy",
-          "description": "The bucket's soft delete policy, which defines the period of time that soft-deleted objects will be retained, and cannot be permanently deleted. If the block is not provided, Server side value will be kept which means removal of block won't generate any terraform change. Structure is documented below.\n"
-        },
-        "storageClass": {
-          "description": "The [Storage Class](https://cloud.google.com/storage/docs/storage-classes) of the new bucket. Supported values include: `STANDARD`, `MULTI_REGIONAL`, `REGIONAL`, `NEARLINE`, `COLDLINE`, `ARCHIVE`.\n",
-          "type": "string"
-        },
-        "uniformBucketLevelAccess": {
-          "description": "Enables [Uniform bucket-level access](https://cloud.google.com/storage/docs/uniform-bucket-level-access) access to a bucket.\n",
-          "type": "boolean"
-        },
-        "versioning": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketVersioning:BucketVersioning",
-          "description": "The bucket's [Versioning](https://cloud.google.com/storage/docs/object-versioning) configuration.  Structure is documented below.\n"
-        },
-        "website": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:storage/BucketWebsite:BucketWebsite",
-          "description": "Configuration if the bucket acts as a website. Structure is documented below.\n"
+        "serviceConfig": {
+          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionServiceConfig:FunctionServiceConfig",
+          "description": "Describes the Service being deployed.\nStructure is documented below.\n"
         }
       },
       "type": "object"
     },
-    "anvil:gcp:BucketTransformArgs": {
+    "anvil:gcp:FunctionHatchArgs": {
       "properties": {
-        "bucket": {
-          "$ref": "#/types/anvil:gcp:BucketOverrides"
+        "function": {
+          "$ref": "#/types/anvil:gcp:FunctionOverrides"
         }
       },
       "type": "object"
@@ -4558,62 +4613,7 @@
         }
       },
       "type": "object"
-    },
-    "anvil:gcp:FunctionTransform": {
-      "properties": {
-        "buildConfig": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionBuildConfig:FunctionBuildConfig",
-          "description": "Describes the Build step of the function that builds a container\nfrom the given source.\nStructure is documented below.\n"
-        },
-        "description": {
-          "description": "User-provided description of a function.\n",
-          "type": "string"
-        },
-        "eventTrigger": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionEventTrigger:FunctionEventTrigger",
-          "description": "An Eventarc trigger managed by Google Cloud Functions that fires events in\nresponse to a condition in another service.\nStructure is documented below.\n"
-        },
-        "kmsKeyName": {
-          "description": "Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources.\nIt must match the pattern projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}.\n",
-          "type": "string"
-        },
-        "labels": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "A set of key/value label pairs associated with this Cloud Function.\n\n**Note**: This field is non-authoritative, and will only manage the labels present in your configuration.\nPlease refer to the field \u003cspan pulumi-lang-nodejs=\"`effectiveLabels`\" pulumi-lang-dotnet=\"`EffectiveLabels`\" pulumi-lang-go=\"`effectiveLabels`\" pulumi-lang-python=\"`effective_labels`\" pulumi-lang-yaml=\"`effectiveLabels`\" pulumi-lang-java=\"`effectiveLabels`\"\u003e`effective_labels`\u003c/span\u003e for all of the labels present on the resource.\n",
-          "type": "object"
-        },
-        "location": {
-          "description": "The location of this cloud function.\n",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "name": {
-          "description": "A user-defined name of the function. Function names must\nbe unique globally and match pattern `projects/*/locations/*/functions/*`.\n",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "project": {
-          "description": "The ID of the project in which the resource belongs.\nIf it is not provided, the provider project is used.\n",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "serviceConfig": {
-          "$ref": "/gcp/v9.15.0/schema.json#/types/gcp:cloudfunctionsv2/FunctionServiceConfig:FunctionServiceConfig",
-          "description": "Describes the Service being deployed.\nStructure is documented below.\n"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:gcp:FunctionTransformArgs": {
-      "properties": {
-        "function": {
-          "$ref": "#/types/anvil:gcp:FunctionOverrides"
-        }
-      },
-      "type": "object"
     }
   },
-  "version": "0.1.17"
+  "version": "0.1.19"
 }

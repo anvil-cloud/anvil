@@ -1,4 +1,4 @@
-package transform
+package hatch
 
 import (
 	"fmt"
@@ -6,19 +6,19 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// MergeTransform deep-merges user overrides into default properties.
+// Merge deep-merges user overrides into default properties.
 //
 // Rules:
 //   - Maps merge recursively (user keys override, default keys preserved)
 //   - Scalars override
 //   - Arrays replace entirely (not append)
 //   - Pulumi Outputs in defaults are preserved unless explicitly overridden
-func MergeTransform(transform map[string]interface{}, defaults pulumi.Map) pulumi.Map {
-	if len(transform) == 0 {
+func Merge(overrides map[string]interface{}, defaults pulumi.Map) pulumi.Map {
+	if len(overrides) == 0 {
 		return defaults
 	}
 
-	for k, v := range transform {
+	for k, v := range overrides {
 		existing, hasExisting := defaults[k]
 
 		if hasExisting {

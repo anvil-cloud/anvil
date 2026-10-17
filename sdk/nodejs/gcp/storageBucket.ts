@@ -43,8 +43,8 @@ export class StorageBucket extends pulumi.ComponentResource {
                 throw new Error("Missing required property 'location'");
             }
             resourceInputs["dataClassification"] = args?.dataClassification;
+            resourceInputs["hatch"] = args?.hatch;
             resourceInputs["location"] = args?.location;
-            resourceInputs["transform"] = args?.transform;
         } else {
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
@@ -60,9 +60,9 @@ export interface StorageBucketArgs {
      * Data classification level for the bucket.
      */
     dataClassification: pulumi.Input<string>;
+    hatch?: pulumi.Input<inputs.gcp.BucketHatchArgsArgs>;
     /**
      * The GCS location (e.g. US, EU, us-central1).
      */
     location: pulumi.Input<string>;
-    transform?: pulumi.Input<inputs.gcp.BucketTransformArgsArgs>;
 }

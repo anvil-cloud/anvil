@@ -25,16 +25,16 @@ class CognitoUserPoolArgs:
                  app_client: Optional[pulumi.Input['CognitoUserPoolAppClientArgs']] = None,
                  attributes: Optional[pulumi.Input['CognitoUserPoolAttributesArgs']] = None,
                  email_configuration: Optional[pulumi.Input['CognitoUserPoolEmailConfigurationArgs']] = None,
+                 hatch: Optional[pulumi.Input['CognitoUserPoolHatchArgsArgs']] = None,
                  hosted_ui: Optional[pulumi.Input['CognitoUserPoolHostedUiArgs']] = None,
                  identity_providers: Optional[pulumi.Input[Sequence[pulumi.Input['CognitoUserPoolIdentityProviderArgs']]]] = None,
                  mfa: Optional[pulumi.Input['CognitoUserPoolMfaArgs']] = None,
                  password_policy: Optional[pulumi.Input['CognitoUserPoolPasswordPolicyArgs']] = None,
-                 transform: Optional[pulumi.Input['CognitoUserPoolTransformArgsArgs']] = None,
                  waf: Optional[pulumi.Input['CognitoUserPoolWafArgs']] = None):
         """
         The set of arguments for constructing a CognitoUserPool resource.
 
-        :param pulumi.Input['CognitoUserPoolAppClientArgs'] app_client: Default app client created with the user pool. Covers the 80% case of one application per pool. Use transform for additional clients.
+        :param pulumi.Input['CognitoUserPoolAppClientArgs'] app_client: Default app client created with the user pool. Covers the 80% case of one application per pool. Use hatch for additional clients.
         :param pulumi.Input['CognitoUserPoolAttributesArgs'] attributes: User attribute configuration. Controls sign-in identifiers and required attributes on sign-up.
         :param pulumi.Input['CognitoUserPoolEmailConfigurationArgs'] email_configuration: Email delivery configuration. Default: Cognito-managed email (5 emails/day limit). Set sesFromAddress for SES delivery in production.
         :param pulumi.Input['CognitoUserPoolHostedUiArgs'] hosted_ui: Hosted UI / Managed Login configuration. Omit to use the Cognito user pools API directly without a hosted sign-in page.
@@ -49,6 +49,8 @@ class CognitoUserPoolArgs:
             pulumi.set(__self__, "attributes", attributes)
         if email_configuration is not None:
             pulumi.set(__self__, "email_configuration", email_configuration)
+        if hatch is not None:
+            pulumi.set(__self__, "hatch", hatch)
         if hosted_ui is not None:
             pulumi.set(__self__, "hosted_ui", hosted_ui)
         if identity_providers is not None:
@@ -57,8 +59,6 @@ class CognitoUserPoolArgs:
             pulumi.set(__self__, "mfa", mfa)
         if password_policy is not None:
             pulumi.set(__self__, "password_policy", password_policy)
-        if transform is not None:
-            pulumi.set(__self__, "transform", transform)
         if waf is not None:
             pulumi.set(__self__, "waf", waf)
 
@@ -66,7 +66,7 @@ class CognitoUserPoolArgs:
     @pulumi.getter(name="appClient")
     def app_client(self) -> Optional[pulumi.Input['CognitoUserPoolAppClientArgs']]:
         """
-        Default app client created with the user pool. Covers the 80% case of one application per pool. Use transform for additional clients.
+        Default app client created with the user pool. Covers the 80% case of one application per pool. Use hatch for additional clients.
         """
         return pulumi.get(self, "app_client")
 
@@ -97,6 +97,15 @@ class CognitoUserPoolArgs:
     @email_configuration.setter
     def email_configuration(self, value: Optional[pulumi.Input['CognitoUserPoolEmailConfigurationArgs']]):
         pulumi.set(self, "email_configuration", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def hatch(self) -> Optional[pulumi.Input['CognitoUserPoolHatchArgsArgs']]:
+        return pulumi.get(self, "hatch")
+
+    @hatch.setter
+    def hatch(self, value: Optional[pulumi.Input['CognitoUserPoolHatchArgsArgs']]):
+        pulumi.set(self, "hatch", value)
 
     @_builtins.property
     @pulumi.getter(name="hostedUi")
@@ -148,15 +157,6 @@ class CognitoUserPoolArgs:
 
     @_builtins.property
     @pulumi.getter
-    def transform(self) -> Optional[pulumi.Input['CognitoUserPoolTransformArgsArgs']]:
-        return pulumi.get(self, "transform")
-
-    @transform.setter
-    def transform(self, value: Optional[pulumi.Input['CognitoUserPoolTransformArgsArgs']]):
-        pulumi.set(self, "transform", value)
-
-    @_builtins.property
-    @pulumi.getter
     def waf(self) -> Optional[pulumi.Input['CognitoUserPoolWafArgs']]:
         """
         Attaches a regional WAF WebACL to the user pool. AWS recommends a WAF for every public user pool — it protects sign-in and sign-up against credential stuffing, brute force, bots and SMS pumping. Use an Anvil Waf created with scope "regional" in the same region as the pool.
@@ -177,11 +177,11 @@ class CognitoUserPool(pulumi.ComponentResource):
                  app_client: Optional[pulumi.Input[Union['CognitoUserPoolAppClientArgs', 'CognitoUserPoolAppClientArgsDict']]] = None,
                  attributes: Optional[pulumi.Input[Union['CognitoUserPoolAttributesArgs', 'CognitoUserPoolAttributesArgsDict']]] = None,
                  email_configuration: Optional[pulumi.Input[Union['CognitoUserPoolEmailConfigurationArgs', 'CognitoUserPoolEmailConfigurationArgsDict']]] = None,
+                 hatch: Optional[pulumi.Input[Union['CognitoUserPoolHatchArgsArgs', 'CognitoUserPoolHatchArgsArgsDict']]] = None,
                  hosted_ui: Optional[pulumi.Input[Union['CognitoUserPoolHostedUiArgs', 'CognitoUserPoolHostedUiArgsDict']]] = None,
                  identity_providers: Optional[pulumi.Input[Sequence[pulumi.Input[Union['CognitoUserPoolIdentityProviderArgs', 'CognitoUserPoolIdentityProviderArgsDict']]]]] = None,
                  mfa: Optional[pulumi.Input[Union['CognitoUserPoolMfaArgs', 'CognitoUserPoolMfaArgsDict']]] = None,
                  password_policy: Optional[pulumi.Input[Union['CognitoUserPoolPasswordPolicyArgs', 'CognitoUserPoolPasswordPolicyArgsDict']]] = None,
-                 transform: Optional[pulumi.Input[Union['CognitoUserPoolTransformArgsArgs', 'CognitoUserPoolTransformArgsArgsDict']]] = None,
                  waf: Optional[pulumi.Input[Union['CognitoUserPoolWafArgs', 'CognitoUserPoolWafArgsDict']]] = None,
                  __props__=None):
         """
@@ -190,7 +190,7 @@ class CognitoUserPool(pulumi.ComponentResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[Union['CognitoUserPoolAppClientArgs', 'CognitoUserPoolAppClientArgsDict']] app_client: Default app client created with the user pool. Covers the 80% case of one application per pool. Use transform for additional clients.
+        :param pulumi.Input[Union['CognitoUserPoolAppClientArgs', 'CognitoUserPoolAppClientArgsDict']] app_client: Default app client created with the user pool. Covers the 80% case of one application per pool. Use hatch for additional clients.
         :param pulumi.Input[Union['CognitoUserPoolAttributesArgs', 'CognitoUserPoolAttributesArgsDict']] attributes: User attribute configuration. Controls sign-in identifiers and required attributes on sign-up.
         :param pulumi.Input[Union['CognitoUserPoolEmailConfigurationArgs', 'CognitoUserPoolEmailConfigurationArgsDict']] email_configuration: Email delivery configuration. Default: Cognito-managed email (5 emails/day limit). Set sesFromAddress for SES delivery in production.
         :param pulumi.Input[Union['CognitoUserPoolHostedUiArgs', 'CognitoUserPoolHostedUiArgsDict']] hosted_ui: Hosted UI / Managed Login configuration. Omit to use the Cognito user pools API directly without a hosted sign-in page.
@@ -227,11 +227,11 @@ class CognitoUserPool(pulumi.ComponentResource):
                  app_client: Optional[pulumi.Input[Union['CognitoUserPoolAppClientArgs', 'CognitoUserPoolAppClientArgsDict']]] = None,
                  attributes: Optional[pulumi.Input[Union['CognitoUserPoolAttributesArgs', 'CognitoUserPoolAttributesArgsDict']]] = None,
                  email_configuration: Optional[pulumi.Input[Union['CognitoUserPoolEmailConfigurationArgs', 'CognitoUserPoolEmailConfigurationArgsDict']]] = None,
+                 hatch: Optional[pulumi.Input[Union['CognitoUserPoolHatchArgsArgs', 'CognitoUserPoolHatchArgsArgsDict']]] = None,
                  hosted_ui: Optional[pulumi.Input[Union['CognitoUserPoolHostedUiArgs', 'CognitoUserPoolHostedUiArgsDict']]] = None,
                  identity_providers: Optional[pulumi.Input[Sequence[pulumi.Input[Union['CognitoUserPoolIdentityProviderArgs', 'CognitoUserPoolIdentityProviderArgsDict']]]]] = None,
                  mfa: Optional[pulumi.Input[Union['CognitoUserPoolMfaArgs', 'CognitoUserPoolMfaArgsDict']]] = None,
                  password_policy: Optional[pulumi.Input[Union['CognitoUserPoolPasswordPolicyArgs', 'CognitoUserPoolPasswordPolicyArgsDict']]] = None,
-                 transform: Optional[pulumi.Input[Union['CognitoUserPoolTransformArgsArgs', 'CognitoUserPoolTransformArgsArgsDict']]] = None,
                  waf: Optional[pulumi.Input[Union['CognitoUserPoolWafArgs', 'CognitoUserPoolWafArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -247,11 +247,11 @@ class CognitoUserPool(pulumi.ComponentResource):
             __props__.__dict__["app_client"] = app_client
             __props__.__dict__["attributes"] = attributes
             __props__.__dict__["email_configuration"] = email_configuration
+            __props__.__dict__["hatch"] = hatch
             __props__.__dict__["hosted_ui"] = hosted_ui
             __props__.__dict__["identity_providers"] = identity_providers
             __props__.__dict__["mfa"] = mfa
             __props__.__dict__["password_policy"] = password_policy
-            __props__.__dict__["transform"] = transform
             __props__.__dict__["waf"] = waf
             __props__.__dict__["app_client_id"] = None
             __props__.__dict__["app_client_secret"] = None

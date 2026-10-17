@@ -47,7 +47,8 @@ type wafArgs struct {
 	// Two-letter ISO 3166 country codes to block, e.g. ["KP"]. Follows mode.
 	BlockCountries []string `pulumi:"blockCountries"`
 	// Header carrying the real visitor IP when the site sits behind a proxy, e.g. "CF-Connecting-IP" for Cloudflare. The rate limit, IP lists and country blocking then use the visitor's IP instead of the proxy's. AWS's ipReputation and anonymousIp rule groups can't read this header, so they default to off when it's set.
-	ClientIpHeader *string `pulumi:"clientIpHeader"`
+	ClientIpHeader *string       `pulumi:"clientIpHeader"`
+	Hatch          *WafHatchArgs `pulumi:"hatch"`
 	// IP addresses or CIDRs (IPv4 and IPv6) that are always allowed, skipping every other rule — e.g. office networks or uptime monitors.
 	IpAllowList []string `pulumi:"ipAllowList"`
 	// IP addresses or CIDRs (IPv4 and IPv6) that are always blocked.
@@ -63,8 +64,7 @@ type wafArgs struct {
 	// Override the action of individual AWS managed rules, keyed by exact AWS rule name: "count", "block" or "allow". Default: { SizeRestrictions_BODY: "count" } — that rule blocks any body over 8 KB, which breaks forms, JSON APIs and uploads. Set it to "block" to restore it.
 	RuleOverrides map[string]string `pulumi:"ruleOverrides"`
 	// What the WAF protects. "cloudfront" (default): sites and other CloudFront distributions; created in us-east-1 as AWS requires. "regional": regional resources such as Cognito user pools; created in the stack's region.
-	Scope     *WafScope         `pulumi:"scope"`
-	Transform *WafTransformArgs `pulumi:"transform"`
+	Scope *WafScope `pulumi:"scope"`
 }
 
 // The set of arguments for constructing a Waf resource.
@@ -73,6 +73,7 @@ type WafArgs struct {
 	BlockCountries pulumi.StringArrayInput
 	// Header carrying the real visitor IP when the site sits behind a proxy, e.g. "CF-Connecting-IP" for Cloudflare. The rate limit, IP lists and country blocking then use the visitor's IP instead of the proxy's. AWS's ipReputation and anonymousIp rule groups can't read this header, so they default to off when it's set.
 	ClientIpHeader pulumi.StringPtrInput
+	Hatch          WafHatchArgsPtrInput
 	// IP addresses or CIDRs (IPv4 and IPv6) that are always allowed, skipping every other rule — e.g. office networks or uptime monitors.
 	IpAllowList pulumi.StringArrayInput
 	// IP addresses or CIDRs (IPv4 and IPv6) that are always blocked.
@@ -88,8 +89,7 @@ type WafArgs struct {
 	// Override the action of individual AWS managed rules, keyed by exact AWS rule name: "count", "block" or "allow". Default: { SizeRestrictions_BODY: "count" } — that rule blocks any body over 8 KB, which breaks forms, JSON APIs and uploads. Set it to "block" to restore it.
 	RuleOverrides pulumi.StringMapInput
 	// What the WAF protects. "cloudfront" (default): sites and other CloudFront distributions; created in us-east-1 as AWS requires. "regional": regional resources such as Cognito user pools; created in the stack's region.
-	Scope     WafScopePtrInput
-	Transform WafTransformArgsPtrInput
+	Scope WafScopePtrInput
 }
 
 func (WafArgs) ElementType() reflect.Type {

@@ -49,8 +49,8 @@ type queueArgs struct {
 	// Dead letter queue configuration. Always provisioned — messages that fail processing are moved here instead of being silently dropped. Omit to use defaults (managed DLQ, maxReceiveCount: 3). Set arn to reuse an existing queue.
 	Dlq *QueueDlqArgs `pulumi:"dlq"`
 	// Creates a FIFO queue when true. FIFO queues guarantee message ordering and exactly-once processing but have lower throughput (~3,000 msg/s vs unlimited for standard). Use for financial transactions, inventory updates, or any workflow where ordering or deduplication matters. Default: false.
-	Fifo      *bool               `pulumi:"fifo"`
-	Transform *QueueTransformArgs `pulumi:"transform"`
+	Fifo  *bool           `pulumi:"fifo"`
+	Hatch *QueueHatchArgs `pulumi:"hatch"`
 }
 
 // The set of arguments for constructing a Queue resource.
@@ -60,8 +60,8 @@ type QueueArgs struct {
 	// Dead letter queue configuration. Always provisioned — messages that fail processing are moved here instead of being silently dropped. Omit to use defaults (managed DLQ, maxReceiveCount: 3). Set arn to reuse an existing queue.
 	Dlq QueueDlqArgsPtrInput
 	// Creates a FIFO queue when true. FIFO queues guarantee message ordering and exactly-once processing but have lower throughput (~3,000 msg/s vs unlimited for standard). Use for financial transactions, inventory updates, or any workflow where ordering or deduplication matters. Default: false.
-	Fifo      pulumi.BoolPtrInput
-	Transform QueueTransformArgsPtrInput
+	Fifo  pulumi.BoolPtrInput
+	Hatch QueueHatchArgsPtrInput
 }
 
 func (QueueArgs) ElementType() reflect.Type {

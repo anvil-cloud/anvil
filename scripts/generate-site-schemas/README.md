@@ -24,7 +24,7 @@ Pulumi `schema.json`.
 This is the *opposite direction* from [`generate/`](../generate/README.md):
 
 - `generate-site-schemas` — **Go struct → schema.json** (authoring the component's own inputs)
-- `generate` — **schema.json + upstream → schema.json** (adding typed transform overrides)
+- `generate` — **schema.json + upstream → schema.json** (adding typed hatch overrides)
 
 Both write to the same per-component `schema.json`; both run before
 [`merge/`](../merge/README.md).

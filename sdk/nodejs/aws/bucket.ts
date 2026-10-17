@@ -45,10 +45,10 @@ export class Bucket extends pulumi.ComponentResource {
         opts = opts || {};
         if (!opts.id) {
             resourceInputs["encryption"] = args?.encryption;
+            resourceInputs["hatch"] = args?.hatch;
             resourceInputs["logging"] = args?.logging;
             resourceInputs["retention"] = args?.retention;
             resourceInputs["storageTransition"] = args?.storageTransition;
-            resourceInputs["transform"] = args?.transform;
             resourceInputs["versionRetention"] = args?.versionRetention;
             resourceInputs["versioning"] = args?.versioning;
             resourceInputs["arn"] = undefined /*out*/;
@@ -70,6 +70,7 @@ export interface BucketArgs {
      * Upgrade at-rest encryption to SSE-KMS. Set to "kms" to enable. SSE-S3 (AES256) is always on by default at no cost. SSE-KMS incurs KMS API call cost and is required by HIPAA, PCI-DSS, FedRAMP, and IRAP.
      */
     encryption?: pulumi.Input<string>;
+    hatch?: pulumi.Input<inputs.aws.BucketHatchArgsArgs>;
     /**
      * Enable S3 server access logging to the centralised logging bucket created during `anvil bootstrap`. Required by most compliance frameworks for audit trails. Incurs storage cost. Default: false.
      */
@@ -79,10 +80,9 @@ export interface BucketArgs {
      */
     retention?: pulumi.Input<number>;
     /**
-     * When to move objects to cheaper storage classes. Omit to use Intelligent-Tiering (recommended default). Only applies when no custom lifecycle is provided via transform.
+     * When to move objects to cheaper storage classes. Omit to use Intelligent-Tiering (recommended default). Only applies when no custom lifecycle is provided via hatch.
      */
     storageTransition?: pulumi.Input<string>;
-    transform?: pulumi.Input<inputs.aws.BucketTransformArgsArgs>;
     /**
      * How long non-current object versions are kept before automatic expiry. Strongly recommended when versioning is enabled to prevent unbounded storage growth. Default: keep forever.
      */

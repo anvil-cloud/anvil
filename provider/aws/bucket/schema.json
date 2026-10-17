@@ -6,6 +6,9 @@
           "description": "Upgrade at-rest encryption to SSE-KMS. Set to \"kms\" to enable. SSE-S3 (AES256) is always on by default at no cost. SSE-KMS incurs KMS API call cost and is required by HIPAA, PCI-DSS, FedRAMP, and IRAP.",
           "type": "string"
         },
+        "hatch": {
+          "$ref": "#/types/anvil:aws:BucketHatchArgs"
+        },
         "logging": {
           "description": "Enable S3 server access logging to the centralised logging bucket created during `anvil bootstrap`. Required by most compliance frameworks for audit trails. Incurs storage cost. Default: false.",
           "type": "boolean"
@@ -15,7 +18,7 @@
           "type": "integer"
         },
         "storageTransition": {
-          "description": "When to move objects to cheaper storage classes. Omit to use Intelligent-Tiering (recommended default). Only applies when no custom lifecycle is provided via transform.",
+          "description": "When to move objects to cheaper storage classes. Omit to use Intelligent-Tiering (recommended default). Only applies when no custom lifecycle is provided via hatch.",
           "enum": [
             {
               "description": "Standard → IA at 30 days, Glacier at 90 days",
@@ -31,9 +34,6 @@
             }
           ],
           "type": "string"
-        },
-        "transform": {
-          "$ref": "#/types/anvil:aws:BucketTransformArgs"
         },
         "versionRetention": {
           "description": "How long non-current object versions are kept before automatic expiry. Strongly recommended when versioning is enabled to prevent unbounded storage growth. Default: keep forever.",
@@ -93,7 +93,7 @@
     }
   },
   "types": {
-    "anvil:aws:BucketAccelerateConfigurationTransform": {
+    "anvil:aws:BucketAccelerateConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket.\n",
@@ -117,7 +117,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketAclTransform": {
+    "anvil:aws:BucketAclHatch": {
       "properties": {
         "accessControlPolicy": {
           "$ref": "/aws/v7.23.0/schema.json#/types/aws:s3/BucketAclAccessControlPolicy:BucketAclAccessControlPolicy",
@@ -144,7 +144,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketCorsConfigurationTransform": {
+    "anvil:aws:BucketCorsConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket.\n",
@@ -170,7 +170,92 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketLifecycleConfigurationTransform": {
+    "anvil:aws:BucketHatch": {
+      "properties": {
+        "bucket": {
+          "description": "Name of the bucket.\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "bucketPrefix": {
+          "description": "Creates a unique bucket name beginning with the specified prefix.\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "forceDestroy": {
+          "description": "Boolean that indicates all objects should be deleted from the bucket when the bucket is destroyed.\n",
+          "type": "boolean"
+        },
+        "objectLockEnabled": {
+          "description": "Indicates whether this bucket has an Object Lock configuration enabled.\n",
+          "type": "boolean",
+          "willReplaceOnChanges": true
+        },
+        "region": {
+          "description": "Region where this resource will be managed.\n",
+          "type": "string"
+        },
+        "tags": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of tags to assign to the bucket.\n",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:BucketHatchArgs": {
+      "properties": {
+        "accelerationStatus": {
+          "$ref": "#/types/anvil:aws:BucketAccelerateConfigurationHatch"
+        },
+        "acl": {
+          "$ref": "#/types/anvil:aws:BucketAclHatch"
+        },
+        "bucket": {
+          "$ref": "#/types/anvil:aws:BucketOverrides"
+        },
+        "corsRules": {
+          "$ref": "#/types/anvil:aws:BucketCorsConfigurationHatch"
+        },
+        "grants": {
+          "$ref": "#/types/anvil:aws:BucketAclHatch"
+        },
+        "lifecycleRules": {
+          "$ref": "#/types/anvil:aws:BucketLifecycleConfigurationHatch"
+        },
+        "logging": {
+          "$ref": "#/types/anvil:aws:BucketLoggingHatch"
+        },
+        "objectLockConfiguration": {
+          "$ref": "#/types/anvil:aws:BucketObjectLockConfigurationHatch"
+        },
+        "policy": {
+          "$ref": "#/types/anvil:aws:BucketPolicyHatch"
+        },
+        "publicAccessBlock": {
+          "$ref": "#/types/anvil:aws:PABHatch"
+        },
+        "replicationConfiguration": {
+          "$ref": "#/types/anvil:aws:BucketReplicationConfigHatch"
+        },
+        "requestPayer": {
+          "$ref": "#/types/anvil:aws:BucketRequestPaymentConfigurationHatch"
+        },
+        "serverSideEncryptionConfiguration": {
+          "$ref": "#/types/anvil:aws:BucketServerSideEncryptionConfigurationHatch"
+        },
+        "versioning": {
+          "$ref": "#/types/anvil:aws:BucketVersioningHatch"
+        },
+        "website": {
+          "$ref": "#/types/anvil:aws:BucketWebsiteConfigurationHatch"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:BucketLifecycleConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the source S3 bucket you want Amazon S3 to monitor.\n",
@@ -202,7 +287,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketLoggingTransform": {
+    "anvil:aws:BucketLoggingHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket.\n",
@@ -240,7 +325,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketObjectLockConfigurationTransform": {
+    "anvil:aws:BucketObjectLockConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket.\n",
@@ -314,7 +399,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketPolicyTransform": {
+    "anvil:aws:BucketPolicyHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket to which to apply the policy.\n",
@@ -341,7 +426,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketReplicationConfigTransform": {
+    "anvil:aws:BucketReplicationConfigHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the source S3 bucket you want Amazon S3 to monitor.\n",
@@ -371,7 +456,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketRequestPaymentConfigurationTransform": {
+    "anvil:aws:BucketRequestPaymentConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket.\n",
@@ -395,7 +480,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketServerSideEncryptionConfigurationTransform": {
+    "anvil:aws:BucketServerSideEncryptionConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "ID (name) of the bucket.\n",
@@ -421,92 +506,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketTransform": {
-      "properties": {
-        "bucket": {
-          "description": "Name of the bucket.\n",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "bucketPrefix": {
-          "description": "Creates a unique bucket name beginning with the specified prefix.\n",
-          "type": "string",
-          "willReplaceOnChanges": true
-        },
-        "forceDestroy": {
-          "description": "Boolean that indicates all objects should be deleted from the bucket when the bucket is destroyed.\n",
-          "type": "boolean"
-        },
-        "objectLockEnabled": {
-          "description": "Indicates whether this bucket has an Object Lock configuration enabled.\n",
-          "type": "boolean",
-          "willReplaceOnChanges": true
-        },
-        "region": {
-          "description": "Region where this resource will be managed.\n",
-          "type": "string"
-        },
-        "tags": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Map of tags to assign to the bucket.\n",
-          "type": "object"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:aws:BucketTransformArgs": {
-      "properties": {
-        "accelerationStatus": {
-          "$ref": "#/types/anvil:aws:BucketAccelerateConfigurationTransform"
-        },
-        "acl": {
-          "$ref": "#/types/anvil:aws:BucketAclTransform"
-        },
-        "bucket": {
-          "$ref": "#/types/anvil:aws:BucketOverrides"
-        },
-        "corsRules": {
-          "$ref": "#/types/anvil:aws:BucketCorsConfigurationTransform"
-        },
-        "grants": {
-          "$ref": "#/types/anvil:aws:BucketAclTransform"
-        },
-        "lifecycleRules": {
-          "$ref": "#/types/anvil:aws:BucketLifecycleConfigurationTransform"
-        },
-        "logging": {
-          "$ref": "#/types/anvil:aws:BucketLoggingTransform"
-        },
-        "objectLockConfiguration": {
-          "$ref": "#/types/anvil:aws:BucketObjectLockConfigurationTransform"
-        },
-        "policy": {
-          "$ref": "#/types/anvil:aws:BucketPolicyTransform"
-        },
-        "publicAccessBlock": {
-          "$ref": "#/types/anvil:aws:PABTransform"
-        },
-        "replicationConfiguration": {
-          "$ref": "#/types/anvil:aws:BucketReplicationConfigTransform"
-        },
-        "requestPayer": {
-          "$ref": "#/types/anvil:aws:BucketRequestPaymentConfigurationTransform"
-        },
-        "serverSideEncryptionConfiguration": {
-          "$ref": "#/types/anvil:aws:BucketServerSideEncryptionConfigurationTransform"
-        },
-        "versioning": {
-          "$ref": "#/types/anvil:aws:BucketVersioningTransform"
-        },
-        "website": {
-          "$ref": "#/types/anvil:aws:BucketWebsiteConfigurationTransform"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:aws:BucketVersioningTransform": {
+    "anvil:aws:BucketVersioningHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the S3 bucket.\n",
@@ -533,7 +533,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:BucketWebsiteConfigurationTransform": {
+    "anvil:aws:BucketWebsiteConfigurationHatch": {
       "properties": {
         "bucket": {
           "description": "Name of the bucket.\n",
@@ -575,7 +575,7 @@
       },
       "type": "object"
     },
-    "anvil:aws:PABTransform": {
+    "anvil:aws:PABHatch": {
       "properties": {
         "blockPublicAcls": {
           "description": "Whether Amazon S3 should block public ACLs for this bucket. Defaults to \u003cspan pulumi-lang-nodejs=\"`false`\" pulumi-lang-dotnet=\"`False`\" pulumi-lang-go=\"`false`\" pulumi-lang-python=\"`false`\" pulumi-lang-yaml=\"`false`\" pulumi-lang-java=\"`false`\"\u003e`false`\u003c/span\u003e. Enabling this setting does not affect existing policies or ACLs. When set to \u003cspan pulumi-lang-nodejs=\"`true`\" pulumi-lang-dotnet=\"`True`\" pulumi-lang-go=\"`true`\" pulumi-lang-python=\"`true`\" pulumi-lang-yaml=\"`true`\" pulumi-lang-java=\"`true`\"\u003e`true`\u003c/span\u003e causes the following behavior:\n* PUT Bucket ACL and PUT Object ACL calls will fail if the specified ACL allows public access.\n* PUT Object calls will fail if the request includes an object ACL.\n",

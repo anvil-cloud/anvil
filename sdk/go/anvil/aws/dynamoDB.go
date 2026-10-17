@@ -48,13 +48,13 @@ type dynamoDBArgs struct {
 	GlobalSecondaryIndexes []DynamoDBGlobalSecondaryIndex `pulumi:"globalSecondaryIndexes"`
 	// Primary hash (partition) key. Required.
 	HashKey DynamoDBKeyAttribute `pulumi:"hashKey"`
+	Hatch   *DynamoHatchArgs     `pulumi:"hatch"`
 	// Tier 2 opt-in. ARN of a KMS CMK for encryption at rest. If omitted, AWS_OWNED_KMS is used (Tier 1 default — always on, zero cost). Use this for compliance workloads requiring key rotation control, audit trail, or the ability to revoke access by disabling the key.
 	KmsKeyArn *string `pulumi:"kmsKeyArn"`
 	// Primary range (sort) key. Optional.
 	RangeKey *DynamoDBKeyAttribute `pulumi:"rangeKey"`
 	// DynamoDB Streams configuration. Opt-in. Enables change data capture on the table.
-	Stream    *DynamoDBStream      `pulumi:"stream"`
-	Transform *DynamoTransformArgs `pulumi:"transform"`
+	Stream *DynamoDBStream `pulumi:"stream"`
 	// Name of the attribute used for TTL (time-to-live). Items with this attribute set to a past Unix timestamp are automatically deleted by DynamoDB.
 	TtlAttribute *string `pulumi:"ttlAttribute"`
 }
@@ -65,13 +65,13 @@ type DynamoDBArgs struct {
 	GlobalSecondaryIndexes DynamoDBGlobalSecondaryIndexArrayInput
 	// Primary hash (partition) key. Required.
 	HashKey DynamoDBKeyAttributeInput
+	Hatch   DynamoHatchArgsPtrInput
 	// Tier 2 opt-in. ARN of a KMS CMK for encryption at rest. If omitted, AWS_OWNED_KMS is used (Tier 1 default — always on, zero cost). Use this for compliance workloads requiring key rotation control, audit trail, or the ability to revoke access by disabling the key.
 	KmsKeyArn pulumi.StringPtrInput
 	// Primary range (sort) key. Optional.
 	RangeKey DynamoDBKeyAttributePtrInput
 	// DynamoDB Streams configuration. Opt-in. Enables change data capture on the table.
-	Stream    DynamoDBStreamPtrInput
-	Transform DynamoTransformArgsPtrInput
+	Stream DynamoDBStreamPtrInput
 	// Name of the attribute used for TTL (time-to-live). Items with this attribute set to a past Unix timestamp are automatically deleted by DynamoDB.
 	TtlAttribute pulumi.StringPtrInput
 }

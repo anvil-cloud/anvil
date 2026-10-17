@@ -38,16 +38,16 @@ func NewEventBus(ctx *pulumi.Context,
 }
 
 type eventBusArgs struct {
+	Hatch *EventBridgeHatchArgs `pulumi:"hatch"`
 	// EventBridge rules on this bus. Each rule matches events by pattern and routes them to a target.
-	Rules     []EventBusRule            `pulumi:"rules"`
-	Transform *EventBridgeTransformArgs `pulumi:"transform"`
+	Rules []EventBusRule `pulumi:"rules"`
 }
 
 // The set of arguments for constructing a EventBus resource.
 type EventBusArgs struct {
+	Hatch EventBridgeHatchArgsPtrInput
 	// EventBridge rules on this bus. Each rule matches events by pattern and routes them to a target.
-	Rules     EventBusRuleArrayInput
-	Transform EventBridgeTransformArgsPtrInput
+	Rules EventBusRuleArrayInput
 }
 
 func (EventBusArgs) ElementType() reflect.Type {

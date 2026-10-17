@@ -40,19 +40,19 @@ func NewStorageBucket(ctx *pulumi.Context,
 
 type storageBucketArgs struct {
 	// Data classification level for the bucket.
-	DataClassification string `pulumi:"dataClassification"`
+	DataClassification string           `pulumi:"dataClassification"`
+	Hatch              *BucketHatchArgs `pulumi:"hatch"`
 	// The GCS location (e.g. US, EU, us-central1).
-	Location  string               `pulumi:"location"`
-	Transform *BucketTransformArgs `pulumi:"transform"`
+	Location string `pulumi:"location"`
 }
 
 // The set of arguments for constructing a StorageBucket resource.
 type StorageBucketArgs struct {
 	// Data classification level for the bucket.
 	DataClassification pulumi.StringInput
+	Hatch              BucketHatchArgsPtrInput
 	// The GCS location (e.g. US, EU, us-central1).
-	Location  pulumi.StringInput
-	Transform BucketTransformArgsPtrInput
+	Location pulumi.StringInput
 }
 
 func (StorageBucketArgs) ElementType() reflect.Type {

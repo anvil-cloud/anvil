@@ -70,7 +70,7 @@ Anvil doesn't change app behaviour. A script-free baseline (`object-src`,
 and left out — the baseline adds little beyond the headers already sent, and
 both would blur the line that CSP belongs to the app.
 
-If an app wants CloudFront to send a fixed CSP anyway, `transform.responseHeadersPolicy`
+If an app wants CloudFront to send a fixed CSP anyway, `hatch.responseHeadersPolicy`
 can add one.
 
 ### The app always wins
@@ -103,7 +103,7 @@ new anvil.aws.SvelteKitSite('web', {
 | `securityHeaders.hsts.preload` | `false` | Requires `includeSubDomains`. Submitting to the browser preload list is a separate, manual step |
 | `securityHeaders.permissionsPolicy` | `camera=(), microphone=(), geolocation=(), usb=(), browsing-topics=()` | Full header value; replaces the default. `none` sends no header |
 | `securityHeaders.crossOriginOpenerPolicy` | `same-origin-allow-popups` | `same-origin` (strict) or `none` (no header) |
-| `transform.responseHeadersPolicy` | — | Escape hatch: extra headers, a CloudFront-set CSP, etc. |
+| `hatch.responseHeadersPolicy` | — | Escape hatch: extra headers, a CloudFront-set CSP, etc. |
 
 Off by default for `includeSubDomains`/`preload` because they're hard to undo
 (browsers remember them for a year) and affect domains beyond the site.

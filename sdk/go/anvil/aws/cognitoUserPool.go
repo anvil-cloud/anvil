@@ -48,12 +48,13 @@ func NewCognitoUserPool(ctx *pulumi.Context,
 }
 
 type cognitoUserPoolArgs struct {
-	// Default app client created with the user pool. Covers the 80% case of one application per pool. Use transform for additional clients.
+	// Default app client created with the user pool. Covers the 80% case of one application per pool. Use hatch for additional clients.
 	AppClient *CognitoUserPoolAppClient `pulumi:"appClient"`
 	// User attribute configuration. Controls sign-in identifiers and required attributes on sign-up.
 	Attributes *CognitoUserPoolAttributes `pulumi:"attributes"`
 	// Email delivery configuration. Default: Cognito-managed email (5 emails/day limit). Set sesFromAddress for SES delivery in production.
 	EmailConfiguration *CognitoUserPoolEmailConfiguration `pulumi:"emailConfiguration"`
+	Hatch              *CognitoUserPoolHatchArgs          `pulumi:"hatch"`
 	// Hosted UI / Managed Login configuration. Omit to use the Cognito user pools API directly without a hosted sign-in page.
 	HostedUi *CognitoUserPoolHostedUi `pulumi:"hostedUi"`
 	// External identity providers to federate with this user pool. Supports Google, Facebook, LoginWithAmazon, SignInWithApple, OIDC, and SAML. Schema never changes per provider — add new providers by extending this array.
@@ -62,19 +63,19 @@ type cognitoUserPoolArgs struct {
 	Mfa *CognitoUserPoolMfa `pulumi:"mfa"`
 	// Password policy for the user pool. Anvil enforces a secure baseline by default — override only to strengthen.
 	PasswordPolicy *CognitoUserPoolPasswordPolicy `pulumi:"passwordPolicy"`
-	Transform      *CognitoUserPoolTransformArgs  `pulumi:"transform"`
 	// Attaches a regional WAF WebACL to the user pool. AWS recommends a WAF for every public user pool — it protects sign-in and sign-up against credential stuffing, brute force, bots and SMS pumping. Use an Anvil Waf created with scope "regional" in the same region as the pool.
 	Waf *CognitoUserPoolWaf `pulumi:"waf"`
 }
 
 // The set of arguments for constructing a CognitoUserPool resource.
 type CognitoUserPoolArgs struct {
-	// Default app client created with the user pool. Covers the 80% case of one application per pool. Use transform for additional clients.
+	// Default app client created with the user pool. Covers the 80% case of one application per pool. Use hatch for additional clients.
 	AppClient CognitoUserPoolAppClientPtrInput
 	// User attribute configuration. Controls sign-in identifiers and required attributes on sign-up.
 	Attributes CognitoUserPoolAttributesPtrInput
 	// Email delivery configuration. Default: Cognito-managed email (5 emails/day limit). Set sesFromAddress for SES delivery in production.
 	EmailConfiguration CognitoUserPoolEmailConfigurationPtrInput
+	Hatch              CognitoUserPoolHatchArgsPtrInput
 	// Hosted UI / Managed Login configuration. Omit to use the Cognito user pools API directly without a hosted sign-in page.
 	HostedUi CognitoUserPoolHostedUiPtrInput
 	// External identity providers to federate with this user pool. Supports Google, Facebook, LoginWithAmazon, SignInWithApple, OIDC, and SAML. Schema never changes per provider — add new providers by extending this array.
@@ -83,7 +84,6 @@ type CognitoUserPoolArgs struct {
 	Mfa CognitoUserPoolMfaPtrInput
 	// Password policy for the user pool. Anvil enforces a secure baseline by default — override only to strengthen.
 	PasswordPolicy CognitoUserPoolPasswordPolicyPtrInput
-	Transform      CognitoUserPoolTransformArgsPtrInput
 	// Attaches a regional WAF WebACL to the user pool. AWS recommends a WAF for every public user pool — it protects sign-in and sign-up against credential stuffing, brute force, bots and SMS pumping. Use an Anvil Waf created with scope "regional" in the same region as the pool.
 	Waf CognitoUserPoolWafPtrInput
 }

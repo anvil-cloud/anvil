@@ -23,7 +23,7 @@ class QueueArgs:
                  consumer: Optional[pulumi.Input['QueueConsumerArgsArgs']] = None,
                  dlq: Optional[pulumi.Input['QueueDlqArgsArgs']] = None,
                  fifo: Optional[pulumi.Input[_builtins.bool]] = None,
-                 transform: Optional[pulumi.Input['QueueTransformArgsArgs']] = None):
+                 hatch: Optional[pulumi.Input['QueueHatchArgsArgs']] = None):
         """
         The set of arguments for constructing a Queue resource.
 
@@ -37,8 +37,8 @@ class QueueArgs:
             pulumi.set(__self__, "dlq", dlq)
         if fifo is not None:
             pulumi.set(__self__, "fifo", fifo)
-        if transform is not None:
-            pulumi.set(__self__, "transform", transform)
+        if hatch is not None:
+            pulumi.set(__self__, "hatch", hatch)
 
     @_builtins.property
     @pulumi.getter
@@ -78,12 +78,12 @@ class QueueArgs:
 
     @_builtins.property
     @pulumi.getter
-    def transform(self) -> Optional[pulumi.Input['QueueTransformArgsArgs']]:
-        return pulumi.get(self, "transform")
+    def hatch(self) -> Optional[pulumi.Input['QueueHatchArgsArgs']]:
+        return pulumi.get(self, "hatch")
 
-    @transform.setter
-    def transform(self, value: Optional[pulumi.Input['QueueTransformArgsArgs']]):
-        pulumi.set(self, "transform", value)
+    @hatch.setter
+    def hatch(self, value: Optional[pulumi.Input['QueueHatchArgsArgs']]):
+        pulumi.set(self, "hatch", value)
 
 
 @pulumi.type_token("anvil:aws:Queue")
@@ -95,7 +95,7 @@ class Queue(pulumi.ComponentResource):
                  consumer: Optional[pulumi.Input[Union['QueueConsumerArgsArgs', 'QueueConsumerArgsArgsDict']]] = None,
                  dlq: Optional[pulumi.Input[Union['QueueDlqArgsArgs', 'QueueDlqArgsArgsDict']]] = None,
                  fifo: Optional[pulumi.Input[_builtins.bool]] = None,
-                 transform: Optional[pulumi.Input[Union['QueueTransformArgsArgs', 'QueueTransformArgsArgsDict']]] = None,
+                 hatch: Optional[pulumi.Input[Union['QueueHatchArgsArgs', 'QueueHatchArgsArgsDict']]] = None,
                  __props__=None):
         """
         An Anvil-managed SQS queue. A dead letter queue is always provisioned to prevent silent message loss. SSE-SQS encryption is enabled by default at no cost.
@@ -135,7 +135,7 @@ class Queue(pulumi.ComponentResource):
                  consumer: Optional[pulumi.Input[Union['QueueConsumerArgsArgs', 'QueueConsumerArgsArgsDict']]] = None,
                  dlq: Optional[pulumi.Input[Union['QueueDlqArgsArgs', 'QueueDlqArgsArgsDict']]] = None,
                  fifo: Optional[pulumi.Input[_builtins.bool]] = None,
-                 transform: Optional[pulumi.Input[Union['QueueTransformArgsArgs', 'QueueTransformArgsArgsDict']]] = None,
+                 hatch: Optional[pulumi.Input[Union['QueueHatchArgsArgs', 'QueueHatchArgsArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -150,7 +150,7 @@ class Queue(pulumi.ComponentResource):
             __props__.__dict__["consumer"] = consumer
             __props__.__dict__["dlq"] = dlq
             __props__.__dict__["fifo"] = fifo
-            __props__.__dict__["transform"] = transform
+            __props__.__dict__["hatch"] = hatch
             __props__.__dict__["arn"] = None
             __props__.__dict__["dlq_arn"] = None
             __props__.__dict__["dlq_url"] = None

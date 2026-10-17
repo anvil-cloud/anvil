@@ -56,10 +56,10 @@ export class DynamoDB extends pulumi.ComponentResource {
             }
             resourceInputs["globalSecondaryIndexes"] = args?.globalSecondaryIndexes;
             resourceInputs["hashKey"] = args?.hashKey;
+            resourceInputs["hatch"] = args?.hatch;
             resourceInputs["kmsKeyArn"] = args?.kmsKeyArn;
             resourceInputs["rangeKey"] = args?.rangeKey;
             resourceInputs["stream"] = args?.stream;
-            resourceInputs["transform"] = args?.transform;
             resourceInputs["ttlAttribute"] = args?.ttlAttribute;
             resourceInputs["streamArn"] = undefined /*out*/;
             resourceInputs["tableArn"] = undefined /*out*/;
@@ -86,6 +86,7 @@ export interface DynamoDBArgs {
      * Primary hash (partition) key. Required.
      */
     hashKey: pulumi.Input<inputs.aws.DynamoDBKeyAttributeArgs>;
+    hatch?: pulumi.Input<inputs.aws.DynamoHatchArgsArgs>;
     /**
      * Tier 2 opt-in. ARN of a KMS CMK for encryption at rest. If omitted, AWS_OWNED_KMS is used (Tier 1 default — always on, zero cost). Use this for compliance workloads requiring key rotation control, audit trail, or the ability to revoke access by disabling the key.
      */
@@ -98,7 +99,6 @@ export interface DynamoDBArgs {
      * DynamoDB Streams configuration. Opt-in. Enables change data capture on the table.
      */
     stream?: pulumi.Input<inputs.aws.DynamoDBStreamArgs>;
-    transform?: pulumi.Input<inputs.aws.DynamoTransformArgsArgs>;
     /**
      * Name of the attribute used for TTL (time-to-live). Items with this attribute set to a past Unix timestamp are automatically deleted by DynamoDB.
      */

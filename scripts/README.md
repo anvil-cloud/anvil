@@ -43,7 +43,7 @@ flowchart TD
     A["provider/&lt;cloud&gt;/&lt;resource&gt;/*.go<br/>(component logic)"] --> SS
     A --> REG
     SS["generate-site-schemas/<br/>AST → schema.json<br/>(site components)"] --> SJ
-    GEN["generate/<br/>enrich schema.json with<br/>upstream transform types"] --> SJ
+    GEN["generate/<br/>enrich schema.json with<br/>upstream hatch types"] --> SJ
     SJ["provider/&lt;cloud&gt;/&lt;resource&gt;/schema.json<br/>(per-component)"] --> MERGE
     BASE["provider/base-schema.json<br/>(metadata, version, language cfg)"] --> MERGE
     MERGE["merge/<br/>combine into one schema"] --> PROV["provider/schema.json<br/>(merged, the source of truth)"]
@@ -79,7 +79,7 @@ Steps 1–3 build the schema. Step 4 builds the provider. Steps 5–8 build the 
 | Folder | Language | Stage | Produces | Docs |
 |---|---|---|---|---|
 | [`generate-site-schemas/`](generate-site-schemas/README.md) | Go | 1 | per-component `schema.json` from Go structs (site components) | ↳ |
-| [`generate/`](generate/README.md) | Go | 2 | enriched per-component `schema.json` (upstream transform types) | ↳ |
+| [`generate/`](generate/README.md) | Go | 2 | enriched per-component `schema.json` (upstream hatch types) | ↳ |
 | [`merge/`](merge/README.md) | Go | 3 | `provider/schema.json` (single merged schema) | ↳ |
 | [`registry/`](registry/README.md) | Go | 4 | `provider/cmd/anvil/main.go` (component registration + version) | ↳ |
 | [`sdk/`](sdk/README.md) | TS (ts-node) | 7 | packaging + overlay wiring in the generated SDKs | ↳ |

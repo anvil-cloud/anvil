@@ -48,11 +48,11 @@ func NewDSQL(ctx *pulumi.Context,
 type dsqlArgs struct {
 	// AWS Backup configuration. Omit to disable. When set, Anvil opts in the DSQL resource type per region, creates a backup plan with retention and schedule, and for multi-region clusters automatically adds cross-region copy rules.
 	Backup *DSQLBackupArgs `pulumi:"backup"`
+	Hatch  *DsqlHatchArgs  `pulumi:"hatch"`
 	// Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region.
 	MultiRegion *DSQLMultiRegionArgs `pulumi:"multiRegion"`
 	// Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
-	Schemas   []DSQLSchema       `pulumi:"schemas"`
-	Transform *DsqlTransformArgs `pulumi:"transform"`
+	Schemas []DSQLSchema `pulumi:"schemas"`
 	// Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
 	Vpc *DSQLVpcArgs `pulumi:"vpc"`
 }
@@ -61,11 +61,11 @@ type dsqlArgs struct {
 type DSQLArgs struct {
 	// AWS Backup configuration. Omit to disable. When set, Anvil opts in the DSQL resource type per region, creates a backup plan with retention and schedule, and for multi-region clusters automatically adds cross-region copy rules.
 	Backup DSQLBackupArgsPtrInput
+	Hatch  DsqlHatchArgsPtrInput
 	// Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region.
 	MultiRegion DSQLMultiRegionArgsPtrInput
 	// Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
-	Schemas   DSQLSchemaArrayInput
-	Transform DsqlTransformArgsPtrInput
+	Schemas DSQLSchemaArrayInput
 	// Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
 	Vpc DSQLVpcArgsPtrInput
 }

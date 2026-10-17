@@ -25,7 +25,7 @@ class FunctionArgs:
                  location: pulumi.Input[_builtins.str],
                  name: pulumi.Input[_builtins.str],
                  runtime: pulumi.Input[_builtins.str],
-                 transform: Optional[pulumi.Input['FunctionTransformArgsArgs']] = None):
+                 hatch: Optional[pulumi.Input['FunctionHatchArgsArgs']] = None):
         """
         The set of arguments for constructing a Function resource.
 
@@ -38,8 +38,8 @@ class FunctionArgs:
         pulumi.set(__self__, "location", location)
         pulumi.set(__self__, "name", name)
         pulumi.set(__self__, "runtime", runtime)
-        if transform is not None:
-            pulumi.set(__self__, "transform", transform)
+        if hatch is not None:
+            pulumi.set(__self__, "hatch", hatch)
 
     @_builtins.property
     @pulumi.getter(name="entryPoint")
@@ -91,12 +91,12 @@ class FunctionArgs:
 
     @_builtins.property
     @pulumi.getter
-    def transform(self) -> Optional[pulumi.Input['FunctionTransformArgsArgs']]:
-        return pulumi.get(self, "transform")
+    def hatch(self) -> Optional[pulumi.Input['FunctionHatchArgsArgs']]:
+        return pulumi.get(self, "hatch")
 
-    @transform.setter
-    def transform(self, value: Optional[pulumi.Input['FunctionTransformArgsArgs']]):
-        pulumi.set(self, "transform", value)
+    @hatch.setter
+    def hatch(self, value: Optional[pulumi.Input['FunctionHatchArgsArgs']]):
+        pulumi.set(self, "hatch", value)
 
 
 @pulumi.type_token("anvil:gcp:Function")
@@ -106,10 +106,10 @@ class Function(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  entry_point: Optional[pulumi.Input[_builtins.str]] = None,
+                 hatch: Optional[pulumi.Input[Union['FunctionHatchArgsArgs', 'FunctionHatchArgsArgsDict']]] = None,
                  location: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  runtime: Optional[pulumi.Input[_builtins.str]] = None,
-                 transform: Optional[pulumi.Input[Union['FunctionTransformArgsArgs', 'FunctionTransformArgsArgsDict']]] = None,
                  __props__=None):
         """
         Create a Function resource with the given unique name, props, and options.
@@ -146,10 +146,10 @@ class Function(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  entry_point: Optional[pulumi.Input[_builtins.str]] = None,
+                 hatch: Optional[pulumi.Input[Union['FunctionHatchArgsArgs', 'FunctionHatchArgsArgsDict']]] = None,
                  location: Optional[pulumi.Input[_builtins.str]] = None,
                  name: Optional[pulumi.Input[_builtins.str]] = None,
                  runtime: Optional[pulumi.Input[_builtins.str]] = None,
-                 transform: Optional[pulumi.Input[Union['FunctionTransformArgsArgs', 'FunctionTransformArgsArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -164,6 +164,7 @@ class Function(pulumi.ComponentResource):
             if entry_point is None and not opts.urn:
                 raise TypeError("Missing required property 'entry_point'")
             __props__.__dict__["entry_point"] = entry_point
+            __props__.__dict__["hatch"] = hatch
             if location is None and not opts.urn:
                 raise TypeError("Missing required property 'location'")
             __props__.__dict__["location"] = location
@@ -173,7 +174,6 @@ class Function(pulumi.ComponentResource):
             if runtime is None and not opts.urn:
                 raise TypeError("Missing required property 'runtime'")
             __props__.__dict__["runtime"] = runtime
-            __props__.__dict__["transform"] = transform
         super(Function, __self__).__init__(
             'anvil:gcp:Function',
             resource_name,

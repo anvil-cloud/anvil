@@ -43,6 +43,7 @@ type svelteKitSiteArgs struct {
 	Domain *string `pulumi:"domain"`
 	// Environment vars available at BOTH build time and runtime. Values must be string literals since they're needed before the build runs.
 	Environment map[string]string `pulumi:"environment"`
+	Hatch       *string           `pulumi:"hatch"`
 	// OriginProtection locks CloudFront to a CDN/proxy in front of it (Cloudflare, Fastly, Akamai, nginx, ...). Requests without the x-origin-secret header are rejected at the edge; configure the proxy to send it on every request with the originSecret output as the value. Protection defaults to "edge-oac" while it's enabled, so the server Function URL can't be reached around the proxy.
 	OriginProtection *bool   `pulumi:"originProtection"`
 	Path             *string `pulumi:"path"`
@@ -52,7 +53,6 @@ type svelteKitSiteArgs struct {
 	RuntimeEnvironment map[string]string `pulumi:"runtimeEnvironment"`
 	// SecurityHeaders configures the security headers CloudFront adds to every response. On by default: Strict-Transport-Security (1 year), X-Content-Type-Options: nosniff, X-Frame-Options: SAMEORIGIN, Referrer-Policy: strict-origin-when-cross-origin, a Permissions-Policy that turns off camera, microphone, geolocation, USB and Topics, and Cross-Origin-Opener-Policy: same-origin-allow-popups. Headers your app sets itself take priority. Content-Security-Policy is left to SvelteKit's kit.csp.
 	SecurityHeaders *SiteSecurityHeaders `pulumi:"securityHeaders"`
-	Transform       *string              `pulumi:"transform"`
 	// Waf attaches a WAF WebACL to the site's CloudFront distribution. Protection defaults to "edge-oac" while it's attached.
 	Waf *SiteWaf `pulumi:"waf"`
 }
@@ -62,6 +62,7 @@ type SvelteKitSiteArgs struct {
 	Domain pulumi.StringPtrInput
 	// Environment vars available at BOTH build time and runtime. Values must be string literals since they're needed before the build runs.
 	Environment pulumi.StringMapInput
+	Hatch       pulumi.StringPtrInput
 	// OriginProtection locks CloudFront to a CDN/proxy in front of it (Cloudflare, Fastly, Akamai, nginx, ...). Requests without the x-origin-secret header are rejected at the edge; configure the proxy to send it on every request with the originSecret output as the value. Protection defaults to "edge-oac" while it's enabled, so the server Function URL can't be reached around the proxy.
 	OriginProtection pulumi.BoolPtrInput
 	Path             pulumi.StringPtrInput
@@ -71,7 +72,6 @@ type SvelteKitSiteArgs struct {
 	RuntimeEnvironment pulumi.StringMapInput
 	// SecurityHeaders configures the security headers CloudFront adds to every response. On by default: Strict-Transport-Security (1 year), X-Content-Type-Options: nosniff, X-Frame-Options: SAMEORIGIN, Referrer-Policy: strict-origin-when-cross-origin, a Permissions-Policy that turns off camera, microphone, geolocation, USB and Topics, and Cross-Origin-Opener-Policy: same-origin-allow-popups. Headers your app sets itself take priority. Content-Security-Policy is left to SvelteKit's kit.csp.
 	SecurityHeaders SiteSecurityHeadersPtrInput
-	Transform       pulumi.StringPtrInput
 	// Waf attaches a WAF WebACL to the site's CloudFront distribution. Protection defaults to "edge-oac" while it's attached.
 	Waf SiteWafPtrInput
 }

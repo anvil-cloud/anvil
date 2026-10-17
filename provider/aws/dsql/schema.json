@@ -7,6 +7,9 @@
           "$ref": "#/types/anvil:aws:DSQLBackupArgs",
           "description": "AWS Backup configuration. Omit to disable. When set, Anvil opts in the DSQL resource type per region, creates a backup plan with retention and schedule, and for multi-region clusters automatically adds cross-region copy rules."
         },
+        "hatch": {
+          "$ref": "#/types/anvil:aws:DsqlHatchArgs"
+        },
         "multiRegion": {
           "$ref": "#/types/anvil:aws:DSQLMultiRegionArgs",
           "description": "Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region."
@@ -17,9 +20,6 @@
             "$ref": "#/types/anvil:aws:DSQLSchema"
           },
           "type": "array"
-        },
-        "transform": {
-          "$ref": "#/types/anvil:aws:DsqlTransformArgs"
         },
         "vpc": {
           "$ref": "#/types/anvil:aws:DSQLVpcArgs",
@@ -250,6 +250,14 @@
       ],
       "type": "string"
     },
+    "anvil:aws:DSQLHatchArgs": {
+      "properties": {
+        "cluster": {
+          "$ref": "#/types/anvil:aws:DSQLOverrides"
+        }
+      },
+      "type": "object"
+    },
     "anvil:aws:DSQLIndex": {
       "description": "A secondary index on a table. Created with CREATE INDEX ASYNC (DSQL requirement); the build runs in the background.",
       "properties": {
@@ -404,14 +412,6 @@
       ],
       "type": "object"
     },
-    "anvil:aws:DSQLTransformArgs": {
-      "properties": {
-        "cluster": {
-          "$ref": "#/types/anvil:aws:DSQLOverrides"
-        }
-      },
-      "type": "object"
-    },
     "anvil:aws:DSQLVpcArgs": {
       "description": "VPC configuration for DSQL. When set without hasNat, Anvil creates interface VPC endpoints per region so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.",
       "properties": {
@@ -432,6 +432,14 @@
         "vpcId",
         "privateSubnetIds"
       ],
+      "type": "object"
+    },
+    "anvil:aws:DsqlHatchArgs": {
+      "properties": {
+        "dsql": {
+          "$ref": "#/types/anvil:aws:DsqlOverrides"
+        }
+      },
       "type": "object"
     },
     "anvil:aws:DsqlOverrides": {
@@ -465,14 +473,6 @@
         },
         "timeouts": {
           "$ref": "/aws/v7.29.0/schema.json#/types/aws:dsql/ClusterTimeouts:ClusterTimeouts"
-        }
-      },
-      "type": "object"
-    },
-    "anvil:aws:DsqlTransformArgs": {
-      "properties": {
-        "dsql": {
-          "$ref": "#/types/anvil:aws:DsqlOverrides"
         }
       },
       "type": "object"
