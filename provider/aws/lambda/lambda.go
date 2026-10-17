@@ -123,16 +123,20 @@ func (t *lambdaEndpointTarget) SecurityGroupOutput() pulumi.StringOutput {
 
 // LambdaArgs defines the inputs for an Anvil-managed Lambda function.
 type LambdaArgs struct {
-	// Entry is the path to the function's entry point file, relative to
-	// the anvil.config.ts directory. e.g. "backend/index.ts".
-	// Omit to deploy a blank Lambda placeholder.
+	// Entry is the path to the function's code, relative to the
+	// anvil.config.ts directory.
+	//   Node: the entry file, e.g. "backend/index.ts". Omit to deploy a
+	//         blank Lambda placeholder.
+	//   Rust: required. A Cargo package directory or a .rs file,
+	//         e.g. "functions/api".
 	Entry string `pulumi:"entry,optional"`
 
-	// Runtime is the Lambda runtime identifier. e.g. "nodejs24.x"
+	// Runtime is the Lambda runtime: a Node identifier such as "nodejs24.x",
+	// or "rust" (see rustRuntime).
 	Runtime string `pulumi:"runtime,optional"`
 
-	// Handler is the exported function name in the entry file.
-	// e.g. "handler" for a function exported as `export const handler = ...`
+	// Handler is the Node handler in the bundled index.js.
+	// Default: "index.handler". Ignored for Rust, which is always "bootstrap".
 	Handler string `pulumi:"handler,optional"`
 
 	// Memory is the amount of memory in MB. Default: 1024.
@@ -243,7 +247,68 @@ const blankHandler = `exports.handler = async () => ({
 });
 `
 
+// Lambda has no managed Rust runtime: a Rust function is an executable named
+// bootstrap, run on the OS-only provided.al2023 runtime. Users write
+// runtime: "rust"; the CLI builds the bootstrap with cargo lambda.
+const (
+	rustRuntime       = "rust"
+	rustLambdaRuntime = "provided.al2023"
+	rustHandler       = "bootstrap"
+)
+
+// validateArgs rejects argument combinations that can't be deployed. It runs
+// in build mode too, so mistakes surface during discovery, before any build.
+func validateArgs(name string, args LambdaArgs) error {
+	if args.Runtime == rustRuntime && args.Entry == "" {
+		return fmt.Errorf("lambda %q: runtime %q requires entry, e.g. entry: \"functions/%s\"", name, rustRuntime, name)
+	}
+	return nil
+}
+
+// resolveRuntime maps the user's runtime and handler to the values Lambda
+// expects.
+func resolveRuntime(args LambdaArgs) (runtime, handler string) {
+	if args.Runtime == rustRuntime {
+		return rustLambdaRuntime, rustHandler
+	}
+
+	handler = args.Handler
+	if handler == "" {
+		// The Node bundle is always index.js (see the CLI's esbuild bundler).
+		handler = "index.handler"
+	}
+	return args.Runtime, handler
+}
+
+// codeArchive returns the function's deployment package: the zip the CLI
+// built, or a placeholder when there is none.
+func codeArchive(ctx *pulumi.Context, name string, args LambdaArgs, zipPath string) (pulumi.Archive, error) {
+	if zipPath != "" {
+		return pulumi.NewFileArchive(zipPath), nil
+	}
+
+	if args.Runtime == rustRuntime {
+		// A Rust function always has an entry, so a missing zip means it was
+		// never built. A preview can still show the plan; a deploy must not
+		// ship a function that can't start.
+		if ctx.DryRun() {
+			return pulumi.NewAssetArchive(map[string]interface{}{
+				rustHandler: pulumi.NewStringAsset(""),
+			}), nil
+		}
+		return nil, fmt.Errorf("lambda %q: no build artifact for this Rust function — deploy with anvil deploy, which builds it first", name)
+	}
+
+	return pulumi.NewAssetArchive(map[string]interface{}{
+		"index.js": pulumi.NewStringAsset(blankHandler),
+	}), nil
+}
+
 func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi.ResourceOption) (*Lambda, error) {
+	if err := validateArgs(name, args); err != nil {
+		return nil, err
+	}
+
 	if os.Getenv("ANVIL_BUILD_MODE") == "true" {
 		l := &Lambda{name: name}
 		if args.Entry != "" {
@@ -306,12 +371,7 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 		architecture = "arm64"
 	}
 
-	runtime := args.Runtime
-
-	handler := args.Handler
-	if handler == "" {
-		handler = "handler"
-	}
+	runtime, handler := resolveRuntime(args)
 
 	logRetentionDays := resolveDays(args.LogRetention)
 
@@ -491,13 +551,9 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 	}
 
 	// ── 6. Lambda Function ─────────────────────────────
-	var codeArchive pulumi.Archive
-	if zipPath != "" {
-		codeArchive = pulumi.NewFileArchive(zipPath)
-	} else {
-		codeArchive = pulumi.NewAssetArchive(map[string]interface{}{
-			"index.js": pulumi.NewStringAsset(blankHandler),
-		})
+	code, err := codeArchive(ctx, name, args, zipPath)
+	if err != nil {
+		return nil, err
 	}
 
 	lambdaMap := pulumi.Map{
@@ -508,7 +564,7 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 		"memorySize":    pulumi.Int(memory),
 		"timeout":       pulumi.Int(timeout),
 		"architectures": pulumi.StringArray{pulumi.String(architecture)},
-		"code":          codeArchive,
+		"code":          code,
 		"tracingConfig": pulumi.Map{
 			"mode": pulumi.String(tracingMode),
 		},

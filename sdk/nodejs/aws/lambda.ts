@@ -56,9 +56,6 @@ export class Lambda extends pulumi.ComponentResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
-            if (args?.handler === undefined && !opts.urn) {
-                throw new Error("Missing required property 'handler'");
-            }
             if (args?.runtime === undefined && !opts.urn) {
                 throw new Error("Missing required property 'runtime'");
             }
@@ -106,7 +103,7 @@ export interface LambdaArgs {
      */
     encryption?: pulumi.Input<string>;
     /**
-     * Path to the function's entry point file, relative to the project root. e.g. "functions/api/index.ts". Omit to deploy a blank Lambda placeholder.
+     * Path to the function's code, relative to the project root. Node: the entry file, e.g. "functions/api/index.ts"; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
      */
     entry?: pulumi.Input<string>;
     /**
@@ -114,9 +111,9 @@ export interface LambdaArgs {
      */
     environment?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     /**
-     * The exported function name in the entry file. e.g. "handler" for `export const handler = ...`
+     * Node only: the handler in the bundled index.js. Default: "index.handler". Ignored for Rust (always "bootstrap").
      */
-    handler: pulumi.Input<string>;
+    handler?: pulumi.Input<string>;
     hatch?: pulumi.Input<inputs.aws.LambdaHatchArgsArgs>;
     /**
      * CloudWatch log group retention period. Default: "1y" (satisfies SOC 2, ISO 27001, PCI-DSS baseline).
@@ -131,7 +128,7 @@ export interface LambdaArgs {
      */
     permissions?: pulumi.Input<pulumi.Input<inputs.aws.LambdaPermissionArgs>[]>;
     /**
-     * The Lambda runtime identifier.
+     * The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
      */
     runtime: pulumi.Input<enums.aws.LambdaRuntime>;
     /**

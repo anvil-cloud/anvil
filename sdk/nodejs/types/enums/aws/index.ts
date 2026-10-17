@@ -371,6 +371,10 @@ export const LambdaRuntime = {
      * Node.js 22 (LTS)
      */
     Nodejs22_x: "nodejs22.x",
+    /**
+     * Rust on provided.al2023, built with cargo lambda. Requires entry.
+     */
+    Rust: "rust",
 } as const;
 
 export type LambdaRuntime = (typeof LambdaRuntime)[keyof typeof LambdaRuntime];

@@ -388,6 +388,10 @@ class LambdaRuntime(_builtins.str, Enum):
     """
     Node.js 22 (LTS)
     """
+    RUST = "rust"
+    """
+    Rust on provided.al2023, built with cargo lambda. Requires entry.
+    """
 
 
 @pulumi.type_token("anvil:aws:S3FlowLogLifecycle")

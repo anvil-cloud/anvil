@@ -22,12 +22,12 @@ __all__ = ['LambdaArgs', 'Lambda']
 @pulumi.input_type
 class LambdaArgs:
     def __init__(__self__, *,
-                 handler: pulumi.Input[_builtins.str],
                  runtime: pulumi.Input['LambdaRuntime'],
                  architecture: Optional[pulumi.Input['LambdaArchitecture']] = None,
                  encryption: Optional[pulumi.Input[_builtins.str]] = None,
                  entry: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 handler: Optional[pulumi.Input[_builtins.str]] = None,
                  hatch: Optional[pulumi.Input['LambdaHatchArgsArgs']] = None,
                  log_retention: Optional[pulumi.Input['LambdaLogRetention']] = None,
                  memory: Optional[pulumi.Input[_builtins.int]] = None,
@@ -39,12 +39,12 @@ class LambdaArgs:
         """
         The set of arguments for constructing a Lambda resource.
 
-        :param pulumi.Input[_builtins.str] handler: The exported function name in the entry file. e.g. "handler" for `export const handler = ...`
-        :param pulumi.Input['LambdaRuntime'] runtime: The Lambda runtime identifier.
+        :param pulumi.Input['LambdaRuntime'] runtime: The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
         :param pulumi.Input['LambdaArchitecture'] architecture: CPU architecture. Default: arm64 (Graviton).
         :param pulumi.Input[_builtins.str] encryption: Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
-        :param pulumi.Input[_builtins.str] entry: Path to the function's entry point file, relative to the project root. e.g. "functions/api/index.ts". Omit to deploy a blank Lambda placeholder.
+        :param pulumi.Input[_builtins.str] entry: Path to the function's code, relative to the project root. Node: the entry file, e.g. "functions/api/index.ts"; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment: Environment variables available to the function at runtime. Supports plain strings and Pulumi outputs.
+        :param pulumi.Input[_builtins.str] handler: Node only: the handler in the bundled index.js. Default: "index.handler". Ignored for Rust (always "bootstrap").
         :param pulumi.Input['LambdaLogRetention'] log_retention: CloudWatch log group retention period. Default: "1y" (satisfies SOC 2, ISO 27001, PCI-DSS baseline).
         :param pulumi.Input[_builtins.int] memory: Memory in MB. Valid: 128 to 32768 in 1MB increments. Default: 1024.
         :param pulumi.Input[Sequence[pulumi.Input['LambdaPermissionArgs']]] permissions: Inline IAM permissions added to the execution role. Use for ad-hoc access not covered by the grant system.
@@ -53,7 +53,6 @@ class LambdaArgs:
         :param pulumi.Input[_builtins.bool] url: Enable a direct HTTPS endpoint for the function. Auth mode is AWS_IAM - never public. Default: false.
         :param pulumi.Input['LambdaVpcArgsArgs'] vpc: Places the Lambda inside a VPC for access to private resources such as RDS or ElastiCache. Anvil creates a dedicated security group with zero inbound and zero outbound rules. Nothing is reachable until explicitly granted via the grant system.
         """
-        pulumi.set(__self__, "handler", handler)
         pulumi.set(__self__, "runtime", runtime)
         if architecture is not None:
             pulumi.set(__self__, "architecture", architecture)
@@ -63,6 +62,8 @@ class LambdaArgs:
             pulumi.set(__self__, "entry", entry)
         if environment is not None:
             pulumi.set(__self__, "environment", environment)
+        if handler is not None:
+            pulumi.set(__self__, "handler", handler)
         if hatch is not None:
             pulumi.set(__self__, "hatch", hatch)
         if log_retention is not None:
@@ -82,21 +83,9 @@ class LambdaArgs:
 
     @_builtins.property
     @pulumi.getter
-    def handler(self) -> pulumi.Input[_builtins.str]:
-        """
-        The exported function name in the entry file. e.g. "handler" for `export const handler = ...`
-        """
-        return pulumi.get(self, "handler")
-
-    @handler.setter
-    def handler(self, value: pulumi.Input[_builtins.str]):
-        pulumi.set(self, "handler", value)
-
-    @_builtins.property
-    @pulumi.getter
     def runtime(self) -> pulumi.Input['LambdaRuntime']:
         """
-        The Lambda runtime identifier.
+        The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
         """
         return pulumi.get(self, "runtime")
 
@@ -132,7 +121,7 @@ class LambdaArgs:
     @pulumi.getter
     def entry(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Path to the function's entry point file, relative to the project root. e.g. "functions/api/index.ts". Omit to deploy a blank Lambda placeholder.
+        Path to the function's code, relative to the project root. Node: the entry file, e.g. "functions/api/index.ts"; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
         """
         return pulumi.get(self, "entry")
 
@@ -151,6 +140,18 @@ class LambdaArgs:
     @environment.setter
     def environment(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "environment", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def handler(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Node only: the handler in the bundled index.js. Default: "index.handler". Ignored for Rust (always "bootstrap").
+        """
+        return pulumi.get(self, "handler")
+
+    @handler.setter
+    def handler(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "handler", value)
 
     @_builtins.property
     @pulumi.getter
@@ -274,13 +275,13 @@ class Lambda(pulumi.ComponentResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input['LambdaArchitecture'] architecture: CPU architecture. Default: arm64 (Graviton).
         :param pulumi.Input[_builtins.str] encryption: Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
-        :param pulumi.Input[_builtins.str] entry: Path to the function's entry point file, relative to the project root. e.g. "functions/api/index.ts". Omit to deploy a blank Lambda placeholder.
+        :param pulumi.Input[_builtins.str] entry: Path to the function's code, relative to the project root. Node: the entry file, e.g. "functions/api/index.ts"; omit to deploy a blank placeholder. Rust (required): a Cargo package directory or a .rs file, e.g. "functions/api".
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment: Environment variables available to the function at runtime. Supports plain strings and Pulumi outputs.
-        :param pulumi.Input[_builtins.str] handler: The exported function name in the entry file. e.g. "handler" for `export const handler = ...`
+        :param pulumi.Input[_builtins.str] handler: Node only: the handler in the bundled index.js. Default: "index.handler". Ignored for Rust (always "bootstrap").
         :param pulumi.Input['LambdaLogRetention'] log_retention: CloudWatch log group retention period. Default: "1y" (satisfies SOC 2, ISO 27001, PCI-DSS baseline).
         :param pulumi.Input[_builtins.int] memory: Memory in MB. Valid: 128 to 32768 in 1MB increments. Default: 1024.
         :param pulumi.Input[Sequence[pulumi.Input[Union['LambdaPermissionArgs', 'LambdaPermissionArgsDict']]]] permissions: Inline IAM permissions added to the execution role. Use for ad-hoc access not covered by the grant system.
-        :param pulumi.Input['LambdaRuntime'] runtime: The Lambda runtime identifier.
+        :param pulumi.Input['LambdaRuntime'] runtime: The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
         :param pulumi.Input[_builtins.int] timeout: Timeout in seconds. Valid: 1 to 900. Default: 5.
         :param pulumi.Input[_builtins.bool] tracing: Enable AWS X-Ray tracing. Incurs per-trace cost (~$5/million traces). Default: false.
         :param pulumi.Input[_builtins.bool] url: Enable a direct HTTPS endpoint for the function. Auth mode is AWS_IAM - never public. Default: false.
@@ -339,8 +340,6 @@ class Lambda(pulumi.ComponentResource):
             __props__.__dict__["encryption"] = encryption
             __props__.__dict__["entry"] = entry
             __props__.__dict__["environment"] = environment
-            if handler is None and not opts.urn:
-                raise TypeError("Missing required property 'handler'")
             __props__.__dict__["handler"] = handler
             __props__.__dict__["hatch"] = hatch
             __props__.__dict__["log_retention"] = log_retention

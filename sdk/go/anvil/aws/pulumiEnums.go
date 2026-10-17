@@ -2827,6 +2827,8 @@ const (
 	LambdaRuntime_Nodejs24_x = LambdaRuntime("nodejs24.x")
 	// Node.js 22 (LTS)
 	LambdaRuntime_Nodejs22_x = LambdaRuntime("nodejs22.x")
+	// Rust on provided.al2023, built with cargo lambda. Requires entry.
+	LambdaRuntimeRust = LambdaRuntime("rust")
 )
 
 func (LambdaRuntime) ElementType() reflect.Type {
@@ -2953,6 +2955,7 @@ func (o LambdaRuntimePtrOutput) ToStringPtrOutputWithContext(ctx context.Context
 //
 //	LambdaRuntime_Nodejs24_x
 //	LambdaRuntime_Nodejs22_x
+//	LambdaRuntimeRust
 type LambdaRuntimeInput interface {
 	pulumi.Input
 
