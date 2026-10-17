@@ -37,6 +37,14 @@
                 { "name": "orders_user_idx", "columns": ["user_id"] },
                 { "name": "orders_status_idx", "columns": ["status"] }
               ]
+            },
+            {
+              "name": "events",
+              "columns": [
+                { "name": "id", "type": "uuid", "notNull": true, "default": "gen_random_uuid()" },
+                { "name": "created_at", "type": "timestamptz", "notNull": true, "default": "now()" }
+              ],
+              "primaryKey": ["id"]
             }
           ],
           "roles": [

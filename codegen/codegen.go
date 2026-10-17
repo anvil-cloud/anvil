@@ -260,3 +260,23 @@ func splitIdentifier(s string) []string {
 		return r == '_' || r == '-' || r == ' '
 	})
 }
+
+// insertRequired reports whether a table's Insert type must carry the column:
+// it has no default and is a primary key or NOT NULL. A column with a default
+// is optional (a primary key included, e.g. `default gen_random_uuid()`), and
+// each generated insert leaves it out of the INSERT when unset so the
+// database applies the default instead of receiving an explicit NULL.
+func insertRequired(t Table, c Column) bool {
+	if c.Default != "" {
+		return false
+	}
+	if c.NotNull {
+		return true
+	}
+	for _, pk := range t.PrimaryKey {
+		if pk == c.Name {
+			return true
+		}
+	}
+	return false
+}

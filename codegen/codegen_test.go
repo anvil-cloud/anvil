@@ -26,8 +26,8 @@ func TestParseSchemaFile(t *testing.T) {
 	if s.Name != "myapp" {
 		t.Errorf("expected schema name 'myapp', got %q", s.Name)
 	}
-	if len(s.Tables) != 2 {
-		t.Fatalf("expected 2 tables, got %d", len(s.Tables))
+	if len(s.Tables) != 3 {
+		t.Fatalf("expected 3 tables, got %d", len(s.Tables))
 	}
 
 	users := s.Tables[0]
@@ -315,4 +315,66 @@ func assertFileContains(t *testing.T, path, want string) {
 	if !strings.Contains(string(data), want) {
 		t.Errorf("%s does not contain %q\n\nFull content:\n%s", path, want, string(data))
 	}
+}
+
+// A column with a default is optional in the Insert type (a primary key
+// included) and, when unset, is left out of the INSERT so the database fills
+// it in. Binding it as NULL instead violates NOT NULL (orders.status).
+func TestInsertOmitsUnsetDefaults(t *testing.T) {
+	sf, err := ParseSchemaFile(filepath.Join("testdata", "anvil.schema.json"))
+	if err != nil {
+		t.Fatalf("ParseSchemaFile: %v", err)
+	}
+	generate := func(g Generator) string {
+		t.Helper()
+		outDir := t.TempDir()
+		if err := g.Generate(sf.DSQL, outDir); err != nil {
+			t.Fatalf("%s Generate: %v", g.Name(), err)
+		}
+		return outDir
+	}
+
+	t.Run("rust", func(t *testing.T) {
+		module := filepath.Join(generate(&RustGenerator{}), "src", "myapp.rs")
+		// Required columns are plain types and always bound.
+		assertFileContains(t, module, "pub struct OrdersInsert {\n    pub id: uuid::Uuid,\n    pub user_id: uuid::Uuid,")
+		assertFileContains(t, module, "        cols.push(\"user_id\");\n        params.push(&row.user_id);\n")
+		// Defaulted columns are bound only when Some.
+		assertFileContains(t, module, "    pub status: Option<String>,")
+		assertFileContains(t, module, "        if let Some(v) = &row.status {\n            cols.push(\"status\");\n            params.push(v);\n        }\n")
+		assertFileContains(t, module, "RETURNING id, user_id, total_amount, status, notes, placed_at\", cols.join(\", \"), placeholders.join(\", \"));")
+		// A defaulted primary key is optional too.
+		assertFileContains(t, module, "pub struct EventsInsert {\n    pub id: Option<uuid::Uuid>,")
+		// With every column defaulted, an empty insert uses DEFAULT VALUES.
+		assertFileContains(t, module, "\"INSERT INTO myapp.events DEFAULT VALUES RETURNING id, created_at\"")
+		// No defaulted columns: the fixed statement stays.
+		assertFileContains(t, module, "\"INSERT INTO myapp.users ")
+		data, _ := os.ReadFile(module)
+		if strings.Contains(string(data), "INSERT INTO myapp.orders (id, user_id, total_amount, status, notes, placed_at) VALUES") {
+			t.Error("orders insert still binds every column")
+		}
+	})
+
+	t.Run("go", func(t *testing.T) {
+		file := filepath.Join(generate(&GoGenerator{}), "myapp.go")
+		assertFileContains(t, file, "\tif row.Status != nil {\n\t\tcols = append(cols, \"status\")\n\t\targs = append(args, row.Status)\n\t}\n")
+		assertFileContains(t, file, "\tcols = append(cols, \"user_id\")\n\targs = append(args, row.UserId)\n")
+		assertFileContains(t, file, "type EventsInsert struct {\n\tId *string")
+		assertFileContains(t, file, "query = \"INSERT INTO myapp.events DEFAULT VALUES RETURNING id, created_at\"")
+		assertFileContains(t, file, "\t\"strconv\"\n\t\"strings\"\n")
+		// RETURNING scans into the result, not the caller's Insert value.
+		assertFileContains(t, file, "QueryRowContext(ctx, query, args...).Scan(&result.Id, &result.UserId,")
+	})
+
+	t.Run("typescript", func(t *testing.T) {
+		file := filepath.Join(generate(&TypeScriptGenerator{}), "myapp.ts")
+		assertFileContains(t, file, "export interface EventsInsert {\n  id?: string;")
+		assertFileContains(t, file, "`INSERT INTO myapp.events DEFAULT VALUES RETURNING *`")
+	})
+
+	t.Run("python", func(t *testing.T) {
+		file := filepath.Join(generate(&PythonGenerator{}), "myapp.py")
+		assertFileContains(t, file, "class EventsInsert:\n    id: Optional[str] = None")
+		assertFileContains(t, file, "sql = 'INSERT INTO myapp.events DEFAULT VALUES RETURNING *'")
+	})
 }

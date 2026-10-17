@@ -49,18 +49,6 @@ func writeTypeScriptTypes(b *strings.Builder, schemaName string, t Table) {
 	ins := ToPascalCase(t.Name) + "Insert"
 	upd := ToPascalCase(t.Name) + "Update"
 
-	pkSet := map[string]bool{}
-	for _, pk := range t.PrimaryKey {
-		pkSet[pk] = true
-	}
-
-	hasDefaultSet := map[string]bool{}
-	for _, c := range t.Columns {
-		if c.Default != "" {
-			hasDefaultSet[c.Name] = true
-		}
-	}
-
 	// Row type
 	fmt.Fprintf(b, "export interface %s {\n", row)
 	for _, c := range t.Columns {
@@ -74,7 +62,7 @@ func writeTypeScriptTypes(b *strings.Builder, schemaName string, t Table) {
 	for _, c := range t.Columns {
 		tsType := tsType(c)
 		optional := ""
-		if !pkSet[c.Name] && (hasDefaultSet[c.Name] || !c.NotNull) {
+		if !insertRequired(t, c) {
 			optional = "?"
 		}
 		fmt.Fprintf(b, "  %s%s: %s;\n", c.Name, optional, tsType)
@@ -191,8 +179,12 @@ func writeTSInsert(b *strings.Builder, ins, row, qualifiedTable string) {
 	b.WriteString("        const cols = Object.keys(data).filter(k => data[k] !== undefined);\n")
 	b.WriteString("        const vals = cols.map(k => data[k]);\n")
 	b.WriteString("        const placeholders = cols.map((_, i) => `$${i + 1}`).join(', ');\n")
+	b.WriteString("        // Unset columns are left out so the database applies their defaults.\n")
+	b.WriteString("        const sql = cols.length\n")
+	fmt.Fprintf(b, "          ? `INSERT INTO %s (${cols.join(', ')}) VALUES (${placeholders}) RETURNING *`\n", qualifiedTable)
+	fmt.Fprintf(b, "          : `INSERT INTO %s DEFAULT VALUES RETURNING *`;\n", qualifiedTable)
 	fmt.Fprintf(b, "        const r = await client.query<%s>(\n", row)
-	fmt.Fprintf(b, "          `INSERT INTO %s (${cols.join(', ')}) VALUES (${placeholders}) RETURNING *`,\n", qualifiedTable)
+	b.WriteString("          sql,\n")
 	b.WriteString("          vals,\n")
 	b.WriteString("        );\n")
 	b.WriteString("        return r.rows[0];\n")

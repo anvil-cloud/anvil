@@ -48,17 +48,6 @@ func writeGoTypes(b *strings.Builder, t Table) {
 	ins := ToPascalCase(t.Name) + "Insert"
 	upd := ToPascalCase(t.Name) + "Update"
 
-	pkSet := map[string]bool{}
-	for _, pk := range t.PrimaryKey {
-		pkSet[pk] = true
-	}
-	hasDefaultSet := map[string]bool{}
-	for _, c := range t.Columns {
-		if c.Default != "" {
-			hasDefaultSet[c.Name] = true
-		}
-	}
-
 	// Row
 	fmt.Fprintf(b, "type %s struct {\n", row)
 	for _, c := range t.Columns {
@@ -72,7 +61,7 @@ func writeGoTypes(b *strings.Builder, t Table) {
 	fmt.Fprintf(b, "type %s struct {\n", ins)
 	for _, c := range t.Columns {
 		fieldName := ToPascalCase(c.Name)
-		required := pkSet[c.Name] || (c.NotNull && !hasDefaultSet[c.Name])
+		required := insertRequired(t, c)
 		var goT string
 		if required {
 			c2 := c
@@ -146,28 +135,7 @@ func writeGoTableQueries(b *strings.Builder, schemaName string, t Table) {
 	b.WriteString("\t\tresult = append(result, row)\n\t}\n\treturn result, rows.Err()\n}\n\n")
 
 	// Insert
-	fmt.Fprintf(b, "func (q *%s) Insert(ctx context.Context, row %s) (*%s, error) {\n", structName, ins, row)
-	fmt.Fprintf(b, "\tvar result %s\n", row)
-	b.WriteString("\t// Build column list and values dynamically based on non-nil fields\n")
-
-	insertCols := make([]string, 0, len(t.Columns))
-	insertPlaceholders := make([]string, 0, len(t.Columns))
-	insertArgs := make([]string, 0, len(t.Columns))
-	for i, c := range t.Columns {
-		insertCols = append(insertCols, c.Name)
-		insertPlaceholders = append(insertPlaceholders, fmt.Sprintf("$%d", i+1))
-		insertArgs = append(insertArgs, "row."+ToPascalCase(c.Name))
-	}
-
-	fmt.Fprintf(b, "\terr := q.db.QueryRowContext(ctx,\n\t\t\"INSERT INTO %s (%s) VALUES (%s) RETURNING %s\",\n\t\t%s,\n\t).Scan(%s)\n",
-		qualifiedTable,
-		strings.Join(insertCols, ", "),
-		strings.Join(insertPlaceholders, ", "),
-		selectCols,
-		strings.Join(insertArgs, ", "),
-		scanArgs,
-	)
-	b.WriteString("\tif err != nil {\n\t\treturn nil, err\n\t}\n\treturn &result, nil\n}\n\n")
+	writeGoInsert(b, t, structName, ins, row, qualifiedTable, selectCols)
 
 	// Delete
 	fmt.Fprintf(b, "func (q *%s) Delete(ctx context.Context, %s) (bool, error) {\n", structName, goPKParams)
@@ -179,6 +147,67 @@ func writeGoTableQueries(b *strings.Builder, schemaName string, t Table) {
 }
 
 // Helpers
+
+// writeGoInsert emits Insert. A table without defaulted columns gets a fixed
+// statement. Otherwise the column list is built at runtime: a defaulted
+// column left nil is omitted so the database applies its default rather
+// than receiving an explicit NULL (which a NOT NULL column rejects).
+func writeGoInsert(b *strings.Builder, t Table, structName, ins, row, qualifiedTable, selectCols string) {
+	fmt.Fprintf(b, "func (q *%s) Insert(ctx context.Context, row %s) (*%s, error) {\n", structName, ins, row)
+
+	// RETURNING scans into result; row is the caller's Insert value.
+	scan := make([]string, len(t.Columns))
+	for i, c := range t.Columns {
+		scan[i] = "&result." + ToPascalCase(c.Name)
+	}
+	scanArgs := strings.Join(scan, ", ")
+
+	if !tableHasDefaults(t) {
+		cols := make([]string, len(t.Columns))
+		placeholders := make([]string, len(t.Columns))
+		args := make([]string, len(t.Columns))
+		for i, c := range t.Columns {
+			cols[i] = c.Name
+			placeholders[i] = fmt.Sprintf("$%d", i+1)
+			args[i] = "row." + ToPascalCase(c.Name)
+		}
+		fmt.Fprintf(b, "\tvar result %s\n", row)
+		fmt.Fprintf(b, "\terr := q.db.QueryRowContext(ctx,\n\t\t\"INSERT INTO %s (%s) VALUES (%s) RETURNING %s\",\n\t\t%s,\n\t).Scan(%s)\n",
+			qualifiedTable, strings.Join(cols, ", "), strings.Join(placeholders, ", "),
+			selectCols, strings.Join(args, ", "), scanArgs)
+	} else {
+		b.WriteString("\tvar cols []string\n\tvar args []any\n")
+		anyRequired := false
+		for _, c := range t.Columns {
+			field := "row." + ToPascalCase(c.Name)
+			if c.Default == "" {
+				anyRequired = true
+				fmt.Fprintf(b, "\tcols = append(cols, \"%s\")\n\targs = append(args, %s)\n", c.Name, field)
+			} else {
+				fmt.Fprintf(b, "\tif %s != nil {\n\t\tcols = append(cols, \"%s\")\n\t\targs = append(args, %s)\n\t}\n", field, c.Name, field)
+			}
+		}
+		b.WriteString("\tplaceholders := make([]string, len(cols))\n")
+		b.WriteString("\tfor i := range cols {\n\t\tplaceholders[i] = \"$\" + strconv.Itoa(i+1)\n\t}\n")
+		fmt.Fprintf(b, "\tquery := \"INSERT INTO %s (\" + strings.Join(cols, \", \") + \") VALUES (\" + strings.Join(placeholders, \", \") + \") RETURNING %s\"\n", qualifiedTable, selectCols)
+		if !anyRequired {
+			// Every column is optional, so all of them may be left out.
+			fmt.Fprintf(b, "\tif len(cols) == 0 {\n\t\tquery = \"INSERT INTO %s DEFAULT VALUES RETURNING %s\"\n\t}\n", qualifiedTable, selectCols)
+		}
+		fmt.Fprintf(b, "\tvar result %s\n", row)
+		fmt.Fprintf(b, "\terr := q.db.QueryRowContext(ctx, query, args...).Scan(%s)\n", scanArgs)
+	}
+	b.WriteString("\tif err != nil {\n\t\treturn nil, err\n\t}\n\treturn &result, nil\n}\n\n")
+}
+
+func tableHasDefaults(t Table) bool {
+	for _, c := range t.Columns {
+		if c.Default != "" {
+			return true
+		}
+	}
+	return false
+}
 
 func goType(c Column) string {
 	m, ok := typeMappings[c.Type]
@@ -226,6 +255,13 @@ func goImports(s Schema) string {
 	imports = append(imports, "\t\"database/sql\"")
 	if needsJSON {
 		imports = append(imports, "\t\"encoding/json\"")
+	}
+	// Inserts that omit unset defaulted columns build their SQL at runtime.
+	for _, t := range s.Tables {
+		if tableHasDefaults(t) {
+			imports = append(imports, "\t\"strconv\"", "\t\"strings\"")
+			break
+		}
 	}
 	if needsTime {
 		imports = append(imports, "\t\"time\"")

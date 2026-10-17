@@ -119,17 +119,6 @@ func writeRustTypes(b *strings.Builder, t Table) {
 	ins := ToPascalCase(t.Name) + "Insert"
 	upd := ToPascalCase(t.Name) + "Update"
 
-	pkSet := map[string]bool{}
-	for _, pk := range t.PrimaryKey {
-		pkSet[pk] = true
-	}
-	hasDefaultSet := map[string]bool{}
-	for _, c := range t.Columns {
-		if c.Default != "" {
-			hasDefaultSet[c.Name] = true
-		}
-	}
-
 	// Row
 	fmt.Fprintf(b, "#[derive(Debug, Clone, Serialize, Deserialize)]\n")
 	fmt.Fprintf(b, "pub struct %s {\n", row)
@@ -143,7 +132,7 @@ func writeRustTypes(b *strings.Builder, t Table) {
 	fmt.Fprintf(b, "#[derive(Debug, Clone, Serialize, Deserialize)]\n")
 	fmt.Fprintf(b, "pub struct %s {\n", ins)
 	for _, c := range t.Columns {
-		required := pkSet[c.Name] || (c.NotNull && !hasDefaultSet[c.Name])
+		required := insertRequired(t, c)
 		if required {
 			c2 := c
 			c2.NotNull = true
@@ -220,25 +209,7 @@ func writeRustTableQueries(b *strings.Builder, schemaName string, t Table) {
 	b.WriteString("        }).collect())\n    }\n\n")
 
 	// insert
-	fmt.Fprintf(b, "    pub async fn insert(&self, row: &%s) -> Result<%s, Error> {\n", ins, row)
-	insertPlaceholders := make([]string, len(t.Columns))
-	insertArgs := make([]string, len(t.Columns))
-	for i, c := range t.Columns {
-		insertPlaceholders[i] = fmt.Sprintf("$%d", i+1)
-		insertArgs[i] = fmt.Sprintf("&row.%s", ToSnakeCase(c.Name))
-	}
-	fmt.Fprintf(b, "        let result = self.client\n")
-	fmt.Fprintf(b, "            .query_one(\n")
-	fmt.Fprintf(b, "                \"INSERT INTO %s (%s) VALUES (%s) RETURNING %s\",\n",
-		qualifiedTable, strings.Join(colNames, ", "),
-		strings.Join(insertPlaceholders, ", "), selectCols)
-	fmt.Fprintf(b, "                &[%s],\n", strings.Join(insertArgs, ", "))
-	b.WriteString("            )\n            .await?;\n")
-	fmt.Fprintf(b, "        Ok(%s {\n", row)
-	for _, c := range t.Columns {
-		fmt.Fprintf(b, "            %s: result.get(\"%s\"),\n", ToSnakeCase(c.Name), c.Name)
-	}
-	b.WriteString("        })\n    }\n\n")
+	writeRustInsert(b, t, ins, row, qualifiedTable, selectCols)
 
 	// delete
 	fmt.Fprintf(b, "    pub async fn delete(&self, %s) -> Result<bool, Error> {\n", pkParams)
@@ -251,7 +222,73 @@ func writeRustTableQueries(b *strings.Builder, schemaName string, t Table) {
 
 	b.WriteString("}\n")
 
-	_ = ins // used above
+}
+
+// writeRustInsert emits insert. A table without defaulted columns gets a
+// fixed statement. Otherwise the column list is built at runtime: a defaulted
+// column that is None is left out so the database applies its default
+// rather than receiving an explicit NULL (which a NOT NULL column rejects).
+func writeRustInsert(b *strings.Builder, t Table, ins, row, qualifiedTable, selectCols string) {
+	fmt.Fprintf(b, "    pub async fn insert(&self, row: &%s) -> Result<%s, Error> {\n", ins, row)
+
+	var dynamic, anyRequired bool
+	for _, c := range t.Columns {
+		if c.Default != "" {
+			dynamic = true
+		} else {
+			anyRequired = true
+		}
+	}
+
+	if !dynamic {
+		cols := make([]string, len(t.Columns))
+		placeholders := make([]string, len(t.Columns))
+		args := make([]string, len(t.Columns))
+		for i, c := range t.Columns {
+			cols[i] = c.Name
+			placeholders[i] = fmt.Sprintf("$%d", i+1)
+			args[i] = fmt.Sprintf("&row.%s", ToSnakeCase(c.Name))
+		}
+		fmt.Fprintf(b, "        let result = self.client\n")
+		fmt.Fprintf(b, "            .query_one(\n")
+		fmt.Fprintf(b, "                \"INSERT INTO %s (%s) VALUES (%s) RETURNING %s\",\n",
+			qualifiedTable, strings.Join(cols, ", "), strings.Join(placeholders, ", "), selectCols)
+		fmt.Fprintf(b, "                &[%s],\n", strings.Join(args, ", "))
+		b.WriteString("            )\n            .await?;\n")
+	} else {
+		b.WriteString("        let mut cols: Vec<&str> = Vec::new();\n")
+		b.WriteString("        let mut params: Vec<&(dyn tokio_postgres::types::ToSql + Sync)> = Vec::new();\n")
+		for _, c := range t.Columns {
+			field := ToSnakeCase(c.Name)
+			if c.Default == "" {
+				fmt.Fprintf(b, "        cols.push(\"%s\");\n        params.push(&row.%s);\n", c.Name, field)
+			} else {
+				fmt.Fprintf(b, "        if let Some(v) = &row.%s {\n            cols.push(\"%s\");\n            params.push(v);\n        }\n", field, c.Name)
+			}
+		}
+		insert := fmt.Sprintf("INSERT INTO %s ({}) VALUES ({}) RETURNING %s", qualifiedTable, selectCols)
+		placeholders := "let placeholders: Vec<String> = (1..=params.len()).map(|i| format!(\"${}\", i)).collect();\n"
+		format := "format!(\"" + insert + "\", cols.join(\", \"), placeholders.join(\", \"))"
+		if anyRequired {
+			b.WriteString("        " + placeholders)
+			b.WriteString("        let sql = " + format + ";\n")
+		} else {
+			// Every column is optional, so all of them may be left out.
+			b.WriteString("        let sql = if cols.is_empty() {\n")
+			fmt.Fprintf(b, "            \"INSERT INTO %s DEFAULT VALUES RETURNING %s\".to_string()\n", qualifiedTable, selectCols)
+			b.WriteString("        } else {\n")
+			b.WriteString("            " + placeholders)
+			b.WriteString("            " + format + "\n")
+			b.WriteString("        };\n")
+		}
+		b.WriteString("        let result = self.client.query_one(sql.as_str(), &params).await?;\n")
+	}
+
+	fmt.Fprintf(b, "        Ok(%s {\n", row)
+	for _, c := range t.Columns {
+		fmt.Fprintf(b, "            %s: result.get(\"%s\"),\n", ToSnakeCase(c.Name), c.Name)
+	}
+	b.WriteString("        })\n    }\n\n")
 }
 
 func generateRustLib(schemas []Schema) string {

@@ -53,17 +53,6 @@ func writePythonTypes(b *strings.Builder, t Table) {
 	ins := ToPascalCase(t.Name) + "Insert"
 	upd := ToPascalCase(t.Name) + "Update"
 
-	pkSet := map[string]bool{}
-	for _, pk := range t.PrimaryKey {
-		pkSet[pk] = true
-	}
-	hasDefaultSet := map[string]bool{}
-	for _, c := range t.Columns {
-		if c.Default != "" {
-			hasDefaultSet[c.Name] = true
-		}
-	}
-
 	// Row
 	fmt.Fprintf(b, "@dataclass\nclass %s:\n", row)
 	requiredFirst := partitionColumns(t.Columns, func(c Column) bool { return c.NotNull })
@@ -79,11 +68,11 @@ func writePythonTypes(b *strings.Builder, t Table) {
 
 	// Insert — PK required, columns with defaults are optional
 	fmt.Fprintf(b, "@dataclass\nclass %s:\n", ins)
-	insertRequired := partitionColumns(t.Columns, func(c Column) bool {
-		return pkSet[c.Name] || (c.NotNull && !hasDefaultSet[c.Name])
+	insertCols := partitionColumns(t.Columns, func(c Column) bool {
+		return insertRequired(t, c)
 	})
-	for _, c := range insertRequired {
-		required := pkSet[c.Name] || (c.NotNull && !hasDefaultSet[c.Name])
+	for _, c := range insertCols {
+		required := insertRequired(t, c)
 		if required {
 			c2 := c
 			c2.NotNull = true
@@ -165,10 +154,12 @@ func writePythonTableQueries(b *strings.Builder, schemaName string, t Table) {
 	b.WriteString("        vals = list(fields.values())\n")
 	b.WriteString("        placeholders = ', '.join(f'${i + 1}' for i in range(len(cols)))\n")
 	b.WriteString("        col_str = ', '.join(cols)\n")
-	b.WriteString("        result = await self._conn.fetchrow(\n")
-	fmt.Fprintf(b, "            f'INSERT INTO %s ({col_str}) VALUES ({placeholders}) RETURNING *',\n", qualifiedTable)
-	b.WriteString("            *vals,\n")
-	b.WriteString("        )\n")
+	b.WriteString("        # Unset columns are left out so the database applies their defaults.\n")
+	b.WriteString("        if cols:\n")
+	fmt.Fprintf(b, "            sql = f'INSERT INTO %s ({col_str}) VALUES ({placeholders}) RETURNING *'\n", qualifiedTable)
+	b.WriteString("        else:\n")
+	fmt.Fprintf(b, "            sql = 'INSERT INTO %s DEFAULT VALUES RETURNING *'\n", qualifiedTable)
+	b.WriteString("        result = await self._conn.fetchrow(sql, *vals)\n")
 	fmt.Fprintf(b, "        return %s(**dict(result))\n\n", row)
 
 	// update
