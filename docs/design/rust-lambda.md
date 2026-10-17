@@ -123,9 +123,18 @@ Hooked in at `buildFunction` in `cmd/anvil/cmd/build.go`, next to the Node case
 
 | Available | Build runs |
 |---|---|
-| `cargo lambda` on PATH | locally (Zig cross-compile) |
+| `cargo lambda` ≥ 1.9.2 on PATH | locally (Zig cross-compile) |
+| `cargo lambda` with an unreadable version | locally, with a warning (the build isn't blocked on parsing its output) |
+| older `cargo lambda`, Docker running | in Docker, with a note saying why |
+| older `cargo lambda`, no Docker | error before building, naming the installed and minimum versions |
 | no cargo-lambda, Docker running | in `ghcr.io/cargo-lambda/cargo-lambda` |
 | neither | error (below) |
+
+The minimum (`minCargoLambdaVersion`, 1.9.2) is what can build against the
+pinned Rust: older cargo-lambda bundles a cargo-zigbuild that passes Rust
+1.99's `-Wl,--fix-cortex-a53-843419` to Zig for aarch64-linux, and fails to
+link `aws-lc-sys` (the AWS SDK's crypto). A unit test keeps the pinned Docker
+image at or above it.
 
 A local Rust toolchain is required either way: `cargo metadata` (handler
 resolution) and `cargo new` / `cargo add` (scaffolding) always run on the host.
@@ -137,6 +146,15 @@ Rust Lambdas need cargo-lambda or Docker to build.
   Install cargo-lambda: https://www.cargo-lambda.info/guide/installation.html
   (or start Docker to build in a container)
 ```
+
+```
+cargo-lambda 1.8.0 is too old to build Rust Lambdas (1.9.2 or newer is needed).
+  Upgrade: https://www.cargo-lambda.info/guide/installation.html (Homebrew: brew install cargo-lambda/tap/cargo-lambda)
+  (or start Docker to build in a container)
+```
+
+Homebrew users on the old `cargo-lambda/cargo-lambda` tap won't get upgrades:
+the project moved to `cargo-lambda/tap`.
 
 ### Docker build
 

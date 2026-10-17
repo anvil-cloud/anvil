@@ -9,6 +9,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -71,14 +73,21 @@ func TestSelectRustBuilder(t *testing.T) {
 	tests := []struct {
 		name       string
 		onPath     []string
+		version    string // `cargo lambda --version` output; "" makes the command fail
 		dockerUp   bool
 		wantDocker bool
 		wantErr    string
 	}{
-		{"cargo-lambda installed", []string{"cargo-lambda", "docker"}, true, false, ""},
-		{"falls back to Docker", []string{"docker"}, true, true, ""},
-		{"Docker installed but not running", []string{"docker"}, false, false, "need cargo-lambda or Docker"},
-		{"neither", nil, false, false, "need cargo-lambda or Docker"},
+		{"current cargo-lambda", []string{"cargo-lambda", "docker"}, "cargo-lambda 1.9.2 (67129fc 2026-08-21Z)\n", true, false, ""},
+		{"newer cargo-lambda", []string{"cargo-lambda"}, "cargo-lambda 1.10.0 (abc 2026-12-01Z)\n", false, false, ""},
+		{"next major", []string{"cargo-lambda"}, "cargo-lambda 2.0.0\n", false, false, ""},
+		{"old cargo-lambda falls back to Docker", []string{"cargo-lambda", "docker"}, "cargo-lambda 1.8.0 (5d84825 2025-03-15Z)\n", true, true, ""},
+		{"old cargo-lambda without Docker", []string{"cargo-lambda", "docker"}, "cargo-lambda 1.8.0 (5d84825 2025-03-15Z)\n", false, false, "cargo-lambda 1.8.0 is too old to build Rust Lambdas (1.9.2 or newer is needed)"},
+		{"unreadable version builds locally", []string{"cargo-lambda"}, "something unexpected\n", false, false, ""},
+		{"version command fails builds locally", []string{"cargo-lambda"}, "", false, false, ""},
+		{"no cargo-lambda falls back to Docker", []string{"docker"}, "", true, true, ""},
+		{"Docker installed but not running", []string{"docker"}, "", false, false, "need cargo-lambda or Docker"},
+		{"neither", nil, "", false, false, "need cargo-lambda or Docker"},
 	}
 
 	for _, tt := range tests {
@@ -95,8 +104,16 @@ func TestSelectRustBuilder(t *testing.T) {
 				return "", exec.ErrNotFound
 			}
 			runCommand = func(name string, args ...string) ([]byte, error) {
-				if name == "docker" && args[0] == "info" && !tt.dockerUp {
-					return nil, errors.New("Cannot connect to the Docker daemon")
+				switch {
+				case name == "docker" && args[0] == "info":
+					if !tt.dockerUp {
+						return nil, errors.New("Cannot connect to the Docker daemon")
+					}
+				case name == "cargo" && args[0] == "lambda" && args[1] == "--version":
+					if tt.version == "" {
+						return nil, errors.New("no such command")
+					}
+					return []byte(tt.version), nil
 				}
 				return nil, nil
 			}
@@ -118,6 +135,20 @@ func TestSelectRustBuilder(t *testing.T) {
 				t.Errorf("useDocker = %v, want %v", useDocker, tt.wantDocker)
 			}
 		})
+	}
+}
+
+func TestDockerImageMeetsMinimumCargoLambda(t *testing.T) {
+	m := regexp.MustCompile(`cargo-lambda:(\d+)\.(\d+)\.(\d+)@`).FindStringSubmatch(cargoLambdaImage)
+	if m == nil {
+		t.Fatalf("can't read the version tag of %s", cargoLambdaImage)
+	}
+	var v [3]int
+	for i := range v {
+		v[i], _ = strconv.Atoi(m[i+1])
+	}
+	if versionLess(v, minCargoLambdaVersion) {
+		t.Errorf("Docker image %s is older than the minimum cargo-lambda %s", formatVersion(v), formatVersion(minCargoLambdaVersion))
 	}
 }
 

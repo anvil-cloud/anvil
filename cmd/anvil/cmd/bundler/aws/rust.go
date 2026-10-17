@@ -6,7 +6,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/anvil-cloud/anvil/cmd/anvil/cmd/bundler"
@@ -142,18 +144,78 @@ func targetTriple(architecture string) (string, error) {
 	}
 }
 
-// selectRustBuilder picks local cargo-lambda, then Docker. A local Rust
-// toolchain is required either way (cargo metadata already ran by now).
+// minCargoLambdaVersion is the oldest local cargo-lambda that can build
+// against the Rust that new workspaces pin. Older releases bundle a
+// cargo-zigbuild that passes Rust 1.99's -Wl,--fix-cortex-a53-843419 to Zig
+// for aarch64-linux (which rejects it), and fail to link aws-lc-sys, which
+// the AWS SDK uses. The pinned Docker image (cargoLambdaImage) meets it.
+var minCargoLambdaVersion = [3]int{1, 9, 2}
+
+var cargoLambdaVersionRe = regexp.MustCompile(`cargo-lambda (\d+)\.(\d+)\.(\d+)`)
+
+// selectRustBuilder picks local cargo-lambda when it's new enough, then
+// Docker. A local Rust toolchain is required either way (cargo metadata
+// already ran by now).
 func selectRustBuilder() (useDocker bool, err error) {
-	if _, err := lookPath("cargo-lambda"); err == nil {
+	if _, err := lookPath("cargo-lambda"); err != nil {
+		if dockerRunning() {
+			return true, nil
+		}
+		return false, errors.New("Rust Lambdas need cargo-lambda or Docker to build.\n" +
+			"  Install cargo-lambda: " + cargoLambdaInstallURL + "\n" +
+			"  (or start Docker to build in a container)")
+	}
+
+	version, ok := localCargoLambdaVersion()
+	if !ok {
+		// Don't block a build on our parsing of its output.
+		fmt.Println("  ⚠️  Couldn't read the cargo-lambda version; building with it anyway")
 		return false, nil
 	}
+	if !versionLess(version, minCargoLambdaVersion) {
+		return false, nil
+	}
+
+	old := fmt.Sprintf("cargo-lambda %s is too old to build Rust Lambdas (%s or newer is needed)",
+		formatVersion(version), formatVersion(minCargoLambdaVersion))
 	if dockerRunning() {
+		fmt.Printf("  ⚠️  %s; building in Docker instead\n", old)
 		return true, nil
 	}
-	return false, errors.New("Rust Lambdas need cargo-lambda or Docker to build.\n" +
-		"  Install cargo-lambda: " + cargoLambdaInstallURL + "\n" +
+	return false, errors.New(old + ".\n" +
+		"  Upgrade: " + cargoLambdaInstallURL + " (Homebrew: brew install cargo-lambda/tap/cargo-lambda)\n" +
 		"  (or start Docker to build in a container)")
+}
+
+// localCargoLambdaVersion parses `cargo lambda --version`, e.g.
+// "cargo-lambda 1.9.2 (67129fc 2026-08-21Z)".
+func localCargoLambdaVersion() ([3]int, bool) {
+	out, err := runCommand("cargo", "lambda", "--version")
+	if err != nil {
+		return [3]int{}, false
+	}
+	m := cargoLambdaVersionRe.FindStringSubmatch(string(out))
+	if m == nil {
+		return [3]int{}, false
+	}
+	var v [3]int
+	for i := range v {
+		v[i], _ = strconv.Atoi(m[i+1])
+	}
+	return v, true
+}
+
+func versionLess(a, b [3]int) bool {
+	for i := range a {
+		if a[i] != b[i] {
+			return a[i] < b[i]
+		}
+	}
+	return false
+}
+
+func formatVersion(v [3]int) string {
+	return fmt.Sprintf("%d.%d.%d", v[0], v[1], v[2])
 }
 
 func dockerRunning() bool {
