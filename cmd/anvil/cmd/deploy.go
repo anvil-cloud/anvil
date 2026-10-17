@@ -49,6 +49,17 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("function discovery failed: %w", err)
 	}
 
+	// ── Step 1b: Scaffold missing functions ───────────
+	// A declared Rust Lambda whose package doesn't exist yet is created
+	// here, so it can be built in step 3. Existing code is never touched.
+	projectRoot, err := findProjectRoot()
+	if err != nil {
+		return err
+	}
+	if err := scaffoldFunctions(projectRoot, functions); err != nil {
+		return err
+	}
+
 	// ── Step 2: Load real deploy stack ────────────────
 	s, err := loadStack(ctx, stage)
 	if err != nil {

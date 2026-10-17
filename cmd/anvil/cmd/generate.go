@@ -17,13 +17,18 @@ var (
 
 var generateCmd = &cobra.Command{
 	Use:   "generate",
-	Short: "Generate typed database client code from your schema",
-	Long: `Discovers DSQL schemas from your Pulumi program and generates fully-typed
-database interfaces for your language. Produces Row, Insert, and Update types
-plus CRUD query helpers for every table in every schema.
+	Short: "Generate code from your infrastructure: Rust Lambda packages and typed database clients",
+	Long: `Makes your code match what your Pulumi program declares. Runs a Pulumi
+preview (no real resources created) to discover functions and schemas, then:
 
-Runs a Pulumi preview (no real resources created) to extract schema definitions,
-then generates code to gen/ (or the --path you provide).
+  • Creates the Cargo package for every Rust Lambda whose handler doesn't
+    exist yet, with a blank handler, and a Cargo workspace at the project
+    root if there isn't one. Existing code is never edited or deleted.
+    (anvil deploy does this too, before building.)
+
+  • Generates fully-typed database interfaces for every DSQL schema: Row,
+    Insert, and Update types plus CRUD query helpers, written to gen/ (or
+    the --path you provide).
 
 Each invocation with --lang/--path is remembered per stage, so a later bare
 "anvil generate" — and the automatic post-deploy refresh — reproduce every
@@ -159,10 +164,16 @@ func runGenerate(cmd *cobra.Command, args []string) error {
 
 	ctx := context.Background()
 
-	fmt.Println("  Discovering schemas...")
+	fmt.Println("  Discovering functions and schemas...")
 
-	if _, err := discoverFunctions(ctx, stage); err != nil {
-		return fmt.Errorf("schema discovery failed: %w", err)
+	functions, err := discoverFunctions(ctx, stage)
+	if err != nil {
+		return fmt.Errorf("discovery failed: %w", err)
+	}
+
+	// Create any declared Rust Lambda packages that don't exist yet.
+	if err := scaffoldFunctions(projectRoot, functions); err != nil {
+		return err
 	}
 
 	manifest, err := readFullManifest()
@@ -170,7 +181,10 @@ func runGenerate(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if manifest == nil || len(manifest.Schemas) == 0 {
-		return fmt.Errorf("no database schemas found — make sure your Pulumi program defines DSQL schemas")
+		if hasRustFunctions(functions) {
+			return nil // scaffolding was the work
+		}
+		return fmt.Errorf("nothing to generate — no Rust Lambdas or DSQL schemas found in your program")
 	}
 
 	if err := runGenerateTargets(projectRoot, targets, manifestEntries(manifest), "Generated"); err != nil {

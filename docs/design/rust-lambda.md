@@ -166,9 +166,10 @@ docker run --rm \
   re-downloaded on every build.
 - **`--user`** so files in `target/` aren't owned by root on Linux hosts;
   `HOME=/tmp` gives that user somewhere to write Zig's cache.
-- **Toolchain:** verify during implementation whether the image honours
-  `rust-toolchain.toml` (if it ships rustup it will install the pinned
-  toolchain; that install then needs caching too).
+- **Toolchain (still to verify with Docker running):** whether the image
+  honours `rust-toolchain.toml`. If it ships rustup it will try to install
+  the pinned toolchain as the non-root `--user`, which may fail or need its
+  own cache mount.
 
 ### Deterministic zip
 
@@ -205,21 +206,34 @@ files.
    - none: **create one at the project root**
    - the project root `Cargo.toml` is a plain `[package]`: **stop** with a
      message. Converting a user's package is never done automatically
-4. **An existing package outside the workspace's `members`:** warn with the
-   fix. It's user code, so no automatic edit (Cargo would refuse to build it).
+4. **An existing package outside the workspace's `members`:** left alone.
+   It's user code, so no automatic edit; Cargo's own error at build time
+   ("believes it's in a workspace when it's not") names the fix.
 5. **A `.rs` handler inside an existing package:** create just the file. Cargo
-   discovers `src/bin/*.rs` on its own.
-6. **`gen/db` is never scaffolded over.** It's Anvil-owned and handled by the
+   discovers `src/bin/*.rs` on its own. With no package above it, stop and
+   suggest a directory handler instead (Anvil won't guess where a package
+   should go).
+6. **An existing directory without `Cargo.toml`** becomes a package, but a
+   `src/main.rs` already in it is kept.
+7. **`gen/db` is never scaffolded over.** It's Anvil-owned and handled by the
    DSQL generator.
 
 ### How files are written
 
 TOML edits go through Cargo, which preserves comments and formatting:
 
-- `cargo new --bin <handler path>`: creates the package and adds it to the enclosing
-  workspace's `members` (Cargo has done this since well before 1.85, the
-  minimum the edition already requires)
-- `cargo add …`: adds dependencies
+- `cargo init --bin --vcs none <handler path>`: creates the package and adds
+  it to the enclosing workspace's `members`, inheriting `edition` and
+  `rust-version` from `[workspace.package]`. `init` rather than `new` so an
+  existing directory (and any `src/main.rs` in it) works.
+- `cargo add lambda_runtime tokio serde_json`: in Anvil's own workspace this
+  writes `{ workspace = true }`; when joining a user's workspace it also
+  passes `--features lambda_runtime/tracing,tokio/macros`, since that
+  workspace may not define them.
+
+Implemented in `cmd/anvil/cmd/scaffold`; verified with real cargo
+(`ANVIL_RUST_E2E=1`): scaffold two Lambdas into an empty project, build
+them, and a second run creates nothing.
 
 Anvil writes directly only the files it creates from nothing: the root
 `Cargo.toml`, `rust-toolchain.toml` and `src/main.rs`. It also adds `/target`
@@ -263,8 +277,10 @@ channel = "<pinned version, e.g. 1.xx.0>"
 targets = ["aarch64-unknown-linux-gnu", "x86_64-unknown-linux-gnu"]
 ```
 
-- **Pinned,** so laptop and CI compile with the same Rust. Anvil picks the
-  version when it creates the file and never bumps it afterwards.
+- **Pinned,** so laptop and CI compile with the same Rust. Anvil pins the
+  host's current `rustc` version (already installed, and what the user
+  develops with) when it creates the file, and never bumps it afterwards.
+  Older than 1.85 is an error asking for `rustup update`.
 - **`targets`** makes rustup install the cross-compile targets automatically;
   otherwise the first build fails until the user installs them.
 - **Overriding:** the file is user-owned (create-only), so editing `channel`
