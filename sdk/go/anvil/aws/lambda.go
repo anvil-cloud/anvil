@@ -62,7 +62,7 @@ type lambdaArgs struct {
 	Memory *int `pulumi:"memory"`
 	// Inline IAM permissions added to the execution role. Use for ad-hoc access not covered by the grant system.
 	Permissions []LambdaPermission `pulumi:"permissions"`
-	// The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires handler (a Cargo package directory or a .rs file).
+	// The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
 	Runtime LambdaRuntime `pulumi:"runtime"`
 	// Timeout in seconds. Valid: 1 to 900. Default: 5.
 	Timeout *int `pulumi:"timeout"`
@@ -91,7 +91,7 @@ type LambdaArgs struct {
 	Memory pulumi.IntPtrInput
 	// Inline IAM permissions added to the execution role. Use for ad-hoc access not covered by the grant system.
 	Permissions LambdaPermissionArrayInput
-	// The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires handler (a Cargo package directory or a .rs file).
+	// The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
 	Runtime LambdaRuntimeInput
 	// Timeout in seconds. Valid: 1 to 900. Default: 5.
 	Timeout pulumi.IntPtrInput

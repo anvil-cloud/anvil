@@ -372,7 +372,7 @@ export const LambdaRuntime = {
      */
     Nodejs22_x: "nodejs22.x",
     /**
-     * Rust on provided.al2023, built with cargo lambda. Requires handler.
+     * Rust on provided.al2023, built with cargo lambda. Requires entry.
      */
     Rust: "rust",
 } as const;

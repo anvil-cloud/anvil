@@ -390,7 +390,7 @@ class LambdaRuntime(_builtins.str, Enum):
     """
     RUST = "rust"
     """
-    Rust on provided.al2023, built with cargo lambda. Requires handler.
+    Rust on provided.al2023, built with cargo lambda. Requires entry.
     """
 
 

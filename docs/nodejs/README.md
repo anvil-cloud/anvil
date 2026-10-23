@@ -39,7 +39,7 @@ import * as anvil from '@anvil-cloud/sdk';
 export default new App({
   run(ctx) {
     const fn = new anvil.aws.Lambda('processor', {
-      runtime: 'nodejs24.x',
+      runtime: 'nodejs20.x',
       handler: 'src/index.handler',
       environment: {
         // forward reference — `db` is declared below
@@ -80,7 +80,7 @@ export default new App({
     });
 
     const fn = new anvil.aws.Lambda('processor', {
-      runtime: 'nodejs24.x',
+      runtime: 'nodejs20.x',
       handler: 'src/index.handler',
     });
 

@@ -38,7 +38,7 @@ class LambdaArgs:
         """
         The set of arguments for constructing a Lambda resource.
 
-        :param pulumi.Input['LambdaRuntime'] runtime: The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires handler (a Cargo package directory or a .rs file).
+        :param pulumi.Input['LambdaRuntime'] runtime: The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
         :param pulumi.Input['LambdaArchitecture'] architecture: CPU architecture. Default: arm64 (Graviton).
         :param pulumi.Input[_builtins.str] encryption: Upgrade environment variable encryption to SSE-KMS. Set to "kms" to enable. Incurs KMS API call cost. Required by HIPAA, PCI-DSS, FedRAMP. Supply kmsKeyArn via hatch["lambda"].
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment: Environment variables available to the function at runtime. Supports plain strings and Pulumi outputs.
@@ -81,7 +81,7 @@ class LambdaArgs:
     @pulumi.getter
     def runtime(self) -> pulumi.Input['LambdaRuntime']:
         """
-        The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires handler (a Cargo package directory or a .rs file).
+        The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
         """
         return pulumi.get(self, "runtime")
 
@@ -263,7 +263,7 @@ class Lambda(pulumi.ComponentResource):
         :param pulumi.Input['LambdaLogRetention'] log_retention: CloudWatch log group retention period. Default: "1y" (satisfies SOC 2, ISO 27001, PCI-DSS baseline).
         :param pulumi.Input[_builtins.int] memory: Memory in MB. Valid: 128 to 32768 in 1MB increments. Default: 1024.
         :param pulumi.Input[Sequence[pulumi.Input[Union['LambdaPermissionArgs', 'LambdaPermissionArgsDict']]]] permissions: Inline IAM permissions added to the execution role. Use for ad-hoc access not covered by the grant system.
-        :param pulumi.Input['LambdaRuntime'] runtime: The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires handler (a Cargo package directory or a .rs file).
+        :param pulumi.Input['LambdaRuntime'] runtime: The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
         :param pulumi.Input[_builtins.int] timeout: Timeout in seconds. Valid: 1 to 900. Default: 5.
         :param pulumi.Input[_builtins.bool] tracing: Enable AWS X-Ray tracing. Incurs per-trace cost (~$5/million traces). Default: false.
         :param pulumi.Input[_builtins.bool] url: Enable a direct HTTPS endpoint for the function. Auth mode is AWS_IAM - never public. Default: false.
