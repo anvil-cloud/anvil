@@ -123,7 +123,7 @@ export interface LambdaArgs {
      */
     permissions?: pulumi.Input<pulumi.Input<inputs.aws.LambdaPermissionArgs>[]>;
     /**
-     * The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry.
+     * The Lambda runtime. "rust" deploys a Rust function on the OS-only provided.al2023 runtime and requires handler (a Cargo package directory or a .rs file).
      */
     runtime: pulumi.Input<enums.aws.LambdaRuntime>;
     /**

@@ -35,7 +35,7 @@ its **logical name** — even one declared **later** in the program:
 ```python
 def infra(ctx: anvil.Context):
     fn = anvil.aws.Lambda("processor",
-        runtime=LambdaRuntime.NODEJS20_X,
+        runtime=LambdaRuntime.NODEJS24_X,
         handler="src/index.handler",
         environment={
             # forward reference — `db` is declared below
@@ -76,7 +76,7 @@ def infra(ctx: anvil.Context):
     )
 
     fn = anvil.aws.Lambda("processor",
-        runtime="nodejs20.x",
+        runtime="nodejs24.x",
         handler="src/index.handler",
     )
 

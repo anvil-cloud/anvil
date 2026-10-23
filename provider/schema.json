@@ -601,7 +601,7 @@
         },
         "runtime": {
           "$ref": "#/types/anvil:aws:LambdaRuntime",
-          "description": "The Lambda runtime. \"rust\" deploys a Rust function on the OS-only provided.al2023 runtime and requires entry."
+          "description": "The Lambda runtime. \"rust\" deploys a Rust function on the OS-only provided.al2023 runtime and requires handler (a Cargo package directory or a .rs file)."
         },
         "timeout": {
           "description": "Timeout in seconds. Valid: 1 to 900. Default: 5.",
@@ -3578,7 +3578,7 @@
           "value": "nodejs22.x"
         },
         {
-          "description": "Rust on provided.al2023, built with cargo lambda. Requires entry.",
+          "description": "Rust on provided.al2023, built with cargo lambda. Requires handler.",
           "value": "rust"
         }
       ],
@@ -4614,5 +4614,5 @@
       "type": "object"
     }
   },
-  "version": "0.1.20"
+  "version": "0.1.19"
 }
