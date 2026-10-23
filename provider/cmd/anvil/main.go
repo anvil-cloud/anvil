@@ -16,6 +16,7 @@ import (
 	awsdynamo "github.com/anvil-cloud/anvil/provider/aws/dynamo"
 	awseventBridge "github.com/anvil-cloud/anvil/provider/aws/eventBridge"
 	awshttpapi "github.com/anvil-cloud/anvil/provider/aws/httpapi"
+	awskinesis "github.com/anvil-cloud/anvil/provider/aws/kinesis"
 	awslambda "github.com/anvil-cloud/anvil/provider/aws/lambda"
 	awsoauthauthorizer "github.com/anvil-cloud/anvil/provider/aws/oauthauthorizer"
 	awsqueue "github.com/anvil-cloud/anvil/provider/aws/queue"
@@ -39,6 +40,7 @@ func main() {
 			infer.ComponentF(awsdynamo.NewDynamoDB),
 			infer.ComponentF(awseventBridge.NewEventBus),
 			infer.ComponentF(awshttpapi.NewHttpApi),
+			infer.ComponentF(awskinesis.NewKinesisStream),
 			infer.ComponentF(awslambda.NewLambda),
 			infer.ComponentF(awsoauthauthorizer.NewOAuthAuthorizer),
 			infer.ComponentF(awsqueue.NewQueue),
@@ -54,5 +56,5 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	p.Run(context.Background(), "anvil", "0.1.20")
+	p.Run(context.Background(), "anvil", "0.1.21")
 }

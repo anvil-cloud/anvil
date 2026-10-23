@@ -137,6 +137,12 @@ __all__ = [
     'HttpApiStepFunctionsConsumerArgsDict',
     'HttpApiThrottlingArgs',
     'HttpApiThrottlingArgsDict',
+    'KinesisHatchArgsArgs',
+    'KinesisHatchArgsArgsDict',
+    'KinesisOverridesArgs',
+    'KinesisOverridesArgsDict',
+    'KinesisProvisionedArgsArgs',
+    'KinesisProvisionedArgsArgsDict',
     'LambdaHatchArgsArgs',
     'LambdaHatchArgsArgsDict',
     'LambdaOverridesArgs',
@@ -6464,6 +6470,312 @@ class HttpApiThrottlingArgs:
     @rate_limit.setter
     def rate_limit(self, value: Optional[pulumi.Input[_builtins.int]]):
         pulumi.set(self, "rate_limit", value)
+
+
+class KinesisHatchArgsArgsDict(TypedDict):
+    kinesis: NotRequired[pulumi.Input['KinesisOverridesArgsDict']]
+
+@pulumi.input_type
+class KinesisHatchArgsArgs:
+    def __init__(__self__, *,
+                 kinesis: Optional[pulumi.Input['KinesisOverridesArgs']] = None):
+        if kinesis is not None:
+            pulumi.set(__self__, "kinesis", kinesis)
+
+    @_builtins.property
+    @pulumi.getter
+    def kinesis(self) -> Optional[pulumi.Input['KinesisOverridesArgs']]:
+        return pulumi.get(self, "kinesis")
+
+    @kinesis.setter
+    def kinesis(self, value: Optional[pulumi.Input['KinesisOverridesArgs']]):
+        pulumi.set(self, "kinesis", value)
+
+
+class KinesisOverridesArgsDict(TypedDict):
+    arn: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    The Amazon Resource Name (ARN) specifying the Stream (same as <span pulumi-lang-nodejs="`id`" pulumi-lang-dotnet="`Id`" pulumi-lang-go="`id`" pulumi-lang-python="`id`" pulumi-lang-yaml="`id`" pulumi-lang-java="`id`">`id`</span>)
+    """
+    encryption_type: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    The encryption type to use. The only acceptable values are `NONE` or `KMS`. The default value is `NONE`.
+    """
+    enforce_consumer_deletion: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    A boolean that indicates all registered consumers should be deregistered from the stream so that the stream can be destroyed without error. The default value is <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>.
+    """
+    kms_key_id: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    The GUID for the customer-managed KMS key to use for encryption. You can also use a Kinesis-owned master key by specifying the alias `alias/aws/kinesis`.
+    """
+    max_record_size_in_kib: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    The maximum size for a single data record in KiB. The minimum value is 1024. The maximum value is 10240.
+    """
+    name: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    A name to identify the stream. This is unique to the AWS account and region the Stream is created in.
+    """
+    region: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
+    """
+    retention_period: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Length of time data records are accessible after they are added to the stream. The maximum value of a stream's retention period is 8760 hours. Minimum value is 24. Default is 24.
+    """
+    shard_count: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    The number of shards that the stream will use. If the <span pulumi-lang-nodejs="`streamMode`" pulumi-lang-dotnet="`StreamMode`" pulumi-lang-go="`streamMode`" pulumi-lang-python="`stream_mode`" pulumi-lang-yaml="`streamMode`" pulumi-lang-java="`streamMode`">`stream_mode`</span> is `PROVISIONED`, this field is required.
+    Amazon has guidelines for specifying the Stream size that should be referenced when creating a Kinesis stream. See [Amazon Kinesis Streams](https://docs.aws.amazon.com/kinesis/latest/dev/amazon-kinesis-streams.html) for more.
+    """
+    shard_level_metrics: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
+    """
+    A list of shard-level CloudWatch metrics which can be enabled for the stream. See [Monitoring with CloudWatch](https://docs.aws.amazon.com/streams/latest/dev/monitoring-with-cloudwatch.html) for more. Note that the value ALL should not be used; instead you should provide an explicit list of metrics you wish to enable.
+    """
+    stream_mode_details: NotRequired[pulumi.Input['pulumi_aws.kinesis.StreamStreamModeDetailsArgsDict']]
+    """
+    Indicates the [capacity mode](https://docs.aws.amazon.com/streams/latest/dev/how-do-i-size-a-stream.html) of the data stream. Detailed below.
+    """
+    tags: NotRequired[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]
+    """
+    A map of tags to assign to the resource. If configured with a provider <span pulumi-lang-nodejs="`defaultTags`" pulumi-lang-dotnet="`DefaultTags`" pulumi-lang-go="`defaultTags`" pulumi-lang-python="`default_tags`" pulumi-lang-yaml="`defaultTags`" pulumi-lang-java="`defaultTags`">`default_tags`</span> configuration block present, tags with matching keys will overwrite those defined at the provider-level.
+    """
+
+@pulumi.input_type
+class KinesisOverridesArgs:
+    def __init__(__self__, *,
+                 arn: Optional[pulumi.Input[_builtins.str]] = None,
+                 encryption_type: Optional[pulumi.Input[_builtins.str]] = None,
+                 enforce_consumer_deletion: Optional[pulumi.Input[_builtins.bool]] = None,
+                 kms_key_id: Optional[pulumi.Input[_builtins.str]] = None,
+                 max_record_size_in_kib: Optional[pulumi.Input[_builtins.int]] = None,
+                 name: Optional[pulumi.Input[_builtins.str]] = None,
+                 region: Optional[pulumi.Input[_builtins.str]] = None,
+                 retention_period: Optional[pulumi.Input[_builtins.int]] = None,
+                 shard_count: Optional[pulumi.Input[_builtins.int]] = None,
+                 shard_level_metrics: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 stream_mode_details: Optional[pulumi.Input['pulumi_aws.kinesis.StreamStreamModeDetailsArgs']] = None,
+                 tags: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None):
+        """
+        :param pulumi.Input[_builtins.str] arn: The Amazon Resource Name (ARN) specifying the Stream (same as <span pulumi-lang-nodejs="`id`" pulumi-lang-dotnet="`Id`" pulumi-lang-go="`id`" pulumi-lang-python="`id`" pulumi-lang-yaml="`id`" pulumi-lang-java="`id`">`id`</span>)
+        :param pulumi.Input[_builtins.str] encryption_type: The encryption type to use. The only acceptable values are `NONE` or `KMS`. The default value is `NONE`.
+        :param pulumi.Input[_builtins.bool] enforce_consumer_deletion: A boolean that indicates all registered consumers should be deregistered from the stream so that the stream can be destroyed without error. The default value is <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>.
+        :param pulumi.Input[_builtins.str] kms_key_id: The GUID for the customer-managed KMS key to use for encryption. You can also use a Kinesis-owned master key by specifying the alias `alias/aws/kinesis`.
+        :param pulumi.Input[_builtins.int] max_record_size_in_kib: The maximum size for a single data record in KiB. The minimum value is 1024. The maximum value is 10240.
+        :param pulumi.Input[_builtins.str] name: A name to identify the stream. This is unique to the AWS account and region the Stream is created in.
+        :param pulumi.Input[_builtins.str] region: Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
+        :param pulumi.Input[_builtins.int] retention_period: Length of time data records are accessible after they are added to the stream. The maximum value of a stream's retention period is 8760 hours. Minimum value is 24. Default is 24.
+        :param pulumi.Input[_builtins.int] shard_count: The number of shards that the stream will use. If the <span pulumi-lang-nodejs="`streamMode`" pulumi-lang-dotnet="`StreamMode`" pulumi-lang-go="`streamMode`" pulumi-lang-python="`stream_mode`" pulumi-lang-yaml="`streamMode`" pulumi-lang-java="`streamMode`">`stream_mode`</span> is `PROVISIONED`, this field is required.
+               Amazon has guidelines for specifying the Stream size that should be referenced when creating a Kinesis stream. See [Amazon Kinesis Streams](https://docs.aws.amazon.com/kinesis/latest/dev/amazon-kinesis-streams.html) for more.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] shard_level_metrics: A list of shard-level CloudWatch metrics which can be enabled for the stream. See [Monitoring with CloudWatch](https://docs.aws.amazon.com/streams/latest/dev/monitoring-with-cloudwatch.html) for more. Note that the value ALL should not be used; instead you should provide an explicit list of metrics you wish to enable.
+        :param pulumi.Input['pulumi_aws.kinesis.StreamStreamModeDetailsArgs'] stream_mode_details: Indicates the [capacity mode](https://docs.aws.amazon.com/streams/latest/dev/how-do-i-size-a-stream.html) of the data stream. Detailed below.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] tags: A map of tags to assign to the resource. If configured with a provider <span pulumi-lang-nodejs="`defaultTags`" pulumi-lang-dotnet="`DefaultTags`" pulumi-lang-go="`defaultTags`" pulumi-lang-python="`default_tags`" pulumi-lang-yaml="`defaultTags`" pulumi-lang-java="`defaultTags`">`default_tags`</span> configuration block present, tags with matching keys will overwrite those defined at the provider-level.
+        """
+        if arn is not None:
+            pulumi.set(__self__, "arn", arn)
+        if encryption_type is not None:
+            pulumi.set(__self__, "encryption_type", encryption_type)
+        if enforce_consumer_deletion is not None:
+            pulumi.set(__self__, "enforce_consumer_deletion", enforce_consumer_deletion)
+        if kms_key_id is not None:
+            pulumi.set(__self__, "kms_key_id", kms_key_id)
+        if max_record_size_in_kib is not None:
+            pulumi.set(__self__, "max_record_size_in_kib", max_record_size_in_kib)
+        if name is not None:
+            pulumi.set(__self__, "name", name)
+        if region is not None:
+            pulumi.set(__self__, "region", region)
+        if retention_period is not None:
+            pulumi.set(__self__, "retention_period", retention_period)
+        if shard_count is not None:
+            pulumi.set(__self__, "shard_count", shard_count)
+        if shard_level_metrics is not None:
+            pulumi.set(__self__, "shard_level_metrics", shard_level_metrics)
+        if stream_mode_details is not None:
+            pulumi.set(__self__, "stream_mode_details", stream_mode_details)
+        if tags is not None:
+            pulumi.set(__self__, "tags", tags)
+
+    @_builtins.property
+    @pulumi.getter
+    def arn(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        The Amazon Resource Name (ARN) specifying the Stream (same as <span pulumi-lang-nodejs="`id`" pulumi-lang-dotnet="`Id`" pulumi-lang-go="`id`" pulumi-lang-python="`id`" pulumi-lang-yaml="`id`" pulumi-lang-java="`id`">`id`</span>)
+        """
+        return pulumi.get(self, "arn")
+
+    @arn.setter
+    def arn(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "arn", value)
+
+    @_builtins.property
+    @pulumi.getter(name="encryptionType")
+    def encryption_type(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        The encryption type to use. The only acceptable values are `NONE` or `KMS`. The default value is `NONE`.
+        """
+        return pulumi.get(self, "encryption_type")
+
+    @encryption_type.setter
+    def encryption_type(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "encryption_type", value)
+
+    @_builtins.property
+    @pulumi.getter(name="enforceConsumerDeletion")
+    def enforce_consumer_deletion(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        A boolean that indicates all registered consumers should be deregistered from the stream so that the stream can be destroyed without error. The default value is <span pulumi-lang-nodejs="`false`" pulumi-lang-dotnet="`False`" pulumi-lang-go="`false`" pulumi-lang-python="`false`" pulumi-lang-yaml="`false`" pulumi-lang-java="`false`">`false`</span>.
+        """
+        return pulumi.get(self, "enforce_consumer_deletion")
+
+    @enforce_consumer_deletion.setter
+    def enforce_consumer_deletion(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "enforce_consumer_deletion", value)
+
+    @_builtins.property
+    @pulumi.getter(name="kmsKeyId")
+    def kms_key_id(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        The GUID for the customer-managed KMS key to use for encryption. You can also use a Kinesis-owned master key by specifying the alias `alias/aws/kinesis`.
+        """
+        return pulumi.get(self, "kms_key_id")
+
+    @kms_key_id.setter
+    def kms_key_id(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "kms_key_id", value)
+
+    @_builtins.property
+    @pulumi.getter(name="maxRecordSizeInKib")
+    def max_record_size_in_kib(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        The maximum size for a single data record in KiB. The minimum value is 1024. The maximum value is 10240.
+        """
+        return pulumi.get(self, "max_record_size_in_kib")
+
+    @max_record_size_in_kib.setter
+    def max_record_size_in_kib(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "max_record_size_in_kib", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def name(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        A name to identify the stream. This is unique to the AWS account and region the Stream is created in.
+        """
+        return pulumi.get(self, "name")
+
+    @name.setter
+    def name(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "name", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def region(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.
+        """
+        return pulumi.get(self, "region")
+
+    @region.setter
+    def region(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "region", value)
+
+    @_builtins.property
+    @pulumi.getter(name="retentionPeriod")
+    def retention_period(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Length of time data records are accessible after they are added to the stream. The maximum value of a stream's retention period is 8760 hours. Minimum value is 24. Default is 24.
+        """
+        return pulumi.get(self, "retention_period")
+
+    @retention_period.setter
+    def retention_period(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "retention_period", value)
+
+    @_builtins.property
+    @pulumi.getter(name="shardCount")
+    def shard_count(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        The number of shards that the stream will use. If the <span pulumi-lang-nodejs="`streamMode`" pulumi-lang-dotnet="`StreamMode`" pulumi-lang-go="`streamMode`" pulumi-lang-python="`stream_mode`" pulumi-lang-yaml="`streamMode`" pulumi-lang-java="`streamMode`">`stream_mode`</span> is `PROVISIONED`, this field is required.
+        Amazon has guidelines for specifying the Stream size that should be referenced when creating a Kinesis stream. See [Amazon Kinesis Streams](https://docs.aws.amazon.com/kinesis/latest/dev/amazon-kinesis-streams.html) for more.
+        """
+        return pulumi.get(self, "shard_count")
+
+    @shard_count.setter
+    def shard_count(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "shard_count", value)
+
+    @_builtins.property
+    @pulumi.getter(name="shardLevelMetrics")
+    def shard_level_metrics(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        A list of shard-level CloudWatch metrics which can be enabled for the stream. See [Monitoring with CloudWatch](https://docs.aws.amazon.com/streams/latest/dev/monitoring-with-cloudwatch.html) for more. Note that the value ALL should not be used; instead you should provide an explicit list of metrics you wish to enable.
+        """
+        return pulumi.get(self, "shard_level_metrics")
+
+    @shard_level_metrics.setter
+    def shard_level_metrics(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "shard_level_metrics", value)
+
+    @_builtins.property
+    @pulumi.getter(name="streamModeDetails")
+    def stream_mode_details(self) -> Optional[pulumi.Input['pulumi_aws.kinesis.StreamStreamModeDetailsArgs']]:
+        """
+        Indicates the [capacity mode](https://docs.aws.amazon.com/streams/latest/dev/how-do-i-size-a-stream.html) of the data stream. Detailed below.
+        """
+        return pulumi.get(self, "stream_mode_details")
+
+    @stream_mode_details.setter
+    def stream_mode_details(self, value: Optional[pulumi.Input['pulumi_aws.kinesis.StreamStreamModeDetailsArgs']]):
+        pulumi.set(self, "stream_mode_details", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tags(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+        """
+        A map of tags to assign to the resource. If configured with a provider <span pulumi-lang-nodejs="`defaultTags`" pulumi-lang-dotnet="`DefaultTags`" pulumi-lang-go="`defaultTags`" pulumi-lang-python="`default_tags`" pulumi-lang-yaml="`defaultTags`" pulumi-lang-java="`defaultTags`">`default_tags`</span> configuration block present, tags with matching keys will overwrite those defined at the provider-level.
+        """
+        return pulumi.get(self, "tags")
+
+    @tags.setter
+    def tags(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "tags", value)
+
+
+class KinesisProvisionedArgsArgsDict(TypedDict):
+    """
+    Provisioned capacity configuration.
+    """
+    shard_count: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.
+    """
+
+@pulumi.input_type
+class KinesisProvisionedArgsArgs:
+    def __init__(__self__, *,
+                 shard_count: Optional[pulumi.Input[_builtins.int]] = None):
+        """
+        Provisioned capacity configuration.
+
+        :param pulumi.Input[_builtins.int] shard_count: Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.
+        """
+        if shard_count is not None:
+            pulumi.set(__self__, "shard_count", shard_count)
+
+    @_builtins.property
+    @pulumi.getter(name="shardCount")
+    def shard_count(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.
+        """
+        return pulumi.get(self, "shard_count")
+
+    @shard_count.setter
+    def shard_count(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "shard_count", value)
 
 
 class LambdaHatchArgsArgsDict(TypedDict):

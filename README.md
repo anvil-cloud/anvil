@@ -238,7 +238,7 @@ Every component behaves identically across all three SDKs.
 | Storage    | Bucket                                                 |
 | Database   | DynamoDB, DSQL, DSQLConnect                            |
 | Networking | Vpc, VpcEndpoint                                       |
-| Messaging  | Queue, EventBus                                        |
+| Messaging  | Queue, EventBus, KinesisStream                         |
 | API & Auth | HttpApi, CognitoUserPool, CognitoAuth, OAuthAuthorizer |
 | Hosting    | SvelteKitSite                                          |
 | Security   | Waf, ComplianceScanner                                 |

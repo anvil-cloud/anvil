@@ -1,0 +1,123 @@
+{
+  "resources": {
+    "anvil:aws:KinesisStream": {
+      "description": "An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key (alias/aws/kinesis) is always on. Wire consumers yourself; use grantRead/grantWrite to give compute access.",
+      "inputProperties": {
+        "hatch": {
+          "$ref": "#/types/anvil:aws:KinesisHatchArgs"
+        },
+        "maxRecordSizeKib": {
+          "description": "Largest record the stream accepts, in KiB, 1024–10240. Default: 2048, so the stream can take Aurora DSQL CDC events (rows up to 2 MiB) without extra config.",
+          "type": "integer"
+        },
+        "provisioned": {
+          "$ref": "#/types/anvil:aws:KinesisProvisionedArgs",
+          "description": "Switches the stream from on-demand to provisioned capacity with a fixed shard count. When omitted, the stream is on-demand and scales shards automatically with traffic — the right choice unless throughput is steady and predictable."
+        },
+        "retentionHours": {
+          "description": "How long records stay readable, in hours, 24–8760 (365 days). Default: 24. Retention beyond 24 hours is billed separately.",
+          "type": "integer"
+        }
+      },
+      "isComponent": true,
+      "properties": {
+        "arn": {
+          "description": "The ARN of the Kinesis stream.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The physical name of the Kinesis stream.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "arn",
+        "name"
+      ],
+      "requiredInputs": []
+    }
+  },
+  "types": {
+    "anvil:aws:KinesisHatchArgs": {
+      "properties": {
+        "kinesis": {
+          "$ref": "#/types/anvil:aws:KinesisOverrides"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:KinesisOverrides": {
+      "properties": {
+        "arn": {
+          "description": "The Amazon Resource Name (ARN) specifying the Stream (same as \u003cspan pulumi-lang-nodejs=\"`id`\" pulumi-lang-dotnet=\"`Id`\" pulumi-lang-go=\"`id`\" pulumi-lang-python=\"`id`\" pulumi-lang-yaml=\"`id`\" pulumi-lang-java=\"`id`\"\u003e`id`\u003c/span\u003e)\n",
+          "type": "string"
+        },
+        "encryptionType": {
+          "description": "The encryption type to use. The only acceptable values are `NONE` or `KMS`. The default value is `NONE`.\n",
+          "type": "string"
+        },
+        "enforceConsumerDeletion": {
+          "description": "A boolean that indicates all registered consumers should be deregistered from the stream so that the stream can be destroyed without error. The default value is \u003cspan pulumi-lang-nodejs=\"`false`\" pulumi-lang-dotnet=\"`False`\" pulumi-lang-go=\"`false`\" pulumi-lang-python=\"`false`\" pulumi-lang-yaml=\"`false`\" pulumi-lang-java=\"`false`\"\u003e`false`\u003c/span\u003e.\n",
+          "type": "boolean"
+        },
+        "kmsKeyId": {
+          "description": "The GUID for the customer-managed KMS key to use for encryption. You can also use a Kinesis-owned master key by specifying the alias `alias/aws/kinesis`.\n",
+          "type": "string"
+        },
+        "maxRecordSizeInKib": {
+          "description": "The maximum size for a single data record in KiB. The minimum value is 1024. The maximum value is 10240.\n",
+          "type": "integer"
+        },
+        "name": {
+          "description": "A name to identify the stream. This is unique to the AWS account and region the Stream is created in.\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "region": {
+          "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.\n",
+          "type": "string"
+        },
+        "retentionPeriod": {
+          "description": "Length of time data records are accessible after they are added to the stream. The maximum value of a stream's retention period is 8760 hours. Minimum value is 24. Default is 24.\n",
+          "type": "integer"
+        },
+        "shardCount": {
+          "description": "The number of shards that the stream will use. If the \u003cspan pulumi-lang-nodejs=\"`streamMode`\" pulumi-lang-dotnet=\"`StreamMode`\" pulumi-lang-go=\"`streamMode`\" pulumi-lang-python=\"`stream_mode`\" pulumi-lang-yaml=\"`streamMode`\" pulumi-lang-java=\"`streamMode`\"\u003e`stream_mode`\u003c/span\u003e is `PROVISIONED`, this field is required.\nAmazon has guidelines for specifying the Stream size that should be referenced when creating a Kinesis stream. See [Amazon Kinesis Streams](https://docs.aws.amazon.com/kinesis/latest/dev/amazon-kinesis-streams.html) for more.\n",
+          "type": "integer"
+        },
+        "shardLevelMetrics": {
+          "description": "A list of shard-level CloudWatch metrics which can be enabled for the stream. See [Monitoring with CloudWatch](https://docs.aws.amazon.com/streams/latest/dev/monitoring-with-cloudwatch.html) for more. Note that the value ALL should not be used; instead you should provide an explicit list of metrics you wish to enable.\n",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "streamModeDetails": {
+          "$ref": "/aws/v7.23.0/schema.json#/types/aws:kinesis/StreamStreamModeDetails:StreamStreamModeDetails",
+          "description": "Indicates the [capacity mode](https://docs.aws.amazon.com/streams/latest/dev/how-do-i-size-a-stream.html) of the data stream. Detailed below.\n"
+        },
+        "tags": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "A map of tags to assign to the resource. If configured with a provider \u003cspan pulumi-lang-nodejs=\"`defaultTags`\" pulumi-lang-dotnet=\"`DefaultTags`\" pulumi-lang-go=\"`defaultTags`\" pulumi-lang-python=\"`default_tags`\" pulumi-lang-yaml=\"`defaultTags`\" pulumi-lang-java=\"`defaultTags`\"\u003e`default_tags`\u003c/span\u003e configuration block present, tags with matching keys will overwrite those defined at the provider-level.\n",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:KinesisProvisionedArgs": {
+      "description": "Provisioned capacity configuration.",
+      "properties": {
+        "shardCount": {
+          "description": "Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "x-upstream-provider": "aws",
+  "x-upstream-token": "aws:kinesis/stream:Stream",
+  "x-upstream-version": "v7.23.0"
+}

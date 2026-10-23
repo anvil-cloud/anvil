@@ -39,6 +39,7 @@ _utilities.register(
    "anvil:aws:DynamoDB": "DynamoDB",
    "anvil:aws:EventBus": "EventBus",
    "anvil:aws:HttpApi": "HttpApi",
+   "anvil:aws:KinesisStream": "KinesisStream",
    "anvil:aws:Lambda": "Lambda",
    "anvil:aws:OAuthAuthorizer": "OAuthAuthorizer",
    "anvil:aws:Queue": "Queue",
@@ -80,4 +81,5 @@ from .aws import lambda_grants  # noqa: F401
 from .aws import queue_grants  # noqa: F401
 from .aws import event_bus_grants  # noqa: F401
 from .aws import dynamo_db_grants  # noqa: F401
+from .aws import kinesis_stream_grants  # noqa: F401
 from .aws import dsql_grants  # noqa: F401

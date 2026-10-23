@@ -18,6 +18,7 @@ var NameLimits = map[string]int{
 	"policy":          128, // IAM Policy
 	"queue":           80,  // SQS (FIFO .fifo suffix eats 5 chars)
 	"topic":           256, // SNS
+	"stream":          128, // Kinesis Data Stream
 	"table":           255, // DynamoDB
 	"site":            63,  // S3-backed site bucket
 	"vpc":             256,
