@@ -106,7 +106,7 @@ Every component accepts a `Hatch` field — an escape hatch to override the unde
 ```go
 bucket, err := anvilaws.NewBucket(ctx.PulumiCtx(), "custom", &anvilaws.BucketArgs{
     DataClassification: pulumi.String("non-sensitive"),
-    Hatch: &anvilaws.BucketHatchArgs{
+    Hatch: &anvilaws.BucketHatchArgsArgs{
         Bucket: &anvilaws.BucketOverridesArgs{
             ForceDestroy: pulumi.Bool(true),
             Tags:         pulumi.StringMap{"env": pulumi.String("dev")},
