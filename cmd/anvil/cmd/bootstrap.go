@@ -36,7 +36,7 @@ var bootstrapCmd = &cobra.Command{
 
 func init() {
 	bootstrapCmd.Flags().StringVar(&bootstrapRegion, "region", "", "AWS region for the state bucket (defaults to AWS CLI default)")
-	bootstrapCmd.Flags().StringVar(&bootstrapStage, "stage", "dev", "Stage name (used in bucket naming)")
+	bootstrapCmd.Flags().StringVar(&bootstrapStage, "stage", "", "Stage name, used in bucket naming (defaults to the active stage)")
 	bootstrapCmd.Flags().StringVar(&bootstrapEnvironment, "environment", "", "Environment type: prod or nonprod (default nonprod)")
 	bootstrapCmd.Flags().BoolVar(&bootstrapS3DataEvents, "s3-data-events", false, "Record S3 object-level reads/writes in CloudTrail for every bucket in the account (billed per event)")
 	rootCmd.AddCommand(bootstrapCmd)
@@ -93,6 +93,10 @@ func sanitizeBucketPart(s string) string {
 
 func runBootstrap(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
+
+	// An explicit --stage (or a stage set by ensureBootstrapped) wins;
+	// otherwise resolve it the same way every other command does.
+	bootstrapStage = resolveStage(bootstrapStage)
 
 	printBanner()
 	fmt.Printf("  Bootstrapping \"%s\"...\n\n", bootstrapStage)
