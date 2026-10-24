@@ -11,6 +11,8 @@ App, and run().
 
 from __future__ import annotations
 
+import json
+import os
 from typing import Dict, Optional
 
 import pulumi
@@ -22,6 +24,7 @@ from .types import (
     ComplianceCron,
     DefaultsConfig,
     GcpProviderConfig,
+    StateConfig,
 )
 from .stack import Stack, set_active_stack
 
@@ -160,6 +163,27 @@ def _register_default_provider_injection(
     pulumi.runtime.register_stack_transformation(_transform)
 
 
+def _write_state_settings(state: Optional[StateConfig]) -> None:
+    """During the CLI's discovery run, write defaults.state where the CLI reads
+    it before Pulumi runs (ANVIL_APP_SETTINGS_PATH). Values are validated by
+    StateConfig. Must match cmd/anvil/cmd/state_settings.go."""
+    path = os.environ.get("ANVIL_APP_SETTINGS_PATH")
+    if os.environ.get("ANVIL_BUILD_MODE") != "true" or not path:
+        return
+    state = state or StateConfig()
+    with open(path, "w") as f:
+        json.dump(
+            {
+                "state": {
+                    "retainVersions": state.retain_versions,
+                    "compressState": state.compress_state,
+                }
+            },
+            f,
+            indent=2,
+        )
+
+
 # ── run / App ──────────────────────────────────────────────
 
 
@@ -180,6 +204,7 @@ def _run_program(app_config: AppConfig) -> None:
     project = pulumi.get_project()
 
     defaults = app_config.defaults
+    _write_state_settings(defaults.state if defaults else None)
     merged_tags = _build_merged_tags(stage, project, defaults)
 
     # ── Create providers ───────────────────────────────

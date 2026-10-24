@@ -37,7 +37,7 @@ var bootstrapCmd = &cobra.Command{
 func init() {
 	bootstrapCmd.Flags().StringVar(&bootstrapRegion, "region", "", "AWS region for the state bucket (defaults to AWS CLI default)")
 	bootstrapCmd.Flags().StringVar(&bootstrapStage, "stage", "dev", "Stage name (used in bucket naming)")
-	bootstrapCmd.Flags().StringVar(&bootstrapEnvironment, "environment", "", "Environment type: prod or nonprod")
+	bootstrapCmd.Flags().StringVar(&bootstrapEnvironment, "environment", "", "Environment type: prod or nonprod (default nonprod)")
 	bootstrapCmd.Flags().BoolVar(&bootstrapS3DataEvents, "s3-data-events", false, "Record S3 object-level reads/writes in CloudTrail for every bucket in the account (billed per event)")
 	rootCmd.AddCommand(bootstrapCmd)
 }
@@ -97,13 +97,9 @@ func runBootstrap(cmd *cobra.Command, args []string) error {
 	printBanner()
 	fmt.Printf("  Bootstrapping \"%s\"...\n\n", bootstrapStage)
 
-	// ── Resolve environment (flag → prompt) ──
+	// ── Resolve environment (flag → default) ──
 	if bootstrapEnvironment == "" {
-		env, err := promptEnvironment()
-		if err != nil {
-			return err
-		}
-		bootstrapEnvironment = env
+		bootstrapEnvironment = defaultEnvironment
 	}
 
 	if bootstrapEnvironment != "prod" && bootstrapEnvironment != "nonprod" {
@@ -196,6 +192,20 @@ func runBootstrap(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to enable versioning: %w", err)
 	}
 	printCheck("Versioning enabled")
+
+	// ── State retention ──
+	// `anvil deploy` reconciles this from the App's defaults.state each time;
+	// here it uses what the last discovery saw, or the defaults.
+	settings := defaultStateSettings()
+	if root, err := findProjectRoot(); err == nil {
+		if settings, err = readStateSettings(root); err != nil {
+			return err
+		}
+	}
+	if err := putStateLifecycle(ctx, s3Client, bucketName, settings); err != nil {
+		return fmt.Errorf("failed to set state retention: %w", err)
+	}
+	printCheck(fmt.Sprintf("State retention set (%d deploys)", settings.RetainVersions))
 
 	// ── Enable encryption ──
 	_, err = s3Client.PutBucketEncryption(ctx, &s3.PutBucketEncryptionInput{

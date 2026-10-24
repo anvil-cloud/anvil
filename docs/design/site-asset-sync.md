@@ -2,7 +2,8 @@
 
 **Status:** Proposal, not built. The two quick fixes it builds on are shipped:
 precompressed `.br`/`.gz` copies are no longer uploaded, and the CLI writes DIY
-state gzipped (`PULUMI_DIY_BACKEND_GZIP`).
+state gzipped (`PULUMI_DIY_BACKEND_GZIP`). Version retention and compression are configurable per
+app; see [state-retention.md](state-retention.md).
 
 ## Why
 

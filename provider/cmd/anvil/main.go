@@ -56,5 +56,5 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	p.Run(context.Background(), "anvil", "0.1.21")
+	p.Run(context.Background(), "anvil", "0.1.22")
 }

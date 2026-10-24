@@ -78,6 +78,16 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 	printBanner()
 	fmt.Printf("  Deploying to %s...\n\n", stage)
 
+	// ── Step 2b: State bucket retention ────────────────
+	// Housekeeping: a failure here mustn't block the deploy.
+	stateCfg, err := readStateSettings(projectRoot)
+	if err != nil {
+		return err
+	}
+	if err := reconcileStateLifecycle(ctx, stage, stateCfg); err != nil {
+		printWarn(fmt.Sprintf("Could not update state bucket retention: %v", err))
+	}
+
 	// ── Step 3: Build functions ────────────────────────
 	// Bundle each discovered function and collect the zip paths.
 	// Skips rebuild if source hash matches cached hash (unless --force-cache).
@@ -142,6 +152,12 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 	_, upErr := s.Up(ctx, upOpts...)
 
 	handler.PrintSummary(stage)
+
+	// ── Step 5a: Trim old deploy checkpoints ───────────
+	// Pulumi records failed updates in history too, so trim either way.
+	if err := pruneHistoryCheckpoints(ctx, stage, stateCfg); err != nil {
+		printWarn(fmt.Sprintf("Could not remove old state checkpoints: %v", err))
+	}
 
 	if handler.HasErrors() {
 		return fmt.Errorf("deploy failed")
