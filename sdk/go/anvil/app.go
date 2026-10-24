@@ -1,7 +1,9 @@
 package anvil
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"sort"
 
 	anvilaws "github.com/anvil-cloud/anvil/sdk/go/anvil/aws"
@@ -76,6 +78,59 @@ type DefaultsConfig struct {
 	// Tags merged into every taggable resource via defaultTags (AWS) / defaultLabels (GCP).
 	// "stage" and "project" are auto-injected. User tags override auto-injected ones.
 	Tags map[string]string
+
+	// State configures the stage's Pulumi state bucket. Optional.
+	State *StateConfig
+}
+
+// StateConfig holds settings for the stage's Pulumi state bucket.
+type StateConfig struct {
+	// RetainVersions is how many deploys' state the bucket keeps, counting the
+	// latest: 2 keeps the latest deploy's state and the one before, 3 also keeps
+	// the deploy before that. Older deploys' state is deleted after each deploy.
+	// 0 means the default, 3. Min 2, max 101.
+	RetainVersions int
+	// CompressState writes state gzipped. nil means the default, true.
+	// Switching either way reads existing state.
+	CompressState *bool
+}
+
+// resolveStateSettings applies defaults to defaults.State and validates it.
+func resolveStateSettings(d *DefaultsConfig) (retainVersions int, compressState bool, err error) {
+	retainVersions, compressState = 3, true
+	if d != nil && d.State != nil {
+		if d.State.RetainVersions != 0 {
+			retainVersions = d.State.RetainVersions
+		}
+		if d.State.CompressState != nil {
+			compressState = *d.State.CompressState
+		}
+	}
+	if retainVersions < 2 || retainVersions > 101 {
+		return 0, false, fmt.Errorf("Defaults.State.RetainVersions must be from 2 to 101 (got %d); 1 would keep no previous state to recover from", retainVersions)
+	}
+	return retainVersions, compressState, nil
+}
+
+// writeStateSettings validates defaults.State and, during the CLI's discovery
+// run, writes it where the CLI reads it before Pulumi runs
+// (ANVIL_APP_SETTINGS_PATH). Must match cmd/anvil/cmd/state_settings.go.
+func writeStateSettings(d *DefaultsConfig) error {
+	retainVersions, compressState, err := resolveStateSettings(d)
+	if err != nil {
+		return err
+	}
+	path := os.Getenv("ANVIL_APP_SETTINGS_PATH")
+	if os.Getenv("ANVIL_BUILD_MODE") != "true" || path == "" {
+		return nil
+	}
+	data, err := json.MarshalIndent(map[string]any{
+		"state": map[string]any{"retainVersions": retainVersions, "compressState": compressState},
+	}, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, data, 0644)
 }
 
 // ComplianceConfig enables scheduled compliance scans (Prowler) of this app's
@@ -152,6 +207,10 @@ type AppConfig struct {
 //	}
 func Run(appConfig AppConfig) {
 	pulumi.Run(func(ctx *pulumi.Context) error {
+		if err := writeStateSettings(appConfig.Defaults); err != nil {
+			return err
+		}
+
 		// ── Read config from Pulumi ────────────────────────
 		cfg := config.New(ctx, "anvil")
 		stage := cfg.Require("stage")

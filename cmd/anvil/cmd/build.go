@@ -86,17 +86,18 @@ func discoverFunctions(ctx context.Context, stage string) ([]FunctionSpec, error
 	backendURL := resolveBackendForStage(stage)
 	region := resolveRegionForStage(stage)
 
-	execPath, _ := os.Executable()
-	pluginDir := filepath.Dir(execPath)
+	// The App rewrites its settings during discovery; a stale file would outlive
+	// a setting removed from the program. Discovery is a preview, which saves no
+	// state, so the default compression is fine here.
+	settingsPath := appSettingsPath(projectRoot)
+	if err := os.Remove(settingsPath); err != nil && !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to clean app settings: %w", err)
+	}
+	env := pulumiEnv(backendURL, defaultStateSettings())
+	env["ANVIL_BUILD_MODE"] = "true"
+	env["ANVIL_APP_SETTINGS_PATH"] = settingsPath
 
-	discoveryStack, err := auto.UpsertStackLocalSource(ctx, stage, workDir,
-		auto.EnvVars(map[string]string{
-			"PULUMI_BACKEND_URL":       backendURL,
-			"PULUMI_CONFIG_PASSPHRASE": "",
-			"PATH":                     pluginDir + ":" + os.Getenv("PATH"),
-			"ANVIL_BUILD_MODE":         "true",
-		}),
-	)
+	discoveryStack, err := auto.UpsertStackLocalSource(ctx, stage, workDir, auto.EnvVars(env))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create discovery stack: %w", err)
 	}

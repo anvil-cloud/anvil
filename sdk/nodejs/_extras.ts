@@ -14,6 +14,7 @@ export {
   AwsProviderConfig,
   GcpProviderConfig,
   DefaultsConfig,
+  StateConfig,
   ComplianceConfig,
   ComplianceFramework,
   ComplianceSchedule,

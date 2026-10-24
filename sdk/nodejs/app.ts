@@ -1,6 +1,7 @@
 import * as pulumi from '@pulumi/pulumi';
 import * as aws from '@pulumi/aws';
 import * as gcp from '@pulumi/gcp';
+import * as fs from 'fs';
 import { Stack, setActiveStack, RefHandle } from './stack';
 import { ComplianceScanner } from './aws/complianceScanner';
 
@@ -72,6 +73,22 @@ export interface DefaultsConfig {
    * Per-resource tags override default tags.
    */
   tags?: Record<string, string>;
+
+  /** The stage's Pulumi state bucket. */
+  state?: StateConfig;
+}
+
+/** Settings for the stage's Pulumi state bucket. */
+export interface StateConfig {
+  /**
+   * How many deploys' state the bucket keeps, counting the latest: 2 keeps
+   * the latest deploy's state and the one before, 3 also keeps the deploy
+   * before that. Older deploys' state is deleted after each deploy. Default 3,
+   * min 2, max 101.
+   */
+  retainVersions?: number;
+  /** Write state gzipped. Default true. Switching either way reads existing state. */
+  compressState?: boolean;
 }
 
 /**
@@ -192,6 +209,29 @@ function getCloud(key: string): string {
   return dot === -1 ? key : key.substring(0, dot);
 }
 
+/**
+ * Validates defaults.state and, during the CLI's discovery run, writes it where
+ * the CLI reads it before Pulumi runs (ANVIL_APP_SETTINGS_PATH). Must match
+ * cmd/anvil/cmd/state_settings.go.
+ */
+function writeStateSettings(state: StateConfig | undefined): void {
+  const retainVersions = state?.retainVersions ?? 3;
+  const compressState = state?.compressState ?? true;
+  if (!Number.isInteger(retainVersions) || retainVersions < 2 || retainVersions > 101) {
+    throw new Error(
+      `defaults.state.retainVersions must be a whole number from 2 to 101 (got ${retainVersions}). ` +
+        '1 would keep no previous state to recover from.'
+    );
+  }
+  if (typeof compressState !== 'boolean') {
+    throw new Error('defaults.state.compressState must be true or false.');
+  }
+  const path = process.env.ANVIL_APP_SETTINGS_PATH;
+  if (process.env.ANVIL_BUILD_MODE === 'true' && path) {
+    fs.writeFileSync(path, JSON.stringify({ state: { retainVersions, compressState } }, null, 2));
+  }
+}
+
 // ── App ────────────────────────────────────────────────────
 
 /**
@@ -228,6 +268,8 @@ export class App {
   [key: string]: any;
 
   constructor(config: AppConfig) {
+    writeStateSettings(config.defaults?.state);
+
     // ── Read config from Pulumi ────────────────────────
     const anvilConfig = new pulumi.Config('anvil');
     const stage = anvilConfig.require('stage');

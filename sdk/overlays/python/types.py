@@ -56,14 +56,52 @@ import pulumi
 # Typed configuration for App, providing intellisense and validation.
 
 
+class StateConfig:
+    """Settings for the stage's Pulumi state bucket.
+
+    ``retain_versions`` is how many deploys' state the bucket keeps, counting the
+    latest: 2 keeps the latest deploy's state and the one before, 3 also keeps
+    the deploy before that. Older deploys' state is deleted after each deploy.
+    Default 3, min 2, max 101.
+
+    ``compress_state`` writes state gzipped. Default True. Switching either way
+    reads existing state.
+    """
+
+    def __init__(
+        self,
+        retain_versions: int = 3,
+        compress_state: bool = True,
+    ):
+        # bool is an int subclass; reject it so True isn't read as 1.
+        if (
+            not isinstance(retain_versions, int)
+            or isinstance(retain_versions, bool)
+            or not 2 <= retain_versions <= 101
+        ):
+            raise ValueError(
+                "defaults.state.retain_versions must be a whole number "
+                f"from 2 to 101 (got {retain_versions!r}). 1 would keep no "
+                "previous state to recover from."
+            )
+        if not isinstance(compress_state, bool):
+            raise ValueError(
+                "defaults.state.compress_state must be True or False."
+            )
+        self.retain_versions = retain_versions
+        self.compress_state = compress_state
+
+
 class DefaultsConfig:
     """Default configuration applied to all resources."""
 
     def __init__(
         self,
         tags: Optional[Dict[str, str]] = None,
+        state: Optional[StateConfig] = None,
     ):
         self.tags = tags or {}
+        self.state = state or StateConfig()
 
 
 class AssumeRoleConfig:

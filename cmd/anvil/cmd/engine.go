@@ -140,12 +140,7 @@ func ensureBootstrapped(_ context.Context, stage string) error {
 
 	bootstrapStage = stage
 	bootstrapRegion = ""
-
-	env, err := promptEnvironment()
-	if err != nil {
-		return fmt.Errorf("auto-bootstrap failed: %w", err)
-	}
-	bootstrapEnvironment = env
+	bootstrapEnvironment = defaultEnvironment
 
 	err = runBootstrap(nil, nil)
 	if err != nil {
@@ -181,16 +176,12 @@ func loadStack(ctx context.Context, stage string) (auto.Stack, error) {
 	backendURL := resolveBackendForStage(stage)
 	region := resolveRegionForStage(stage)
 
-	execPath, _ := os.Executable()
-	pluginDir := filepath.Dir(execPath)
+	settings, err := readStateSettings(projectRoot)
+	if err != nil {
+		return auto.Stack{}, err
+	}
 
-	s, err := auto.UpsertStackLocalSource(ctx, stage, workDir,
-		auto.EnvVars(map[string]string{
-			"PULUMI_BACKEND_URL":       backendURL,
-			"PULUMI_CONFIG_PASSPHRASE": "",
-			"PATH":                     pluginDir + ":" + os.Getenv("PATH"),
-		}),
-	)
+	s, err := auto.UpsertStackLocalSource(ctx, stage, workDir, auto.EnvVars(pulumiEnv(backendURL, settings)))
 	if err != nil {
 		return auto.Stack{}, fmt.Errorf("%s", mapError(err.Error()))
 	}
@@ -255,16 +246,12 @@ func loadStackNoBootstrap(ctx context.Context, stage string) (auto.Stack, error)
 
 	region := resolveRegionForStage(stage)
 
-	execPath, _ := os.Executable()
-	pluginDir := filepath.Dir(execPath)
+	settings, err := readStateSettings(projectRoot)
+	if err != nil {
+		return auto.Stack{}, err
+	}
 
-	s, err := auto.UpsertStackLocalSource(ctx, stage, workDir,
-		auto.EnvVars(map[string]string{
-			"PULUMI_BACKEND_URL":       backendURL,
-			"PULUMI_CONFIG_PASSPHRASE": "",
-			"PATH":                     pluginDir + ":" + os.Getenv("PATH"),
-		}),
-	)
+	s, err := auto.UpsertStackLocalSource(ctx, stage, workDir, auto.EnvVars(pulumiEnv(backendURL, settings)))
 	if err != nil {
 		return auto.Stack{}, fmt.Errorf("%s", mapError(err.Error()))
 	}

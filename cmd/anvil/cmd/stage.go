@@ -30,7 +30,7 @@ var stageGetCmd = &cobra.Command{
 }
 
 func init() {
-	stageSetCmd.Flags().StringVar(&stageSetEnvironment, "environment", "", "Environment type: prod or nonprod")
+	stageSetCmd.Flags().StringVar(&stageSetEnvironment, "environment", "", "Environment type: prod or nonprod (default nonprod)")
 	stageCmd.AddCommand(stageSetCmd)
 	stageCmd.AddCommand(stageGetCmd)
 	rootCmd.AddCommand(stageCmd)
@@ -57,17 +57,13 @@ func runStageSet(cmd *cobra.Command, args []string) error {
 	// If this stage already exists, update its environment if a new one is provided
 	sc, exists := config.Stages[name]
 
-	// Resolve environment: flag → existing → prompt
+	// Resolve environment: flag → existing → default
 	env := stageSetEnvironment
 	if env == "" && exists && sc.Environment != "" {
 		env = sc.Environment
 	}
 	if env == "" {
-		prompted, err := promptEnvironment()
-		if err != nil {
-			return err
-		}
-		env = prompted
+		env = defaultEnvironment
 	}
 
 	if env != "prod" && env != "nonprod" {

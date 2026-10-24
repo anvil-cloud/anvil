@@ -179,14 +179,23 @@ func listStacksInBucket(ctx context.Context, bucketName, region string) ([]strin
 			continue
 		}
 		key := *obj.Key
-		name := strings.TrimPrefix(key, prefix)
-		if strings.HasSuffix(name, ".json") {
-			name = strings.TrimSuffix(name, ".json")
-			if name != "" {
-				names = append(names, name)
-			}
+		if name, ok := stackNameFromKey(strings.TrimPrefix(key, prefix)); ok {
+			names = append(names, name)
 		}
 	}
 
 	return names, nil
+}
+
+// stackNameFromKey returns the stack a state file key belongs to. State is
+// written gzipped (PULUMI_DIY_BACKEND_GZIP), but stacks last saved before that
+// still hold plain .json until their next update. A stack mid-migration has
+// both, which callers dedupe.
+func stackNameFromKey(key string) (string, bool) {
+	for _, ext := range []string{".json", ".json.gz", ".json.zst"} {
+		if name, ok := strings.CutSuffix(key, ext); ok && name != "" {
+			return name, true
+		}
+	}
+	return "", false
 }

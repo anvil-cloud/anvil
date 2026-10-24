@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
 	"strings"
 
@@ -17,6 +18,7 @@ var (
 	initLang   string
 	initCloud  string
 	initRegion string
+	initStage  string
 )
 
 var initCmd = &cobra.Command{
@@ -36,6 +38,7 @@ func initInitCmd() {
 	initCmd.Flags().StringVar(&initLang, "lang", "", "Language: ts, python, or go")
 	initCmd.Flags().StringVar(&initCloud, "cloud", "", "Target clouds: aws, gcp, or aws,gcp")
 	initCmd.Flags().StringVar(&initRegion, "region", "", "Default region for the primary cloud")
+	initCmd.Flags().StringVar(&initStage, "stage", "", "Stage to deploy to (defaults to your OS username)")
 	rootCmd.AddCommand(initCmd)
 }
 
@@ -191,12 +194,20 @@ func runInit(cmd *cobra.Command, args []string) error {
 		region = cloudDefaultRegion(clouds[0])
 	}
 
+	// ── Stage ──
+	stage, err := resolveInitStage(initStage, reader)
+	if err != nil {
+		return err
+	}
+
 	// ── Generate files ──
 	fmt.Println()
 
-	// anvil.yaml
-	err := writeAnvilConfig(anvilConfig{
+	// anvil.yaml. The stage becomes the active one, so `anvil deploy` uses it
+	// without falling back to the OS username. It's bootstrapped on first deploy.
+	err = writeAnvilConfig(anvilConfig{
 		Project: projectName,
+		Active:  stage,
 		Stages:  make(map[string]*stageConfig),
 	})
 	if err != nil {
@@ -257,13 +268,58 @@ func runInit(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Println()
+	next := fmt.Sprintf("  Run `anvil deploy` to deploy stage %q.", stage)
 	if isTTY() {
-		fmt.Println(dim("  Run `anvil deploy` to get started."))
+		fmt.Println(dim(next))
 	} else {
-		fmt.Println("  Run `anvil deploy` to get started.")
+		fmt.Println(next)
 	}
 
 	return nil
+}
+
+// defaultInitStage is the stage `anvil init` suggests: the OS username, made
+// valid as a stage name, or "dev" when there isn't a usable one.
+func defaultInitStage() string {
+	if u, err := user.Current(); err == nil {
+		if s := sanitizeBucketPart(u.Username); validStageName.MatchString(s) {
+			return s
+		}
+	}
+	return "dev"
+}
+
+// resolveInitStage returns the --stage flag if set, otherwise asks for the
+// stage name, suggesting defaultInitStage. Without a terminal it uses the
+// suggestion.
+func resolveInitStage(flag string, reader *bufio.Reader) (string, error) {
+	if flag != "" {
+		if !validStageName.MatchString(flag) {
+			return "", fmt.Errorf("Invalid stage name %q.\n  Use letters, numbers and hyphens, starting with a letter or number.", flag)
+		}
+		return flag, nil
+	}
+
+	suggested := defaultInitStage()
+	if !isTTY() {
+		return suggested, nil
+	}
+
+	fmt.Println()
+	fmt.Println(dim("  A stage is one separate copy of this app: its own resources and state."))
+	fmt.Println(dim("  Use your name for a personal stage, or a name like \"staging\" or \"prod\"."))
+	for {
+		fmt.Printf("  Stage name (%s): ", suggested)
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+		if input == "" {
+			return suggested, nil
+		}
+		if validStageName.MatchString(input) {
+			return input, nil
+		}
+		fmt.Printf("  %s %q isn't a valid stage name. Use letters, numbers and hyphens, starting with a letter or number.\n", yellow("⚠"), input)
+	}
 }
 
 // ── Scaffolders ──

@@ -9,6 +9,7 @@ from .block import Block
 from .types import (
     AppConfig,
     DefaultsConfig,
+    StateConfig,
     AwsProviderConfig,
     GcpProviderConfig,
     AssumeRoleConfig,
@@ -27,6 +28,7 @@ __all__ = [
     "Block",
     "AppConfig",
     "DefaultsConfig",
+    "StateConfig",
     "AwsProviderConfig",
     "GcpProviderConfig",
     "AssumeRoleConfig",
