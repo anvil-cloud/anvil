@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"regexp"
+	"runtime/debug"
 	"strings"
 
 	"github.com/manifoldco/promptui"
@@ -370,7 +372,7 @@ func scaffoldGo(project string, clouds []string, region string) error {
 	printCheck("Created anvil.config.go")
 
 	modulePath := fmt.Sprintf("github.com/%s", project)
-	err = os.WriteFile("go.mod", []byte(goMod(modulePath, clouds)), 0644)
+	err = os.WriteFile("go.mod", []byte(goMod(modulePath, goSDKVersion(version, mainModuleVersion(), latestGoSDKVersion))), 0644)
 	if err != nil {
 		return fmt.Errorf("failed to write go.mod: %w", err)
 	}
@@ -565,16 +567,84 @@ func main() {
 `, imports, providers)
 }
 
-func goMod(modulePath string, clouds []string) string {
-	return fmt.Sprintf(`module %s
+// anvilGoSDKModule is the module path of the Anvil Go SDK. It lives in the
+// sdk/go/anvil subdirectory of the repo, so each release is published as a
+// `sdk/go/anvil/vX.Y.Z` tag (see targetPublishGo in build/deploy.go and the
+// publish-go job in .github/workflows/release.yml).
+const anvilGoSDKModule = "github.com/anvil-cloud/anvil/sdk/go/anvil"
 
-go 1.22
+// releaseVersionRe matches a plain release version (optionally v-prefixed):
+// no pre-release, build metadata, pseudo-version or "+dirty" suffix — those
+// never have a matching sdk/go/anvil tag.
+var releaseVersionRe = regexp.MustCompile(`^v?(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$`)
 
-require (
-	github.com/anvil-cloud/anvil/sdk/go/anvil v0.0.4
-	github.com/pulumi/pulumi/sdk/v3 v3.145.0
-)
-`, modulePath)
+// goSDKVersion picks the Anvil Go SDK version a new Go project should require.
+//
+// The CLI and the Go SDK are released together from the same commit with the
+// same version (vX.Y.Z and sdk/go/anvil/vX.Y.Z), so a release CLI requires its
+// own version. In order:
+//
+//  1. cliVersion — the ldflags-injected `version` (release builds).
+//  2. buildInfoVersion — the main module version Go stamps into binaries built
+//     with `go install github.com/anvil-cloud/anvil/cmd/anvil@vX.Y.Z`.
+//  3. latest() — for dev builds, the newest SDK version the Go module proxy
+//     can resolve right now (`go list -m <sdk>@latest`). A dev build has no
+//     version of its own, and the version in provider/base-schema.json may be
+//     an unreleased bump with no tag yet, so "latest published" is the only
+//     choice guaranteed to resolve.
+//
+// It returns "" when none of these yields a version; goMod then leaves the
+// requirement out and `go mod tidy` resolves the SDK to its latest version.
+func goSDKVersion(cliVersion, buildInfoVersion string, latest func() (string, error)) string {
+	for _, v := range []string{cliVersion, buildInfoVersion} {
+		if releaseVersionRe.MatchString(v) {
+			return "v" + strings.TrimPrefix(v, "v")
+		}
+	}
+	if latest != nil {
+		if v, err := latest(); err == nil {
+			v = strings.TrimSpace(v)
+			if releaseVersionRe.MatchString(v) {
+				return "v" + strings.TrimPrefix(v, "v")
+			}
+		}
+	}
+	return ""
+}
+
+// mainModuleVersion returns the version Go stamped into this binary's build
+// info ("(devel)" or a pseudo-version for local builds, which goSDKVersion
+// ignores).
+func mainModuleVersion() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		return info.Main.Version
+	}
+	return ""
+}
+
+// latestGoSDKVersion asks the go command for the newest published Anvil Go
+// SDK version. GOWORK=off keeps a surrounding go.work from interfering.
+func latestGoSDKVersion() (string, error) {
+	cmd := exec.Command("go", "list", "-m", "-f", "{{.Version}}", anvilGoSDKModule+"@latest")
+	cmd.Env = append(os.Environ(), "GOWORK=off")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	return string(out), nil
+}
+
+// goMod renders the scaffolded go.mod. Only the Anvil SDK is pinned:
+// github.com/pulumi/pulumi/sdk/v3 is deliberately not listed, so `go mod
+// tidy` adds it at exactly the version the chosen Anvil SDK requires (it is
+// already in the module graph via the SDK's go.mod) instead of a literal here
+// that drifts out of step with the SDK.
+func goMod(modulePath, sdkVersion string) string {
+	var require string
+	if sdkVersion != "" {
+		require = fmt.Sprintf("\nrequire %s %s\n", anvilGoSDKModule, sdkVersion)
+	}
+	return fmt.Sprintf("module %s\n\ngo 1.22\n%s", modulePath, require)
 }
 
 // ── Helpers ──

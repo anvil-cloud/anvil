@@ -26,8 +26,9 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X main.version={{.Version}}
-      - -X main.commit={{.ShortCommit}}
+      - -X github.com/anvil-cloud/anvil/cmd/anvil/cmd.version={{.Version}}
+      - -X github.com/anvil-cloud/anvil/cmd/anvil/cmd.commit={{.ShortCommit}}
+      - -X github.com/anvil-cloud/anvil/cmd/anvil/cmd.date={{.Date}}
 
   # ── Provider Binary ─────────────────────────────────────────
   - id: provider
