@@ -16,6 +16,7 @@ from .dsql_connect import *
 from .dynamo_db import *
 from .event_bus import *
 from .http_api import *
+from .kinesis_stream import *
 from .lambda_ import *
 from .o_auth_authorizer import *
 from .queue import *

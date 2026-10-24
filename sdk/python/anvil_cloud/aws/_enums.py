@@ -20,6 +20,7 @@ __all__ = [
     'DynamoDBStreamStartingPosition',
     'DynamoDBStreamViewType',
     'HttpApiMethod',
+    'KinesisConsumerStartingPosition',
     'LambdaArchitecture',
     'LambdaLogRetention',
     'LambdaRuntime',
@@ -331,6 +332,18 @@ class HttpApiMethod(_builtins.str, Enum):
     ANY = "ANY"
     """
     Matches all HTTP methods. Maps to the $default route key.
+    """
+
+
+@pulumi.type_token("anvil:aws:KinesisConsumerStartingPosition")
+class KinesisConsumerStartingPosition(_builtins.str, Enum):
+    TRI_M_HORIZON = "TRIM_HORIZON"
+    """
+    Every record still in the stream, so a consumer that builds state (search index, replica, read model) misses nothing from before it existed. Default.
+    """
+    LATEST = "LATEST"
+    """
+    Only records written after the consumer is created, for consumers that only care about what happens from now on (cache invalidation, notifications).
     """
 
 

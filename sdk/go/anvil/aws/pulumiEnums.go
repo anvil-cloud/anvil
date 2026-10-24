@@ -2471,6 +2471,173 @@ func (in *httpApiMethodPtr) ToHttpApiMethodPtrOutputWithContext(ctx context.Cont
 	return pulumi.ToOutputWithContext(ctx, in).(HttpApiMethodPtrOutput)
 }
 
+type KinesisConsumerStartingPosition string
+
+const (
+	// Every record still in the stream, so a consumer that builds state (search index, replica, read model) misses nothing from before it existed. Default.
+	KinesisConsumerStartingPosition_TRIM_HORIZON = KinesisConsumerStartingPosition("TRIM_HORIZON")
+	// Only records written after the consumer is created, for consumers that only care about what happens from now on (cache invalidation, notifications).
+	KinesisConsumerStartingPositionLATEST = KinesisConsumerStartingPosition("LATEST")
+)
+
+func (KinesisConsumerStartingPosition) ElementType() reflect.Type {
+	return reflect.TypeOf((*KinesisConsumerStartingPosition)(nil)).Elem()
+}
+
+func (e KinesisConsumerStartingPosition) ToKinesisConsumerStartingPositionOutput() KinesisConsumerStartingPositionOutput {
+	return pulumi.ToOutput(e).(KinesisConsumerStartingPositionOutput)
+}
+
+func (e KinesisConsumerStartingPosition) ToKinesisConsumerStartingPositionOutputWithContext(ctx context.Context) KinesisConsumerStartingPositionOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(KinesisConsumerStartingPositionOutput)
+}
+
+func (e KinesisConsumerStartingPosition) ToKinesisConsumerStartingPositionPtrOutput() KinesisConsumerStartingPositionPtrOutput {
+	return e.ToKinesisConsumerStartingPositionPtrOutputWithContext(context.Background())
+}
+
+func (e KinesisConsumerStartingPosition) ToKinesisConsumerStartingPositionPtrOutputWithContext(ctx context.Context) KinesisConsumerStartingPositionPtrOutput {
+	return KinesisConsumerStartingPosition(e).ToKinesisConsumerStartingPositionOutputWithContext(ctx).ToKinesisConsumerStartingPositionPtrOutputWithContext(ctx)
+}
+
+func (e KinesisConsumerStartingPosition) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e KinesisConsumerStartingPosition) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e KinesisConsumerStartingPosition) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e KinesisConsumerStartingPosition) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type KinesisConsumerStartingPositionOutput struct{ *pulumi.OutputState }
+
+func (KinesisConsumerStartingPositionOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*KinesisConsumerStartingPosition)(nil)).Elem()
+}
+
+func (o KinesisConsumerStartingPositionOutput) ToKinesisConsumerStartingPositionOutput() KinesisConsumerStartingPositionOutput {
+	return o
+}
+
+func (o KinesisConsumerStartingPositionOutput) ToKinesisConsumerStartingPositionOutputWithContext(ctx context.Context) KinesisConsumerStartingPositionOutput {
+	return o
+}
+
+func (o KinesisConsumerStartingPositionOutput) ToKinesisConsumerStartingPositionPtrOutput() KinesisConsumerStartingPositionPtrOutput {
+	return o.ToKinesisConsumerStartingPositionPtrOutputWithContext(context.Background())
+}
+
+func (o KinesisConsumerStartingPositionOutput) ToKinesisConsumerStartingPositionPtrOutputWithContext(ctx context.Context) KinesisConsumerStartingPositionPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v KinesisConsumerStartingPosition) *KinesisConsumerStartingPosition {
+		return &v
+	}).(KinesisConsumerStartingPositionPtrOutput)
+}
+
+func (o KinesisConsumerStartingPositionOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o KinesisConsumerStartingPositionOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e KinesisConsumerStartingPosition) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o KinesisConsumerStartingPositionOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o KinesisConsumerStartingPositionOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e KinesisConsumerStartingPosition) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type KinesisConsumerStartingPositionPtrOutput struct{ *pulumi.OutputState }
+
+func (KinesisConsumerStartingPositionPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**KinesisConsumerStartingPosition)(nil)).Elem()
+}
+
+func (o KinesisConsumerStartingPositionPtrOutput) ToKinesisConsumerStartingPositionPtrOutput() KinesisConsumerStartingPositionPtrOutput {
+	return o
+}
+
+func (o KinesisConsumerStartingPositionPtrOutput) ToKinesisConsumerStartingPositionPtrOutputWithContext(ctx context.Context) KinesisConsumerStartingPositionPtrOutput {
+	return o
+}
+
+func (o KinesisConsumerStartingPositionPtrOutput) Elem() KinesisConsumerStartingPositionOutput {
+	return o.ApplyT(func(v *KinesisConsumerStartingPosition) KinesisConsumerStartingPosition {
+		if v != nil {
+			return *v
+		}
+		var ret KinesisConsumerStartingPosition
+		return ret
+	}).(KinesisConsumerStartingPositionOutput)
+}
+
+func (o KinesisConsumerStartingPositionPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o KinesisConsumerStartingPositionPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *KinesisConsumerStartingPosition) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// KinesisConsumerStartingPositionInput is an input type that accepts values of the KinesisConsumerStartingPosition enum
+// A concrete instance of `KinesisConsumerStartingPositionInput` can be one of the following:
+//
+//	KinesisConsumerStartingPosition_TRIM_HORIZON
+//	KinesisConsumerStartingPositionLATEST
+type KinesisConsumerStartingPositionInput interface {
+	pulumi.Input
+
+	ToKinesisConsumerStartingPositionOutput() KinesisConsumerStartingPositionOutput
+	ToKinesisConsumerStartingPositionOutputWithContext(context.Context) KinesisConsumerStartingPositionOutput
+}
+
+var kinesisConsumerStartingPositionPtrType = reflect.TypeOf((**KinesisConsumerStartingPosition)(nil)).Elem()
+
+type KinesisConsumerStartingPositionPtrInput interface {
+	pulumi.Input
+
+	ToKinesisConsumerStartingPositionPtrOutput() KinesisConsumerStartingPositionPtrOutput
+	ToKinesisConsumerStartingPositionPtrOutputWithContext(context.Context) KinesisConsumerStartingPositionPtrOutput
+}
+
+type kinesisConsumerStartingPositionPtr string
+
+func KinesisConsumerStartingPositionPtr(v string) KinesisConsumerStartingPositionPtrInput {
+	return (*kinesisConsumerStartingPositionPtr)(&v)
+}
+
+func (*kinesisConsumerStartingPositionPtr) ElementType() reflect.Type {
+	return kinesisConsumerStartingPositionPtrType
+}
+
+func (in *kinesisConsumerStartingPositionPtr) ToKinesisConsumerStartingPositionPtrOutput() KinesisConsumerStartingPositionPtrOutput {
+	return pulumi.ToOutput(in).(KinesisConsumerStartingPositionPtrOutput)
+}
+
+func (in *kinesisConsumerStartingPositionPtr) ToKinesisConsumerStartingPositionPtrOutputWithContext(ctx context.Context) KinesisConsumerStartingPositionPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(KinesisConsumerStartingPositionPtrOutput)
+}
+
 type LambdaArchitecture string
 
 const (
@@ -4201,6 +4368,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DynamoDBStreamViewTypePtrInput)(nil)).Elem(), DynamoDBStreamViewType("NEW_IMAGE"))
 	pulumi.RegisterInputType(reflect.TypeOf((*HttpApiMethodInput)(nil)).Elem(), HttpApiMethod("GET"))
 	pulumi.RegisterInputType(reflect.TypeOf((*HttpApiMethodPtrInput)(nil)).Elem(), HttpApiMethod("GET"))
+	pulumi.RegisterInputType(reflect.TypeOf((*KinesisConsumerStartingPositionInput)(nil)).Elem(), KinesisConsumerStartingPosition("TRIM_HORIZON"))
+	pulumi.RegisterInputType(reflect.TypeOf((*KinesisConsumerStartingPositionPtrInput)(nil)).Elem(), KinesisConsumerStartingPosition("TRIM_HORIZON"))
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaArchitectureInput)(nil)).Elem(), LambdaArchitecture("arm64"))
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaArchitecturePtrInput)(nil)).Elem(), LambdaArchitecture("arm64"))
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaLogRetentionInput)(nil)).Elem(), LambdaLogRetention("7d"))
@@ -4251,6 +4420,8 @@ func init() {
 	pulumi.RegisterOutputType(DynamoDBStreamViewTypePtrOutput{})
 	pulumi.RegisterOutputType(HttpApiMethodOutput{})
 	pulumi.RegisterOutputType(HttpApiMethodPtrOutput{})
+	pulumi.RegisterOutputType(KinesisConsumerStartingPositionOutput{})
+	pulumi.RegisterOutputType(KinesisConsumerStartingPositionPtrOutput{})
 	pulumi.RegisterOutputType(LambdaArchitectureOutput{})
 	pulumi.RegisterOutputType(LambdaArchitecturePtrOutput{})
 	pulumi.RegisterOutputType(LambdaLogRetentionOutput{})

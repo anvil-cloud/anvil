@@ -40,4 +40,5 @@ import "./aws/lambda.grants";
 import "./aws/queue.grants";
 import "./aws/eventBus.grants";
 import "./aws/dynamoDB.grants";
+import "./aws/kinesisStream.grants";
 import "./aws/dsql.grants";

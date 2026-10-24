@@ -50,6 +50,11 @@ export type HttpApi = import("./httpApi").HttpApi;
 export const HttpApi: typeof import("./httpApi").HttpApi = null as any;
 utilities.lazyLoad(exports, ["HttpApi"], () => require("./httpApi"));
 
+export { KinesisStreamArgs } from "./kinesisStream";
+export type KinesisStream = import("./kinesisStream").KinesisStream;
+export const KinesisStream: typeof import("./kinesisStream").KinesisStream = null as any;
+utilities.lazyLoad(exports, ["KinesisStream"], () => require("./kinesisStream"));
+
 export { LambdaArgs } from "./lambda";
 export type Lambda = import("./lambda").Lambda;
 export const Lambda: typeof import("./lambda").Lambda = null as any;
@@ -111,6 +116,8 @@ const _module = {
                 return new EventBus(name, <any>undefined, { urn })
             case "anvil:aws:HttpApi":
                 return new HttpApi(name, <any>undefined, { urn })
+            case "anvil:aws:KinesisStream":
+                return new KinesisStream(name, <any>undefined, { urn })
             case "anvil:aws:Lambda":
                 return new Lambda(name, <any>undefined, { urn })
             case "anvil:aws:OAuthAuthorizer":

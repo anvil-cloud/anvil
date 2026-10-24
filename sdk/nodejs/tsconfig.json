@@ -24,6 +24,7 @@
         "aws/eventBus.ts",
         "aws/httpApi.ts",
         "aws/index.ts",
+        "aws/kinesisStream.ts",
         "aws/lambda.ts",
         "aws/oauthAuthorizer.ts",
         "aws/queue.ts",

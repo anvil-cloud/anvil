@@ -560,6 +560,65 @@
         "routes"
       ]
     },
+    "anvil:aws:KinesisStream": {
+      "description": "An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key (alias/aws/kinesis) is always on. Add Lambda consumers with consumers (each gets a dead letter queue and safe retry defaults); use grantRead/grantWrite for other compute.",
+      "inputProperties": {
+        "consumers": {
+          "description": "Lambda functions that read the stream. Each consumer gets an event source mapping (starting from the oldest record, bisect-on-error, 3 retries), its own dead letter queue for records that still fail, sqs:SendMessage on that DLQ, and — with grantRead: true — the grantRead permissions. All consumers share the stream's read throughput (2 MB/s per shard). Each consumer's resources are named after its consumerName, so adding, removing or reordering consumers only touches the one that changed.",
+          "items": {
+            "$ref": "#/types/anvil:aws:KinesisConsumerArgs"
+          },
+          "type": "array"
+        },
+        "hatch": {
+          "$ref": "#/types/anvil:aws:KinesisHatchArgs"
+        },
+        "maxRecordSizeKib": {
+          "description": "Largest record the stream accepts, in KiB, 1024–10240. Default: 2048, so the stream can take Aurora DSQL CDC events (rows up to 2 MiB) without extra config.",
+          "type": "integer"
+        },
+        "provisioned": {
+          "$ref": "#/types/anvil:aws:KinesisProvisionedArgs",
+          "description": "Switches the stream from on-demand to provisioned capacity with a fixed shard count. When omitted, the stream is on-demand and scales shards automatically with traffic — the right choice unless throughput is steady and predictable."
+        },
+        "retentionHours": {
+          "description": "How long records stay readable, in hours, 24–8760 (365 days). Default: 24. Retention beyond 24 hours is billed separately.",
+          "type": "integer"
+        }
+      },
+      "isComponent": true,
+      "properties": {
+        "arn": {
+          "description": "The ARN of the Kinesis stream.",
+          "type": "string"
+        },
+        "dlqArns": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Each consumer's consumerName mapped to the ARN of its dead letter queue.",
+          "type": "object"
+        },
+        "dlqUrls": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Each consumer's consumerName mapped to the URL of its dead letter queue.",
+          "type": "object"
+        },
+        "name": {
+          "description": "The physical name of the Kinesis stream.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "arn",
+        "name",
+        "dlqArns",
+        "dlqUrls"
+      ],
+      "requiredInputs": []
+    },
     "anvil:aws:Lambda": {
       "inputProperties": {
         "architecture": {
@@ -3231,6 +3290,182 @@
       },
       "type": "object"
     },
+    "anvil:aws:KinesisConsumerArgs": {
+      "description": "One consumer of the stream.",
+      "properties": {
+        "batchSize": {
+          "description": "Most records sent to the Lambda in one invocation, 1–10000. Default: 100.",
+          "type": "integer"
+        },
+        "consumerName": {
+          "description": "Identifies the consumer and names its resources (\u003cstream\u003e-\u003cconsumerName\u003e-dlq, -esm, -policy). Usually the Lambda's name, e.g. \"indexer\". Letters, numbers and hyphens, starting with a letter, up to 32 characters, unique per stream. Renaming a consumer recreates its resources.",
+          "plain": true,
+          "type": "string"
+        },
+        "enabled": {
+          "description": "Pauses the consumer when false: the event source mapping stops polling but keeps its position, so it resumes where it left off. Records older than the stream's retention are lost while paused. Default: true.",
+          "type": "boolean"
+        },
+        "filter": {
+          "$ref": "#/types/anvil:aws:KinesisConsumerFilterArgs",
+          "description": "Limits which records invoke the Lambda. Applied by the event source mapping, not the stream: the stream still receives every record, but records that don't match are skipped (not invoked, not billed). When omitted, every record is delivered."
+        },
+        "grantRead": {
+          "description": "Attaches the grantRead permissions on this stream to the consumer's execution role. Declared here, not with a separate grantRead call, because the event source mapping must wait for the grant. false skips it with a deploy warning: the role must then get read access another way, or the event source mapping fails to create.",
+          "type": "boolean"
+        },
+        "lambda": {
+          "$ref": "#/types/anvil:aws:KinesisLambdaConsumerArgs",
+          "description": "Wire an Anvil Lambda function as the consumer."
+        },
+        "reportBatchItemFailures": {
+          "description": "Lets the Lambda report which records in a batch failed so only those are retried. The handler must return { batchItemFailures: [{ itemIdentifier: \u003csequenceNumber\u003e }] }. Default: false (a failure retries the whole batch, split in half each time).",
+          "type": "boolean"
+        },
+        "startingPosition": {
+          "$ref": "#/types/anvil:aws:KinesisConsumerStartingPosition",
+          "description": "Where the consumer starts reading when it's first created. Default: \"TRIM_HORIZON\". Changing it later recreates the event source mapping, which resets the consumer's position."
+        }
+      },
+      "required": [
+        "consumerName",
+        "lambda",
+        "grantRead"
+      ],
+      "type": "object"
+    },
+    "anvil:aws:KinesisConsumerFilterArgs": {
+      "description": "Limits which records invoke a consumer. tables and patterns can be combined; a record matching any of them is delivered. Together they can produce at most 5 filter patterns (Lambda's quota).",
+      "properties": {
+        "patterns": {
+          "description": "Raw Lambda event filter patterns (JSON), for records that aren't DSQL CDC events. Kinesis record data is matched under \"data\", e.g. {\"data\":{\"type\":[\"order.created\"]}}. Each pattern takes one filter.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "tables": {
+          "description": "Delivers only Aurora DSQL CDC events for these tables, matched against the event's source.table. Qualify with a schema to also match source.schema: \"orders\" matches orders in any schema, \"app.orders\" only app.orders. Unqualified tables share one pattern; each qualified table takes one.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:KinesisConsumerStartingPosition": {
+      "enum": [
+        {
+          "description": "Every record still in the stream, so a consumer that builds state (search index, replica, read model) misses nothing from before it existed. Default.",
+          "value": "TRIM_HORIZON"
+        },
+        {
+          "description": "Only records written after the consumer is created, for consumers that only care about what happens from now on (cache invalidation, notifications).",
+          "value": "LATEST"
+        }
+      ],
+      "type": "string"
+    },
+    "anvil:aws:KinesisHatchArgs": {
+      "properties": {
+        "kinesis": {
+          "$ref": "#/types/anvil:aws:KinesisOverrides"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:KinesisLambdaConsumerArgs": {
+      "description": "Lambda consumer configuration. Pass fn.arn and fn.roleArn from an Anvil Lambda component.",
+      "properties": {
+        "arn": {
+          "description": "The ARN of the Lambda function to trigger. Use fn.arn from an Anvil Lambda component.",
+          "type": "string"
+        },
+        "lambdaRoleArn": {
+          "description": "The ARN of the Lambda's execution role. Use fn.roleArn from an Anvil Lambda component. Required for Anvil to attach the grantRead and DLQ permissions.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "arn",
+        "lambdaRoleArn"
+      ],
+      "type": "object"
+    },
+    "anvil:aws:KinesisOverrides": {
+      "properties": {
+        "arn": {
+          "description": "The Amazon Resource Name (ARN) specifying the Stream (same as \u003cspan pulumi-lang-nodejs=\"`id`\" pulumi-lang-dotnet=\"`Id`\" pulumi-lang-go=\"`id`\" pulumi-lang-python=\"`id`\" pulumi-lang-yaml=\"`id`\" pulumi-lang-java=\"`id`\"\u003e`id`\u003c/span\u003e)\n",
+          "type": "string"
+        },
+        "encryptionType": {
+          "description": "The encryption type to use. The only acceptable values are `NONE` or `KMS`. The default value is `NONE`.\n",
+          "type": "string"
+        },
+        "enforceConsumerDeletion": {
+          "description": "A boolean that indicates all registered consumers should be deregistered from the stream so that the stream can be destroyed without error. The default value is \u003cspan pulumi-lang-nodejs=\"`false`\" pulumi-lang-dotnet=\"`False`\" pulumi-lang-go=\"`false`\" pulumi-lang-python=\"`false`\" pulumi-lang-yaml=\"`false`\" pulumi-lang-java=\"`false`\"\u003e`false`\u003c/span\u003e.\n",
+          "type": "boolean"
+        },
+        "kmsKeyId": {
+          "description": "The GUID for the customer-managed KMS key to use for encryption. You can also use a Kinesis-owned master key by specifying the alias `alias/aws/kinesis`.\n",
+          "type": "string"
+        },
+        "maxRecordSizeInKib": {
+          "description": "The maximum size for a single data record in KiB. The minimum value is 1024. The maximum value is 10240.\n",
+          "type": "integer"
+        },
+        "name": {
+          "description": "A name to identify the stream. This is unique to the AWS account and region the Stream is created in.\n",
+          "type": "string",
+          "willReplaceOnChanges": true
+        },
+        "region": {
+          "description": "Region where this resource will be [managed](https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints). Defaults to the Region set in the provider configuration.\n",
+          "type": "string"
+        },
+        "retentionPeriod": {
+          "description": "Length of time data records are accessible after they are added to the stream. The maximum value of a stream's retention period is 8760 hours. Minimum value is 24. Default is 24.\n",
+          "type": "integer"
+        },
+        "shardCount": {
+          "description": "The number of shards that the stream will use. If the \u003cspan pulumi-lang-nodejs=\"`streamMode`\" pulumi-lang-dotnet=\"`StreamMode`\" pulumi-lang-go=\"`streamMode`\" pulumi-lang-python=\"`stream_mode`\" pulumi-lang-yaml=\"`streamMode`\" pulumi-lang-java=\"`streamMode`\"\u003e`stream_mode`\u003c/span\u003e is `PROVISIONED`, this field is required.\nAmazon has guidelines for specifying the Stream size that should be referenced when creating a Kinesis stream. See [Amazon Kinesis Streams](https://docs.aws.amazon.com/kinesis/latest/dev/amazon-kinesis-streams.html) for more.\n",
+          "type": "integer"
+        },
+        "shardLevelMetrics": {
+          "description": "A list of shard-level CloudWatch metrics which can be enabled for the stream. See [Monitoring with CloudWatch](https://docs.aws.amazon.com/streams/latest/dev/monitoring-with-cloudwatch.html) for more. Note that the value ALL should not be used; instead you should provide an explicit list of metrics you wish to enable.\n",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "streamModeDetails": {
+          "$ref": "/aws/v7.23.0/schema.json#/types/aws:kinesis/StreamStreamModeDetails:StreamStreamModeDetails",
+          "description": "Indicates the [capacity mode](https://docs.aws.amazon.com/streams/latest/dev/how-do-i-size-a-stream.html) of the data stream. Detailed below.\n"
+        },
+        "tags": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "A map of tags to assign to the resource. If configured with a provider \u003cspan pulumi-lang-nodejs=\"`defaultTags`\" pulumi-lang-dotnet=\"`DefaultTags`\" pulumi-lang-go=\"`defaultTags`\" pulumi-lang-python=\"`default_tags`\" pulumi-lang-yaml=\"`defaultTags`\" pulumi-lang-java=\"`defaultTags`\"\u003e`default_tags`\u003c/span\u003e configuration block present, tags with matching keys will overwrite those defined at the provider-level.\n",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:KinesisProvisionedArgs": {
+      "description": "Provisioned capacity configuration.",
+      "properties": {
+        "shardCount": {
+          "description": "Number of shards, at least 1. Required, so a provisioned stream's capacity is always stated. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out.",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "shardCount"
+      ],
+      "type": "object"
+    },
     "anvil:aws:LambdaArchitecture": {
       "enum": [
         {
@@ -4614,5 +4849,5 @@
       "type": "object"
     }
   },
-  "version": "0.1.20"
+  "version": "0.1.21"
 }

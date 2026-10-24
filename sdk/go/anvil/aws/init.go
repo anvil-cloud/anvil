@@ -39,6 +39,8 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &EventBus{}
 	case "anvil:aws:HttpApi":
 		r = &HttpApi{}
+	case "anvil:aws:KinesisStream":
+		r = &KinesisStream{}
 	case "anvil:aws:Lambda":
 		r = &Lambda{}
 	case "anvil:aws:OAuthAuthorizer":
