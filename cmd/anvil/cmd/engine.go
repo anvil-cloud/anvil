@@ -188,6 +188,7 @@ func loadStack(ctx context.Context, stage string) (auto.Stack, error) {
 		auto.EnvVars(map[string]string{
 			"PULUMI_BACKEND_URL":       backendURL,
 			"PULUMI_CONFIG_PASSPHRASE": "",
+			"PULUMI_DIY_BACKEND_GZIP":  "true",
 			"PATH":                     pluginDir + ":" + os.Getenv("PATH"),
 		}),
 	)
@@ -262,6 +263,7 @@ func loadStackNoBootstrap(ctx context.Context, stage string) (auto.Stack, error)
 		auto.EnvVars(map[string]string{
 			"PULUMI_BACKEND_URL":       backendURL,
 			"PULUMI_CONFIG_PASSPHRASE": "",
+			"PULUMI_DIY_BACKEND_GZIP":  "true",
 			"PATH":                     pluginDir + ":" + os.Getenv("PATH"),
 		}),
 	)

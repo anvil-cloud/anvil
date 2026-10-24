@@ -21,6 +21,10 @@ import (
 // The immutablePrefixes param lets each framework declare which path prefixes
 // contain content-hashed assets eligible for long-term caching.
 //
+// Precompressed .br/.gz copies are skipped when their source file exists: the
+// distribution compresses responses itself, so they are never served, and each
+// one is another resource whose every operation rewrites the stack's state.
+//
 // Each object's resource name comes from its key, not its content, so a changed
 // file (a new robots.txt) is updated in place. Naming by content made every edit a
 // create-then-delete of two resources pointing at the same key, and the delete
@@ -31,6 +35,10 @@ func UploadSiteAssets(ctx *pulumi.Context, parent pulumi.Resource, name string, 
 			return err
 		}
 		if info.IsDir() {
+			return nil
+		}
+
+		if isRedundantPrecompressed(path) {
 			return nil
 		}
 
@@ -81,4 +89,16 @@ func assetResourceNames(name, key string, content []byte) (current, legacy strin
 func assetName(name, key string, hashed []byte) string {
 	sum := sha256.Sum256(hashed)
 	return fmt.Sprintf("%s-asset-%s-%s", name, SanitiseResourceName(key), hex.EncodeToString(sum[:8]))
+}
+
+// isRedundantPrecompressed reports whether path is a .br or .gz copy of a file
+// that sits next to it, the same rule StaticRootBehaviors applies.
+func isRedundantPrecompressed(path string) bool {
+	for _, ext := range []string{".br", ".gz"} {
+		if base, ok := strings.CutSuffix(path, ext); ok {
+			info, err := os.Stat(base)
+			return err == nil && !info.IsDir()
+		}
+	}
+	return false
 }

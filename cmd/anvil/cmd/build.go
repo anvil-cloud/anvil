@@ -93,6 +93,7 @@ func discoverFunctions(ctx context.Context, stage string) ([]FunctionSpec, error
 		auto.EnvVars(map[string]string{
 			"PULUMI_BACKEND_URL":       backendURL,
 			"PULUMI_CONFIG_PASSPHRASE": "",
+			"PULUMI_DIY_BACKEND_GZIP":  "true",
 			"PATH":                     pluginDir + ":" + os.Getenv("PATH"),
 			"ANVIL_BUILD_MODE":         "true",
 		}),
