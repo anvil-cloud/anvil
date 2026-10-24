@@ -6819,6 +6819,184 @@ func (o DSQLSchemaArrayOutput) Index(i pulumi.IntInput) DSQLSchemaOutput {
 	}).(DSQLSchemaOutput)
 }
 
+// Change data capture to a Kinesis Data Stream.
+type DSQLStreamArgs struct {
+	// The Kinesis Data Stream that receives the events, e.g. a KinesisStream's arn. Must be in the cluster's region (the provider region for multi-region clusters) and accept records of at least 2048 KiB, which is KinesisStream's default.
+	KinesisArn string `pulumi:"kinesisArn"`
+	// The customer-managed KMS key the Kinesis stream is encrypted with, if any. Anvil's role is then also allowed kms:GenerateDataKey on it. Not needed with the AWS-managed key (KinesisStream's default). Only valid without roleArn.
+	KmsKeyArn *string `pulumi:"kmsKeyArn"`
+	// An existing IAM role for DSQL to write with. Omit to have Anvil create one that only this cluster can assume, allowed to write to kinesisArn only.
+	RoleArn *string `pulumi:"roleArn"`
+}
+
+// DSQLStreamArgsInput is an input type that accepts DSQLStreamArgsArgs and DSQLStreamArgsOutput values.
+// You can construct a concrete instance of `DSQLStreamArgsInput` via:
+//
+//	DSQLStreamArgsArgs{...}
+type DSQLStreamArgsInput interface {
+	pulumi.Input
+
+	ToDSQLStreamArgsOutput() DSQLStreamArgsOutput
+	ToDSQLStreamArgsOutputWithContext(context.Context) DSQLStreamArgsOutput
+}
+
+// Change data capture to a Kinesis Data Stream.
+type DSQLStreamArgsArgs struct {
+	// The Kinesis Data Stream that receives the events, e.g. a KinesisStream's arn. Must be in the cluster's region (the provider region for multi-region clusters) and accept records of at least 2048 KiB, which is KinesisStream's default.
+	KinesisArn pulumi.StringInput `pulumi:"kinesisArn"`
+	// The customer-managed KMS key the Kinesis stream is encrypted with, if any. Anvil's role is then also allowed kms:GenerateDataKey on it. Not needed with the AWS-managed key (KinesisStream's default). Only valid without roleArn.
+	KmsKeyArn pulumi.StringPtrInput `pulumi:"kmsKeyArn"`
+	// An existing IAM role for DSQL to write with. Omit to have Anvil create one that only this cluster can assume, allowed to write to kinesisArn only.
+	RoleArn pulumi.StringPtrInput `pulumi:"roleArn"`
+}
+
+func (DSQLStreamArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*DSQLStreamArgs)(nil)).Elem()
+}
+
+func (i DSQLStreamArgsArgs) ToDSQLStreamArgsOutput() DSQLStreamArgsOutput {
+	return i.ToDSQLStreamArgsOutputWithContext(context.Background())
+}
+
+func (i DSQLStreamArgsArgs) ToDSQLStreamArgsOutputWithContext(ctx context.Context) DSQLStreamArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DSQLStreamArgsOutput)
+}
+
+func (i DSQLStreamArgsArgs) ToDSQLStreamArgsPtrOutput() DSQLStreamArgsPtrOutput {
+	return i.ToDSQLStreamArgsPtrOutputWithContext(context.Background())
+}
+
+func (i DSQLStreamArgsArgs) ToDSQLStreamArgsPtrOutputWithContext(ctx context.Context) DSQLStreamArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DSQLStreamArgsOutput).ToDSQLStreamArgsPtrOutputWithContext(ctx)
+}
+
+// DSQLStreamArgsPtrInput is an input type that accepts DSQLStreamArgsArgs, DSQLStreamArgsPtr and DSQLStreamArgsPtrOutput values.
+// You can construct a concrete instance of `DSQLStreamArgsPtrInput` via:
+//
+//	        DSQLStreamArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type DSQLStreamArgsPtrInput interface {
+	pulumi.Input
+
+	ToDSQLStreamArgsPtrOutput() DSQLStreamArgsPtrOutput
+	ToDSQLStreamArgsPtrOutputWithContext(context.Context) DSQLStreamArgsPtrOutput
+}
+
+type dsqlstreamArgsPtrType DSQLStreamArgsArgs
+
+func DSQLStreamArgsPtr(v *DSQLStreamArgsArgs) DSQLStreamArgsPtrInput {
+	return (*dsqlstreamArgsPtrType)(v)
+}
+
+func (*dsqlstreamArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**DSQLStreamArgs)(nil)).Elem()
+}
+
+func (i *dsqlstreamArgsPtrType) ToDSQLStreamArgsPtrOutput() DSQLStreamArgsPtrOutput {
+	return i.ToDSQLStreamArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *dsqlstreamArgsPtrType) ToDSQLStreamArgsPtrOutputWithContext(ctx context.Context) DSQLStreamArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(DSQLStreamArgsPtrOutput)
+}
+
+// Change data capture to a Kinesis Data Stream.
+type DSQLStreamArgsOutput struct{ *pulumi.OutputState }
+
+func (DSQLStreamArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*DSQLStreamArgs)(nil)).Elem()
+}
+
+func (o DSQLStreamArgsOutput) ToDSQLStreamArgsOutput() DSQLStreamArgsOutput {
+	return o
+}
+
+func (o DSQLStreamArgsOutput) ToDSQLStreamArgsOutputWithContext(ctx context.Context) DSQLStreamArgsOutput {
+	return o
+}
+
+func (o DSQLStreamArgsOutput) ToDSQLStreamArgsPtrOutput() DSQLStreamArgsPtrOutput {
+	return o.ToDSQLStreamArgsPtrOutputWithContext(context.Background())
+}
+
+func (o DSQLStreamArgsOutput) ToDSQLStreamArgsPtrOutputWithContext(ctx context.Context) DSQLStreamArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v DSQLStreamArgs) *DSQLStreamArgs {
+		return &v
+	}).(DSQLStreamArgsPtrOutput)
+}
+
+// The Kinesis Data Stream that receives the events, e.g. a KinesisStream's arn. Must be in the cluster's region (the provider region for multi-region clusters) and accept records of at least 2048 KiB, which is KinesisStream's default.
+func (o DSQLStreamArgsOutput) KinesisArn() pulumi.StringOutput {
+	return o.ApplyT(func(v DSQLStreamArgs) string { return v.KinesisArn }).(pulumi.StringOutput)
+}
+
+// The customer-managed KMS key the Kinesis stream is encrypted with, if any. Anvil's role is then also allowed kms:GenerateDataKey on it. Not needed with the AWS-managed key (KinesisStream's default). Only valid without roleArn.
+func (o DSQLStreamArgsOutput) KmsKeyArn() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v DSQLStreamArgs) *string { return v.KmsKeyArn }).(pulumi.StringPtrOutput)
+}
+
+// An existing IAM role for DSQL to write with. Omit to have Anvil create one that only this cluster can assume, allowed to write to kinesisArn only.
+func (o DSQLStreamArgsOutput) RoleArn() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v DSQLStreamArgs) *string { return v.RoleArn }).(pulumi.StringPtrOutput)
+}
+
+type DSQLStreamArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (DSQLStreamArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**DSQLStreamArgs)(nil)).Elem()
+}
+
+func (o DSQLStreamArgsPtrOutput) ToDSQLStreamArgsPtrOutput() DSQLStreamArgsPtrOutput {
+	return o
+}
+
+func (o DSQLStreamArgsPtrOutput) ToDSQLStreamArgsPtrOutputWithContext(ctx context.Context) DSQLStreamArgsPtrOutput {
+	return o
+}
+
+func (o DSQLStreamArgsPtrOutput) Elem() DSQLStreamArgsOutput {
+	return o.ApplyT(func(v *DSQLStreamArgs) DSQLStreamArgs {
+		if v != nil {
+			return *v
+		}
+		var ret DSQLStreamArgs
+		return ret
+	}).(DSQLStreamArgsOutput)
+}
+
+// The Kinesis Data Stream that receives the events, e.g. a KinesisStream's arn. Must be in the cluster's region (the provider region for multi-region clusters) and accept records of at least 2048 KiB, which is KinesisStream's default.
+func (o DSQLStreamArgsPtrOutput) KinesisArn() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DSQLStreamArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return &v.KinesisArn
+	}).(pulumi.StringPtrOutput)
+}
+
+// The customer-managed KMS key the Kinesis stream is encrypted with, if any. Anvil's role is then also allowed kms:GenerateDataKey on it. Not needed with the AWS-managed key (KinesisStream's default). Only valid without roleArn.
+func (o DSQLStreamArgsPtrOutput) KmsKeyArn() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DSQLStreamArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.KmsKeyArn
+	}).(pulumi.StringPtrOutput)
+}
+
+// An existing IAM role for DSQL to write with. Omit to have Anvil create one that only this cluster can assume, allowed to write to kinesisArn only.
+func (o DSQLStreamArgsPtrOutput) RoleArn() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DSQLStreamArgs) *string {
+		if v == nil {
+			return nil
+		}
+		return v.RoleArn
+	}).(pulumi.StringPtrOutput)
+}
+
 // A table to create in a schema. Additive-only: Anvil creates the table and adds new columns/indexes, but never drops or alters existing ones.
 type DSQLTable struct {
 	// The table's columns.
@@ -18231,6 +18409,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DSQLRoleArrayInput)(nil)).Elem(), DSQLRoleArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DSQLSchemaInput)(nil)).Elem(), DSQLSchemaArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DSQLSchemaArrayInput)(nil)).Elem(), DSQLSchemaArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DSQLStreamArgsInput)(nil)).Elem(), DSQLStreamArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*DSQLStreamArgsPtrInput)(nil)).Elem(), DSQLStreamArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DSQLTableInput)(nil)).Elem(), DSQLTableArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DSQLTableArrayInput)(nil)).Elem(), DSQLTableArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DSQLVpcArgsInput)(nil)).Elem(), DSQLVpcArgsArgs{})
@@ -18411,6 +18591,8 @@ func init() {
 	pulumi.RegisterOutputType(DSQLRoleArrayOutput{})
 	pulumi.RegisterOutputType(DSQLSchemaOutput{})
 	pulumi.RegisterOutputType(DSQLSchemaArrayOutput{})
+	pulumi.RegisterOutputType(DSQLStreamArgsOutput{})
+	pulumi.RegisterOutputType(DSQLStreamArgsPtrOutput{})
 	pulumi.RegisterOutputType(DSQLTableOutput{})
 	pulumi.RegisterOutputType(DSQLTableArrayOutput{})
 	pulumi.RegisterOutputType(DSQLVpcArgsOutput{})

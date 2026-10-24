@@ -21,6 +21,10 @@
           },
           "type": "array"
         },
+        "stream": {
+          "$ref": "#/types/anvil:aws:DSQLStreamArgs",
+          "description": "Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off."
+        },
         "vpc": {
           "$ref": "#/types/anvil:aws:DSQLVpcArgs",
           "description": "Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS."
@@ -48,6 +52,14 @@
         },
         "rolesTableName": {
           "description": "DynamoDB table name for role bootstrap. Passed to DSQLConnect (via grantConnect) so it can create the IAM role-mapping item. Empty when no roles are configured.",
+          "type": "string"
+        },
+        "streamKinesisArn": {
+          "description": "The Kinesis stream CDC events are sent to. Empty when stream is omitted.",
+          "type": "string"
+        },
+        "streamRoleArn": {
+          "description": "The IAM role DSQL writes CDC events with: the one Anvil created, or stream.roleArn. Empty when stream is omitted.",
           "type": "string"
         },
         "vpcEndpointIds": {
@@ -373,6 +385,27 @@
       },
       "required": [
         "name"
+      ],
+      "type": "object"
+    },
+    "anvil:aws:DSQLStreamArgs": {
+      "description": "Change data capture to a Kinesis Data Stream.",
+      "properties": {
+        "kinesisArn": {
+          "description": "The Kinesis Data Stream that receives the events, e.g. a KinesisStream's arn. Must be in the cluster's region (the provider region for multi-region clusters) and accept records of at least 2048 KiB, which is KinesisStream's default.",
+          "type": "string"
+        },
+        "kmsKeyArn": {
+          "description": "The customer-managed KMS key the Kinesis stream is encrypted with, if any. Anvil's role is then also allowed kms:GenerateDataKey on it. Not needed with the AWS-managed key (KinesisStream's default). Only valid without roleArn.",
+          "type": "string"
+        },
+        "roleArn": {
+          "description": "An existing IAM role for DSQL to write with. Omit to have Anvil create one that only this cluster can assume, allowed to write to kinesisArn only.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kinesisArn"
       ],
       "type": "object"
     },

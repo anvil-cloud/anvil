@@ -44,6 +44,14 @@ export class DSQL extends pulumi.ComponentResource {
      */
     declare public /*out*/ readonly rolesTableName: pulumi.Output<string | undefined>;
     /**
+     * The Kinesis stream CDC events are sent to. Empty when stream is omitted.
+     */
+    declare public /*out*/ readonly streamKinesisArn: pulumi.Output<string | undefined>;
+    /**
+     * The IAM role DSQL writes CDC events with: the one Anvil created, or stream.roleArn. Empty when stream is omitted.
+     */
+    declare public /*out*/ readonly streamRoleArn: pulumi.Output<string | undefined>;
+    /**
      * Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.
      */
     declare public /*out*/ readonly vpcEndpointIds: pulumi.Output<{[key: string]: string} | undefined>;
@@ -67,11 +75,14 @@ export class DSQL extends pulumi.ComponentResource {
             resourceInputs["hatch"] = args?.hatch;
             resourceInputs["multiRegion"] = args?.multiRegion;
             resourceInputs["schemas"] = args?.schemas;
+            resourceInputs["stream"] = args?.stream;
             resourceInputs["vpc"] = args?.vpc;
             resourceInputs["clusterArns"] = undefined /*out*/;
             resourceInputs["endpoint"] = undefined /*out*/;
             resourceInputs["endpoints"] = undefined /*out*/;
             resourceInputs["rolesTableName"] = undefined /*out*/;
+            resourceInputs["streamKinesisArn"] = undefined /*out*/;
+            resourceInputs["streamRoleArn"] = undefined /*out*/;
             resourceInputs["vpcEndpointIds"] = undefined /*out*/;
             resourceInputs["vpcEndpointSecurityGroupIds"] = undefined /*out*/;
         } else {
@@ -79,6 +90,8 @@ export class DSQL extends pulumi.ComponentResource {
             resourceInputs["endpoint"] = undefined /*out*/;
             resourceInputs["endpoints"] = undefined /*out*/;
             resourceInputs["rolesTableName"] = undefined /*out*/;
+            resourceInputs["streamKinesisArn"] = undefined /*out*/;
+            resourceInputs["streamRoleArn"] = undefined /*out*/;
             resourceInputs["vpcEndpointIds"] = undefined /*out*/;
             resourceInputs["vpcEndpointSecurityGroupIds"] = undefined /*out*/;
         }
@@ -104,6 +117,10 @@ export interface DSQLArgs {
      * Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
      */
     schemas?: pulumi.Input<pulumi.Input<inputs.aws.DSQLSchemaArgs>[]>;
+    /**
+     * Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
+     */
+    stream?: pulumi.Input<inputs.aws.DSQLStreamArgsArgs>;
     /**
      * Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
      */

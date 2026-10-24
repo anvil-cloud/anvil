@@ -23,6 +23,10 @@ type DSQL struct {
 	Endpoints pulumi.StringMapOutput `pulumi:"endpoints"`
 	// DynamoDB table name for role bootstrap. Passed to DSQLConnect (via grantConnect) so it can create the IAM role-mapping item. Empty when no roles are configured.
 	RolesTableName pulumi.StringPtrOutput `pulumi:"rolesTableName"`
+	// The Kinesis stream CDC events are sent to. Empty when stream is omitted.
+	StreamKinesisArn pulumi.StringPtrOutput `pulumi:"streamKinesisArn"`
+	// The IAM role DSQL writes CDC events with: the one Anvil created, or stream.roleArn. Empty when stream is omitted.
+	StreamRoleArn pulumi.StringPtrOutput `pulumi:"streamRoleArn"`
 	// Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.
 	VpcEndpointIds pulumi.StringMapOutput `pulumi:"vpcEndpointIds"`
 	// Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId so Anvil can wire the egress rule from the Lambda SG to the endpoint SG on port 5432.
@@ -53,6 +57,8 @@ type dsqlArgs struct {
 	MultiRegion *DSQLMultiRegionArgs `pulumi:"multiRegion"`
 	// Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
 	Schemas []DSQLSchema `pulumi:"schemas"`
+	// Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
+	Stream *DSQLStreamArgs `pulumi:"stream"`
 	// Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
 	Vpc *DSQLVpcArgs `pulumi:"vpc"`
 }
@@ -66,6 +72,8 @@ type DSQLArgs struct {
 	MultiRegion DSQLMultiRegionArgsPtrInput
 	// Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
 	Schemas DSQLSchemaArrayInput
+	// Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
+	Stream DSQLStreamArgsPtrInput
 	// Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
 	Vpc DSQLVpcArgsPtrInput
 }
@@ -175,6 +183,16 @@ func (o DSQLOutput) Endpoints() pulumi.StringMapOutput {
 // DynamoDB table name for role bootstrap. Passed to DSQLConnect (via grantConnect) so it can create the IAM role-mapping item. Empty when no roles are configured.
 func (o DSQLOutput) RolesTableName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *DSQL) pulumi.StringPtrOutput { return v.RolesTableName }).(pulumi.StringPtrOutput)
+}
+
+// The Kinesis stream CDC events are sent to. Empty when stream is omitted.
+func (o DSQLOutput) StreamKinesisArn() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DSQL) pulumi.StringPtrOutput { return v.StreamKinesisArn }).(pulumi.StringPtrOutput)
+}
+
+// The IAM role DSQL writes CDC events with: the one Anvil created, or stream.roleArn. Empty when stream is omitted.
+func (o DSQLOutput) StreamRoleArn() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *DSQL) pulumi.StringPtrOutput { return v.StreamRoleArn }).(pulumi.StringPtrOutput)
 }
 
 // Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.

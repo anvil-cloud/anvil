@@ -65,6 +65,9 @@ func discoverFunctions(ctx context.Context, stage string) ([]FunctionSpec, error
 	if err := os.Remove(manifestPath); err != nil && !os.IsNotExist(err) {
 		return nil, fmt.Errorf("failed to clean build manifest: %w", err)
 	}
+	if err := os.Remove(dsqlStreamManifestPath); err != nil && !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to clean DSQL stream manifest: %w", err)
+	}
 
 	// ── Build discovery stack ──────────────────────────
 	projectRoot, err := findProjectRoot()

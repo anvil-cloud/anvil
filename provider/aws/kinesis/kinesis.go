@@ -2,6 +2,7 @@ package kinesis
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/anvil-cloud/anvil/provider/internal/hatch"
 	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
@@ -170,6 +171,28 @@ func NewKinesisStream(ctx *pulumi.Context, name string, args KinesisStreamArgs, 
 	resolvedConsumers, consumerWarnings, err := resolveConsumers(name, args.Consumers)
 	if err != nil {
 		return nil, err
+	}
+
+	// Build mode is the CLI's discovery run: it only needs the program to get
+	// through every component. Lambdas return empty outputs then, so wiring a
+	// consumer would build an IAM policy for a role with no name and fail the
+	// preview, which stops discovery of everything declared after this.
+	if os.Getenv("ANVIL_BUILD_MODE") == "true" {
+		opts = provider.WithDefault(opts, true)
+		if err := ctx.RegisterComponentResource(p.GetTypeToken(ctx), name, k, opts...); err != nil {
+			return nil, err
+		}
+		k.Arn = pulumi.String("").ToStringOutput()
+		k.StreamName = pulumi.String("").ToStringOutput()
+		k.DlqArns = pulumi.StringMap{}.ToStringMapOutput()
+		k.DlqUrls = pulumi.StringMap{}.ToStringMapOutput()
+		ctx.RegisterResourceOutputs(k, pulumi.Map{
+			"arn":     k.Arn,
+			"name":    k.StreamName,
+			"dlqArns": k.DlqArns,
+			"dlqUrls": k.DlqUrls,
+		})
+		return k, nil
 	}
 
 	provider.NewContext(ctx)

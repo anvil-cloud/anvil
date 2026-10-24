@@ -832,6 +832,24 @@ export namespace aws {
     }
 
     /**
+     * Change data capture to a Kinesis Data Stream.
+     */
+    export interface DSQLStreamArgsArgs {
+        /**
+         * The Kinesis Data Stream that receives the events, e.g. a KinesisStream's arn. Must be in the cluster's region (the provider region for multi-region clusters) and accept records of at least 2048 KiB, which is KinesisStream's default.
+         */
+        kinesisArn: pulumi.Input<string>;
+        /**
+         * The customer-managed KMS key the Kinesis stream is encrypted with, if any. Anvil's role is then also allowed kms:GenerateDataKey on it. Not needed with the AWS-managed key (KinesisStream's default). Only valid without roleArn.
+         */
+        kmsKeyArn?: pulumi.Input<string>;
+        /**
+         * An existing IAM role for DSQL to write with. Omit to have Anvil create one that only this cluster can assume, allowed to write to kinesisArn only.
+         */
+        roleArn?: pulumi.Input<string>;
+    }
+
+    /**
      * A table to create in a schema. Additive-only: Anvil creates the table and adds new columns/indexes, but never drops or alters existing ones.
      */
     export interface DSQLTableArgs {

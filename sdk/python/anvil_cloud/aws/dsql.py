@@ -26,6 +26,7 @@ class DSQLArgs:
                  hatch: Optional[pulumi.Input['DsqlHatchArgsArgs']] = None,
                  multi_region: Optional[pulumi.Input['DSQLMultiRegionArgsArgs']] = None,
                  schemas: Optional[pulumi.Input[Sequence[pulumi.Input['DSQLSchemaArgs']]]] = None,
+                 stream: Optional[pulumi.Input['DSQLStreamArgsArgs']] = None,
                  vpc: Optional[pulumi.Input['DSQLVpcArgsArgs']] = None):
         """
         The set of arguments for constructing a DSQL resource.
@@ -33,6 +34,7 @@ class DSQLArgs:
         :param pulumi.Input['DSQLBackupArgsArgs'] backup: AWS Backup configuration. Omit to disable. When set, Anvil opts in the DSQL resource type per region, creates a backup plan with retention and schedule, and for multi-region clusters automatically adds cross-region copy rules.
         :param pulumi.Input['DSQLMultiRegionArgsArgs'] multi_region: Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region.
         :param pulumi.Input[Sequence[pulumi.Input['DSQLSchemaArgs']]] schemas: Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
+        :param pulumi.Input['DSQLStreamArgsArgs'] stream: Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
         :param pulumi.Input['DSQLVpcArgsArgs'] vpc: Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
         """
         if backup is not None:
@@ -43,6 +45,8 @@ class DSQLArgs:
             pulumi.set(__self__, "multi_region", multi_region)
         if schemas is not None:
             pulumi.set(__self__, "schemas", schemas)
+        if stream is not None:
+            pulumi.set(__self__, "stream", stream)
         if vpc is not None:
             pulumi.set(__self__, "vpc", vpc)
 
@@ -93,6 +97,18 @@ class DSQLArgs:
 
     @_builtins.property
     @pulumi.getter
+    def stream(self) -> Optional[pulumi.Input['DSQLStreamArgsArgs']]:
+        """
+        Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
+        """
+        return pulumi.get(self, "stream")
+
+    @stream.setter
+    def stream(self, value: Optional[pulumi.Input['DSQLStreamArgsArgs']]):
+        pulumi.set(self, "stream", value)
+
+    @_builtins.property
+    @pulumi.getter
     def vpc(self) -> Optional[pulumi.Input['DSQLVpcArgsArgs']]:
         """
         Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
@@ -114,6 +130,7 @@ class DSQL(pulumi.ComponentResource):
                  hatch: Optional[pulumi.Input[Union['DsqlHatchArgsArgs', 'DsqlHatchArgsArgsDict']]] = None,
                  multi_region: Optional[pulumi.Input[Union['DSQLMultiRegionArgsArgs', 'DSQLMultiRegionArgsArgsDict']]] = None,
                  schemas: Optional[pulumi.Input[Sequence[pulumi.Input[Union['DSQLSchemaArgs', 'DSQLSchemaArgsDict']]]]] = None,
+                 stream: Optional[pulumi.Input[Union['DSQLStreamArgsArgs', 'DSQLStreamArgsArgsDict']]] = None,
                  vpc: Optional[pulumi.Input[Union['DSQLVpcArgsArgs', 'DSQLVpcArgsArgsDict']]] = None,
                  __props__=None):
         """
@@ -125,6 +142,7 @@ class DSQL(pulumi.ComponentResource):
         :param pulumi.Input[Union['DSQLBackupArgsArgs', 'DSQLBackupArgsArgsDict']] backup: AWS Backup configuration. Omit to disable. When set, Anvil opts in the DSQL resource type per region, creates a backup plan with retention and schedule, and for multi-region clusters automatically adds cross-region copy rules.
         :param pulumi.Input[Union['DSQLMultiRegionArgsArgs', 'DSQLMultiRegionArgsArgsDict']] multi_region: Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region.
         :param pulumi.Input[Sequence[pulumi.Input[Union['DSQLSchemaArgs', 'DSQLSchemaArgsDict']]]] schemas: Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
+        :param pulumi.Input[Union['DSQLStreamArgsArgs', 'DSQLStreamArgsArgsDict']] stream: Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
         :param pulumi.Input[Union['DSQLVpcArgsArgs', 'DSQLVpcArgsArgsDict']] vpc: Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
         """
         ...
@@ -156,6 +174,7 @@ class DSQL(pulumi.ComponentResource):
                  hatch: Optional[pulumi.Input[Union['DsqlHatchArgsArgs', 'DsqlHatchArgsArgsDict']]] = None,
                  multi_region: Optional[pulumi.Input[Union['DSQLMultiRegionArgsArgs', 'DSQLMultiRegionArgsArgsDict']]] = None,
                  schemas: Optional[pulumi.Input[Sequence[pulumi.Input[Union['DSQLSchemaArgs', 'DSQLSchemaArgsDict']]]]] = None,
+                 stream: Optional[pulumi.Input[Union['DSQLStreamArgsArgs', 'DSQLStreamArgsArgsDict']]] = None,
                  vpc: Optional[pulumi.Input[Union['DSQLVpcArgsArgs', 'DSQLVpcArgsArgsDict']]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
@@ -172,11 +191,14 @@ class DSQL(pulumi.ComponentResource):
             __props__.__dict__["hatch"] = hatch
             __props__.__dict__["multi_region"] = multi_region
             __props__.__dict__["schemas"] = schemas
+            __props__.__dict__["stream"] = stream
             __props__.__dict__["vpc"] = vpc
             __props__.__dict__["cluster_arns"] = None
             __props__.__dict__["endpoint"] = None
             __props__.__dict__["endpoints"] = None
             __props__.__dict__["roles_table_name"] = None
+            __props__.__dict__["stream_kinesis_arn"] = None
+            __props__.__dict__["stream_role_arn"] = None
             __props__.__dict__["vpc_endpoint_ids"] = None
             __props__.__dict__["vpc_endpoint_security_group_ids"] = None
         super(DSQL, __self__).__init__(
@@ -217,6 +239,22 @@ class DSQL(pulumi.ComponentResource):
         DynamoDB table name for role bootstrap. Passed to DSQLConnect (via grantConnect) so it can create the IAM role-mapping item. Empty when no roles are configured.
         """
         return pulumi.get(self, "roles_table_name")
+
+    @_builtins.property
+    @pulumi.getter(name="streamKinesisArn")
+    def stream_kinesis_arn(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The Kinesis stream CDC events are sent to. Empty when stream is omitted.
+        """
+        return pulumi.get(self, "stream_kinesis_arn")
+
+    @_builtins.property
+    @pulumi.getter(name="streamRoleArn")
+    def stream_role_arn(self) -> pulumi.Output[Optional[_builtins.str]]:
+        """
+        The IAM role DSQL writes CDC events with: the one Anvil created, or stream.roleArn. Empty when stream is omitted.
+        """
+        return pulumi.get(self, "stream_role_arn")
 
     @_builtins.property
     @pulumi.getter(name="vpcEndpointIds")
