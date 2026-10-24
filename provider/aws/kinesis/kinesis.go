@@ -22,7 +22,6 @@ const (
 	defaultMaxRecordSizeKib = 2048
 	minMaxRecordSizeKib     = 1024
 	maxMaxRecordSizeKib     = 10240
-	defaultShardCount       = 1
 
 	// awsManagedKey is the AWS-owned KMS key for Kinesis. Free, no key policy
 	// to manage, and producers/consumers in the account need no kms:* grants.
@@ -31,9 +30,10 @@ const (
 
 // KinesisProvisionedArgs switches the stream to provisioned capacity.
 type KinesisProvisionedArgs struct {
-	// ShardCount is the number of shards. Each shard takes 1 MB/s or 1,000
-	// records/s in and serves 2 MB/s out. Default: 1.
-	ShardCount int `pulumi:"shardCount,optional"`
+	// ShardCount is the number of shards. Required, so a provisioned stream's
+	// capacity is always stated. Each shard takes 1 MB/s or 1,000 records/s in
+	// and serves 2 MB/s out.
+	ShardCount int `pulumi:"shardCount"`
 }
 
 // KinesisStreamArgs defines the inputs for an Anvil-managed Kinesis Data Stream.
@@ -53,6 +53,12 @@ type KinesisStreamArgs struct {
 	// events (rows up to 2 MiB) without extra config.
 	MaxRecordSizeKib int `pulumi:"maxRecordSizeKib,optional"`
 
+	// Consumers wires Lambda functions to read the stream. Each consumer gets
+	// an event source mapping, its own dead letter queue, and — with
+	// grantRead: true — the grantRead permissions. Every consumer shares the
+	// stream's read throughput (2 MB/s per shard).
+	Consumers []KinesisConsumerArgs `pulumi:"consumers,optional"`
+
 	// Hatch is the escape hatch for low-level overrides of the underlying
 	// aws.kinesis.Stream. Keys: "kinesis". Use for a customer-managed KMS key
 	// (encryptionType + kmsKeyId) or shard-level metrics.
@@ -69,6 +75,12 @@ type KinesisStream struct {
 	// StreamName is the physical name of the Kinesis stream.
 	StreamName pulumi.StringOutput `pulumi:"name"`
 
+	// DlqArns maps each consumer's consumerName to the ARN of its dead letter queue.
+	DlqArns pulumi.StringMapOutput `pulumi:"dlqArns"`
+
+	// DlqUrls maps each consumer's consumerName to the URL of its dead letter queue.
+	DlqUrls pulumi.StringMapOutput `pulumi:"dlqUrls"`
+
 	name string
 }
 
@@ -78,7 +90,7 @@ func (k *KinesisStream) Name() string {
 
 func (k *KinesisStream) Annotate(a infer.Annotator) {
 	a.SetToken("aws", "KinesisStream")
-	a.Describe(&k, "An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key is always on.")
+	a.Describe(&k, "An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key is always on. Consumers get a dead letter queue and safe retry defaults.")
 }
 
 // streamConfig is the validated, defaulted form of KinesisStreamArgs.
@@ -100,11 +112,8 @@ func resolveConfig(name string, args KinesisStreamArgs) (streamConfig, error) {
 	if args.Provisioned != nil {
 		cfg.mode = modeProvisioned
 		cfg.shardCount = args.Provisioned.ShardCount
-		if cfg.shardCount < 0 {
-			return cfg, fmt.Errorf("kinesis stream %q: provisioned.shardCount must be positive, got %d", name, cfg.shardCount)
-		}
-		if cfg.shardCount == 0 {
-			cfg.shardCount = defaultShardCount
+		if cfg.shardCount < 1 {
+			return cfg, fmt.Errorf("kinesis stream %q: provisioned.shardCount must be at least 1, got %d — omit provisioned for an on-demand stream", name, cfg.shardCount)
 		}
 	}
 
@@ -158,6 +167,10 @@ func NewKinesisStream(ctx *pulumi.Context, name string, args KinesisStreamArgs, 
 	if err != nil {
 		return nil, err
 	}
+	resolvedConsumers, consumerWarnings, err := resolveConsumers(name, args.Consumers)
+	if err != nil {
+		return nil, err
+	}
 
 	provider.NewContext(ctx)
 
@@ -171,6 +184,10 @@ func NewKinesisStream(ctx *pulumi.Context, name string, args KinesisStreamArgs, 
 		return nil, err
 	}
 
+	for _, warning := range consumerWarnings {
+		ctx.Log.Warn(warning, &pulumi.LogArgs{Resource: k})
+	}
+
 	// ── 1. Stream ──────────────────────────────────────
 	props := streamProps(provider.PhysicalName(stage, name, "stream", stageId), streamCfg)
 	streamPropsMerged := hatch.Merge(args.Hatch["kinesis"], props)
@@ -179,13 +196,23 @@ func NewKinesisStream(ctx *pulumi.Context, name string, args KinesisStreamArgs, 
 		return nil, fmt.Errorf("failed to create kinesis stream %q: %w", name, err)
 	}
 
-	// ── 2. Wire outputs ────────────────────────────────
+	// ── 2. Consumers (optional) ────────────────────────
+	dlqArns, dlqUrls, err := wireConsumers(ctx, k, name, stage, stageId, streamRes.Arn, args.Consumers, resolvedConsumers)
+	if err != nil {
+		return nil, err
+	}
+
+	// ── 3. Wire outputs ────────────────────────────────
 	k.Arn = streamRes.Arn
 	k.StreamName = streamRes.Name
+	k.DlqArns = dlqArns.ToStringMapOutput()
+	k.DlqUrls = dlqUrls.ToStringMapOutput()
 
 	ctx.RegisterResourceOutputs(k, pulumi.Map{
-		"arn":  streamRes.Arn,
-		"name": streamRes.Name,
+		"arn":     streamRes.Arn,
+		"name":    streamRes.Name,
+		"dlqArns": k.DlqArns,
+		"dlqUrls": k.DlqUrls,
 	})
 
 	return k, nil

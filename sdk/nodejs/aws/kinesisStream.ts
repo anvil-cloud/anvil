@@ -10,7 +10,7 @@ import * as utilities from "../utilities";
 import * as pulumiAws from "@pulumi/aws";
 
 /**
- * An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key (alias/aws/kinesis) is always on. Wire consumers yourself; use grantRead/grantWrite to give compute access.
+ * An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key (alias/aws/kinesis) is always on. Add Lambda consumers with consumers (each gets a dead letter queue and safe retry defaults); use grantRead/grantWrite for other compute.
  */
 export class KinesisStream extends pulumi.ComponentResource {
     /** @internal */
@@ -32,6 +32,14 @@ export class KinesisStream extends pulumi.ComponentResource {
      */
     declare public /*out*/ readonly arn: pulumi.Output<string>;
     /**
+     * Each consumer's consumerName mapped to the ARN of its dead letter queue.
+     */
+    declare public /*out*/ readonly dlqArns: pulumi.Output<{[key: string]: string}>;
+    /**
+     * Each consumer's consumerName mapped to the URL of its dead letter queue.
+     */
+    declare public /*out*/ readonly dlqUrls: pulumi.Output<{[key: string]: string}>;
+    /**
      * The physical name of the Kinesis stream.
      */
     declare public /*out*/ readonly name: pulumi.Output<string>;
@@ -47,14 +55,19 @@ export class KinesisStream extends pulumi.ComponentResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
+            resourceInputs["consumers"] = args?.consumers;
             resourceInputs["hatch"] = args?.hatch;
             resourceInputs["maxRecordSizeKib"] = args?.maxRecordSizeKib;
             resourceInputs["provisioned"] = args?.provisioned;
             resourceInputs["retentionHours"] = args?.retentionHours;
             resourceInputs["arn"] = undefined /*out*/;
+            resourceInputs["dlqArns"] = undefined /*out*/;
+            resourceInputs["dlqUrls"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
         } else {
             resourceInputs["arn"] = undefined /*out*/;
+            resourceInputs["dlqArns"] = undefined /*out*/;
+            resourceInputs["dlqUrls"] = undefined /*out*/;
             resourceInputs["name"] = undefined /*out*/;
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts);
@@ -66,6 +79,10 @@ export class KinesisStream extends pulumi.ComponentResource {
  * The set of arguments for constructing a KinesisStream resource.
  */
 export interface KinesisStreamArgs {
+    /**
+     * Lambda functions that read the stream. Each consumer gets an event source mapping (starting from the oldest record, bisect-on-error, 3 retries), its own dead letter queue for records that still fail, sqs:SendMessage on that DLQ, and — with grantRead: true — the grantRead permissions. All consumers share the stream's read throughput (2 MB/s per shard). Each consumer's resources are named after its consumerName, so adding, removing or reordering consumers only touches the one that changed.
+     */
+    consumers?: pulumi.Input<pulumi.Input<inputs.aws.KinesisConsumerArgsArgs>[]>;
     hatch?: pulumi.Input<inputs.aws.KinesisHatchArgsArgs>;
     /**
      * Largest record the stream accepts, in KiB, 1024–10240. Default: 2048, so the stream can take Aurora DSQL CDC events (rows up to 2 MiB) without extra config.

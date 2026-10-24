@@ -11697,6 +11697,328 @@ func (o HttpApiThrottlingPtrOutput) RateLimit() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
+// One consumer of the stream.
+type KinesisConsumerArgs struct {
+	// Most records sent to the Lambda in one invocation, 1–10000. Default: 100.
+	BatchSize *int `pulumi:"batchSize"`
+	// Identifies the consumer and names its resources (<stream>-<consumerName>-dlq, -esm, -policy). Usually the Lambda's name, e.g. "indexer". Letters, numbers and hyphens, starting with a letter, up to 32 characters, unique per stream. Renaming a consumer recreates its resources.
+	ConsumerName string `pulumi:"consumerName"`
+	// Pauses the consumer when false: the event source mapping stops polling but keeps its position, so it resumes where it left off. Records older than the stream's retention are lost while paused. Default: true.
+	Enabled *bool `pulumi:"enabled"`
+	// Limits which records invoke the Lambda. Applied by the event source mapping, not the stream: the stream still receives every record, but records that don't match are skipped (not invoked, not billed). When omitted, every record is delivered.
+	Filter *KinesisConsumerFilterArgs `pulumi:"filter"`
+	// Attaches the grantRead permissions on this stream to the consumer's execution role. Declared here, not with a separate grantRead call, because the event source mapping must wait for the grant. false skips it with a deploy warning: the role must then get read access another way, or the event source mapping fails to create.
+	GrantRead bool `pulumi:"grantRead"`
+	// Wire an Anvil Lambda function as the consumer.
+	Lambda KinesisLambdaConsumerArgs `pulumi:"lambda"`
+	// Lets the Lambda report which records in a batch failed so only those are retried. The handler must return { batchItemFailures: [{ itemIdentifier: <sequenceNumber> }] }. Default: false (a failure retries the whole batch, split in half each time).
+	ReportBatchItemFailures *bool `pulumi:"reportBatchItemFailures"`
+	// Where the consumer starts reading when it's first created. Default: "TRIM_HORIZON". Changing it later recreates the event source mapping, which resets the consumer's position.
+	StartingPosition *KinesisConsumerStartingPosition `pulumi:"startingPosition"`
+}
+
+// KinesisConsumerArgsInput is an input type that accepts KinesisConsumerArgsArgs and KinesisConsumerArgsOutput values.
+// You can construct a concrete instance of `KinesisConsumerArgsInput` via:
+//
+//	KinesisConsumerArgsArgs{...}
+type KinesisConsumerArgsInput interface {
+	pulumi.Input
+
+	ToKinesisConsumerArgsOutput() KinesisConsumerArgsOutput
+	ToKinesisConsumerArgsOutputWithContext(context.Context) KinesisConsumerArgsOutput
+}
+
+// One consumer of the stream.
+type KinesisConsumerArgsArgs struct {
+	// Most records sent to the Lambda in one invocation, 1–10000. Default: 100.
+	BatchSize pulumi.IntPtrInput `pulumi:"batchSize"`
+	// Identifies the consumer and names its resources (<stream>-<consumerName>-dlq, -esm, -policy). Usually the Lambda's name, e.g. "indexer". Letters, numbers and hyphens, starting with a letter, up to 32 characters, unique per stream. Renaming a consumer recreates its resources.
+	ConsumerName string `pulumi:"consumerName"`
+	// Pauses the consumer when false: the event source mapping stops polling but keeps its position, so it resumes where it left off. Records older than the stream's retention are lost while paused. Default: true.
+	Enabled pulumi.BoolPtrInput `pulumi:"enabled"`
+	// Limits which records invoke the Lambda. Applied by the event source mapping, not the stream: the stream still receives every record, but records that don't match are skipped (not invoked, not billed). When omitted, every record is delivered.
+	Filter KinesisConsumerFilterArgsPtrInput `pulumi:"filter"`
+	// Attaches the grantRead permissions on this stream to the consumer's execution role. Declared here, not with a separate grantRead call, because the event source mapping must wait for the grant. false skips it with a deploy warning: the role must then get read access another way, or the event source mapping fails to create.
+	GrantRead pulumi.BoolInput `pulumi:"grantRead"`
+	// Wire an Anvil Lambda function as the consumer.
+	Lambda KinesisLambdaConsumerArgsInput `pulumi:"lambda"`
+	// Lets the Lambda report which records in a batch failed so only those are retried. The handler must return { batchItemFailures: [{ itemIdentifier: <sequenceNumber> }] }. Default: false (a failure retries the whole batch, split in half each time).
+	ReportBatchItemFailures pulumi.BoolPtrInput `pulumi:"reportBatchItemFailures"`
+	// Where the consumer starts reading when it's first created. Default: "TRIM_HORIZON". Changing it later recreates the event source mapping, which resets the consumer's position.
+	StartingPosition KinesisConsumerStartingPositionPtrInput `pulumi:"startingPosition"`
+}
+
+func (KinesisConsumerArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*KinesisConsumerArgs)(nil)).Elem()
+}
+
+func (i KinesisConsumerArgsArgs) ToKinesisConsumerArgsOutput() KinesisConsumerArgsOutput {
+	return i.ToKinesisConsumerArgsOutputWithContext(context.Background())
+}
+
+func (i KinesisConsumerArgsArgs) ToKinesisConsumerArgsOutputWithContext(ctx context.Context) KinesisConsumerArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KinesisConsumerArgsOutput)
+}
+
+// KinesisConsumerArgsArrayInput is an input type that accepts KinesisConsumerArgsArray and KinesisConsumerArgsArrayOutput values.
+// You can construct a concrete instance of `KinesisConsumerArgsArrayInput` via:
+//
+//	KinesisConsumerArgsArray{ KinesisConsumerArgsArgs{...} }
+type KinesisConsumerArgsArrayInput interface {
+	pulumi.Input
+
+	ToKinesisConsumerArgsArrayOutput() KinesisConsumerArgsArrayOutput
+	ToKinesisConsumerArgsArrayOutputWithContext(context.Context) KinesisConsumerArgsArrayOutput
+}
+
+type KinesisConsumerArgsArray []KinesisConsumerArgsInput
+
+func (KinesisConsumerArgsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]KinesisConsumerArgs)(nil)).Elem()
+}
+
+func (i KinesisConsumerArgsArray) ToKinesisConsumerArgsArrayOutput() KinesisConsumerArgsArrayOutput {
+	return i.ToKinesisConsumerArgsArrayOutputWithContext(context.Background())
+}
+
+func (i KinesisConsumerArgsArray) ToKinesisConsumerArgsArrayOutputWithContext(ctx context.Context) KinesisConsumerArgsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KinesisConsumerArgsArrayOutput)
+}
+
+// One consumer of the stream.
+type KinesisConsumerArgsOutput struct{ *pulumi.OutputState }
+
+func (KinesisConsumerArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*KinesisConsumerArgs)(nil)).Elem()
+}
+
+func (o KinesisConsumerArgsOutput) ToKinesisConsumerArgsOutput() KinesisConsumerArgsOutput {
+	return o
+}
+
+func (o KinesisConsumerArgsOutput) ToKinesisConsumerArgsOutputWithContext(ctx context.Context) KinesisConsumerArgsOutput {
+	return o
+}
+
+// Most records sent to the Lambda in one invocation, 1–10000. Default: 100.
+func (o KinesisConsumerArgsOutput) BatchSize() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v KinesisConsumerArgs) *int { return v.BatchSize }).(pulumi.IntPtrOutput)
+}
+
+// Identifies the consumer and names its resources (<stream>-<consumerName>-dlq, -esm, -policy). Usually the Lambda's name, e.g. "indexer". Letters, numbers and hyphens, starting with a letter, up to 32 characters, unique per stream. Renaming a consumer recreates its resources.
+func (o KinesisConsumerArgsOutput) ConsumerName() pulumi.StringOutput {
+	return o.ApplyT(func(v KinesisConsumerArgs) string { return v.ConsumerName }).(pulumi.StringOutput)
+}
+
+// Pauses the consumer when false: the event source mapping stops polling but keeps its position, so it resumes where it left off. Records older than the stream's retention are lost while paused. Default: true.
+func (o KinesisConsumerArgsOutput) Enabled() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v KinesisConsumerArgs) *bool { return v.Enabled }).(pulumi.BoolPtrOutput)
+}
+
+// Limits which records invoke the Lambda. Applied by the event source mapping, not the stream: the stream still receives every record, but records that don't match are skipped (not invoked, not billed). When omitted, every record is delivered.
+func (o KinesisConsumerArgsOutput) Filter() KinesisConsumerFilterArgsPtrOutput {
+	return o.ApplyT(func(v KinesisConsumerArgs) *KinesisConsumerFilterArgs { return v.Filter }).(KinesisConsumerFilterArgsPtrOutput)
+}
+
+// Attaches the grantRead permissions on this stream to the consumer's execution role. Declared here, not with a separate grantRead call, because the event source mapping must wait for the grant. false skips it with a deploy warning: the role must then get read access another way, or the event source mapping fails to create.
+func (o KinesisConsumerArgsOutput) GrantRead() pulumi.BoolOutput {
+	return o.ApplyT(func(v KinesisConsumerArgs) bool { return v.GrantRead }).(pulumi.BoolOutput)
+}
+
+// Wire an Anvil Lambda function as the consumer.
+func (o KinesisConsumerArgsOutput) Lambda() KinesisLambdaConsumerArgsOutput {
+	return o.ApplyT(func(v KinesisConsumerArgs) KinesisLambdaConsumerArgs { return v.Lambda }).(KinesisLambdaConsumerArgsOutput)
+}
+
+// Lets the Lambda report which records in a batch failed so only those are retried. The handler must return { batchItemFailures: [{ itemIdentifier: <sequenceNumber> }] }. Default: false (a failure retries the whole batch, split in half each time).
+func (o KinesisConsumerArgsOutput) ReportBatchItemFailures() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v KinesisConsumerArgs) *bool { return v.ReportBatchItemFailures }).(pulumi.BoolPtrOutput)
+}
+
+// Where the consumer starts reading when it's first created. Default: "TRIM_HORIZON". Changing it later recreates the event source mapping, which resets the consumer's position.
+func (o KinesisConsumerArgsOutput) StartingPosition() KinesisConsumerStartingPositionPtrOutput {
+	return o.ApplyT(func(v KinesisConsumerArgs) *KinesisConsumerStartingPosition { return v.StartingPosition }).(KinesisConsumerStartingPositionPtrOutput)
+}
+
+type KinesisConsumerArgsArrayOutput struct{ *pulumi.OutputState }
+
+func (KinesisConsumerArgsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]KinesisConsumerArgs)(nil)).Elem()
+}
+
+func (o KinesisConsumerArgsArrayOutput) ToKinesisConsumerArgsArrayOutput() KinesisConsumerArgsArrayOutput {
+	return o
+}
+
+func (o KinesisConsumerArgsArrayOutput) ToKinesisConsumerArgsArrayOutputWithContext(ctx context.Context) KinesisConsumerArgsArrayOutput {
+	return o
+}
+
+func (o KinesisConsumerArgsArrayOutput) Index(i pulumi.IntInput) KinesisConsumerArgsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) KinesisConsumerArgs {
+		return vs[0].([]KinesisConsumerArgs)[vs[1].(int)]
+	}).(KinesisConsumerArgsOutput)
+}
+
+// Limits which records invoke a consumer. tables and patterns can be combined; a record matching any of them is delivered. Together they can produce at most 5 filter patterns (Lambda's quota).
+type KinesisConsumerFilterArgs struct {
+	// Raw Lambda event filter patterns (JSON), for records that aren't DSQL CDC events. Kinesis record data is matched under "data", e.g. {"data":{"type":["order.created"]}}. Each pattern takes one filter.
+	Patterns []string `pulumi:"patterns"`
+	// Delivers only Aurora DSQL CDC events for these tables, matched against the event's source.table. Qualify with a schema to also match source.schema: "orders" matches orders in any schema, "app.orders" only app.orders. Unqualified tables share one pattern; each qualified table takes one.
+	Tables []string `pulumi:"tables"`
+}
+
+// KinesisConsumerFilterArgsInput is an input type that accepts KinesisConsumerFilterArgsArgs and KinesisConsumerFilterArgsOutput values.
+// You can construct a concrete instance of `KinesisConsumerFilterArgsInput` via:
+//
+//	KinesisConsumerFilterArgsArgs{...}
+type KinesisConsumerFilterArgsInput interface {
+	pulumi.Input
+
+	ToKinesisConsumerFilterArgsOutput() KinesisConsumerFilterArgsOutput
+	ToKinesisConsumerFilterArgsOutputWithContext(context.Context) KinesisConsumerFilterArgsOutput
+}
+
+// Limits which records invoke a consumer. tables and patterns can be combined; a record matching any of them is delivered. Together they can produce at most 5 filter patterns (Lambda's quota).
+type KinesisConsumerFilterArgsArgs struct {
+	// Raw Lambda event filter patterns (JSON), for records that aren't DSQL CDC events. Kinesis record data is matched under "data", e.g. {"data":{"type":["order.created"]}}. Each pattern takes one filter.
+	Patterns pulumi.StringArrayInput `pulumi:"patterns"`
+	// Delivers only Aurora DSQL CDC events for these tables, matched against the event's source.table. Qualify with a schema to also match source.schema: "orders" matches orders in any schema, "app.orders" only app.orders. Unqualified tables share one pattern; each qualified table takes one.
+	Tables pulumi.StringArrayInput `pulumi:"tables"`
+}
+
+func (KinesisConsumerFilterArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*KinesisConsumerFilterArgs)(nil)).Elem()
+}
+
+func (i KinesisConsumerFilterArgsArgs) ToKinesisConsumerFilterArgsOutput() KinesisConsumerFilterArgsOutput {
+	return i.ToKinesisConsumerFilterArgsOutputWithContext(context.Background())
+}
+
+func (i KinesisConsumerFilterArgsArgs) ToKinesisConsumerFilterArgsOutputWithContext(ctx context.Context) KinesisConsumerFilterArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KinesisConsumerFilterArgsOutput)
+}
+
+func (i KinesisConsumerFilterArgsArgs) ToKinesisConsumerFilterArgsPtrOutput() KinesisConsumerFilterArgsPtrOutput {
+	return i.ToKinesisConsumerFilterArgsPtrOutputWithContext(context.Background())
+}
+
+func (i KinesisConsumerFilterArgsArgs) ToKinesisConsumerFilterArgsPtrOutputWithContext(ctx context.Context) KinesisConsumerFilterArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KinesisConsumerFilterArgsOutput).ToKinesisConsumerFilterArgsPtrOutputWithContext(ctx)
+}
+
+// KinesisConsumerFilterArgsPtrInput is an input type that accepts KinesisConsumerFilterArgsArgs, KinesisConsumerFilterArgsPtr and KinesisConsumerFilterArgsPtrOutput values.
+// You can construct a concrete instance of `KinesisConsumerFilterArgsPtrInput` via:
+//
+//	        KinesisConsumerFilterArgsArgs{...}
+//
+//	or:
+//
+//	        nil
+type KinesisConsumerFilterArgsPtrInput interface {
+	pulumi.Input
+
+	ToKinesisConsumerFilterArgsPtrOutput() KinesisConsumerFilterArgsPtrOutput
+	ToKinesisConsumerFilterArgsPtrOutputWithContext(context.Context) KinesisConsumerFilterArgsPtrOutput
+}
+
+type kinesisConsumerFilterArgsPtrType KinesisConsumerFilterArgsArgs
+
+func KinesisConsumerFilterArgsPtr(v *KinesisConsumerFilterArgsArgs) KinesisConsumerFilterArgsPtrInput {
+	return (*kinesisConsumerFilterArgsPtrType)(v)
+}
+
+func (*kinesisConsumerFilterArgsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**KinesisConsumerFilterArgs)(nil)).Elem()
+}
+
+func (i *kinesisConsumerFilterArgsPtrType) ToKinesisConsumerFilterArgsPtrOutput() KinesisConsumerFilterArgsPtrOutput {
+	return i.ToKinesisConsumerFilterArgsPtrOutputWithContext(context.Background())
+}
+
+func (i *kinesisConsumerFilterArgsPtrType) ToKinesisConsumerFilterArgsPtrOutputWithContext(ctx context.Context) KinesisConsumerFilterArgsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KinesisConsumerFilterArgsPtrOutput)
+}
+
+// Limits which records invoke a consumer. tables and patterns can be combined; a record matching any of them is delivered. Together they can produce at most 5 filter patterns (Lambda's quota).
+type KinesisConsumerFilterArgsOutput struct{ *pulumi.OutputState }
+
+func (KinesisConsumerFilterArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*KinesisConsumerFilterArgs)(nil)).Elem()
+}
+
+func (o KinesisConsumerFilterArgsOutput) ToKinesisConsumerFilterArgsOutput() KinesisConsumerFilterArgsOutput {
+	return o
+}
+
+func (o KinesisConsumerFilterArgsOutput) ToKinesisConsumerFilterArgsOutputWithContext(ctx context.Context) KinesisConsumerFilterArgsOutput {
+	return o
+}
+
+func (o KinesisConsumerFilterArgsOutput) ToKinesisConsumerFilterArgsPtrOutput() KinesisConsumerFilterArgsPtrOutput {
+	return o.ToKinesisConsumerFilterArgsPtrOutputWithContext(context.Background())
+}
+
+func (o KinesisConsumerFilterArgsOutput) ToKinesisConsumerFilterArgsPtrOutputWithContext(ctx context.Context) KinesisConsumerFilterArgsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v KinesisConsumerFilterArgs) *KinesisConsumerFilterArgs {
+		return &v
+	}).(KinesisConsumerFilterArgsPtrOutput)
+}
+
+// Raw Lambda event filter patterns (JSON), for records that aren't DSQL CDC events. Kinesis record data is matched under "data", e.g. {"data":{"type":["order.created"]}}. Each pattern takes one filter.
+func (o KinesisConsumerFilterArgsOutput) Patterns() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v KinesisConsumerFilterArgs) []string { return v.Patterns }).(pulumi.StringArrayOutput)
+}
+
+// Delivers only Aurora DSQL CDC events for these tables, matched against the event's source.table. Qualify with a schema to also match source.schema: "orders" matches orders in any schema, "app.orders" only app.orders. Unqualified tables share one pattern; each qualified table takes one.
+func (o KinesisConsumerFilterArgsOutput) Tables() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v KinesisConsumerFilterArgs) []string { return v.Tables }).(pulumi.StringArrayOutput)
+}
+
+type KinesisConsumerFilterArgsPtrOutput struct{ *pulumi.OutputState }
+
+func (KinesisConsumerFilterArgsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**KinesisConsumerFilterArgs)(nil)).Elem()
+}
+
+func (o KinesisConsumerFilterArgsPtrOutput) ToKinesisConsumerFilterArgsPtrOutput() KinesisConsumerFilterArgsPtrOutput {
+	return o
+}
+
+func (o KinesisConsumerFilterArgsPtrOutput) ToKinesisConsumerFilterArgsPtrOutputWithContext(ctx context.Context) KinesisConsumerFilterArgsPtrOutput {
+	return o
+}
+
+func (o KinesisConsumerFilterArgsPtrOutput) Elem() KinesisConsumerFilterArgsOutput {
+	return o.ApplyT(func(v *KinesisConsumerFilterArgs) KinesisConsumerFilterArgs {
+		if v != nil {
+			return *v
+		}
+		var ret KinesisConsumerFilterArgs
+		return ret
+	}).(KinesisConsumerFilterArgsOutput)
+}
+
+// Raw Lambda event filter patterns (JSON), for records that aren't DSQL CDC events. Kinesis record data is matched under "data", e.g. {"data":{"type":["order.created"]}}. Each pattern takes one filter.
+func (o KinesisConsumerFilterArgsPtrOutput) Patterns() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *KinesisConsumerFilterArgs) []string {
+		if v == nil {
+			return nil
+		}
+		return v.Patterns
+	}).(pulumi.StringArrayOutput)
+}
+
+// Delivers only Aurora DSQL CDC events for these tables, matched against the event's source.table. Qualify with a schema to also match source.schema: "orders" matches orders in any schema, "app.orders" only app.orders. Unqualified tables share one pattern; each qualified table takes one.
+func (o KinesisConsumerFilterArgsPtrOutput) Tables() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *KinesisConsumerFilterArgs) []string {
+		if v == nil {
+			return nil
+		}
+		return v.Tables
+	}).(pulumi.StringArrayOutput)
+}
+
 type KinesisHatchArgs struct {
 	Kinesis *KinesisOverrides `pulumi:"kinesis"`
 }
@@ -11828,6 +12150,70 @@ func (o KinesisHatchArgsPtrOutput) Kinesis() KinesisOverridesPtrOutput {
 		}
 		return v.Kinesis
 	}).(KinesisOverridesPtrOutput)
+}
+
+// Lambda consumer configuration. Pass fn.arn and fn.roleArn from an Anvil Lambda component.
+type KinesisLambdaConsumerArgs struct {
+	// The ARN of the Lambda function to trigger. Use fn.arn from an Anvil Lambda component.
+	Arn string `pulumi:"arn"`
+	// The ARN of the Lambda's execution role. Use fn.roleArn from an Anvil Lambda component. Required for Anvil to attach the grantRead and DLQ permissions.
+	LambdaRoleArn string `pulumi:"lambdaRoleArn"`
+}
+
+// KinesisLambdaConsumerArgsInput is an input type that accepts KinesisLambdaConsumerArgsArgs and KinesisLambdaConsumerArgsOutput values.
+// You can construct a concrete instance of `KinesisLambdaConsumerArgsInput` via:
+//
+//	KinesisLambdaConsumerArgsArgs{...}
+type KinesisLambdaConsumerArgsInput interface {
+	pulumi.Input
+
+	ToKinesisLambdaConsumerArgsOutput() KinesisLambdaConsumerArgsOutput
+	ToKinesisLambdaConsumerArgsOutputWithContext(context.Context) KinesisLambdaConsumerArgsOutput
+}
+
+// Lambda consumer configuration. Pass fn.arn and fn.roleArn from an Anvil Lambda component.
+type KinesisLambdaConsumerArgsArgs struct {
+	// The ARN of the Lambda function to trigger. Use fn.arn from an Anvil Lambda component.
+	Arn pulumi.StringInput `pulumi:"arn"`
+	// The ARN of the Lambda's execution role. Use fn.roleArn from an Anvil Lambda component. Required for Anvil to attach the grantRead and DLQ permissions.
+	LambdaRoleArn pulumi.StringInput `pulumi:"lambdaRoleArn"`
+}
+
+func (KinesisLambdaConsumerArgsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*KinesisLambdaConsumerArgs)(nil)).Elem()
+}
+
+func (i KinesisLambdaConsumerArgsArgs) ToKinesisLambdaConsumerArgsOutput() KinesisLambdaConsumerArgsOutput {
+	return i.ToKinesisLambdaConsumerArgsOutputWithContext(context.Background())
+}
+
+func (i KinesisLambdaConsumerArgsArgs) ToKinesisLambdaConsumerArgsOutputWithContext(ctx context.Context) KinesisLambdaConsumerArgsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(KinesisLambdaConsumerArgsOutput)
+}
+
+// Lambda consumer configuration. Pass fn.arn and fn.roleArn from an Anvil Lambda component.
+type KinesisLambdaConsumerArgsOutput struct{ *pulumi.OutputState }
+
+func (KinesisLambdaConsumerArgsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*KinesisLambdaConsumerArgs)(nil)).Elem()
+}
+
+func (o KinesisLambdaConsumerArgsOutput) ToKinesisLambdaConsumerArgsOutput() KinesisLambdaConsumerArgsOutput {
+	return o
+}
+
+func (o KinesisLambdaConsumerArgsOutput) ToKinesisLambdaConsumerArgsOutputWithContext(ctx context.Context) KinesisLambdaConsumerArgsOutput {
+	return o
+}
+
+// The ARN of the Lambda function to trigger. Use fn.arn from an Anvil Lambda component.
+func (o KinesisLambdaConsumerArgsOutput) Arn() pulumi.StringOutput {
+	return o.ApplyT(func(v KinesisLambdaConsumerArgs) string { return v.Arn }).(pulumi.StringOutput)
+}
+
+// The ARN of the Lambda's execution role. Use fn.roleArn from an Anvil Lambda component. Required for Anvil to attach the grantRead and DLQ permissions.
+func (o KinesisLambdaConsumerArgsOutput) LambdaRoleArn() pulumi.StringOutput {
+	return o.ApplyT(func(v KinesisLambdaConsumerArgs) string { return v.LambdaRoleArn }).(pulumi.StringOutput)
 }
 
 type KinesisOverrides struct {
@@ -12182,8 +12568,8 @@ func (o KinesisOverridesPtrOutput) Tags() pulumi.StringMapOutput {
 
 // Provisioned capacity configuration.
 type KinesisProvisionedArgs struct {
-	// Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.
-	ShardCount *int `pulumi:"shardCount"`
+	// Number of shards, at least 1. Required, so a provisioned stream's capacity is always stated. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out.
+	ShardCount int `pulumi:"shardCount"`
 }
 
 // KinesisProvisionedArgsInput is an input type that accepts KinesisProvisionedArgsArgs and KinesisProvisionedArgsOutput values.
@@ -12199,8 +12585,8 @@ type KinesisProvisionedArgsInput interface {
 
 // Provisioned capacity configuration.
 type KinesisProvisionedArgsArgs struct {
-	// Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.
-	ShardCount pulumi.IntPtrInput `pulumi:"shardCount"`
+	// Number of shards, at least 1. Required, so a provisioned stream's capacity is always stated. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out.
+	ShardCount pulumi.IntInput `pulumi:"shardCount"`
 }
 
 func (KinesisProvisionedArgsArgs) ElementType() reflect.Type {
@@ -12281,9 +12667,9 @@ func (o KinesisProvisionedArgsOutput) ToKinesisProvisionedArgsPtrOutputWithConte
 	}).(KinesisProvisionedArgsPtrOutput)
 }
 
-// Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.
-func (o KinesisProvisionedArgsOutput) ShardCount() pulumi.IntPtrOutput {
-	return o.ApplyT(func(v KinesisProvisionedArgs) *int { return v.ShardCount }).(pulumi.IntPtrOutput)
+// Number of shards, at least 1. Required, so a provisioned stream's capacity is always stated. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out.
+func (o KinesisProvisionedArgsOutput) ShardCount() pulumi.IntOutput {
+	return o.ApplyT(func(v KinesisProvisionedArgs) int { return v.ShardCount }).(pulumi.IntOutput)
 }
 
 type KinesisProvisionedArgsPtrOutput struct{ *pulumi.OutputState }
@@ -12310,13 +12696,13 @@ func (o KinesisProvisionedArgsPtrOutput) Elem() KinesisProvisionedArgsOutput {
 	}).(KinesisProvisionedArgsOutput)
 }
 
-// Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.
+// Number of shards, at least 1. Required, so a provisioned stream's capacity is always stated. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out.
 func (o KinesisProvisionedArgsPtrOutput) ShardCount() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *KinesisProvisionedArgs) *int {
 		if v == nil {
 			return nil
 		}
-		return v.ShardCount
+		return &v.ShardCount
 	}).(pulumi.IntPtrOutput)
 }
 
@@ -17898,8 +18284,13 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*HttpApiStepFunctionsConsumerPtrInput)(nil)).Elem(), HttpApiStepFunctionsConsumerArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HttpApiThrottlingInput)(nil)).Elem(), HttpApiThrottlingArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HttpApiThrottlingPtrInput)(nil)).Elem(), HttpApiThrottlingArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KinesisConsumerArgsInput)(nil)).Elem(), KinesisConsumerArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KinesisConsumerArgsArrayInput)(nil)).Elem(), KinesisConsumerArgsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KinesisConsumerFilterArgsInput)(nil)).Elem(), KinesisConsumerFilterArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KinesisConsumerFilterArgsPtrInput)(nil)).Elem(), KinesisConsumerFilterArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*KinesisHatchArgsInput)(nil)).Elem(), KinesisHatchArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*KinesisHatchArgsPtrInput)(nil)).Elem(), KinesisHatchArgsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*KinesisLambdaConsumerArgsInput)(nil)).Elem(), KinesisLambdaConsumerArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*KinesisOverridesInput)(nil)).Elem(), KinesisOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*KinesisOverridesPtrInput)(nil)).Elem(), KinesisOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*KinesisProvisionedArgsInput)(nil)).Elem(), KinesisProvisionedArgsArgs{})
@@ -18074,8 +18465,13 @@ func init() {
 	pulumi.RegisterOutputType(HttpApiStepFunctionsConsumerPtrOutput{})
 	pulumi.RegisterOutputType(HttpApiThrottlingOutput{})
 	pulumi.RegisterOutputType(HttpApiThrottlingPtrOutput{})
+	pulumi.RegisterOutputType(KinesisConsumerArgsOutput{})
+	pulumi.RegisterOutputType(KinesisConsumerArgsArrayOutput{})
+	pulumi.RegisterOutputType(KinesisConsumerFilterArgsOutput{})
+	pulumi.RegisterOutputType(KinesisConsumerFilterArgsPtrOutput{})
 	pulumi.RegisterOutputType(KinesisHatchArgsOutput{})
 	pulumi.RegisterOutputType(KinesisHatchArgsPtrOutput{})
+	pulumi.RegisterOutputType(KinesisLambdaConsumerArgsOutput{})
 	pulumi.RegisterOutputType(KinesisOverridesOutput{})
 	pulumi.RegisterOutputType(KinesisOverridesPtrOutput{})
 	pulumi.RegisterOutputType(KinesisProvisionedArgsOutput{})

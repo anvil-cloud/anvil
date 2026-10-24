@@ -13,6 +13,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import NotRequired, TypedDict, TypeAlias
 from .. import _utilities
+from ._enums import *
 from ._inputs import *
 import pulumi_aws
 
@@ -21,6 +22,7 @@ __all__ = ['KinesisStreamArgs', 'KinesisStream']
 @pulumi.input_type
 class KinesisStreamArgs:
     def __init__(__self__, *,
+                 consumers: Optional[pulumi.Input[Sequence[pulumi.Input['KinesisConsumerArgsArgs']]]] = None,
                  hatch: Optional[pulumi.Input['KinesisHatchArgsArgs']] = None,
                  max_record_size_kib: Optional[pulumi.Input[_builtins.int]] = None,
                  provisioned: Optional[pulumi.Input['KinesisProvisionedArgsArgs']] = None,
@@ -28,10 +30,13 @@ class KinesisStreamArgs:
         """
         The set of arguments for constructing a KinesisStream resource.
 
+        :param pulumi.Input[Sequence[pulumi.Input['KinesisConsumerArgsArgs']]] consumers: Lambda functions that read the stream. Each consumer gets an event source mapping (starting from the oldest record, bisect-on-error, 3 retries), its own dead letter queue for records that still fail, sqs:SendMessage on that DLQ, and — with grantRead: true — the grantRead permissions. All consumers share the stream's read throughput (2 MB/s per shard). Each consumer's resources are named after its consumerName, so adding, removing or reordering consumers only touches the one that changed.
         :param pulumi.Input[_builtins.int] max_record_size_kib: Largest record the stream accepts, in KiB, 1024–10240. Default: 2048, so the stream can take Aurora DSQL CDC events (rows up to 2 MiB) without extra config.
         :param pulumi.Input['KinesisProvisionedArgsArgs'] provisioned: Switches the stream from on-demand to provisioned capacity with a fixed shard count. When omitted, the stream is on-demand and scales shards automatically with traffic — the right choice unless throughput is steady and predictable.
         :param pulumi.Input[_builtins.int] retention_hours: How long records stay readable, in hours, 24–8760 (365 days). Default: 24. Retention beyond 24 hours is billed separately.
         """
+        if consumers is not None:
+            pulumi.set(__self__, "consumers", consumers)
         if hatch is not None:
             pulumi.set(__self__, "hatch", hatch)
         if max_record_size_kib is not None:
@@ -40,6 +45,18 @@ class KinesisStreamArgs:
             pulumi.set(__self__, "provisioned", provisioned)
         if retention_hours is not None:
             pulumi.set(__self__, "retention_hours", retention_hours)
+
+    @_builtins.property
+    @pulumi.getter
+    def consumers(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['KinesisConsumerArgsArgs']]]]:
+        """
+        Lambda functions that read the stream. Each consumer gets an event source mapping (starting from the oldest record, bisect-on-error, 3 retries), its own dead letter queue for records that still fail, sqs:SendMessage on that DLQ, and — with grantRead: true — the grantRead permissions. All consumers share the stream's read throughput (2 MB/s per shard). Each consumer's resources are named after its consumerName, so adding, removing or reordering consumers only touches the one that changed.
+        """
+        return pulumi.get(self, "consumers")
+
+    @consumers.setter
+    def consumers(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['KinesisConsumerArgsArgs']]]]):
+        pulumi.set(self, "consumers", value)
 
     @_builtins.property
     @pulumi.getter
@@ -93,17 +110,19 @@ class KinesisStream(pulumi.ComponentResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 consumers: Optional[pulumi.Input[Sequence[pulumi.Input[Union['KinesisConsumerArgsArgs', 'KinesisConsumerArgsArgsDict']]]]] = None,
                  hatch: Optional[pulumi.Input[Union['KinesisHatchArgsArgs', 'KinesisHatchArgsArgsDict']]] = None,
                  max_record_size_kib: Optional[pulumi.Input[_builtins.int]] = None,
                  provisioned: Optional[pulumi.Input[Union['KinesisProvisionedArgsArgs', 'KinesisProvisionedArgsArgsDict']]] = None,
                  retention_hours: Optional[pulumi.Input[_builtins.int]] = None,
                  __props__=None):
         """
-        An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key (alias/aws/kinesis) is always on. Wire consumers yourself; use grantRead/grantWrite to give compute access.
+        An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key (alias/aws/kinesis) is always on. Add Lambda consumers with consumers (each gets a dead letter queue and safe retry defaults); use grantRead/grantWrite for other compute.
 
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[Sequence[pulumi.Input[Union['KinesisConsumerArgsArgs', 'KinesisConsumerArgsArgsDict']]]] consumers: Lambda functions that read the stream. Each consumer gets an event source mapping (starting from the oldest record, bisect-on-error, 3 retries), its own dead letter queue for records that still fail, sqs:SendMessage on that DLQ, and — with grantRead: true — the grantRead permissions. All consumers share the stream's read throughput (2 MB/s per shard). Each consumer's resources are named after its consumerName, so adding, removing or reordering consumers only touches the one that changed.
         :param pulumi.Input[_builtins.int] max_record_size_kib: Largest record the stream accepts, in KiB, 1024–10240. Default: 2048, so the stream can take Aurora DSQL CDC events (rows up to 2 MiB) without extra config.
         :param pulumi.Input[Union['KinesisProvisionedArgsArgs', 'KinesisProvisionedArgsArgsDict']] provisioned: Switches the stream from on-demand to provisioned capacity with a fixed shard count. When omitted, the stream is on-demand and scales shards automatically with traffic — the right choice unless throughput is steady and predictable.
         :param pulumi.Input[_builtins.int] retention_hours: How long records stay readable, in hours, 24–8760 (365 days). Default: 24. Retention beyond 24 hours is billed separately.
@@ -115,7 +134,7 @@ class KinesisStream(pulumi.ComponentResource):
                  args: Optional[KinesisStreamArgs] = None,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key (alias/aws/kinesis) is always on. Wire consumers yourself; use grantRead/grantWrite to give compute access.
+        An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key (alias/aws/kinesis) is always on. Add Lambda consumers with consumers (each gets a dead letter queue and safe retry defaults); use grantRead/grantWrite for other compute.
 
 
         :param str resource_name: The name of the resource.
@@ -133,6 +152,7 @@ class KinesisStream(pulumi.ComponentResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 consumers: Optional[pulumi.Input[Sequence[pulumi.Input[Union['KinesisConsumerArgsArgs', 'KinesisConsumerArgsArgsDict']]]]] = None,
                  hatch: Optional[pulumi.Input[Union['KinesisHatchArgsArgs', 'KinesisHatchArgsArgsDict']]] = None,
                  max_record_size_kib: Optional[pulumi.Input[_builtins.int]] = None,
                  provisioned: Optional[pulumi.Input[Union['KinesisProvisionedArgsArgs', 'KinesisProvisionedArgsArgsDict']]] = None,
@@ -148,11 +168,14 @@ class KinesisStream(pulumi.ComponentResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = KinesisStreamArgs.__new__(KinesisStreamArgs)
 
+            __props__.__dict__["consumers"] = consumers
             __props__.__dict__["hatch"] = hatch
             __props__.__dict__["max_record_size_kib"] = max_record_size_kib
             __props__.__dict__["provisioned"] = provisioned
             __props__.__dict__["retention_hours"] = retention_hours
             __props__.__dict__["arn"] = None
+            __props__.__dict__["dlq_arns"] = None
+            __props__.__dict__["dlq_urls"] = None
             __props__.__dict__["name"] = None
         super(KinesisStream, __self__).__init__(
             'anvil:aws:KinesisStream',
@@ -168,6 +191,22 @@ class KinesisStream(pulumi.ComponentResource):
         The ARN of the Kinesis stream.
         """
         return pulumi.get(self, "arn")
+
+    @_builtins.property
+    @pulumi.getter(name="dlqArns")
+    def dlq_arns(self) -> pulumi.Output[Mapping[str, _builtins.str]]:
+        """
+        Each consumer's consumerName mapped to the ARN of its dead letter queue.
+        """
+        return pulumi.get(self, "dlq_arns")
+
+    @_builtins.property
+    @pulumi.getter(name="dlqUrls")
+    def dlq_urls(self) -> pulumi.Output[Mapping[str, _builtins.str]]:
+        """
+        Each consumer's consumerName mapped to the URL of its dead letter queue.
+        """
+        return pulumi.get(self, "dlq_urls")
 
     @_builtins.property
     @pulumi.getter

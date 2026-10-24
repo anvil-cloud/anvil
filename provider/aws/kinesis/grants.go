@@ -8,6 +8,16 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
+// readActions is what a consumer needs on the stream. Shared by GrantRead and
+// the consumers wiring so they never drift apart.
+var readActions = []string{
+	"kinesis:GetRecords",
+	"kinesis:GetShardIterator",
+	"kinesis:DescribeStream",
+	"kinesis:DescribeStreamSummary",
+	"kinesis:ListShards",
+}
+
 // GrantRead grants the permissions needed to consume records from this stream:
 // kinesis:GetRecords, kinesis:GetShardIterator, kinesis:DescribeStream,
 // kinesis:DescribeStreamSummary, kinesis:ListShards.
@@ -20,13 +30,7 @@ import (
 func (k *KinesisStream) GrantRead(ctx *pulumi.Context, target provider.GrantTarget, opts ...provider.GrantOptions) error {
 	o := provider.MergeGrantOptions(opts)
 	name := fmt.Sprintf("%s-%s-read", k.name, target.Name())
-	return aws.CreateGrant(ctx, k, name, target, []string{
-		"kinesis:GetRecords",
-		"kinesis:GetShardIterator",
-		"kinesis:DescribeStream",
-		"kinesis:DescribeStreamSummary",
-		"kinesis:ListShards",
-	}, []pulumi.StringInput{k.Arn}, o)
+	return aws.CreateGrant(ctx, k, name, target, readActions, []pulumi.StringInput{k.Arn}, o)
 }
 
 // GrantWrite grants the permissions needed to put records onto this stream:

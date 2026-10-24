@@ -137,8 +137,14 @@ __all__ = [
     'HttpApiStepFunctionsConsumerArgsDict',
     'HttpApiThrottlingArgs',
     'HttpApiThrottlingArgsDict',
+    'KinesisConsumerArgsArgs',
+    'KinesisConsumerArgsArgsDict',
+    'KinesisConsumerFilterArgsArgs',
+    'KinesisConsumerFilterArgsArgsDict',
     'KinesisHatchArgsArgs',
     'KinesisHatchArgsArgsDict',
+    'KinesisLambdaConsumerArgsArgs',
+    'KinesisLambdaConsumerArgsArgsDict',
     'KinesisOverridesArgs',
     'KinesisOverridesArgsDict',
     'KinesisProvisionedArgsArgs',
@@ -6472,6 +6478,231 @@ class HttpApiThrottlingArgs:
         pulumi.set(self, "rate_limit", value)
 
 
+class KinesisConsumerArgsArgsDict(TypedDict):
+    """
+    One consumer of the stream.
+    """
+    consumer_name: _builtins.str
+    """
+    Identifies the consumer and names its resources (<stream>-<consumerName>-dlq, -esm, -policy). Usually the Lambda's name, e.g. "indexer". Letters, numbers and hyphens, starting with a letter, up to 32 characters, unique per stream. Renaming a consumer recreates its resources.
+    """
+    grant_read: pulumi.Input[_builtins.bool]
+    """
+    Attaches the grantRead permissions on this stream to the consumer's execution role. Declared here, not with a separate grantRead call, because the event source mapping must wait for the grant. false skips it with a deploy warning: the role must then get read access another way, or the event source mapping fails to create.
+    """
+    lambda_: pulumi.Input['KinesisLambdaConsumerArgsArgsDict']
+    """
+    Wire an Anvil Lambda function as the consumer.
+    """
+    batch_size: NotRequired[pulumi.Input[_builtins.int]]
+    """
+    Most records sent to the Lambda in one invocation, 1–10000. Default: 100.
+    """
+    enabled: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Pauses the consumer when false: the event source mapping stops polling but keeps its position, so it resumes where it left off. Records older than the stream's retention are lost while paused. Default: true.
+    """
+    filter: NotRequired[pulumi.Input['KinesisConsumerFilterArgsArgsDict']]
+    """
+    Limits which records invoke the Lambda. Applied by the event source mapping, not the stream: the stream still receives every record, but records that don't match are skipped (not invoked, not billed). When omitted, every record is delivered.
+    """
+    report_batch_item_failures: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Lets the Lambda report which records in a batch failed so only those are retried. The handler must return { batchItemFailures: [{ itemIdentifier: <sequenceNumber> }] }. Default: false (a failure retries the whole batch, split in half each time).
+    """
+    starting_position: NotRequired[pulumi.Input['KinesisConsumerStartingPosition']]
+    """
+    Where the consumer starts reading when it's first created. Default: "TRIM_HORIZON". Changing it later recreates the event source mapping, which resets the consumer's position.
+    """
+
+@pulumi.input_type
+class KinesisConsumerArgsArgs:
+    def __init__(__self__, *,
+                 consumer_name: _builtins.str,
+                 grant_read: pulumi.Input[_builtins.bool],
+                 lambda_: pulumi.Input['KinesisLambdaConsumerArgsArgs'],
+                 batch_size: Optional[pulumi.Input[_builtins.int]] = None,
+                 enabled: Optional[pulumi.Input[_builtins.bool]] = None,
+                 filter: Optional[pulumi.Input['KinesisConsumerFilterArgsArgs']] = None,
+                 report_batch_item_failures: Optional[pulumi.Input[_builtins.bool]] = None,
+                 starting_position: Optional[pulumi.Input['KinesisConsumerStartingPosition']] = None):
+        """
+        One consumer of the stream.
+
+        :param _builtins.str consumer_name: Identifies the consumer and names its resources (<stream>-<consumerName>-dlq, -esm, -policy). Usually the Lambda's name, e.g. "indexer". Letters, numbers and hyphens, starting with a letter, up to 32 characters, unique per stream. Renaming a consumer recreates its resources.
+        :param pulumi.Input[_builtins.bool] grant_read: Attaches the grantRead permissions on this stream to the consumer's execution role. Declared here, not with a separate grantRead call, because the event source mapping must wait for the grant. false skips it with a deploy warning: the role must then get read access another way, or the event source mapping fails to create.
+        :param pulumi.Input['KinesisLambdaConsumerArgsArgs'] lambda_: Wire an Anvil Lambda function as the consumer.
+        :param pulumi.Input[_builtins.int] batch_size: Most records sent to the Lambda in one invocation, 1–10000. Default: 100.
+        :param pulumi.Input[_builtins.bool] enabled: Pauses the consumer when false: the event source mapping stops polling but keeps its position, so it resumes where it left off. Records older than the stream's retention are lost while paused. Default: true.
+        :param pulumi.Input['KinesisConsumerFilterArgsArgs'] filter: Limits which records invoke the Lambda. Applied by the event source mapping, not the stream: the stream still receives every record, but records that don't match are skipped (not invoked, not billed). When omitted, every record is delivered.
+        :param pulumi.Input[_builtins.bool] report_batch_item_failures: Lets the Lambda report which records in a batch failed so only those are retried. The handler must return { batchItemFailures: [{ itemIdentifier: <sequenceNumber> }] }. Default: false (a failure retries the whole batch, split in half each time).
+        :param pulumi.Input['KinesisConsumerStartingPosition'] starting_position: Where the consumer starts reading when it's first created. Default: "TRIM_HORIZON". Changing it later recreates the event source mapping, which resets the consumer's position.
+        """
+        pulumi.set(__self__, "consumer_name", consumer_name)
+        pulumi.set(__self__, "grant_read", grant_read)
+        pulumi.set(__self__, "lambda_", lambda_)
+        if batch_size is not None:
+            pulumi.set(__self__, "batch_size", batch_size)
+        if enabled is not None:
+            pulumi.set(__self__, "enabled", enabled)
+        if filter is not None:
+            pulumi.set(__self__, "filter", filter)
+        if report_batch_item_failures is not None:
+            pulumi.set(__self__, "report_batch_item_failures", report_batch_item_failures)
+        if starting_position is not None:
+            pulumi.set(__self__, "starting_position", starting_position)
+
+    @_builtins.property
+    @pulumi.getter(name="consumerName")
+    def consumer_name(self) -> _builtins.str:
+        """
+        Identifies the consumer and names its resources (<stream>-<consumerName>-dlq, -esm, -policy). Usually the Lambda's name, e.g. "indexer". Letters, numbers and hyphens, starting with a letter, up to 32 characters, unique per stream. Renaming a consumer recreates its resources.
+        """
+        return pulumi.get(self, "consumer_name")
+
+    @consumer_name.setter
+    def consumer_name(self, value: _builtins.str):
+        pulumi.set(self, "consumer_name", value)
+
+    @_builtins.property
+    @pulumi.getter(name="grantRead")
+    def grant_read(self) -> pulumi.Input[_builtins.bool]:
+        """
+        Attaches the grantRead permissions on this stream to the consumer's execution role. Declared here, not with a separate grantRead call, because the event source mapping must wait for the grant. false skips it with a deploy warning: the role must then get read access another way, or the event source mapping fails to create.
+        """
+        return pulumi.get(self, "grant_read")
+
+    @grant_read.setter
+    def grant_read(self, value: pulumi.Input[_builtins.bool]):
+        pulumi.set(self, "grant_read", value)
+
+    @_builtins.property
+    @pulumi.getter(name="lambda")
+    def lambda_(self) -> pulumi.Input['KinesisLambdaConsumerArgsArgs']:
+        """
+        Wire an Anvil Lambda function as the consumer.
+        """
+        return pulumi.get(self, "lambda_")
+
+    @lambda_.setter
+    def lambda_(self, value: pulumi.Input['KinesisLambdaConsumerArgsArgs']):
+        pulumi.set(self, "lambda_", value)
+
+    @_builtins.property
+    @pulumi.getter(name="batchSize")
+    def batch_size(self) -> Optional[pulumi.Input[_builtins.int]]:
+        """
+        Most records sent to the Lambda in one invocation, 1–10000. Default: 100.
+        """
+        return pulumi.get(self, "batch_size")
+
+    @batch_size.setter
+    def batch_size(self, value: Optional[pulumi.Input[_builtins.int]]):
+        pulumi.set(self, "batch_size", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def enabled(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Pauses the consumer when false: the event source mapping stops polling but keeps its position, so it resumes where it left off. Records older than the stream's retention are lost while paused. Default: true.
+        """
+        return pulumi.get(self, "enabled")
+
+    @enabled.setter
+    def enabled(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "enabled", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def filter(self) -> Optional[pulumi.Input['KinesisConsumerFilterArgsArgs']]:
+        """
+        Limits which records invoke the Lambda. Applied by the event source mapping, not the stream: the stream still receives every record, but records that don't match are skipped (not invoked, not billed). When omitted, every record is delivered.
+        """
+        return pulumi.get(self, "filter")
+
+    @filter.setter
+    def filter(self, value: Optional[pulumi.Input['KinesisConsumerFilterArgsArgs']]):
+        pulumi.set(self, "filter", value)
+
+    @_builtins.property
+    @pulumi.getter(name="reportBatchItemFailures")
+    def report_batch_item_failures(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Lets the Lambda report which records in a batch failed so only those are retried. The handler must return { batchItemFailures: [{ itemIdentifier: <sequenceNumber> }] }. Default: false (a failure retries the whole batch, split in half each time).
+        """
+        return pulumi.get(self, "report_batch_item_failures")
+
+    @report_batch_item_failures.setter
+    def report_batch_item_failures(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "report_batch_item_failures", value)
+
+    @_builtins.property
+    @pulumi.getter(name="startingPosition")
+    def starting_position(self) -> Optional[pulumi.Input['KinesisConsumerStartingPosition']]:
+        """
+        Where the consumer starts reading when it's first created. Default: "TRIM_HORIZON". Changing it later recreates the event source mapping, which resets the consumer's position.
+        """
+        return pulumi.get(self, "starting_position")
+
+    @starting_position.setter
+    def starting_position(self, value: Optional[pulumi.Input['KinesisConsumerStartingPosition']]):
+        pulumi.set(self, "starting_position", value)
+
+
+class KinesisConsumerFilterArgsArgsDict(TypedDict):
+    """
+    Limits which records invoke a consumer. tables and patterns can be combined; a record matching any of them is delivered. Together they can produce at most 5 filter patterns (Lambda's quota).
+    """
+    patterns: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
+    """
+    Raw Lambda event filter patterns (JSON), for records that aren't DSQL CDC events. Kinesis record data is matched under "data", e.g. {"data":{"type":["order.created"]}}. Each pattern takes one filter.
+    """
+    tables: NotRequired[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]
+    """
+    Delivers only Aurora DSQL CDC events for these tables, matched against the event's source.table. Qualify with a schema to also match source.schema: "orders" matches orders in any schema, "app.orders" only app.orders. Unqualified tables share one pattern; each qualified table takes one.
+    """
+
+@pulumi.input_type
+class KinesisConsumerFilterArgsArgs:
+    def __init__(__self__, *,
+                 patterns: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 tables: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None):
+        """
+        Limits which records invoke a consumer. tables and patterns can be combined; a record matching any of them is delivered. Together they can produce at most 5 filter patterns (Lambda's quota).
+
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] patterns: Raw Lambda event filter patterns (JSON), for records that aren't DSQL CDC events. Kinesis record data is matched under "data", e.g. {"data":{"type":["order.created"]}}. Each pattern takes one filter.
+        :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] tables: Delivers only Aurora DSQL CDC events for these tables, matched against the event's source.table. Qualify with a schema to also match source.schema: "orders" matches orders in any schema, "app.orders" only app.orders. Unqualified tables share one pattern; each qualified table takes one.
+        """
+        if patterns is not None:
+            pulumi.set(__self__, "patterns", patterns)
+        if tables is not None:
+            pulumi.set(__self__, "tables", tables)
+
+    @_builtins.property
+    @pulumi.getter
+    def patterns(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        Raw Lambda event filter patterns (JSON), for records that aren't DSQL CDC events. Kinesis record data is matched under "data", e.g. {"data":{"type":["order.created"]}}. Each pattern takes one filter.
+        """
+        return pulumi.get(self, "patterns")
+
+    @patterns.setter
+    def patterns(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "patterns", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def tables(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
+        """
+        Delivers only Aurora DSQL CDC events for these tables, matched against the event's source.table. Qualify with a schema to also match source.schema: "orders" matches orders in any schema, "app.orders" only app.orders. Unqualified tables share one pattern; each qualified table takes one.
+        """
+        return pulumi.get(self, "tables")
+
+    @tables.setter
+    def tables(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "tables", value)
+
+
 class KinesisHatchArgsArgsDict(TypedDict):
     kinesis: NotRequired[pulumi.Input['KinesisOverridesArgsDict']]
 
@@ -6490,6 +6721,58 @@ class KinesisHatchArgsArgs:
     @kinesis.setter
     def kinesis(self, value: Optional[pulumi.Input['KinesisOverridesArgs']]):
         pulumi.set(self, "kinesis", value)
+
+
+class KinesisLambdaConsumerArgsArgsDict(TypedDict):
+    """
+    Lambda consumer configuration. Pass fn.arn and fn.roleArn from an Anvil Lambda component.
+    """
+    arn: pulumi.Input[_builtins.str]
+    """
+    The ARN of the Lambda function to trigger. Use fn.arn from an Anvil Lambda component.
+    """
+    lambda_role_arn: pulumi.Input[_builtins.str]
+    """
+    The ARN of the Lambda's execution role. Use fn.roleArn from an Anvil Lambda component. Required for Anvil to attach the grantRead and DLQ permissions.
+    """
+
+@pulumi.input_type
+class KinesisLambdaConsumerArgsArgs:
+    def __init__(__self__, *,
+                 arn: pulumi.Input[_builtins.str],
+                 lambda_role_arn: pulumi.Input[_builtins.str]):
+        """
+        Lambda consumer configuration. Pass fn.arn and fn.roleArn from an Anvil Lambda component.
+
+        :param pulumi.Input[_builtins.str] arn: The ARN of the Lambda function to trigger. Use fn.arn from an Anvil Lambda component.
+        :param pulumi.Input[_builtins.str] lambda_role_arn: The ARN of the Lambda's execution role. Use fn.roleArn from an Anvil Lambda component. Required for Anvil to attach the grantRead and DLQ permissions.
+        """
+        pulumi.set(__self__, "arn", arn)
+        pulumi.set(__self__, "lambda_role_arn", lambda_role_arn)
+
+    @_builtins.property
+    @pulumi.getter
+    def arn(self) -> pulumi.Input[_builtins.str]:
+        """
+        The ARN of the Lambda function to trigger. Use fn.arn from an Anvil Lambda component.
+        """
+        return pulumi.get(self, "arn")
+
+    @arn.setter
+    def arn(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "arn", value)
+
+    @_builtins.property
+    @pulumi.getter(name="lambdaRoleArn")
+    def lambda_role_arn(self) -> pulumi.Input[_builtins.str]:
+        """
+        The ARN of the Lambda's execution role. Use fn.roleArn from an Anvil Lambda component. Required for Anvil to attach the grantRead and DLQ permissions.
+        """
+        return pulumi.get(self, "lambda_role_arn")
+
+    @lambda_role_arn.setter
+    def lambda_role_arn(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "lambda_role_arn", value)
 
 
 class KinesisOverridesArgsDict(TypedDict):
@@ -6748,33 +7031,32 @@ class KinesisProvisionedArgsArgsDict(TypedDict):
     """
     Provisioned capacity configuration.
     """
-    shard_count: NotRequired[pulumi.Input[_builtins.int]]
+    shard_count: pulumi.Input[_builtins.int]
     """
-    Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.
+    Number of shards, at least 1. Required, so a provisioned stream's capacity is always stated. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out.
     """
 
 @pulumi.input_type
 class KinesisProvisionedArgsArgs:
     def __init__(__self__, *,
-                 shard_count: Optional[pulumi.Input[_builtins.int]] = None):
+                 shard_count: pulumi.Input[_builtins.int]):
         """
         Provisioned capacity configuration.
 
-        :param pulumi.Input[_builtins.int] shard_count: Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.
+        :param pulumi.Input[_builtins.int] shard_count: Number of shards, at least 1. Required, so a provisioned stream's capacity is always stated. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out.
         """
-        if shard_count is not None:
-            pulumi.set(__self__, "shard_count", shard_count)
+        pulumi.set(__self__, "shard_count", shard_count)
 
     @_builtins.property
     @pulumi.getter(name="shardCount")
-    def shard_count(self) -> Optional[pulumi.Input[_builtins.int]]:
+    def shard_count(self) -> pulumi.Input[_builtins.int]:
         """
-        Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.
+        Number of shards, at least 1. Required, so a provisioned stream's capacity is always stated. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out.
         """
         return pulumi.get(self, "shard_count")
 
     @shard_count.setter
-    def shard_count(self, value: Optional[pulumi.Input[_builtins.int]]):
+    def shard_count(self, value: pulumi.Input[_builtins.int]):
         pulumi.set(self, "shard_count", value)
 
 

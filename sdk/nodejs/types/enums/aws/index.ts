@@ -316,6 +316,19 @@ export const HttpApiMethod = {
  */
 export type HttpApiMethod = (typeof HttpApiMethod)[keyof typeof HttpApiMethod];
 
+export const KinesisConsumerStartingPosition = {
+    /**
+     * Every record still in the stream, so a consumer that builds state (search index, replica, read model) misses nothing from before it existed. Default.
+     */
+    TRIM_HORIZON: "TRIM_HORIZON",
+    /**
+     * Only records written after the consumer is created, for consumers that only care about what happens from now on (cache invalidation, notifications).
+     */
+    LATEST: "LATEST",
+} as const;
+
+export type KinesisConsumerStartingPosition = (typeof KinesisConsumerStartingPosition)[keyof typeof KinesisConsumerStartingPosition];
+
 export const LambdaArchitecture = {
     /**
      * Graviton - 20% cheaper, better performance. Default.

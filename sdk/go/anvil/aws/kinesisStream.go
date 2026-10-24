@@ -11,12 +11,16 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
-// An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key (alias/aws/kinesis) is always on. Wire consumers yourself; use grantRead/grantWrite to give compute access.
+// An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key (alias/aws/kinesis) is always on. Add Lambda consumers with consumers (each gets a dead letter queue and safe retry defaults); use grantRead/grantWrite for other compute.
 type KinesisStream struct {
 	pulumi.ResourceState
 
 	// The ARN of the Kinesis stream.
 	Arn pulumi.StringOutput `pulumi:"arn"`
+	// Each consumer's consumerName mapped to the ARN of its dead letter queue.
+	DlqArns pulumi.StringMapOutput `pulumi:"dlqArns"`
+	// Each consumer's consumerName mapped to the URL of its dead letter queue.
+	DlqUrls pulumi.StringMapOutput `pulumi:"dlqUrls"`
 	// The physical name of the Kinesis stream.
 	Name pulumi.StringOutput `pulumi:"name"`
 }
@@ -38,7 +42,9 @@ func NewKinesisStream(ctx *pulumi.Context,
 }
 
 type kinesisStreamArgs struct {
-	Hatch *KinesisHatchArgs `pulumi:"hatch"`
+	// Lambda functions that read the stream. Each consumer gets an event source mapping (starting from the oldest record, bisect-on-error, 3 retries), its own dead letter queue for records that still fail, sqs:SendMessage on that DLQ, and — with grantRead: true — the grantRead permissions. All consumers share the stream's read throughput (2 MB/s per shard). Each consumer's resources are named after its consumerName, so adding, removing or reordering consumers only touches the one that changed.
+	Consumers []KinesisConsumerArgs `pulumi:"consumers"`
+	Hatch     *KinesisHatchArgs     `pulumi:"hatch"`
 	// Largest record the stream accepts, in KiB, 1024–10240. Default: 2048, so the stream can take Aurora DSQL CDC events (rows up to 2 MiB) without extra config.
 	MaxRecordSizeKib *int `pulumi:"maxRecordSizeKib"`
 	// Switches the stream from on-demand to provisioned capacity with a fixed shard count. When omitted, the stream is on-demand and scales shards automatically with traffic — the right choice unless throughput is steady and predictable.
@@ -49,7 +55,9 @@ type kinesisStreamArgs struct {
 
 // The set of arguments for constructing a KinesisStream resource.
 type KinesisStreamArgs struct {
-	Hatch KinesisHatchArgsPtrInput
+	// Lambda functions that read the stream. Each consumer gets an event source mapping (starting from the oldest record, bisect-on-error, 3 retries), its own dead letter queue for records that still fail, sqs:SendMessage on that DLQ, and — with grantRead: true — the grantRead permissions. All consumers share the stream's read throughput (2 MB/s per shard). Each consumer's resources are named after its consumerName, so adding, removing or reordering consumers only touches the one that changed.
+	Consumers KinesisConsumerArgsArrayInput
+	Hatch     KinesisHatchArgsPtrInput
 	// Largest record the stream accepts, in KiB, 1024–10240. Default: 2048, so the stream can take Aurora DSQL CDC events (rows up to 2 MiB) without extra config.
 	MaxRecordSizeKib pulumi.IntPtrInput
 	// Switches the stream from on-demand to provisioned capacity with a fixed shard count. When omitted, the stream is on-demand and scales shards automatically with traffic — the right choice unless throughput is steady and predictable.
@@ -148,6 +156,16 @@ func (o KinesisStreamOutput) ToKinesisStreamOutputWithContext(ctx context.Contex
 // The ARN of the Kinesis stream.
 func (o KinesisStreamOutput) Arn() pulumi.StringOutput {
 	return o.ApplyT(func(v *KinesisStream) pulumi.StringOutput { return v.Arn }).(pulumi.StringOutput)
+}
+
+// Each consumer's consumerName mapped to the ARN of its dead letter queue.
+func (o KinesisStreamOutput) DlqArns() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *KinesisStream) pulumi.StringMapOutput { return v.DlqArns }).(pulumi.StringMapOutput)
+}
+
+// Each consumer's consumerName mapped to the URL of its dead letter queue.
+func (o KinesisStreamOutput) DlqUrls() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *KinesisStream) pulumi.StringMapOutput { return v.DlqUrls }).(pulumi.StringMapOutput)
 }
 
 // The physical name of the Kinesis stream.

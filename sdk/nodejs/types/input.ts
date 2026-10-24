@@ -1411,8 +1411,74 @@ export namespace aws {
         rateLimit?: pulumi.Input<number>;
     }
 
+    /**
+     * One consumer of the stream.
+     */
+    export interface KinesisConsumerArgsArgs {
+        /**
+         * Most records sent to the Lambda in one invocation, 1–10000. Default: 100.
+         */
+        batchSize?: pulumi.Input<number>;
+        /**
+         * Identifies the consumer and names its resources (<stream>-<consumerName>-dlq, -esm, -policy). Usually the Lambda's name, e.g. "indexer". Letters, numbers and hyphens, starting with a letter, up to 32 characters, unique per stream. Renaming a consumer recreates its resources.
+         */
+        consumerName: string;
+        /**
+         * Pauses the consumer when false: the event source mapping stops polling but keeps its position, so it resumes where it left off. Records older than the stream's retention are lost while paused. Default: true.
+         */
+        enabled?: pulumi.Input<boolean>;
+        /**
+         * Limits which records invoke the Lambda. Applied by the event source mapping, not the stream: the stream still receives every record, but records that don't match are skipped (not invoked, not billed). When omitted, every record is delivered.
+         */
+        filter?: pulumi.Input<inputs.aws.KinesisConsumerFilterArgsArgs>;
+        /**
+         * Attaches the grantRead permissions on this stream to the consumer's execution role. Declared here, not with a separate grantRead call, because the event source mapping must wait for the grant. false skips it with a deploy warning: the role must then get read access another way, or the event source mapping fails to create.
+         */
+        grantRead: pulumi.Input<boolean>;
+        /**
+         * Wire an Anvil Lambda function as the consumer.
+         */
+        lambda: pulumi.Input<inputs.aws.KinesisLambdaConsumerArgsArgs>;
+        /**
+         * Lets the Lambda report which records in a batch failed so only those are retried. The handler must return { batchItemFailures: [{ itemIdentifier: <sequenceNumber> }] }. Default: false (a failure retries the whole batch, split in half each time).
+         */
+        reportBatchItemFailures?: pulumi.Input<boolean>;
+        /**
+         * Where the consumer starts reading when it's first created. Default: "TRIM_HORIZON". Changing it later recreates the event source mapping, which resets the consumer's position.
+         */
+        startingPosition?: pulumi.Input<enums.aws.KinesisConsumerStartingPosition>;
+    }
+
+    /**
+     * Limits which records invoke a consumer. tables and patterns can be combined; a record matching any of them is delivered. Together they can produce at most 5 filter patterns (Lambda's quota).
+     */
+    export interface KinesisConsumerFilterArgsArgs {
+        /**
+         * Raw Lambda event filter patterns (JSON), for records that aren't DSQL CDC events. Kinesis record data is matched under "data", e.g. {"data":{"type":["order.created"]}}. Each pattern takes one filter.
+         */
+        patterns?: pulumi.Input<pulumi.Input<string>[]>;
+        /**
+         * Delivers only Aurora DSQL CDC events for these tables, matched against the event's source.table. Qualify with a schema to also match source.schema: "orders" matches orders in any schema, "app.orders" only app.orders. Unqualified tables share one pattern; each qualified table takes one.
+         */
+        tables?: pulumi.Input<pulumi.Input<string>[]>;
+    }
+
     export interface KinesisHatchArgsArgs {
         kinesis?: pulumi.Input<inputs.aws.KinesisOverridesArgs>;
+    }
+
+    /**
+     * Lambda consumer configuration. Pass fn.arn and fn.roleArn from an Anvil Lambda component.
+     */
+    export interface KinesisLambdaConsumerArgsArgs {
+        /**
+         * The ARN of the Lambda function to trigger. Use fn.arn from an Anvil Lambda component.
+         */
+        arn: pulumi.Input<string>;
+        /**
+         * The ARN of the Lambda's execution role. Use fn.roleArn from an Anvil Lambda component. Required for Anvil to attach the grantRead and DLQ permissions.
+         */
+        lambdaRoleArn: pulumi.Input<string>;
     }
 
     export interface KinesisOverridesArgs {
@@ -1472,9 +1538,9 @@ export namespace aws {
      */
     export interface KinesisProvisionedArgsArgs {
         /**
-         * Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.
+         * Number of shards, at least 1. Required, so a provisioned stream's capacity is always stated. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out.
          */
-        shardCount?: pulumi.Input<number>;
+        shardCount: pulumi.Input<number>;
     }
 
     export interface LambdaHatchArgsArgs {

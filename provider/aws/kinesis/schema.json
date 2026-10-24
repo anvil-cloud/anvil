@@ -1,8 +1,15 @@
 {
   "resources": {
     "anvil:aws:KinesisStream": {
-      "description": "An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key (alias/aws/kinesis) is always on. Wire consumers yourself; use grantRead/grantWrite to give compute access.",
+      "description": "An Anvil-managed Kinesis Data Stream. On-demand capacity by default (set provisioned for a fixed shard count), and server-side encryption with the AWS-managed KMS key (alias/aws/kinesis) is always on. Add Lambda consumers with consumers (each gets a dead letter queue and safe retry defaults); use grantRead/grantWrite for other compute.",
       "inputProperties": {
+        "consumers": {
+          "description": "Lambda functions that read the stream. Each consumer gets an event source mapping (starting from the oldest record, bisect-on-error, 3 retries), its own dead letter queue for records that still fail, sqs:SendMessage on that DLQ, and — with grantRead: true — the grantRead permissions. All consumers share the stream's read throughput (2 MB/s per shard). Each consumer's resources are named after its consumerName, so adding, removing or reordering consumers only touches the one that changed.",
+          "items": {
+            "$ref": "#/types/anvil:aws:KinesisConsumerArgs"
+          },
+          "type": "array"
+        },
         "hatch": {
           "$ref": "#/types/anvil:aws:KinesisHatchArgs"
         },
@@ -25,6 +32,20 @@
           "description": "The ARN of the Kinesis stream.",
           "type": "string"
         },
+        "dlqArns": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Each consumer's consumerName mapped to the ARN of its dead letter queue.",
+          "type": "object"
+        },
+        "dlqUrls": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Each consumer's consumerName mapped to the URL of its dead letter queue.",
+          "type": "object"
+        },
         "name": {
           "description": "The physical name of the Kinesis stream.",
           "type": "string"
@@ -32,18 +53,115 @@
       },
       "required": [
         "arn",
-        "name"
+        "name",
+        "dlqArns",
+        "dlqUrls"
       ],
       "requiredInputs": []
     }
   },
   "types": {
+    "anvil:aws:KinesisConsumerArgs": {
+      "description": "One consumer of the stream.",
+      "properties": {
+        "batchSize": {
+          "description": "Most records sent to the Lambda in one invocation, 1–10000. Default: 100.",
+          "type": "integer"
+        },
+        "consumerName": {
+          "description": "Identifies the consumer and names its resources (\u003cstream\u003e-\u003cconsumerName\u003e-dlq, -esm, -policy). Usually the Lambda's name, e.g. \"indexer\". Letters, numbers and hyphens, starting with a letter, up to 32 characters, unique per stream. Renaming a consumer recreates its resources.",
+          "plain": true,
+          "type": "string"
+        },
+        "enabled": {
+          "description": "Pauses the consumer when false: the event source mapping stops polling but keeps its position, so it resumes where it left off. Records older than the stream's retention are lost while paused. Default: true.",
+          "type": "boolean"
+        },
+        "filter": {
+          "$ref": "#/types/anvil:aws:KinesisConsumerFilterArgs",
+          "description": "Limits which records invoke the Lambda. Applied by the event source mapping, not the stream: the stream still receives every record, but records that don't match are skipped (not invoked, not billed). When omitted, every record is delivered."
+        },
+        "grantRead": {
+          "description": "Attaches the grantRead permissions on this stream to the consumer's execution role. Declared here, not with a separate grantRead call, because the event source mapping must wait for the grant. false skips it with a deploy warning: the role must then get read access another way, or the event source mapping fails to create.",
+          "type": "boolean"
+        },
+        "lambda": {
+          "$ref": "#/types/anvil:aws:KinesisLambdaConsumerArgs",
+          "description": "Wire an Anvil Lambda function as the consumer."
+        },
+        "reportBatchItemFailures": {
+          "description": "Lets the Lambda report which records in a batch failed so only those are retried. The handler must return { batchItemFailures: [{ itemIdentifier: \u003csequenceNumber\u003e }] }. Default: false (a failure retries the whole batch, split in half each time).",
+          "type": "boolean"
+        },
+        "startingPosition": {
+          "$ref": "#/types/anvil:aws:KinesisConsumerStartingPosition",
+          "description": "Where the consumer starts reading when it's first created. Default: \"TRIM_HORIZON\". Changing it later recreates the event source mapping, which resets the consumer's position."
+        }
+      },
+      "required": [
+        "consumerName",
+        "lambda",
+        "grantRead"
+      ],
+      "type": "object"
+    },
+    "anvil:aws:KinesisConsumerFilterArgs": {
+      "description": "Limits which records invoke a consumer. tables and patterns can be combined; a record matching any of them is delivered. Together they can produce at most 5 filter patterns (Lambda's quota).",
+      "properties": {
+        "patterns": {
+          "description": "Raw Lambda event filter patterns (JSON), for records that aren't DSQL CDC events. Kinesis record data is matched under \"data\", e.g. {\"data\":{\"type\":[\"order.created\"]}}. Each pattern takes one filter.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "tables": {
+          "description": "Delivers only Aurora DSQL CDC events for these tables, matched against the event's source.table. Qualify with a schema to also match source.schema: \"orders\" matches orders in any schema, \"app.orders\" only app.orders. Unqualified tables share one pattern; each qualified table takes one.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "anvil:aws:KinesisConsumerStartingPosition": {
+      "enum": [
+        {
+          "description": "Every record still in the stream, so a consumer that builds state (search index, replica, read model) misses nothing from before it existed. Default.",
+          "value": "TRIM_HORIZON"
+        },
+        {
+          "description": "Only records written after the consumer is created, for consumers that only care about what happens from now on (cache invalidation, notifications).",
+          "value": "LATEST"
+        }
+      ],
+      "type": "string"
+    },
     "anvil:aws:KinesisHatchArgs": {
       "properties": {
         "kinesis": {
           "$ref": "#/types/anvil:aws:KinesisOverrides"
         }
       },
+      "type": "object"
+    },
+    "anvil:aws:KinesisLambdaConsumerArgs": {
+      "description": "Lambda consumer configuration. Pass fn.arn and fn.roleArn from an Anvil Lambda component.",
+      "properties": {
+        "arn": {
+          "description": "The ARN of the Lambda function to trigger. Use fn.arn from an Anvil Lambda component.",
+          "type": "string"
+        },
+        "lambdaRoleArn": {
+          "description": "The ARN of the Lambda's execution role. Use fn.roleArn from an Anvil Lambda component. Required for Anvil to attach the grantRead and DLQ permissions.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "arn",
+        "lambdaRoleArn"
+      ],
       "type": "object"
     },
     "anvil:aws:KinesisOverrides": {
@@ -110,10 +228,13 @@
       "description": "Provisioned capacity configuration.",
       "properties": {
         "shardCount": {
-          "description": "Number of shards. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out. Default: 1.",
+          "description": "Number of shards, at least 1. Required, so a provisioned stream's capacity is always stated. Each shard takes 1 MB/s or 1,000 records/s in and serves 2 MB/s out.",
           "type": "integer"
         }
       },
+      "required": [
+        "shardCount"
+      ],
       "type": "object"
     }
   },
