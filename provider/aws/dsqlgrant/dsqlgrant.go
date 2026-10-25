@@ -37,9 +37,10 @@ import (
 // deletes the IAM policy and the DynamoDB item. The stream fires REMOVE,
 // and the bootstrap Lambda runs AWS IAM REVOKE.
 //
-// VPC egress wiring is NOT handled here — it stays on DSQL.GrantConnect
-// because it requires access to the private vpcEndpointSgOutputs map
-// which is not exposed as a Pulumi output.
+// VPC network access is NOT handled here. The DSQL component gives each
+// interface endpoint SG self-referencing ingress and egress on 5432, so a
+// compute resource that declares the endpoint SG in vpc.vpcEndpoints can
+// reach the endpoint whichever language called grantConnect.
 //
 // Usage from user code (TypeScript):
 //

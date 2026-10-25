@@ -234,7 +234,7 @@ class DSQL(pulumi.ComponentResource):
 
     @_builtins.property
     @pulumi.getter(name="rolesTableName")
-    def roles_table_name(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def roles_table_name(self) -> pulumi.Output[_builtins.str]:
         """
         DynamoDB table name for role bootstrap. Passed to DSQLConnect (via grantConnect) so it can create the IAM role-mapping item. Empty when no roles are configured.
         """
@@ -242,7 +242,7 @@ class DSQL(pulumi.ComponentResource):
 
     @_builtins.property
     @pulumi.getter(name="streamKinesisArn")
-    def stream_kinesis_arn(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def stream_kinesis_arn(self) -> pulumi.Output[_builtins.str]:
         """
         The Kinesis stream CDC events are sent to. Empty when stream is omitted.
         """
@@ -250,7 +250,7 @@ class DSQL(pulumi.ComponentResource):
 
     @_builtins.property
     @pulumi.getter(name="streamRoleArn")
-    def stream_role_arn(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def stream_role_arn(self) -> pulumi.Output[_builtins.str]:
         """
         The IAM role DSQL writes CDC events with: the one Anvil created, or stream.roleArn. Empty when stream is omitted.
         """
@@ -258,7 +258,7 @@ class DSQL(pulumi.ComponentResource):
 
     @_builtins.property
     @pulumi.getter(name="vpcEndpointIds")
-    def vpc_endpoint_ids(self) -> pulumi.Output[Optional[Mapping[str, _builtins.str]]]:
+    def vpc_endpoint_ids(self) -> pulumi.Output[Mapping[str, _builtins.str]]:
         """
         Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.
         """
@@ -266,9 +266,9 @@ class DSQL(pulumi.ComponentResource):
 
     @_builtins.property
     @pulumi.getter(name="vpcEndpointSecurityGroupIds")
-    def vpc_endpoint_security_group_ids(self) -> pulumi.Output[Optional[Mapping[str, _builtins.str]]]:
+    def vpc_endpoint_security_group_ids(self) -> pulumi.Output[Mapping[str, _builtins.str]]:
         """
-        Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId so Anvil can wire the egress rule from the Lambda SG to the endpoint SG on port 5432.
+        Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.
         """
         return pulumi.get(self, "vpc_endpoint_security_group_ids")
 
