@@ -98,6 +98,14 @@ func runDestroy(cmd *cobra.Command, args []string) error {
 		}
 	}()
 
+	// CDC streams aren't Pulumi resources: delete them first, while their role
+	// and cluster still exist.
+	if projectRoot, rootErr := findProjectRoot(); rootErr == nil {
+		if err := deleteAllStreams(ctx, s, resolveProjectName(projectRoot), destroyStage); err != nil {
+			return fmt.Errorf("failed to delete CDC streams, nothing was destroyed: %w", err)
+		}
+	}
+
 	_, err = s.Destroy(ctx,
 		optdestroy.EventStreams(eventCh),
 		optdestroy.Parallel(10),

@@ -165,6 +165,32 @@ type DSQLBackupArgs struct {
 	VaultArn           string `pulumi:"vaultArn,optional"`
 }
 
+// DSQLStreamArgs sends the cluster's change data capture (CDC) events, every
+// committed row change in every table, to a Kinesis Data Stream.
+//
+// Anvil creates the IAM role DSQL uses to write to the stream (unless roleArn
+// is set). The CDC stream itself has no Pulumi resource yet, so `anvil deploy`
+// creates it with the DSQL API after the rest of the stack is deployed, and
+// `anvil destroy` deletes it first. Removing `stream` deletes the CDC stream;
+// changes made while it's gone are never captured.
+type DSQLStreamArgs struct {
+	// KinesisArn is the Kinesis Data Stream that receives the events, e.g. a
+	// KinesisStream's arn. It must be in the cluster's region (the provider
+	// region for multi-region clusters) and accept records of at least 2048 KiB.
+	KinesisArn pulumi.StringInput `pulumi:"kinesisArn"`
+
+	// RoleArn is an existing IAM role for DSQL to write with. When omitted,
+	// Anvil creates one that only this cluster can assume, allowed to write to
+	// kinesisArn only.
+	RoleArn pulumi.StringInput `pulumi:"roleArn,optional"`
+
+	// KmsKeyArn is the customer-managed KMS key the Kinesis stream is encrypted
+	// with, if any. Anvil's role is then also allowed kms:GenerateDataKey on it.
+	// Not needed with the AWS-managed key (KinesisStream's default). Only valid
+	// without roleArn.
+	KmsKeyArn pulumi.StringInput `pulumi:"kmsKeyArn,optional"`
+}
+
 // ── Args ───────────────────────────────────────────────────────────────────
 
 type DSQLArgs struct {
@@ -186,6 +212,10 @@ type DSQLArgs struct {
 	// Backup configures AWS Backup for the cluster(s).
 	// When omitted, no backup resources are created.
 	Backup *DSQLBackupArgs `pulumi:"backup,optional"`
+
+	// Stream sends change data capture events to a Kinesis stream.
+	// When omitted, CDC is off.
+	Stream *DSQLStreamArgs `pulumi:"stream,optional"`
 
 	// Hatch is the escape hatch for low-level overrides of the underlying aws.dsql.Cluster.
 	// Keys: "cluster". Use for KMS key ARN and other cluster-level settings
@@ -226,6 +256,14 @@ type DSQL struct {
 	// create IAM mapping items. Empty when roles is omitted.
 	RolesTableName pulumi.StringOutput `pulumi:"rolesTableName"`
 
+	// StreamKinesisArn is the Kinesis stream CDC events go to. Empty when
+	// stream is omitted. The CLI reads it to create the CDC stream.
+	StreamKinesisArn pulumi.StringOutput `pulumi:"streamKinesisArn"`
+
+	// StreamRoleArn is the IAM role DSQL writes to Kinesis with: the one Anvil
+	// created, or stream.roleArn. Empty when stream is omitted.
+	StreamRoleArn pulumi.StringOutput `pulumi:"streamRoleArn"`
+
 	// hasVpcEndpoints tracks whether interface endpoints were created.
 	// Used by GrantConnect to decide whether to wire SG egress rules.
 	hasVpcEndpoints bool
@@ -258,12 +296,18 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 	if err := validateSchemas(args.Schemas); err != nil {
 		return nil, fmt.Errorf("invalid DSQL schemas config: %w", err)
 	}
+	if err := validateStream(args.Stream); err != nil {
+		return nil, fmt.Errorf("dsql %q: %w", name, err)
+	}
 
 	if os.Getenv("ANVIL_BUILD_MODE") == "true" {
 		if len(args.Schemas) > 0 {
 			if err := appendSchemasToManifest(name, args.Schemas); err != nil {
 				return nil, fmt.Errorf("build manifest write failed for %s: %w", name, err)
 			}
+		}
+		if err := appendStreamToManifest(name, args.Stream != nil); err != nil {
+			return nil, fmt.Errorf("stream manifest write failed for %s: %w", name, err)
 		}
 
 		// Build mode runs a Pulumi preview to extract schema metadata without
@@ -285,6 +329,8 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 		d.VpcEndpointIds = empty
 		d.VpcEndpointSecurityGroupIds = empty
 		d.RolesTableName = emptyStr
+		d.StreamKinesisArn = emptyStr
+		d.StreamRoleArn = emptyStr
 
 		ctx.RegisterResourceOutputs(d, pulumi.Map{
 			"endpoints":                   d.Endpoints,
@@ -293,6 +339,8 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 			"vpcEndpointIds":              d.VpcEndpointIds,
 			"vpcEndpointSecurityGroupIds": d.VpcEndpointSecurityGroupIds,
 			"rolesTableName":              d.RolesTableName,
+			"streamKinesisArn":            d.StreamKinesisArn,
+			"streamRoleArn":               d.StreamRoleArn,
 		})
 
 		return d, nil
@@ -449,6 +497,24 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 		clusterArnMap[region] = cluster.Arn
 	}
 	d.ClusterArns = clusterArnMap.ToStringMapOutput()
+
+	// ── 5b. Change data capture role ───────────────────────────────────────
+	// The CDC stream is created on the provider region's cluster (it captures
+	// writes from every region), so only that cluster may assume the role.
+	d.StreamKinesisArn = pulumi.String("").ToStringOutput()
+	d.StreamRoleArn = pulumi.String("").ToStringOutput()
+	if args.Stream != nil {
+		d.StreamKinesisArn = args.Stream.KinesisArn.ToStringOutput()
+		if args.Stream.RoleArn != nil {
+			d.StreamRoleArn = args.Stream.RoleArn.ToStringOutput()
+		} else {
+			roleArn, err := newStreamRole(ctx, d, name, stage, stageId, clusters[providerRegion].Arn, args.Stream)
+			if err != nil {
+				return nil, err
+			}
+			d.StreamRoleArn = roleArn
+		}
+	}
 
 	// ── 6. VPC endpoints ───────────────────────────────────────────────────
 	// Only when vpc is set and hasNat is false.
@@ -1112,6 +1178,8 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 		"vpcEndpointIds":              vpcEndpointIds,
 		"vpcEndpointSecurityGroupIds": vpcEndpointSgIds,
 		"rolesTableName":              d.RolesTableName,
+		"streamKinesisArn":            d.StreamKinesisArn,
+		"streamRoleArn":               d.StreamRoleArn,
 	}
 	ctx.RegisterResourceOutputs(d, outputMap)
 

@@ -32,6 +32,12 @@ func runPreview(cmd *cobra.Command, args []string) error {
 
 	ctx := context.Background()
 
+	// Discovery records which DSQL components want a CDC stream, so the
+	// preview can say what deploy will do to them.
+	if _, err := discoverFunctions(ctx, stage); err != nil {
+		return fmt.Errorf("discovery failed: %w", err)
+	}
+
 	s, err := loadStack(ctx, stage)
 	if err != nil {
 		return err
@@ -54,6 +60,10 @@ func runPreview(cmd *cobra.Command, args []string) error {
 
 	if err != nil {
 		return fmt.Errorf("preview failed")
+	}
+
+	if err := previewStreams(ctx, s, stage); err != nil {
+		printWarn(fmt.Sprintf("Could not check CDC streams: %v", err))
 	}
 
 	return nil

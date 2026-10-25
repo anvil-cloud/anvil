@@ -131,6 +131,13 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		fmt.Println()
 	}
 
+	// ── Step 4c: Remove CDC streams no longer wanted ───
+	// Before `up`, so Pulumi can then remove their role and cluster.
+	project := resolveProjectName(projectRoot)
+	if err := removeUnwantedStreams(ctx, s, project, stage); err != nil {
+		return fmt.Errorf("CDC stream cleanup failed, nothing was deployed: %w", err)
+	}
+
 	// ── Step 5: Real deploy ────────────────────────────
 	handler := NewEventHandler(deployVerbose, "deploy")
 	eventCh := make(chan events.EngineEvent)
@@ -174,7 +181,13 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// ── Step 5b: Scan on deploy ────────────────────────
+	// ── Step 5b: DSQL CDC streams ──────────────────────
+	// After `up`: the role and the Kinesis stream they target exist now.
+	if err := reconcileStreams(ctx, s, project, stage); err != nil {
+		return fmt.Errorf("deploy succeeded, but setting up the CDC stream failed: %w", err)
+	}
+
+	// ── Step 5c: Scan on deploy ────────────────────────
 	// Fire and forget: a scan failure never fails a completed deploy.
 	if compliance != nil && compliance.ScanOnDeploy {
 		startDeployScan(ctx, stage, compliance)

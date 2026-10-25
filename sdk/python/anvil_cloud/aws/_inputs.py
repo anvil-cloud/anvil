@@ -81,6 +81,8 @@ __all__ = [
     'DSQLRoleArgsDict',
     'DSQLSchemaArgs',
     'DSQLSchemaArgsDict',
+    'DSQLStreamArgsArgs',
+    'DSQLStreamArgsArgsDict',
     'DSQLTableArgs',
     'DSQLTableArgsDict',
     'DSQLVpcArgsArgs',
@@ -3989,6 +3991,79 @@ class DSQLSchemaArgs:
     @tables.setter
     def tables(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['DSQLTableArgs']]]]):
         pulumi.set(self, "tables", value)
+
+
+class DSQLStreamArgsArgsDict(TypedDict):
+    """
+    Change data capture to a Kinesis Data Stream.
+    """
+    kinesis_arn: pulumi.Input[_builtins.str]
+    """
+    The Kinesis Data Stream that receives the events, e.g. a KinesisStream's arn. Must be in the cluster's region (the provider region for multi-region clusters) and accept records of at least 2048 KiB, which is KinesisStream's default.
+    """
+    kms_key_arn: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    The customer-managed KMS key the Kinesis stream is encrypted with, if any. Anvil's role is then also allowed kms:GenerateDataKey on it. Not needed with the AWS-managed key (KinesisStream's default). Only valid without roleArn.
+    """
+    role_arn: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    An existing IAM role for DSQL to write with. Omit to have Anvil create one that only this cluster can assume, allowed to write to kinesisArn only.
+    """
+
+@pulumi.input_type
+class DSQLStreamArgsArgs:
+    def __init__(__self__, *,
+                 kinesis_arn: pulumi.Input[_builtins.str],
+                 kms_key_arn: Optional[pulumi.Input[_builtins.str]] = None,
+                 role_arn: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        Change data capture to a Kinesis Data Stream.
+
+        :param pulumi.Input[_builtins.str] kinesis_arn: The Kinesis Data Stream that receives the events, e.g. a KinesisStream's arn. Must be in the cluster's region (the provider region for multi-region clusters) and accept records of at least 2048 KiB, which is KinesisStream's default.
+        :param pulumi.Input[_builtins.str] kms_key_arn: The customer-managed KMS key the Kinesis stream is encrypted with, if any. Anvil's role is then also allowed kms:GenerateDataKey on it. Not needed with the AWS-managed key (KinesisStream's default). Only valid without roleArn.
+        :param pulumi.Input[_builtins.str] role_arn: An existing IAM role for DSQL to write with. Omit to have Anvil create one that only this cluster can assume, allowed to write to kinesisArn only.
+        """
+        pulumi.set(__self__, "kinesis_arn", kinesis_arn)
+        if kms_key_arn is not None:
+            pulumi.set(__self__, "kms_key_arn", kms_key_arn)
+        if role_arn is not None:
+            pulumi.set(__self__, "role_arn", role_arn)
+
+    @_builtins.property
+    @pulumi.getter(name="kinesisArn")
+    def kinesis_arn(self) -> pulumi.Input[_builtins.str]:
+        """
+        The Kinesis Data Stream that receives the events, e.g. a KinesisStream's arn. Must be in the cluster's region (the provider region for multi-region clusters) and accept records of at least 2048 KiB, which is KinesisStream's default.
+        """
+        return pulumi.get(self, "kinesis_arn")
+
+    @kinesis_arn.setter
+    def kinesis_arn(self, value: pulumi.Input[_builtins.str]):
+        pulumi.set(self, "kinesis_arn", value)
+
+    @_builtins.property
+    @pulumi.getter(name="kmsKeyArn")
+    def kms_key_arn(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        The customer-managed KMS key the Kinesis stream is encrypted with, if any. Anvil's role is then also allowed kms:GenerateDataKey on it. Not needed with the AWS-managed key (KinesisStream's default). Only valid without roleArn.
+        """
+        return pulumi.get(self, "kms_key_arn")
+
+    @kms_key_arn.setter
+    def kms_key_arn(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "kms_key_arn", value)
+
+    @_builtins.property
+    @pulumi.getter(name="roleArn")
+    def role_arn(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        An existing IAM role for DSQL to write with. Omit to have Anvil create one that only this cluster can assume, allowed to write to kinesisArn only.
+        """
+        return pulumi.get(self, "role_arn")
+
+    @role_arn.setter
+    def role_arn(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "role_arn", value)
 
 
 class DSQLTableArgsDict(TypedDict):
