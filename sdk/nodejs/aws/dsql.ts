@@ -56,7 +56,7 @@ export class DSQL extends pulumi.ComponentResource {
      */
     declare public /*out*/ readonly vpcEndpointIds: pulumi.Output<{[key: string]: string} | undefined>;
     /**
-     * Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId so Anvil can wire the egress rule from the Lambda SG to the endpoint SG on port 5432.
+     * Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.
      */
     declare public /*out*/ readonly vpcEndpointSecurityGroupIds: pulumi.Output<{[key: string]: string} | undefined>;
 

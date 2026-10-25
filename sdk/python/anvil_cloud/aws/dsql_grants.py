@@ -12,6 +12,10 @@ def grant_connect(self, target: "grants.GrantTarget", schemas: list = None) -> N
     Pass one or more {"schema", "role_name"} pairs. The compute may be mapped
     to multiple roles and connects as whichever one it chooses at runtime.
 
+    Network access is not wired here. When the cluster has VPC endpoints,
+    declare vpc_endpoint_security_group_ids in the target's vpc.vpc_endpoints;
+    the endpoint SG lets its members reach the endpoint on port 5432.
+
     Args:
         target: The compute resource to grant access to (Lambda, ECS, etc.).
         schemas: List of {"schema": ..., "role_name": ...} pairs.

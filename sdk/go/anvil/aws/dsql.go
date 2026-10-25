@@ -29,7 +29,7 @@ type DSQL struct {
 	StreamRoleArn pulumi.StringPtrOutput `pulumi:"streamRoleArn"`
 	// Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.
 	VpcEndpointIds pulumi.StringMapOutput `pulumi:"vpcEndpointIds"`
-	// Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId so Anvil can wire the egress rule from the Lambda SG to the endpoint SG on port 5432.
+	// Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.
 	VpcEndpointSecurityGroupIds pulumi.StringMapOutput `pulumi:"vpcEndpointSecurityGroupIds"`
 }
 
@@ -200,7 +200,7 @@ func (o DSQLOutput) VpcEndpointIds() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *DSQL) pulumi.StringMapOutput { return v.VpcEndpointIds }).(pulumi.StringMapOutput)
 }
 
-// Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId so Anvil can wire the egress rule from the Lambda SG to the endpoint SG on port 5432.
+// Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.
 func (o DSQLOutput) VpcEndpointSecurityGroupIds() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *DSQL) pulumi.StringMapOutput { return v.VpcEndpointSecurityGroupIds }).(pulumi.StringMapOutput)
 }

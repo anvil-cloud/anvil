@@ -23,6 +23,10 @@ declare module "./dsql" {
      * 2. One DynamoDB IAM mapping item per role — the bootstrap Lambda runs
      *    AWS IAM GRANT "<roleName>" TO 'arn:...' for each.
      *
+     * Network access is not wired here. When the cluster has VPC endpoints,
+     * declare vpcEndpointSecurityGroupIds in the target's vpc.vpcEndpoints;
+     * the endpoint SG lets its members reach the endpoint on port 5432.
+     *
      * @param target - The compute resource to grant access to (Lambda, ECS, etc.).
      * @param opts.schemas - The { schema, roleName } pairs this compute may connect as.
      *

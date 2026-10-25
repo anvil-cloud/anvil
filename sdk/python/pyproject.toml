@@ -4,7 +4,7 @@
   dependencies = ["parver>=0.2.1", "pulumi>=3.0.0,<4.0.0", "pulumi-aws>=7.21.0,<8.0.0", "pulumi-gcp>=9.0.0,<10.0.0", "semver>=2.8.1", "typing-extensions>=4.11,<5; python_version < \"3.11\""]
   readme = "README.md"
   requires-python = ">=3.9"
-  version = "0.1.23"
+  version = "0.1.24"
   [project.license]
     text = "Apache-2.0"
   [project.urls]

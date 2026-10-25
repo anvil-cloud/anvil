@@ -268,7 +268,7 @@ class DSQL(pulumi.ComponentResource):
     @pulumi.getter(name="vpcEndpointSecurityGroupIds")
     def vpc_endpoint_security_group_ids(self) -> pulumi.Output[Optional[Mapping[str, _builtins.str]]]:
         """
-        Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId so Anvil can wire the egress rule from the Lambda SG to the endpoint SG on port 5432.
+        Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.
         """
         return pulumi.get(self, "vpc_endpoint_security_group_ids")
 

@@ -46,6 +46,10 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
      * 2. One DynamoDB IAM mapping item per role — the bootstrap Lambda runs
      *    AWS IAM GRANT "<roleName>" TO 'arn:...' for each.
      *
+     * Network access is not wired here. When the cluster has VPC endpoints,
+     * declare vpcEndpointSecurityGroupIds in the target's vpc.vpcEndpoints;
+     * the endpoint SG lets its members reach the endpoint on port 5432.
+     *
      * @param target - The compute resource to grant access to (Lambda, ECS, etc.).
      * @param opts.schemas - The { schema, roleName } pairs this compute may connect as.
      *
@@ -78,6 +82,10 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
 
         Pass one or more {"schema", "role_name"} pairs. The compute may be mapped
         to multiple roles and connects as whichever one it chooses at runtime.
+
+        Network access is not wired here. When the cluster has VPC endpoints,
+        declare vpc_endpoint_security_group_ids in the target's vpc.vpc_endpoints;
+        the endpoint SG lets its members reach the endpoint on port 5432.
 
         Args:
             target: The compute resource to grant access to (Lambda, ECS, etc.).
