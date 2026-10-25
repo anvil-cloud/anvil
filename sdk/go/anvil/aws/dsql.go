@@ -22,11 +22,11 @@ type DSQL struct {
 	// Map of region to cluster endpoint. Single-region: one entry keyed by the provider region. Multi-region: one entry per region. e.g. { "us-east-1": "abc123.dsql.us-east-1.on.aws" }. Pass the relevant endpoint to your Lambda via environment variables.
 	Endpoints pulumi.StringMapOutput `pulumi:"endpoints"`
 	// DynamoDB table name for role bootstrap. Passed to DSQLConnect (via grantConnect) so it can create the IAM role-mapping item. Empty when no roles are configured.
-	RolesTableName pulumi.StringPtrOutput `pulumi:"rolesTableName"`
+	RolesTableName pulumi.StringOutput `pulumi:"rolesTableName"`
 	// The Kinesis stream CDC events are sent to. Empty when stream is omitted.
-	StreamKinesisArn pulumi.StringPtrOutput `pulumi:"streamKinesisArn"`
+	StreamKinesisArn pulumi.StringOutput `pulumi:"streamKinesisArn"`
 	// The IAM role DSQL writes CDC events with: the one Anvil created, or stream.roleArn. Empty when stream is omitted.
-	StreamRoleArn pulumi.StringPtrOutput `pulumi:"streamRoleArn"`
+	StreamRoleArn pulumi.StringOutput `pulumi:"streamRoleArn"`
 	// Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.
 	VpcEndpointIds pulumi.StringMapOutput `pulumi:"vpcEndpointIds"`
 	// Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.
@@ -181,18 +181,18 @@ func (o DSQLOutput) Endpoints() pulumi.StringMapOutput {
 }
 
 // DynamoDB table name for role bootstrap. Passed to DSQLConnect (via grantConnect) so it can create the IAM role-mapping item. Empty when no roles are configured.
-func (o DSQLOutput) RolesTableName() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *DSQL) pulumi.StringPtrOutput { return v.RolesTableName }).(pulumi.StringPtrOutput)
+func (o DSQLOutput) RolesTableName() pulumi.StringOutput {
+	return o.ApplyT(func(v *DSQL) pulumi.StringOutput { return v.RolesTableName }).(pulumi.StringOutput)
 }
 
 // The Kinesis stream CDC events are sent to. Empty when stream is omitted.
-func (o DSQLOutput) StreamKinesisArn() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *DSQL) pulumi.StringPtrOutput { return v.StreamKinesisArn }).(pulumi.StringPtrOutput)
+func (o DSQLOutput) StreamKinesisArn() pulumi.StringOutput {
+	return o.ApplyT(func(v *DSQL) pulumi.StringOutput { return v.StreamKinesisArn }).(pulumi.StringOutput)
 }
 
 // The IAM role DSQL writes CDC events with: the one Anvil created, or stream.roleArn. Empty when stream is omitted.
-func (o DSQLOutput) StreamRoleArn() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *DSQL) pulumi.StringPtrOutput { return v.StreamRoleArn }).(pulumi.StringPtrOutput)
+func (o DSQLOutput) StreamRoleArn() pulumi.StringOutput {
+	return o.ApplyT(func(v *DSQL) pulumi.StringOutput { return v.StreamRoleArn }).(pulumi.StringOutput)
 }
 
 // Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.

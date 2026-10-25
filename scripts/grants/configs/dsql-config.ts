@@ -17,7 +17,7 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
     'import { DSQLConnect } from "./dsqlconnect";',
   ],
   tsPropertyDeclarations: [
-    '    declare public /*out*/ readonly rolesTableName: pulumi.Output<string | undefined>;',
+    '    declare public /*out*/ readonly rolesTableName: pulumi.Output<string>;',
   ],
   tsResourceInputs: [
     '            resourceInputs["rolesTableName"] = undefined /*out*/;',
@@ -28,7 +28,7 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
   pyPropertyDeclarations: [
     `    @_builtins.property
     @pulumi.getter(name="rolesTableName")
-    def roles_table_name(self) -> pulumi.Output[Optional[_builtins.str]]:
+    def roles_table_name(self) -> pulumi.Output[_builtins.str]:
         """
         DynamoDB table name for role bootstrap. Pass to DSQLConnect (via grant_connect) so it can create the IAM role-mapping item. Empty when no roles are configured.
         """

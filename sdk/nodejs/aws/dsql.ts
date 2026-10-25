@@ -42,23 +42,23 @@ export class DSQL extends pulumi.ComponentResource {
     /**
      * DynamoDB table name for role bootstrap. Passed to DSQLConnect (via grantConnect) so it can create the IAM role-mapping item. Empty when no roles are configured.
      */
-    declare public /*out*/ readonly rolesTableName: pulumi.Output<string | undefined>;
+    declare public /*out*/ readonly rolesTableName: pulumi.Output<string>;
     /**
      * The Kinesis stream CDC events are sent to. Empty when stream is omitted.
      */
-    declare public /*out*/ readonly streamKinesisArn: pulumi.Output<string | undefined>;
+    declare public /*out*/ readonly streamKinesisArn: pulumi.Output<string>;
     /**
      * The IAM role DSQL writes CDC events with: the one Anvil created, or stream.roleArn. Empty when stream is omitted.
      */
-    declare public /*out*/ readonly streamRoleArn: pulumi.Output<string | undefined>;
+    declare public /*out*/ readonly streamRoleArn: pulumi.Output<string>;
     /**
      * Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.
      */
-    declare public /*out*/ readonly vpcEndpointIds: pulumi.Output<{[key: string]: string} | undefined>;
+    declare public /*out*/ readonly vpcEndpointIds: pulumi.Output<{[key: string]: string}>;
     /**
      * Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.
      */
-    declare public /*out*/ readonly vpcEndpointSecurityGroupIds: pulumi.Output<{[key: string]: string} | undefined>;
+    declare public /*out*/ readonly vpcEndpointSecurityGroupIds: pulumi.Output<{[key: string]: string}>;
 
     /**
      * Create a DSQL resource with the given unique name, arguments, and options.

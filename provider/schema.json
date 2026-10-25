@@ -383,7 +383,12 @@
       "required": [
         "endpoints",
         "clusterArns",
-        "endpoint"
+        "endpoint",
+        "rolesTableName",
+        "streamKinesisArn",
+        "streamRoleArn",
+        "vpcEndpointIds",
+        "vpcEndpointSecurityGroupIds"
       ],
       "requiredInputs": []
     },
