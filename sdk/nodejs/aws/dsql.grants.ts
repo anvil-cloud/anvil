@@ -7,7 +7,30 @@ import { DSQLConnect } from "./dsqlconnect";
 
 declare module "./dsql" {
     interface DSQL {
-        grantConnect(target: grants.GrantTarget, opts: any): void;
+        /**
+         * Grants a compute resource connect access to this DSQL cluster.
+         *
+         * Pass one or more { schema, roleName } pairs. The compute may be mapped to
+         * multiple roles and connects as whichever one it chooses at runtime. Each
+         * role must be declared in this component's schemas, in that schema, or
+         * the deploy fails.
+         *
+         * Creates an anvil:aws:DSQLConnect component that handles:
+         * 1. IAM policy (dsql:DbConnect) on all cluster ARNs
+         * 2. One DynamoDB IAM mapping item per role — the bootstrap Lambda runs
+         *    AWS IAM GRANT "<roleName>" TO 'arn:...' for each.
+         *
+         * Network access is not wired here. When the cluster has VPC endpoints,
+         * declare vpcEndpointSecurityGroupIds in the target's vpc.vpcEndpoints;
+         * the endpoint SG lets its members reach the endpoint on port 5432.
+         *
+         * @param target - The compute resource to grant access to (Lambda, ECS, etc.).
+         * @param opts.schemas - The { schema, roleName } pairs this compute may connect as.
+         *
+         * @example
+         *   dsql.grantConnect(lambda, { schemas: [{ schema: 'my_app', roleName: 'app_role' }] });
+         */
+        grantConnect(target: grants.GrantTarget, opts: { schemas: { schema: string; roleName: string }[] }): void;
     }
 }
 
@@ -16,7 +39,9 @@ declare module "./dsql" {
      * Grants a compute resource connect access to this DSQL cluster.
      *
      * Pass one or more { schema, roleName } pairs. The compute may be mapped to
-     * multiple roles and connects as whichever one it chooses at runtime.
+     * multiple roles and connects as whichever one it chooses at runtime. Each
+     * role must be declared in this component's schemas, in that schema, or
+     * the deploy fails.
      *
      * Creates an anvil:aws:DSQLConnect component that handles:
      * 1. IAM policy (dsql:DbConnect) on all cluster ARNs
@@ -43,6 +68,8 @@ declare module "./dsql" {
             targetRoleArn: target.grantRoleArn(),
             targetName: target.grantName(),
             dbRoles: dbRoles,
+            declaredRoles: this.declaredRoles,
+            dbRoleSchemas: Object.fromEntries(opts.schemas.map((s) => [s.roleName, s.schema])),
         };
         if (this.rolesTableName) {
             args.rolesTableName = this.rolesTableName;

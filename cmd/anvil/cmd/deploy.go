@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/auto/events"
 	"github.com/pulumi/pulumi/sdk/v3/go/auto/optup"
@@ -156,6 +157,7 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		upOpts = append(upOpts, optup.Refresh())
 	}
 
+	upStarted := time.Now()
 	_, upErr := s.Up(ctx, upOpts...)
 
 	handler.PrintSummary(stage)
@@ -187,7 +189,14 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("deploy succeeded, but setting up the CDC stream failed: %w", err)
 	}
 
-	// ── Step 5c: Scan on deploy ────────────────────────
+	// ── Step 5c: DSQL database changes ─────────────────
+	// The bootstrap Lambdas apply schemas, roles and grants from the stream
+	// after `up`; wait for their status and fail if a change didn't apply.
+	if err := waitForDatabaseChanges(ctx, s, stage, upStarted); err != nil {
+		return fmt.Errorf("deploy succeeded, but %w", err)
+	}
+
+	// ── Step 5d: Scan on deploy ────────────────────────
 	// Fire and forget: a scan failure never fails a completed deploy.
 	if compliance != nil && compliance.ScanOnDeploy {
 		startDeployScan(ctx, stage, compliance)

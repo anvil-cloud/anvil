@@ -3566,7 +3566,7 @@ class DSQLColumnArgsDict(TypedDict):
     """
     default: NotRequired[pulumi.Input[_builtins.str]]
     """
-    Raw SQL default expression, passed through verbatim. String literals need inner quotes: "'active'". Functions: "now()".
+    Column default. Limited to safe forms: a quoted string ("'active'", optionally cast: "'{}'::jsonb"), a number, true/false/null, or one of now(), gen_random_uuid(), current_timestamp, current_date, current_time, localtimestamp, localtime, clock_timestamp(), statement_timestamp(), transaction_timestamp().
     """
     length: NotRequired[pulumi.Input[_builtins.int]]
     """
@@ -3605,7 +3605,7 @@ class DSQLColumnArgs:
 
         :param pulumi.Input[_builtins.str] name: Column name.
         :param pulumi.Input['DSQLColumnType'] type: DSQL column type.
-        :param pulumi.Input[_builtins.str] default: Raw SQL default expression, passed through verbatim. String literals need inner quotes: "'active'". Functions: "now()".
+        :param pulumi.Input[_builtins.str] default: Column default. Limited to safe forms: a quoted string ("'active'", optionally cast: "'{}'::jsonb"), a number, true/false/null, or one of now(), gen_random_uuid(), current_timestamp, current_date, current_time, localtimestamp, localtime, clock_timestamp(), statement_timestamp(), transaction_timestamp().
         :param pulumi.Input[_builtins.int] length: Length for char/varchar. char <= 4096, varchar <= 65535.
         :param pulumi.Input[_builtins.bool] not_null: Adds NOT NULL. Primary-key columns are auto-NOT-NULL.
         :param pulumi.Input[_builtins.int] precision: Total digits for numeric (<= 38).
@@ -3655,7 +3655,7 @@ class DSQLColumnArgs:
     @pulumi.getter
     def default(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Raw SQL default expression, passed through verbatim. String literals need inner quotes: "'active'". Functions: "now()".
+        Column default. Limited to safe forms: a quoted string ("'active'", optionally cast: "'{}'::jsonb"), a number, true/false/null, or one of now(), gen_random_uuid(), current_timestamp, current_date, current_time, localtimestamp, localtime, clock_timestamp(), statement_timestamp(), transaction_timestamp().
         """
         return pulumi.get(self, "default")
 

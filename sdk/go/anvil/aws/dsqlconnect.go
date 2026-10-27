@@ -45,8 +45,12 @@ func NewDSQLConnect(ctx *pulumi.Context,
 type dsqlconnectArgs struct {
 	// Map of region to cluster ARN from the DSQL component. Used to scope the dsql:DbConnect IAM policy.
 	ClusterArns map[string]string `pulumi:"clusterArns"`
+	// Maps a role in dbRoles to the schema you expect it in. Optional; a role declared in a different schema fails the deploy. grantConnect fills it from its { schema, roleName } pairs.
+	DbRoleSchemas map[string]string `pulumi:"dbRoleSchemas"`
 	// Postgres database role names to map this IAM identity to. One mapping is created per role; the bootstrap Lambda runs AWS IAM GRANT "<role>" TO 'arn:...' for each. The compute connects as whichever role it chooses at runtime.
 	DbRoles []string `pulumi:"dbRoles"`
+	// Every role declared in the DSQL component's schemas, mapped to its schema: pass dsql.declaredRoles. Required with dbRoles. Each role in dbRoles must be declared there, or the deploy fails, so access is always managed in code.
+	DeclaredRoles map[string]string `pulumi:"declaredRoles"`
 	// DynamoDB table name for role bootstrap. Pass dsql.rolesTableName from the DSQL component. When set with dbRole, a TableItem is created to trigger the bootstrap Lambda. Optional — omit when roles are not configured.
 	RolesTableName *string `pulumi:"rolesTableName"`
 	// Logical name of the compute resource. Used for naming child resources.
@@ -59,8 +63,12 @@ type dsqlconnectArgs struct {
 type DSQLConnectArgs struct {
 	// Map of region to cluster ARN from the DSQL component. Used to scope the dsql:DbConnect IAM policy.
 	ClusterArns pulumi.StringMapInput
+	// Maps a role in dbRoles to the schema you expect it in. Optional; a role declared in a different schema fails the deploy. grantConnect fills it from its { schema, roleName } pairs.
+	DbRoleSchemas pulumi.StringMapInput
 	// Postgres database role names to map this IAM identity to. One mapping is created per role; the bootstrap Lambda runs AWS IAM GRANT "<role>" TO 'arn:...' for each. The compute connects as whichever role it chooses at runtime.
 	DbRoles pulumi.StringArrayInput
+	// Every role declared in the DSQL component's schemas, mapped to its schema: pass dsql.declaredRoles. Required with dbRoles. Each role in dbRoles must be declared there, or the deploy fails, so access is always managed in code.
+	DeclaredRoles pulumi.StringMapInput
 	// DynamoDB table name for role bootstrap. Pass dsql.rolesTableName from the DSQL component. When set with dbRole, a TableItem is created to trigger the bootstrap Lambda. Optional — omit when roles are not configured.
 	RolesTableName pulumi.StringPtrInput
 	// Logical name of the compute resource. Used for naming child resources.

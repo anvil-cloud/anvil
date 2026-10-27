@@ -44,7 +44,9 @@ export class DSQLConnect extends pulumi.ComponentResource {
                 throw new Error("Missing required property 'targetRoleArn'");
             }
             resourceInputs["clusterArns"] = args?.clusterArns;
+            resourceInputs["dbRoleSchemas"] = args?.dbRoleSchemas;
             resourceInputs["dbRoles"] = args?.dbRoles;
+            resourceInputs["declaredRoles"] = args?.declaredRoles;
             resourceInputs["rolesTableName"] = args?.rolesTableName;
             resourceInputs["targetName"] = args?.targetName;
             resourceInputs["targetRoleArn"] = args?.targetRoleArn;
@@ -64,9 +66,17 @@ export interface DSQLConnectArgs {
      */
     clusterArns: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     /**
+     * Maps a role in dbRoles to the schema you expect it in. Optional; a role declared in a different schema fails the deploy. grantConnect fills it from its { schema, roleName } pairs.
+     */
+    dbRoleSchemas?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
+    /**
      * Postgres database role names to map this IAM identity to. One mapping is created per role; the bootstrap Lambda runs AWS IAM GRANT "<role>" TO 'arn:...' for each. The compute connects as whichever role it chooses at runtime.
      */
     dbRoles?: pulumi.Input<pulumi.Input<string>[]>;
+    /**
+     * Every role declared in the DSQL component's schemas, mapped to its schema: pass dsql.declaredRoles. Required with dbRoles. Each role in dbRoles must be declared there, or the deploy fails, so access is always managed in code.
+     */
+    declaredRoles?: pulumi.Input<{[key: string]: pulumi.Input<string>}>;
     /**
      * DynamoDB table name for role bootstrap. Pass dsql.rolesTableName from the DSQL component. When set with dbRole, a TableItem is created to trigger the bootstrap Lambda. Optional — omit when roles are not configured.
      */

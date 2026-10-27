@@ -13,6 +13,8 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
   tsFile: 'aws/dsql.ts',
   pyFile: 'aws/dsql.py',
   detectMethod: 'grantConnect',
+  tsSignature:
+    'grantConnect(target: grants.GrantTarget, opts: { schemas: { schema: string; roleName: string }[] }): void;',
   tsImports: [
     'import { DSQLConnect } from "./dsqlconnect";',
   ],
@@ -39,7 +41,9 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
      * Grants a compute resource connect access to this DSQL cluster.
      *
      * Pass one or more { schema, roleName } pairs. The compute may be mapped to
-     * multiple roles and connects as whichever one it chooses at runtime.
+     * multiple roles and connects as whichever one it chooses at runtime. Each
+     * role must be declared in this component's schemas, in that schema, or
+     * the deploy fails.
      *
      * Creates an anvil:aws:DSQLConnect component that handles:
      * 1. IAM policy (dsql:DbConnect) on all cluster ARNs
@@ -66,6 +70,8 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
             targetRoleArn: target.grantRoleArn(),
             targetName: target.grantName(),
             dbRoles: dbRoles,
+            declaredRoles: this.declaredRoles,
+            dbRoleSchemas: Object.fromEntries(opts.schemas.map((s) => [s.roleName, s.schema])),
         };
         if (this.rolesTableName) {
             args.rolesTableName = this.rolesTableName;
@@ -82,6 +88,8 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
 
         Pass one or more {"schema", "role_name"} pairs. The compute may be mapped
         to multiple roles and connects as whichever one it chooses at runtime.
+        Each role must be declared in this component's schemas, in that schema,
+        or the deploy fails.
 
         Network access is not wired here. When the cluster has VPC endpoints,
         declare vpc_endpoint_security_group_ids in the target's vpc.vpc_endpoints;
@@ -99,6 +107,8 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
             target_role_arn=target.grant_role_arn(),
             target_name=target.grant_name(),
             db_roles=db_roles,
+            declared_roles=self.declared_roles,
+            db_role_schemas={s["role_name"]: s["schema"] for s in schemas},
             roles_table_name=self.roles_table_name,
             opts=pulumi.ResourceOptions(parent=self),
         )

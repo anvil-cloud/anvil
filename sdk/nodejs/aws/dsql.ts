@@ -32,6 +32,10 @@ export class DSQL extends pulumi.ComponentResource {
      */
     declare public /*out*/ readonly clusterArns: pulumi.Output<{[key: string]: string}>;
     /**
+     * Map of each role declared in schemas to its schema, e.g. { "orders_writer": "shop" }. Passed to DSQLConnect (via grantConnect) so a grant can only name a declared role, in its own schema. Empty when schemas is omitted.
+     */
+    declare public /*out*/ readonly declaredRoles: pulumi.Output<{[key: string]: string}>;
+    /**
      * The single cluster endpoint for the provider's default region. Convenience for the common single-region case — pass straight to a Lambda env var: { DSQL_ENDPOINT: dsql.endpoint }. For multi-region this is the local-region endpoint; use endpoints[region] for another.
      */
     declare public /*out*/ readonly endpoint: pulumi.Output<string>;
@@ -74,10 +78,12 @@ export class DSQL extends pulumi.ComponentResource {
             resourceInputs["backup"] = args?.backup;
             resourceInputs["hatch"] = args?.hatch;
             resourceInputs["multiRegion"] = args?.multiRegion;
+            resourceInputs["pruneUnmanagedRoles"] = args?.pruneUnmanagedRoles;
             resourceInputs["schemas"] = args?.schemas;
             resourceInputs["stream"] = args?.stream;
             resourceInputs["vpc"] = args?.vpc;
             resourceInputs["clusterArns"] = undefined /*out*/;
+            resourceInputs["declaredRoles"] = undefined /*out*/;
             resourceInputs["endpoint"] = undefined /*out*/;
             resourceInputs["endpoints"] = undefined /*out*/;
             resourceInputs["rolesTableName"] = undefined /*out*/;
@@ -87,6 +93,7 @@ export class DSQL extends pulumi.ComponentResource {
             resourceInputs["vpcEndpointSecurityGroupIds"] = undefined /*out*/;
         } else {
             resourceInputs["clusterArns"] = undefined /*out*/;
+            resourceInputs["declaredRoles"] = undefined /*out*/;
             resourceInputs["endpoint"] = undefined /*out*/;
             resourceInputs["endpoints"] = undefined /*out*/;
             resourceInputs["rolesTableName"] = undefined /*out*/;
@@ -113,6 +120,10 @@ export interface DSQLArgs {
      * Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region.
      */
     multiRegion?: pulumi.Input<inputs.aws.DSQLMultiRegionArgsArgs>;
+    /**
+     * Also drop database roles that aren't declared in schemas and weren't created by Anvil (made by hand in SQL, or by another tool). Roles Anvil created are always dropped once they're removed from schemas. Defaults to false: unmanaged roles are only reported when you deploy. admin and dbowner are never touched.
+     */
+    pruneUnmanagedRoles?: pulumi.Input<boolean>;
     /**
      * Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
      */

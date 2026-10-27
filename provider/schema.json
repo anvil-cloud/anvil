@@ -317,6 +317,10 @@
           "$ref": "#/types/anvil:aws:DSQLMultiRegionArgs",
           "description": "Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region."
         },
+        "pruneUnmanagedRoles": {
+          "description": "Also drop database roles that aren't declared in schemas and weren't created by Anvil (made by hand in SQL, or by another tool). Roles Anvil created are always dropped once they're removed from schemas. Defaults to false: unmanaged roles are only reported when you deploy. admin and dbowner are never touched.",
+          "type": "boolean"
+        },
         "schemas": {
           "description": "Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.",
           "items": {
@@ -340,6 +344,13 @@
             "type": "string"
           },
           "description": "Map of region to cluster ARN. Single-region: one entry. Multi-region: one entry per region. e.g. { \"us-east-1\": \"arn:aws:dsql:us-east-1:...\" }.",
+          "type": "object"
+        },
+        "declaredRoles": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map of each role declared in schemas to its schema, e.g. { \"orders_writer\": \"shop\" }. Passed to DSQLConnect (via grantConnect) so a grant can only name a declared role, in its own schema. Empty when schemas is omitted.",
           "type": "object"
         },
         "endpoint": {
@@ -385,6 +396,7 @@
         "clusterArns",
         "endpoint",
         "rolesTableName",
+        "declaredRoles",
         "streamKinesisArn",
         "streamRoleArn",
         "vpcEndpointIds",
@@ -402,12 +414,26 @@
           "description": "Map of region to cluster ARN from the DSQL component. Used to scope the dsql:DbConnect IAM policy.",
           "type": "object"
         },
+        "dbRoleSchemas": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Maps a role in dbRoles to the schema you expect it in. Optional; a role declared in a different schema fails the deploy. grantConnect fills it from its { schema, roleName } pairs.",
+          "type": "object"
+        },
         "dbRoles": {
           "description": "Postgres database role names to map this IAM identity to. One mapping is created per role; the bootstrap Lambda runs AWS IAM GRANT \"\u003crole\u003e\" TO 'arn:...' for each. The compute connects as whichever role it chooses at runtime.",
           "items": {
             "type": "string"
           },
           "type": "array"
+        },
+        "declaredRoles": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Every role declared in the DSQL component's schemas, mapped to its schema: pass dsql.declaredRoles. Required with dbRoles. Each role in dbRoles must be declared there, or the deploy fails, so access is always managed in code.",
+          "type": "object"
         },
         "rolesTableName": {
           "description": "DynamoDB table name for role bootstrap. Pass dsql.rolesTableName from the DSQL component. When set with dbRole, a TableItem is created to trigger the bootstrap Lambda. Optional — omit when roles are not configured.",
@@ -2181,7 +2207,7 @@
       "description": "A single column in a table.",
       "properties": {
         "default": {
-          "description": "Raw SQL default expression, passed through verbatim. String literals need inner quotes: \"'active'\". Functions: \"now()\".",
+          "description": "Column default. Limited to safe forms: a quoted string (\"'active'\", optionally cast: \"'{}'::jsonb\"), a number, true/false/null, or one of now(), gen_random_uuid(), current_timestamp, current_date, current_time, localtimestamp, localtime, clock_timestamp(), statement_timestamp(), transaction_timestamp().",
           "type": "string"
         },
         "length": {

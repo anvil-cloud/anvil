@@ -6,22 +6,29 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/config"
 	dsqlauth "github.com/aws/aws-sdk-go-v2/feature/dsql/auth"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 // ── NOTES FOR FRONTEND / DASHBOARD ──────────────────────────────────────────
 //
-// This Lambda is triggered ONLY by a DynamoDB Stream. It cannot be invoked
-// directly — no lambda:InvokeFunction is granted to anything.
+// This Lambda's only trigger is a DynamoDB Stream — no lambda:InvokeFunction
+// is granted to anything. Every record is re-checked against the table before
+// it is acted on (verify.go), so a direct invoke can only replay what is
+// already there.
 //
 // The cluster endpoint and region are set as Lambda environment variables
 // (DSQL_ENDPOINT, DSQL_REGION) — they are NOT stored in the DynamoDB items.
+// ROLES_TABLE_NAME and ROLES_STREAM_ARN identify the table records are
+// verified against.
 // Each DSQL component has its own table and Lambda, so multi-cluster
 // deployments are fully isolated.
 //
@@ -51,9 +58,10 @@ import (
 // The Lambda connects as admin using dsql:DbConnectAdmin IAM auth.
 // Auth tokens are generated per-request — no long-lived credentials.
 //
-// Error handling: if SQL fails, the Lambda returns an error and the DynamoDB
-// stream retries (up to the stream retention window of 24 hours). Failed
-// items stay in the stream until processed or expired.
+// Error handling: DSQL concurrency conflicts (40001) are retried in-process
+// with jittered backoff, and scoped grants don't depend on record order
+// (ordering.go). Any other SQL failure returns an error and the stream retries
+// the record up to the event source mapping's retry limit.
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -70,33 +78,93 @@ func handler(ctx context.Context, event events.DynamoDBEvent) error {
 	log.Printf("[dsql-bootstrap] received %d stream record(s) | endpoint=%s region=%s",
 		len(event.Records), dsqlEndpoint, dsqlRegion)
 
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(dsqlRegion))
+	if err != nil {
+		return fmt.Errorf("loading AWS config: %w", err)
+	}
+	ddb := dynamodb.NewFromConfig(cfg)
+
 	for _, record := range event.Records {
-		if err := processRecord(ctx, record); err != nil {
-			log.Printf("[dsql-bootstrap] ERROR processing record %s: %v", record.EventID, err)
+		// Status items are this Lambda's own reports; acting on them would loop.
+		if isStatusRecord(record) {
+			continue
+		}
+		ok, err := verifyRecord(ctx, ddb, &record)
+		if err != nil {
+			return fmt.Errorf("failed to verify record %s: %w", record.EventID, err)
+		}
+		if !ok {
+			continue
+		}
+		if err := handleRecord(ctx, ddb, record); err != nil {
+			return err
+		}
+	}
+
+	log.Printf("[dsql-bootstrap] all %d record(s) processed", len(event.Records))
+	return nil
+}
+
+// handleRecord processes one verified record and reports it in a status item.
+// Only failures retrying can fix are returned, so the stream retries them; a
+// permanent failure is recorded and the stream moves on.
+func handleRecord(ctx context.Context, ddb rolesTableAPI, record events.DynamoDBEventRecord) error {
+	pk := record.Change.Keys["roleName"].String()
+	sk := record.Change.Keys["sk"].String()
+
+	o, err := processRecord(ctx, ddb, record)
+	switch {
+	case record.EventName == "REMOVE":
+		deleteStatus(ctx, ddb, pk, sk)
+	case err != nil:
+		writeStatus(ctx, ddb, pk, sk, attrString(record.Change.NewImage, "version"),
+			outcome{State: stateFailed, Message: err.Error()})
+	default:
+		writeStatus(ctx, ddb, pk, sk, attrString(record.Change.NewImage, "version"), o)
+	}
+	if err != nil {
+		log.Printf("[dsql-bootstrap] ERROR processing record %s: %v", record.EventID, err)
+		if retryable(err) {
 			return fmt.Errorf("failed to process record %s: %w", record.EventID, err)
 		}
 	}
 
-	log.Printf("[dsql-bootstrap] all %d record(s) processed successfully", len(event.Records))
+	// Any change to roles or settings can leave a role the code no longer has.
+	if isRoleDefinition(record) || pk == settingsKey {
+		runSweep(ctx, ddb)
+	}
 	return nil
 }
 
-func processRecord(ctx context.Context, record events.DynamoDBEventRecord) error {
-	// Dispatch order:
-	//   kind == "table"  → table DDL (create/additive-alter; no-op on removal)
-	//   sk  starts "arn:" → IAM GRANT/REVOKE mapping
-	//   else             → role definition (sk == "DEFINITION")
-	var image map[string]events.DynamoDBAttributeValue
+func recordImage(record events.DynamoDBEventRecord) map[string]events.DynamoDBAttributeValue {
 	if record.Change.NewImage != nil {
-		image = record.Change.NewImage
-	} else {
-		image = record.Change.OldImage
+		return record.Change.NewImage
 	}
+	return record.Change.OldImage
+}
+
+func isRoleDefinition(record events.DynamoDBEventRecord) bool {
+	image := recordImage(record)
+	return image["sk"].String() == "DEFINITION" && attrString(image, "kind") == ""
+}
+
+func processRecord(ctx context.Context, ddb rolesTableAPI, record events.DynamoDBEventRecord) (outcome, error) {
+	// Dispatch order:
+	//   kind == "table"    → table DDL (create/additive changes; no-op on removal)
+	//   kind == "settings" → nothing here; the sweep reads it
+	//   sk  starts "arn:"  → IAM GRANT/REVOKE mapping
+	//   else               → role definition (sk == "DEFINITION")
+	image := recordImage(record)
 
 	if isTable(image) {
 		log.Printf("[dsql-bootstrap] record %s | type=TABLE event=%s id=%q",
 			record.EventID, record.EventName, image["roleName"].String())
-		return processTable(ctx, record)
+		return processTable(ctx, ddb, record)
+	}
+
+	if attrString(image, "kind") == "settings" {
+		log.Printf("[dsql-bootstrap] record %s | type=SETTINGS event=%s", record.EventID, record.EventName)
+		return outcome{}, nil
 	}
 
 	if isIAMMapping(image) {
@@ -108,26 +176,35 @@ func processRecord(ctx context.Context, record events.DynamoDBEventRecord) error
 	log.Printf("[dsql-bootstrap] record %s | type=ROLE_DEFINITION event=%s roleName=%q schema=%q",
 		record.EventID, record.EventName, image["roleName"].String(), image["schema"].String())
 
+	// Grants go into SQL unquoted — reject anything off the allowlist before
+	// connecting. The rejection is the item's status; the stream moves on.
+	if record.EventName == "INSERT" || record.EventName == "MODIFY" {
+		if err := validateRoleConfig(extractRoleConfig(record.Change.NewImage)); err != nil {
+			log.Printf("[dsql-bootstrap]   REJECTED → %v", err)
+			return outcome{State: stateFailed, Message: fmt.Sprintf("rejected: %v", err)}, nil
+		}
+	}
+
 	switch record.EventName {
 	case "INSERT":
-		return handleInsert(ctx, record.Change.NewImage)
+		return handleInsert(ctx, ddb, record.Change.NewImage)
 	case "MODIFY":
-		return handleModify(ctx, record.Change.OldImage, record.Change.NewImage)
+		return handleModify(ctx, ddb, record.Change.OldImage, record.Change.NewImage)
 	case "REMOVE":
-		return handleRemove(ctx, record.Change.OldImage)
+		return outcome{}, handleRemove(ctx, record.Change.OldImage)
 	default:
-		return nil
+		return outcome{}, nil
 	}
 }
 
 // ── INSERT: create schema, role, and grants ─────────────────────────────────
 
-func handleInsert(ctx context.Context, newImage map[string]events.DynamoDBAttributeValue) error {
+func handleInsert(ctx context.Context, ddb tableScanner, newImage map[string]events.DynamoDBAttributeValue) (outcome, error) {
 	role := extractRoleConfig(newImage)
 
 	conn, err := connectAdmin(ctx)
 	if err != nil {
-		return fmt.Errorf("admin connect failed: %w", err)
+		return outcome{}, fmt.Errorf("admin connect failed: %w", err)
 	}
 	defer conn.Close(ctx)
 
@@ -139,56 +216,65 @@ func handleInsert(ctx context.Context, newImage map[string]events.DynamoDBAttrib
 			role.RoleName, role.Schema, role.Grants)
 	}
 
-	// Schema (idempotent) then the role. DSQL has no CREATE ROLE IF NOT EXISTS,
-	// so check pg_roles first and only create when absent — makes INSERT
-	// re-runnable on retries/redeploys without a "role already exists" error.
-	if err := execAll(ctx, conn, []string{
-		fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %s", pgIdent(role.Schema)),
-	}); err != nil {
-		return err
+	// Schema then the role, each only when absent. DSQL has no CREATE ROLE IF
+	// NOT EXISTS, so check pg_roles first — makes INSERT re-runnable on
+	// retries/redeploys without a "role already exists" error.
+	if err := ensureSchema(ctx, conn, role.Schema); err != nil {
+		return outcome{}, err
 	}
 
-	if err := ensureRole(ctx, conn, role.RoleName); err != nil {
-		return err
+	created, err := ensureRole(ctx, conn, role.RoleName)
+	if err != nil {
+		return outcome{}, err
+	}
+	if created {
+		if err := reapplyMappings(ctx, conn, ddb, role.RoleName); err != nil {
+			return outcome{}, err
+		}
 	}
 
-	// Grants are re-runnable (GRANT is idempotent).
-	if err := execAll(ctx, conn, buildRoleGrantStatements(role)); err != nil {
-		return err
+	// Grants are re-runnable (GRANT is idempotent). The role must exist before
+	// this check so a table created in parallel can grant to it (ordering.go).
+	statements, _, err := roleGrantStatementsNow(ctx, conn, role)
+	if err != nil {
+		return outcome{}, err
+	}
+	if err := execAll(ctx, conn, statements); err != nil {
+		return outcome{}, err
 	}
 
 	logRoleGrants(ctx, conn, role.Schema, role.RoleName)
-	return nil
+	return roleOutcome(ctx, conn, role)
 }
 
-// ensureRole creates the role only if it doesn't already exist. DSQL/Postgres
-// has no CREATE ROLE IF NOT EXISTS, and DSQL forbids DDL inside DO/PLpgSQL
-// blocks, so this is a SELECT (its own txn) followed by a conditional CREATE
-// ROLE (its own txn) — both satisfying DSQL's one-DDL-per-transaction rule.
-func ensureRole(ctx context.Context, conn *pgx.Conn, roleName string) error {
-	var exists bool
-	if err := conn.QueryRow(ctx,
-		"SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = $1)", roleName,
-	).Scan(&exists); err != nil {
-		return fmt.Errorf("checking role %q existence: %w", roleName, err)
+// ensureRole creates the role only if it doesn't already exist, and tags it as
+// Anvil's (roles.go). created reports whether it was made now, in which case
+// the caller re-applies the role's IAM mappings (mappings.go). DSQL/Postgres has no CREATE ROLE IF NOT EXISTS, and DSQL
+// forbids DDL inside DO/PLpgSQL blocks, so this is a SELECT (its own txn)
+// followed by a conditional CREATE ROLE (its own txn) — both satisfying DSQL's
+// one-DDL-per-transaction rule.
+func ensureRole(ctx context.Context, conn *pgx.Conn, roleName string) (created bool, err error) {
+	exists, err := roleExists(ctx, conn, roleName)
+	if err != nil {
+		return false, fmt.Errorf("checking role %q existence: %w", roleName, err)
 	}
 	if exists {
 		log.Printf("[dsql-bootstrap]   role %q already exists — skipping CREATE ROLE", roleName)
-		return nil
+	} else if err := execAll(ctx, conn, []string{fmt.Sprintf("CREATE ROLE %s WITH LOGIN", pgIdent(roleName))}); err != nil {
+		return false, err
 	}
-	sql := fmt.Sprintf("CREATE ROLE %s WITH LOGIN", pgIdent(roleName))
-	return execAll(ctx, conn, []string{sql})
+	return !exists, tagRole(ctx, conn, roleName)
 }
 
 // ── MODIFY: diff grants and update ──────────────────────────────────────────
 
-func handleModify(ctx context.Context, oldImage, newImage map[string]events.DynamoDBAttributeValue) error {
+func handleModify(ctx context.Context, ddb tableScanner, oldImage, newImage map[string]events.DynamoDBAttributeValue) (outcome, error) {
 	oldRole := extractRoleConfig(oldImage)
 	newRole := extractRoleConfig(newImage)
 
 	conn, err := connectAdmin(ctx)
 	if err != nil {
-		return fmt.Errorf("admin connect failed: %w", err)
+		return outcome{}, fmt.Errorf("admin connect failed: %w", err)
 	}
 	defer conn.Close(ctx)
 
@@ -213,24 +299,38 @@ func handleModify(ctx context.Context, oldImage, newImage map[string]events.Dyna
 	}
 	execBestEffort(ctx, conn, revokes)
 
-	// Phase 2 — apply the new spec. These MUST succeed (the schema/tables may not
-	// exist yet on the first attempt, in which case the stream retries until the
-	// table-creation records have run — same self-healing path as INSERT).
-	statements := []string{
-		fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %s", pgIdent(newRole.Schema)),
+	// Phase 2 — apply the new spec. These MUST succeed. Scoped tables that don't
+	// exist yet are skipped; their table record grants them (ordering.go).
+	if err := ensureSchema(ctx, conn, newRole.Schema); err != nil {
+		return outcome{}, err
 	}
-	statements = append(statements, buildRoleGrantStatements(newRole)...)
-
-	return execAll(ctx, conn, statements)
+	created, err := ensureRole(ctx, conn, newRole.RoleName)
+	if err != nil {
+		return outcome{}, err
+	}
+	if created {
+		if err := reapplyMappings(ctx, conn, ddb, newRole.RoleName); err != nil {
+			return outcome{}, err
+		}
+	}
+	statements, _, err := roleGrantStatementsNow(ctx, conn, newRole)
+	if err != nil {
+		return outcome{}, err
+	}
+	if err := execAll(ctx, conn, statements); err != nil {
+		return outcome{}, err
+	}
+	return roleOutcome(ctx, conn, newRole)
 }
 
 // ── REMOVE: revoke everything and drop role ─────────────────────────────────
 //
-// Best-effort: cleanup statements are logged on failure but do NOT return an
-// error. A REMOVE that errored would block (poison) the DynamoDB stream and
-// retry forever, stalling every record behind it. The revokes have already
-// removed the role's access by the time a drop might fail, so partial cleanup
-// is acceptable — far better than a stuck stream.
+// dropRoleCompletely (roles.go) revokes the role's IAM mappings first — DSQL
+// won't drop a role that still has one — then its privileges in every schema.
+//
+// A drop that fails is logged, not returned: a REMOVE that errored would block
+// (poison) the stream behind it. The role's access is already revoked by then,
+// and the sweep that runs after this record retries the drop and reports it.
 //
 // Note: DSQL does not support DROP OWNED BY (SQLSTATE 0A000). It isn't needed —
 // app roles own no objects (the bootstrap Lambda creates tables as admin), so
@@ -245,17 +345,9 @@ func handleRemove(ctx context.Context, oldImage map[string]events.DynamoDBAttrib
 	}
 	defer conn.Close(ctx)
 
-	statements := []string{
-		fmt.Sprintf("REVOKE ALL ON ALL TABLES IN SCHEMA %s FROM %s",
-			pgIdent(role.Schema), pgIdent(role.RoleName)),
-		fmt.Sprintf("ALTER DEFAULT PRIVILEGES IN SCHEMA %s REVOKE ALL ON TABLES FROM %s",
-			pgIdent(role.Schema), pgIdent(role.RoleName)),
-		fmt.Sprintf("REVOKE USAGE ON SCHEMA %s FROM %s",
-			pgIdent(role.Schema), pgIdent(role.RoleName)),
-		fmt.Sprintf("DROP ROLE IF EXISTS %s", pgIdent(role.RoleName)),
+	if err := dropRoleCompletely(ctx, conn, role.RoleName); err != nil {
+		log.Printf("[dsql-bootstrap]   drop of role %q failed (the sweep retries it): %v", role.RoleName, err)
 	}
-
-	execBestEffort(ctx, conn, statements)
 	return nil
 }
 
@@ -266,31 +358,52 @@ func isIAMMapping(image map[string]events.DynamoDBAttributeValue) bool {
 	return strings.HasPrefix(sk, "arn:")
 }
 
-func processIAMMapping(ctx context.Context, record events.DynamoDBEventRecord) error {
+func processIAMMapping(ctx context.Context, record events.DynamoDBEventRecord) (outcome, error) {
 	switch record.EventName {
-	case "INSERT":
+	// MODIFY only happens when the item's attributes change (e.g. it gains a
+	// version on upgrade); the mapping it describes is the same, so it is
+	// re-applied. AWS IAM GRANT of an existing mapping is a no-op notice.
+	case "INSERT", "MODIFY":
 		roleName := record.Change.NewImage["roleName"].String()
 		iamArn := record.Change.NewImage["sk"].String()
 
-		log.Printf("[dsql-bootstrap] INSERT IAM mapping: db role %q ← IAM %s", roleName, iamArn)
+		log.Printf("[dsql-bootstrap] %s IAM mapping: db role %q ← IAM %s", record.EventName, roleName, iamArn)
+
+		// The ARN lands inside a SQL string literal. Reject anything that isn't
+		// a plain IAM role ARN before connecting.
+		if !iamRoleArnPattern.MatchString(iamArn) {
+			log.Printf("[dsql-bootstrap]   REJECTED → %q is not a valid IAM role ARN", iamArn)
+			return outcome{State: stateFailed, Message: fmt.Sprintf("rejected: %q is not a valid IAM role ARN", iamArn)}, nil
+		}
 
 		conn, err := connectAdmin(ctx)
 		if err != nil {
-			return fmt.Errorf("admin connect failed: %w", err)
+			return outcome{}, fmt.Errorf("admin connect failed: %w", err)
 		}
 		defer conn.Close(ctx)
 
-		sql := fmt.Sprintf("AWS IAM GRANT %s TO '%s'", pgIdent(roleName), iamArn)
+		exists, err := roleExists(ctx, conn, roleName)
+		if err != nil {
+			return outcome{}, err
+		}
+		if !exists {
+			return outcome{}, permanent(fmt.Errorf("database role %q doesn't exist, so nothing can connect as it", roleName))
+		}
+
+		sql := fmt.Sprintf("AWS IAM GRANT %s TO %s", pgIdent(roleName), pgLiteral(iamArn))
 		log.Printf("[dsql-bootstrap]   SQL → %s", sql)
-		if _, err := conn.Exec(ctx, sql); err != nil {
+		if err := withRetry(ctx, "AWS IAM GRANT", func() error {
+			_, err := conn.Exec(ctx, sql)
+			return err
+		}); err != nil {
 			log.Printf("[dsql-bootstrap]   SQL FAILED → %s | %v", sql, err)
-			return fmt.Errorf("SQL failed [%s]: %w", sql, err)
+			return outcome{}, fmt.Errorf("SQL failed [%s]: %w", sql, err)
 		}
 		log.Printf("[dsql-bootstrap]   SQL OK → AWS IAM GRANT")
 
 		// Confirm the mapping is actually present in DSQL's catalog.
 		logIAMMappings(ctx, conn, roleName)
-		return nil
+		return outcome{State: stateApplied, Message: fmt.Sprintf("%s can connect as %s", iamRoleName(iamArn), roleName)}, nil
 
 	case "REMOVE":
 		roleName := record.Change.OldImage["roleName"].String()
@@ -298,22 +411,32 @@ func processIAMMapping(ctx context.Context, record events.DynamoDBEventRecord) e
 
 		log.Printf("[dsql-bootstrap] REMOVE IAM mapping: db role %q ✗ IAM %s", roleName, iamArn)
 
+		if !iamRoleArnPattern.MatchString(iamArn) {
+			log.Printf("[dsql-bootstrap]   REJECTED → %q is not a valid IAM role ARN", iamArn)
+			return outcome{}, nil
+		}
+
 		conn, err := connectAdmin(ctx)
 		if err != nil {
-			return fmt.Errorf("admin connect failed: %w", err)
+			return outcome{}, fmt.Errorf("admin connect failed: %w", err)
 		}
 		defer conn.Close(ctx)
 
 		// Best-effort: a failed REVOKE must not poison the stream. If the role
 		// was already dropped, the mapping is gone anyway.
 		execBestEffort(ctx, conn, []string{
-			fmt.Sprintf("AWS IAM REVOKE %s FROM '%s'", pgIdent(roleName), iamArn),
+			fmt.Sprintf("AWS IAM REVOKE %s FROM %s", pgIdent(roleName), pgLiteral(iamArn)),
 		})
-		return nil
+		return outcome{}, nil
 
 	default:
-		return nil
+		return outcome{}, nil
 	}
+}
+
+// iamRoleName is the name part of an IAM role ARN, for status messages.
+func iamRoleName(arn string) string {
+	return arn[strings.LastIndex(arn, "/")+1:]
 }
 
 // ── Table items (kind = "table") ────────────────────────────────────────────
@@ -321,12 +444,11 @@ func processIAMMapping(ctx context.Context, record events.DynamoDBEventRecord) e
 // Additive-only. The full table definition is stored as a JSON string in the
 // "definition" attribute (mirrors provider/aws/dsql tableDefPayload).
 //
-//   INSERT → CREATE SCHEMA IF NOT EXISTS, CREATE TABLE IF NOT EXISTS,
-//            CREATE INDEX ASYNC for each index
-//   MODIFY → diff old vs new columns/indexes; ADD COLUMN / CREATE INDEX ASYNC
-//            for new ones only. Removed columns/indexes and type changes are
-//            ignored (destructive changes are human-owned).
-//   REMOVE → no-op (the table stays in DSQL; only Pulumi state drops it)
+//   INSERT / MODIFY → create the table if it's missing, otherwise add the
+//                     columns and indexes the catalog lacks (tables.go).
+//                     Removed columns/indexes and type changes are left alone
+//                     (destructive changes are human-owned) and reported.
+//   REMOVE          → no-op (the table stays in DSQL; only Pulumi state drops it)
 
 type columnDef struct {
 	Name      string `json:"name"`
@@ -372,25 +494,18 @@ func parseTableDef(image map[string]events.DynamoDBAttributeValue) (tableDef, er
 	return def, nil
 }
 
-func processTable(ctx context.Context, record events.DynamoDBEventRecord) error {
+func processTable(ctx context.Context, ddb rolesTableAPI, record events.DynamoDBEventRecord) (outcome, error) {
 	switch record.EventName {
-	case "INSERT":
+	case "INSERT", "MODIFY":
 		def, err := parseTableDef(record.Change.NewImage)
 		if err != nil {
-			return err
+			return outcome{}, permanent(err)
 		}
-		return createTable(ctx, def)
-
-	case "MODIFY":
-		oldDef, err := parseTableDef(record.Change.OldImage)
-		if err != nil {
-			return err
+		if err := validateTableDef(def); err != nil {
+			log.Printf("[dsql-bootstrap]   REJECTED → %v", err)
+			return outcome{State: stateFailed, Message: fmt.Sprintf("rejected: %v", err)}, nil
 		}
-		newDef, err := parseTableDef(record.Change.NewImage)
-		if err != nil {
-			return err
-		}
-		return alterTableAdditive(ctx, oldDef, newDef)
+		return reconcileTable(ctx, ddb, def, record.EventName == "INSERT")
 
 	case "REMOVE":
 		// Destructive — Anvil never drops tables. The table stays in DSQL;
@@ -398,115 +513,29 @@ func processTable(ctx context.Context, record events.DynamoDBEventRecord) error 
 		def, _ := parseTableDef(record.Change.OldImage)
 		log.Printf("[dsql-bootstrap] REMOVE table %s.%s — no-op (destructive changes are human-owned; table left intact)",
 			def.Schema, def.Name)
-		return nil
+		return outcome{}, nil
 
 	default:
-		return nil
+		return outcome{}, nil
 	}
 }
 
 // createTable creates the schema, the table, and its indexes (async).
-func createTable(ctx context.Context, def tableDef) error {
+func createTable(ctx context.Context, conn *pgx.Conn, def tableDef) error {
 	log.Printf("[dsql-bootstrap] CREATE table %s.%s (%d columns, pk=%v, %d indexes)",
 		def.Schema, def.Name, len(def.Columns), def.PrimaryKey, len(def.Indexes))
 
-	conn, err := connectAdmin(ctx)
-	if err != nil {
-		return err
-	}
-	defer conn.Close(ctx)
-
 	// Schema first (its own transaction), then table (its own transaction).
-	if err := execAll(ctx, conn, []string{
-		fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %s", pgIdent(def.Schema)),
-		buildCreateTable(def),
-	}); err != nil {
+	if err := ensureSchema(ctx, conn, def.Schema); err != nil {
+		return err
+	}
+	if err := execAll(ctx, conn, []string{buildCreateTable(def)}); err != nil {
 		return err
 	}
 
-	// Indexes — each async, fire-and-log.
-	for _, idx := range def.Indexes {
+	// Declared indexes and column-level unique indexes — each async.
+	for _, idx := range tableIndexes(def) {
 		if err := createIndexAsync(ctx, conn, def, idx); err != nil {
-			return err
-		}
-	}
-
-	// Column-level unique → named async unique index.
-	for _, c := range def.Columns {
-		if c.Unique {
-			if err := createIndexAsync(ctx, conn, def, indexDef{
-				Name:    fmt.Sprintf("%s_%s_key", def.Name, c.Name),
-				Columns: []string{c.Name},
-				Unique:  true,
-			}); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
-// alterTableAdditive adds columns and indexes present in new but not old.
-// Removed columns/indexes and any type changes are ignored.
-func alterTableAdditive(ctx context.Context, oldDef, newDef tableDef) error {
-	oldCols := map[string]bool{}
-	for _, c := range oldDef.Columns {
-		oldCols[c.Name] = true
-	}
-	oldIdx := map[string]bool{}
-	for _, x := range oldDef.Indexes {
-		oldIdx[x.Name] = true
-	}
-
-	var newColumns []columnDef
-	for _, c := range newDef.Columns {
-		if !oldCols[c.Name] {
-			newColumns = append(newColumns, c)
-		}
-	}
-	var newIndexes []indexDef
-	for _, x := range newDef.Indexes {
-		if !oldIdx[x.Name] {
-			newIndexes = append(newIndexes, x)
-		}
-	}
-
-	// New column-level unique indexes (column added with unique:true).
-	for _, c := range newColumns {
-		if c.Unique {
-			newIndexes = append(newIndexes, indexDef{
-				Name:    fmt.Sprintf("%s_%s_key", newDef.Name, c.Name),
-				Columns: []string{c.Name},
-				Unique:  true,
-			})
-		}
-	}
-
-	if len(newColumns) == 0 && len(newIndexes) == 0 {
-		log.Printf("[dsql-bootstrap] MODIFY table %s.%s — no additive changes (removals/type-changes ignored)",
-			newDef.Schema, newDef.Name)
-		return nil
-	}
-
-	log.Printf("[dsql-bootstrap] MODIFY table %s.%s — adding %d column(s), %d index(es)",
-		newDef.Schema, newDef.Name, len(newColumns), len(newIndexes))
-
-	conn, err := connectAdmin(ctx)
-	if err != nil {
-		return err
-	}
-	defer conn.Close(ctx)
-
-	for _, c := range newColumns {
-		sql := fmt.Sprintf("ALTER TABLE %s.%s ADD COLUMN IF NOT EXISTS %s",
-			pgIdent(newDef.Schema), pgIdent(newDef.Name), buildColumnDDL(c))
-		if err := execAll(ctx, conn, []string{sql}); err != nil {
-			return err
-		}
-	}
-	for _, idx := range newIndexes {
-		if err := createIndexAsync(ctx, conn, newDef, idx); err != nil {
 			return err
 		}
 	}
@@ -552,7 +581,7 @@ func buildColumnDDL(c columnDef) string {
 		ddl += " NOT NULL"
 	}
 	if c.Default != "" {
-		ddl += " DEFAULT " + c.Default // raw passthrough expression
+		ddl += " DEFAULT " + c.Default // unquoted; checked by validDefault first
 	}
 	return ddl
 }
@@ -574,7 +603,9 @@ func createIndexAsync(ctx context.Context, conn *pgx.Conn, def tableDef, idx ind
 	log.Printf("[dsql-bootstrap]   SQL → %s", sql)
 	var jobID string
 	// CREATE INDEX ASYNC returns a job_id row.
-	if err := conn.QueryRow(ctx, sql).Scan(&jobID); err != nil {
+	if err := withRetry(ctx, "CREATE INDEX "+idx.Name, func() error {
+		return conn.QueryRow(ctx, sql).Scan(&jobID)
+	}); err != nil {
 		// Some drivers return no row for IF NOT EXISTS no-op; treat as non-fatal
 		// only if it's a "no rows" case, otherwise surface it.
 		if err.Error() == "no rows in result set" {
@@ -635,12 +666,15 @@ type roleConfig struct {
 	// TableScoping, when non-empty, narrows grants to these specific tables
 	// instead of the whole schema.
 	TableScoping []string
+	// Version is the item's version, for its status item.
+	Version string
 }
 
 func extractRoleConfig(image map[string]events.DynamoDBAttributeValue) roleConfig {
 	r := roleConfig{
 		RoleName: image["roleName"].String(),
 		Schema:   image["schema"].String(),
+		Version:  attrString(image, "version"),
 	}
 
 	if grantsAttr, ok := image["grants"]; ok {
@@ -670,11 +704,7 @@ func buildRoleGrantStatements(role roleConfig) []string {
 	}
 
 	if len(role.TableScoping) > 0 {
-		for _, table := range role.TableScoping {
-			stmts = append(stmts, fmt.Sprintf("GRANT %s ON %s.%s TO %s",
-				grants, pgIdent(role.Schema), pgIdent(table), pgIdent(role.RoleName)))
-		}
-		return stmts
+		return buildScopedGrantStatements(role, role.TableScoping)
 	}
 
 	// Schema-wide: current + future tables.
@@ -684,6 +714,20 @@ func buildRoleGrantStatements(role roleConfig) []string {
 		fmt.Sprintf("ALTER DEFAULT PRIVILEGES IN SCHEMA %s GRANT %s ON TABLES TO %s",
 			pgIdent(role.Schema), grants, pgIdent(role.RoleName)),
 	)
+	return stmts
+}
+
+// buildScopedGrantStatements returns USAGE on the schema plus the role's grants
+// on each of tables. With no tables it grants USAGE only — never schema-wide.
+func buildScopedGrantStatements(role roleConfig, tables []string) []string {
+	grants := strings.Join(role.Grants, ", ")
+	stmts := []string{
+		fmt.Sprintf("GRANT USAGE ON SCHEMA %s TO %s", pgIdent(role.Schema), pgIdent(role.RoleName)),
+	}
+	for _, table := range tables {
+		stmts = append(stmts, fmt.Sprintf("GRANT %s ON %s.%s TO %s",
+			grants, pgIdent(role.Schema), pgIdent(table), pgIdent(role.RoleName)))
+	}
 	return stmts
 }
 
@@ -704,7 +748,12 @@ func execBestEffort(ctx context.Context, conn *pgx.Conn, statements []string) {
 func execAll(ctx context.Context, conn *pgx.Conn, statements []string) error {
 	for _, sql := range statements {
 		log.Printf("[dsql-bootstrap]   SQL → %s", sql)
-		tag, err := conn.Exec(ctx, sql)
+		var tag pgconn.CommandTag
+		err := withRetry(ctx, sql, func() error {
+			var err error
+			tag, err = conn.Exec(ctx, sql)
+			return err
+		})
 		if err != nil {
 			log.Printf("[dsql-bootstrap]   SQL FAILED → %s | %v", sql, err)
 			return fmt.Errorf("SQL failed [%s]: %w", sql, err)
@@ -784,3 +833,12 @@ func pgIdent(name string) string {
 	escaped := strings.ReplaceAll(name, `"`, `""`)
 	return `"` + escaped + `"`
 }
+
+// pgLiteral quotes a PostgreSQL string literal to prevent injection.
+func pgLiteral(s string) string {
+	return "'" + strings.ReplaceAll(s, "'", "''") + "'"
+}
+
+// iamRoleArnPattern matches an IAM role ARN in any partition. The path/name
+// charset is IAM's own ([\w+=,.@-] plus '/'), so it can never contain a quote.
+var iamRoleArnPattern = regexp.MustCompile(`^arn:aws[a-z-]*:iam::\d{12}:role/[\w+=,.@/-]+$`)

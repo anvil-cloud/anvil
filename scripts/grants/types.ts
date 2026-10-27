@@ -50,6 +50,9 @@ export interface CustomGrantConfig {
   tsFile: string;
   pyFile: string;
   detectMethod: string;
+  // Declaration-merged method signature, e.g. `grantX(target: grants.GrantTarget, opts: {...}): void;`.
+  // Must match tsMethod's parameters — this is what callers are type-checked against.
+  tsSignature: string;
   tsMethod: string;
   pyMethod: string;
   tsImports?: string[];

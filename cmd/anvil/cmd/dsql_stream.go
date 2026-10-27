@@ -51,6 +51,7 @@ type dsqlStreamComponent struct {
 	ClusterArn string // the provider region's cluster, where the stream lives
 	KinesisArn string // "" when the component has no stream
 	RoleArn    string
+	RolesTable string // "" when the component declares no schemas
 }
 
 // readStreamManifest returns which DSQL components want a stream, from the
@@ -114,6 +115,7 @@ func dsqlComponentsFromDeployment(deployment json.RawMessage, region string) ([]
 		}
 		c.KinesisArn, _ = r.Outputs["streamKinesisArn"].(string)
 		c.RoleArn, _ = r.Outputs["streamRoleArn"].(string)
+		c.RolesTable, _ = r.Outputs["rolesTableName"].(string)
 		out = append(out, c)
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })

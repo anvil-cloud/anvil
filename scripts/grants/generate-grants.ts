@@ -156,8 +156,17 @@ function tsCustomMethod(
       )
       .replace(/this\.__name/g, 'grants.grantResourceName(this)')
       .trimEnd() + ';';
+  // Carry the method's JSDoc onto the declaration so callers get hover docs —
+  // the copy on the prototype assignment isn't surfaced by editors.
+  const doc = config.tsMethod.match(/\/\*\*[\s\S]*?\*\//)?.[0];
+  const docLines = doc
+    ? doc
+        .split('\n')
+        .map((l, i) => (i === 0 ? l.trim() : ' ' + l.trim()))
+        .join('\n        ') + '\n        '
+    : '';
   return {
-    signature: `${config.detectMethod}(target: grants.GrantTarget, opts: any): void;`,
+    signature: docLines + config.tsSignature,
     impl,
   };
 }

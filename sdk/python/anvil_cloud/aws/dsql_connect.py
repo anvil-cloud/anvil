@@ -22,7 +22,9 @@ class DSQLConnectArgs:
                  cluster_arns: pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]],
                  target_name: pulumi.Input[_builtins.str],
                  target_role_arn: pulumi.Input[_builtins.str],
+                 db_role_schemas: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  db_roles: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 declared_roles: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  roles_table_name: Optional[pulumi.Input[_builtins.str]] = None):
         """
         The set of arguments for constructing a DSQLConnect resource.
@@ -30,14 +32,20 @@ class DSQLConnectArgs:
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] cluster_arns: Map of region to cluster ARN from the DSQL component. Used to scope the dsql:DbConnect IAM policy.
         :param pulumi.Input[_builtins.str] target_name: Logical name of the compute resource. Used for naming child resources.
         :param pulumi.Input[_builtins.str] target_role_arn: IAM execution role ARN of the compute resource (Lambda, ECS task, etc.) that will connect to the cluster.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] db_role_schemas: Maps a role in dbRoles to the schema you expect it in. Optional; a role declared in a different schema fails the deploy. grantConnect fills it from its { schema, roleName } pairs.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] db_roles: Postgres database role names to map this IAM identity to. One mapping is created per role; the bootstrap Lambda runs AWS IAM GRANT "<role>" TO 'arn:...' for each. The compute connects as whichever role it chooses at runtime.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] declared_roles: Every role declared in the DSQL component's schemas, mapped to its schema: pass dsql.declaredRoles. Required with dbRoles. Each role in dbRoles must be declared there, or the deploy fails, so access is always managed in code.
         :param pulumi.Input[_builtins.str] roles_table_name: DynamoDB table name for role bootstrap. Pass dsql.rolesTableName from the DSQL component. When set with dbRole, a TableItem is created to trigger the bootstrap Lambda. Optional — omit when roles are not configured.
         """
         pulumi.set(__self__, "cluster_arns", cluster_arns)
         pulumi.set(__self__, "target_name", target_name)
         pulumi.set(__self__, "target_role_arn", target_role_arn)
+        if db_role_schemas is not None:
+            pulumi.set(__self__, "db_role_schemas", db_role_schemas)
         if db_roles is not None:
             pulumi.set(__self__, "db_roles", db_roles)
+        if declared_roles is not None:
+            pulumi.set(__self__, "declared_roles", declared_roles)
         if roles_table_name is not None:
             pulumi.set(__self__, "roles_table_name", roles_table_name)
 
@@ -78,6 +86,18 @@ class DSQLConnectArgs:
         pulumi.set(self, "target_role_arn", value)
 
     @_builtins.property
+    @pulumi.getter(name="dbRoleSchemas")
+    def db_role_schemas(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+        """
+        Maps a role in dbRoles to the schema you expect it in. Optional; a role declared in a different schema fails the deploy. grantConnect fills it from its { schema, roleName } pairs.
+        """
+        return pulumi.get(self, "db_role_schemas")
+
+    @db_role_schemas.setter
+    def db_role_schemas(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "db_role_schemas", value)
+
+    @_builtins.property
     @pulumi.getter(name="dbRoles")
     def db_roles(self) -> Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]:
         """
@@ -88,6 +108,18 @@ class DSQLConnectArgs:
     @db_roles.setter
     def db_roles(self, value: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]]):
         pulumi.set(self, "db_roles", value)
+
+    @_builtins.property
+    @pulumi.getter(name="declaredRoles")
+    def declared_roles(self) -> Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]:
+        """
+        Every role declared in the DSQL component's schemas, mapped to its schema: pass dsql.declaredRoles. Required with dbRoles. Each role in dbRoles must be declared there, or the deploy fails, so access is always managed in code.
+        """
+        return pulumi.get(self, "declared_roles")
+
+    @declared_roles.setter
+    def declared_roles(self, value: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]]):
+        pulumi.set(self, "declared_roles", value)
 
     @_builtins.property
     @pulumi.getter(name="rolesTableName")
@@ -109,7 +141,9 @@ class DSQLConnect(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  cluster_arns: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 db_role_schemas: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  db_roles: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 declared_roles: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  roles_table_name: Optional[pulumi.Input[_builtins.str]] = None,
                  target_name: Optional[pulumi.Input[_builtins.str]] = None,
                  target_role_arn: Optional[pulumi.Input[_builtins.str]] = None,
@@ -121,7 +155,9 @@ class DSQLConnect(pulumi.ComponentResource):
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] cluster_arns: Map of region to cluster ARN from the DSQL component. Used to scope the dsql:DbConnect IAM policy.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] db_role_schemas: Maps a role in dbRoles to the schema you expect it in. Optional; a role declared in a different schema fails the deploy. grantConnect fills it from its { schema, roleName } pairs.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] db_roles: Postgres database role names to map this IAM identity to. One mapping is created per role; the bootstrap Lambda runs AWS IAM GRANT "<role>" TO 'arn:...' for each. The compute connects as whichever role it chooses at runtime.
+        :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] declared_roles: Every role declared in the DSQL component's schemas, mapped to its schema: pass dsql.declaredRoles. Required with dbRoles. Each role in dbRoles must be declared there, or the deploy fails, so access is always managed in code.
         :param pulumi.Input[_builtins.str] roles_table_name: DynamoDB table name for role bootstrap. Pass dsql.rolesTableName from the DSQL component. When set with dbRole, a TableItem is created to trigger the bootstrap Lambda. Optional — omit when roles are not configured.
         :param pulumi.Input[_builtins.str] target_name: Logical name of the compute resource. Used for naming child resources.
         :param pulumi.Input[_builtins.str] target_role_arn: IAM execution role ARN of the compute resource (Lambda, ECS task, etc.) that will connect to the cluster.
@@ -152,7 +188,9 @@ class DSQLConnect(pulumi.ComponentResource):
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
                  cluster_arns: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
+                 db_role_schemas: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  db_roles: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
+                 declared_roles: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  roles_table_name: Optional[pulumi.Input[_builtins.str]] = None,
                  target_name: Optional[pulumi.Input[_builtins.str]] = None,
                  target_role_arn: Optional[pulumi.Input[_builtins.str]] = None,
@@ -170,7 +208,9 @@ class DSQLConnect(pulumi.ComponentResource):
             if cluster_arns is None and not opts.urn:
                 raise TypeError("Missing required property 'cluster_arns'")
             __props__.__dict__["cluster_arns"] = cluster_arns
+            __props__.__dict__["db_role_schemas"] = db_role_schemas
             __props__.__dict__["db_roles"] = db_roles
+            __props__.__dict__["declared_roles"] = declared_roles
             __props__.__dict__["roles_table_name"] = roles_table_name
             if target_name is None and not opts.urn:
                 raise TypeError("Missing required property 'target_name'")
