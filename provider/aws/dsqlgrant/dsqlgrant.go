@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
+	"strings"
 
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/dynamodb"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"
@@ -97,6 +99,41 @@ type DSQLConnectArgs struct {
 	// AWS IAM GRANT. When the DSQL component has no roles configured,
 	// this is empty and the mapping item is skipped.
 	RolesTableName pulumi.StringInput `pulumi:"rolesTableName,optional"`
+
+	// DeclaredRoles maps every role declared in the DSQL component's schemas
+	// to its schema — pass dsql.declaredRoles. Required whenever dbRoles is
+	// set: each role must be declared there, so access is always managed in
+	// code. A role made by hand in SQL can't be granted.
+	DeclaredRoles pulumi.StringMapInput `pulumi:"declaredRoles,optional"`
+
+	// DbRoleSchemas maps a role in dbRoles to the schema the caller expects
+	// it in. Optional; when set, a role declared in a different schema fails
+	// the deploy. grantConnect fills it from its { schema, roleName } pairs.
+	DbRoleSchemas map[string]string `pulumi:"dbRoleSchemas,optional"`
+}
+
+// validateRoles checks every requested role against the DSQL component's
+// declared roles.
+func validateRoles(dbRoles []string, schemas, declared map[string]string) error {
+	for _, role := range dbRoles {
+		declaredIn, ok := declared[role]
+		if !ok {
+			names := make([]string, 0, len(declared))
+			for r, s := range declared {
+				names = append(names, fmt.Sprintf("%s (%s)", r, s))
+			}
+			sort.Strings(names)
+			list := "none — declare roles in the DSQL component's schemas"
+			if len(names) > 0 {
+				list = strings.Join(names, ", ")
+			}
+			return fmt.Errorf("role %q isn't declared in the DSQL component's schemas, so nothing can connect as it. Declared roles: %s", role, list)
+		}
+		if want, ok := schemas[role]; ok && want != declaredIn {
+			return fmt.Errorf("role %q is declared in schema %q, not %q", role, declaredIn, want)
+		}
+	}
+	return nil
 }
 
 // ── Component ──────────────────────────────────────────────────────────────
@@ -130,11 +167,28 @@ func NewDSQLConnect(ctx *pulumi.Context, name string, args DSQLConnectArgs, opts
 		return g, nil
 	}
 
+	// Every role must be declared in the DSQL component, in the schema the
+	// caller named. Checked before anything is created, so a typo fails the
+	// deploy instead of leaving an IAM policy for a role that doesn't exist.
+	if len(args.DbRoles) > 0 && args.DeclaredRoles == nil {
+		return nil, fmt.Errorf("DSQLConnect %q: declaredRoles is required with dbRoles — pass the DSQL component's declaredRoles", name)
+	}
+	checked := pulumi.String("").ToStringOutput()
+	if args.DeclaredRoles != nil {
+		checked = args.DeclaredRoles.ToStringMapOutput().ApplyT(func(declared map[string]string) (string, error) {
+			if err := validateRoles(args.DbRoles, args.DbRoleSchemas, declared); err != nil {
+				return "", fmt.Errorf("DSQLConnect %q: %w", name, err)
+			}
+			return "", nil
+		}).(pulumi.StringOutput)
+	}
+
 	// ── 1. IAM policy — dsql:DbConnect on all cluster ARNs ────────────
 	// Allows the compute resource to call getDbConnectAuthToken() /
 	// GenerateDbConnectAuthToken() to generate temporary auth tokens.
 	// Scoped to all cluster ARNs (one per region for multi-region).
-	policyJSON := args.ClusterArns.ToStringMapOutput().ApplyT(func(arns map[string]string) (string, error) {
+	policyJSON := pulumi.All(args.ClusterArns.ToStringMapOutput(), checked).ApplyT(func(vs []interface{}) (string, error) {
+		arns := vs[0].(map[string]string)
 		resources := make([]string, 0, len(arns))
 		for _, arn := range arns {
 			resources = append(resources, arn)
@@ -193,11 +247,13 @@ func NewDSQLConnect(ctx *pulumi.Context, name string, args DSQLConnectArgs, opts
 	if args.RolesTableName != nil {
 		for _, dbRole := range args.DbRoles {
 			dbRole := dbRole
-			itemJSON := args.TargetRoleArn.ToStringOutput().ApplyT(func(arn string) (string, error) {
+			itemJSON := pulumi.All(args.TargetRoleArn.ToStringOutput(), checked).ApplyT(func(vs []interface{}) (string, error) {
+				arn := vs[0].(string)
 				item := map[string]map[string]string{
 					"roleName": {"S": dbRole},
 					"sk":       {"S": arn},
 				}
+				item["version"] = map[string]string{"S": ItemVersion(item)}
 				b, err := json.Marshal(item)
 				if err != nil {
 					return "", fmt.Errorf("failed to marshal IAM mapping item: %w", err)

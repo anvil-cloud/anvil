@@ -25,6 +25,7 @@ class DSQLArgs:
                  backup: Optional[pulumi.Input['DSQLBackupArgsArgs']] = None,
                  hatch: Optional[pulumi.Input['DsqlHatchArgsArgs']] = None,
                  multi_region: Optional[pulumi.Input['DSQLMultiRegionArgsArgs']] = None,
+                 prune_unmanaged_roles: Optional[pulumi.Input[_builtins.bool]] = None,
                  schemas: Optional[pulumi.Input[Sequence[pulumi.Input['DSQLSchemaArgs']]]] = None,
                  stream: Optional[pulumi.Input['DSQLStreamArgsArgs']] = None,
                  vpc: Optional[pulumi.Input['DSQLVpcArgsArgs']] = None):
@@ -33,6 +34,7 @@ class DSQLArgs:
 
         :param pulumi.Input['DSQLBackupArgsArgs'] backup: AWS Backup configuration. Omit to disable. When set, Anvil opts in the DSQL resource type per region, creates a backup plan with retention and schedule, and for multi-region clusters automatically adds cross-region copy rules.
         :param pulumi.Input['DSQLMultiRegionArgsArgs'] multi_region: Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region.
+        :param pulumi.Input[_builtins.bool] prune_unmanaged_roles: Also drop database roles that aren't declared in schemas and weren't created by Anvil (made by hand in SQL, or by another tool). Roles Anvil created are always dropped once they're removed from schemas. Defaults to false: unmanaged roles are only reported when you deploy. admin and dbowner are never touched.
         :param pulumi.Input[Sequence[pulumi.Input['DSQLSchemaArgs']]] schemas: Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
         :param pulumi.Input['DSQLStreamArgsArgs'] stream: Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
         :param pulumi.Input['DSQLVpcArgsArgs'] vpc: Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
@@ -43,6 +45,8 @@ class DSQLArgs:
             pulumi.set(__self__, "hatch", hatch)
         if multi_region is not None:
             pulumi.set(__self__, "multi_region", multi_region)
+        if prune_unmanaged_roles is not None:
+            pulumi.set(__self__, "prune_unmanaged_roles", prune_unmanaged_roles)
         if schemas is not None:
             pulumi.set(__self__, "schemas", schemas)
         if stream is not None:
@@ -82,6 +86,18 @@ class DSQLArgs:
     @multi_region.setter
     def multi_region(self, value: Optional[pulumi.Input['DSQLMultiRegionArgsArgs']]):
         pulumi.set(self, "multi_region", value)
+
+    @_builtins.property
+    @pulumi.getter(name="pruneUnmanagedRoles")
+    def prune_unmanaged_roles(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Also drop database roles that aren't declared in schemas and weren't created by Anvil (made by hand in SQL, or by another tool). Roles Anvil created are always dropped once they're removed from schemas. Defaults to false: unmanaged roles are only reported when you deploy. admin and dbowner are never touched.
+        """
+        return pulumi.get(self, "prune_unmanaged_roles")
+
+    @prune_unmanaged_roles.setter
+    def prune_unmanaged_roles(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "prune_unmanaged_roles", value)
 
     @_builtins.property
     @pulumi.getter
@@ -129,6 +145,7 @@ class DSQL(pulumi.ComponentResource):
                  backup: Optional[pulumi.Input[Union['DSQLBackupArgsArgs', 'DSQLBackupArgsArgsDict']]] = None,
                  hatch: Optional[pulumi.Input[Union['DsqlHatchArgsArgs', 'DsqlHatchArgsArgsDict']]] = None,
                  multi_region: Optional[pulumi.Input[Union['DSQLMultiRegionArgsArgs', 'DSQLMultiRegionArgsArgsDict']]] = None,
+                 prune_unmanaged_roles: Optional[pulumi.Input[_builtins.bool]] = None,
                  schemas: Optional[pulumi.Input[Sequence[pulumi.Input[Union['DSQLSchemaArgs', 'DSQLSchemaArgsDict']]]]] = None,
                  stream: Optional[pulumi.Input[Union['DSQLStreamArgsArgs', 'DSQLStreamArgsArgsDict']]] = None,
                  vpc: Optional[pulumi.Input[Union['DSQLVpcArgsArgs', 'DSQLVpcArgsArgsDict']]] = None,
@@ -141,6 +158,7 @@ class DSQL(pulumi.ComponentResource):
         :param pulumi.ResourceOptions opts: Options for the resource.
         :param pulumi.Input[Union['DSQLBackupArgsArgs', 'DSQLBackupArgsArgsDict']] backup: AWS Backup configuration. Omit to disable. When set, Anvil opts in the DSQL resource type per region, creates a backup plan with retention and schedule, and for multi-region clusters automatically adds cross-region copy rules.
         :param pulumi.Input[Union['DSQLMultiRegionArgsArgs', 'DSQLMultiRegionArgsArgsDict']] multi_region: Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region.
+        :param pulumi.Input[_builtins.bool] prune_unmanaged_roles: Also drop database roles that aren't declared in schemas and weren't created by Anvil (made by hand in SQL, or by another tool). Roles Anvil created are always dropped once they're removed from schemas. Defaults to false: unmanaged roles are only reported when you deploy. admin and dbowner are never touched.
         :param pulumi.Input[Sequence[pulumi.Input[Union['DSQLSchemaArgs', 'DSQLSchemaArgsDict']]]] schemas: Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
         :param pulumi.Input[Union['DSQLStreamArgsArgs', 'DSQLStreamArgsArgsDict']] stream: Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
         :param pulumi.Input[Union['DSQLVpcArgsArgs', 'DSQLVpcArgsArgsDict']] vpc: Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
@@ -173,6 +191,7 @@ class DSQL(pulumi.ComponentResource):
                  backup: Optional[pulumi.Input[Union['DSQLBackupArgsArgs', 'DSQLBackupArgsArgsDict']]] = None,
                  hatch: Optional[pulumi.Input[Union['DsqlHatchArgsArgs', 'DsqlHatchArgsArgsDict']]] = None,
                  multi_region: Optional[pulumi.Input[Union['DSQLMultiRegionArgsArgs', 'DSQLMultiRegionArgsArgsDict']]] = None,
+                 prune_unmanaged_roles: Optional[pulumi.Input[_builtins.bool]] = None,
                  schemas: Optional[pulumi.Input[Sequence[pulumi.Input[Union['DSQLSchemaArgs', 'DSQLSchemaArgsDict']]]]] = None,
                  stream: Optional[pulumi.Input[Union['DSQLStreamArgsArgs', 'DSQLStreamArgsArgsDict']]] = None,
                  vpc: Optional[pulumi.Input[Union['DSQLVpcArgsArgs', 'DSQLVpcArgsArgsDict']]] = None,
@@ -190,10 +209,12 @@ class DSQL(pulumi.ComponentResource):
             __props__.__dict__["backup"] = backup
             __props__.__dict__["hatch"] = hatch
             __props__.__dict__["multi_region"] = multi_region
+            __props__.__dict__["prune_unmanaged_roles"] = prune_unmanaged_roles
             __props__.__dict__["schemas"] = schemas
             __props__.__dict__["stream"] = stream
             __props__.__dict__["vpc"] = vpc
             __props__.__dict__["cluster_arns"] = None
+            __props__.__dict__["declared_roles"] = None
             __props__.__dict__["endpoint"] = None
             __props__.__dict__["endpoints"] = None
             __props__.__dict__["roles_table_name"] = None
@@ -215,6 +236,14 @@ class DSQL(pulumi.ComponentResource):
         Map of region to cluster ARN. Single-region: one entry. Multi-region: one entry per region. e.g. { "us-east-1": "arn:aws:dsql:us-east-1:..." }.
         """
         return pulumi.get(self, "cluster_arns")
+
+    @_builtins.property
+    @pulumi.getter(name="declaredRoles")
+    def declared_roles(self) -> pulumi.Output[Mapping[str, _builtins.str]]:
+        """
+        Map of each role declared in schemas to its schema, e.g. { "orders_writer": "shop" }. Passed to DSQLConnect (via grantConnect) so a grant can only name a declared role, in its own schema. Empty when schemas is omitted.
+        """
+        return pulumi.get(self, "declared_roles")
 
     @_builtins.property
     @pulumi.getter

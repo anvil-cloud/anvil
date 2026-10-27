@@ -6133,7 +6133,7 @@ func (o DSQLBackupArgsPtrOutput) VaultArn() pulumi.StringPtrOutput {
 
 // A single column in a table.
 type DSQLColumn struct {
-	// Raw SQL default expression, passed through verbatim. String literals need inner quotes: "'active'". Functions: "now()".
+	// Column default. Limited to safe forms: a quoted string ("'active'", optionally cast: "'{}'::jsonb"), a number, true/false/null, or one of now(), gen_random_uuid(), current_timestamp, current_date, current_time, localtimestamp, localtime, clock_timestamp(), statement_timestamp(), transaction_timestamp().
 	Default *string `pulumi:"default"`
 	// Length for char/varchar. char <= 4096, varchar <= 65535.
 	Length *int `pulumi:"length"`
@@ -6164,7 +6164,7 @@ type DSQLColumnInput interface {
 
 // A single column in a table.
 type DSQLColumnArgs struct {
-	// Raw SQL default expression, passed through verbatim. String literals need inner quotes: "'active'". Functions: "now()".
+	// Column default. Limited to safe forms: a quoted string ("'active'", optionally cast: "'{}'::jsonb"), a number, true/false/null, or one of now(), gen_random_uuid(), current_timestamp, current_date, current_time, localtimestamp, localtime, clock_timestamp(), statement_timestamp(), transaction_timestamp().
 	Default pulumi.StringPtrInput `pulumi:"default"`
 	// Length for char/varchar. char <= 4096, varchar <= 65535.
 	Length pulumi.IntPtrInput `pulumi:"length"`
@@ -6234,7 +6234,7 @@ func (o DSQLColumnOutput) ToDSQLColumnOutputWithContext(ctx context.Context) DSQ
 	return o
 }
 
-// Raw SQL default expression, passed through verbatim. String literals need inner quotes: "'active'". Functions: "now()".
+// Column default. Limited to safe forms: a quoted string ("'active'", optionally cast: "'{}'::jsonb"), a number, true/false/null, or one of now(), gen_random_uuid(), current_timestamp, current_date, current_time, localtimestamp, localtime, clock_timestamp(), statement_timestamp(), transaction_timestamp().
 func (o DSQLColumnOutput) Default() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DSQLColumn) *string { return v.Default }).(pulumi.StringPtrOutput)
 }

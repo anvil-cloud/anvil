@@ -88,9 +88,10 @@ type DSQLColumnArgs struct {
 	// Composite/explicit uniqueness goes in the table's indexes instead.
 	Unique bool `pulumi:"unique,optional" json:"unique,omitempty"`
 
-	// Default is a raw SQL default expression, passed through verbatim.
-	// String literals need inner quotes: "'active'". Functions: "now()".
-	// Anvil cannot validate the expression — it must be DSQL-valid.
+	// Default is the column default, limited to safe forms (validDefault):
+	// a quoted string ("'active'", optionally cast: "'{}'::jsonb"), a number,
+	// true/false/null, or an argument-free time/uuid function ("now()",
+	// "gen_random_uuid()", "current_timestamp", ...).
 	Default string `pulumi:"default,optional" json:"default,omitempty"`
 }
 
@@ -217,6 +218,13 @@ type DSQLArgs struct {
 	// When omitted, CDC is off.
 	Stream *DSQLStreamArgs `pulumi:"stream,optional"`
 
+	// PruneUnmanagedRoles also drops database roles that aren't declared in
+	// schemas and weren't created by Anvil (made by hand, or by another tool).
+	// Roles Anvil created are always dropped once they leave the code. When
+	// false (the default), unmanaged roles are only reported at deploy.
+	// admin and dbowner are never touched.
+	PruneUnmanagedRoles *bool `pulumi:"pruneUnmanagedRoles,optional"`
+
 	// Hatch is the escape hatch for low-level overrides of the underlying aws.dsql.Cluster.
 	// Keys: "cluster". Use for KMS key ARN and other cluster-level settings
 	// not exposed by the Anvil API.
@@ -256,6 +264,11 @@ type DSQL struct {
 	// Only populated when roles is configured. Used by DSQLConnect to
 	// create IAM mapping items. Empty when roles is omitted.
 	RolesTableName pulumi.StringOutput `pulumi:"rolesTableName"`
+
+	// DeclaredRoles maps each role declared in schemas to its schema. Passed
+	// to DSQLConnect (via grantConnect) so a grant can only name a declared
+	// role in its own schema. Empty when schemas is omitted.
+	DeclaredRoles pulumi.StringMapOutput `pulumi:"declaredRoles"`
 
 	// StreamKinesisArn is the Kinesis stream CDC events go to. Empty when
 	// stream is omitted. The CLI reads it to create the CDC stream.
@@ -319,6 +332,7 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 		d.VpcEndpointIds = empty
 		d.VpcEndpointSecurityGroupIds = empty
 		d.RolesTableName = emptyStr
+		d.DeclaredRoles = empty
 		d.StreamKinesisArn = emptyStr
 		d.StreamRoleArn = emptyStr
 
@@ -329,6 +343,7 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 			"vpcEndpointIds":              d.VpcEndpointIds,
 			"vpcEndpointSecurityGroupIds": d.VpcEndpointSecurityGroupIds,
 			"rolesTableName":              d.RolesTableName,
+			"declaredRoles":               d.DeclaredRoles,
 			"streamKinesisArn":            d.StreamKinesisArn,
 			"streamRoleArn":               d.StreamRoleArn,
 		})
@@ -725,7 +740,9 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 	// to DynamoDB — they cannot execute arbitrary SQL against the cluster.
 	//
 	// The bootstrap Lambda:
-	//   - Can ONLY be triggered by the DynamoDB stream (no lambda:InvokeFunction)
+	//   - Is triggered only by the DynamoDB stream (no lambda:InvokeFunction is
+	//     granted) and re-reads every record from the table before acting, so a
+	//     direct invoke can only replay what's already there
 	//   - Has dsql:DbConnectAdmin scoped to these cluster ARNs only
 	//   - Reads DSQL_ENDPOINT and DSQL_REGION from its own env vars
 	//   - Generates IAM auth tokens per-request (no stored credentials)
@@ -937,6 +954,10 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 					"variables": pulumi.StringMap{
 						"DSQL_ENDPOINT": clusterEndpoint,
 						"DSQL_REGION":   pulumi.String(firstRegion),
+						// Every record is re-read from this table before it's
+						// acted on, so a direct invoke can't forge one.
+						"ROLES_TABLE_NAME": rolesTable.Name,
+						"ROLES_STREAM_ARN": rolesTable.StreamArn,
 					},
 				},
 				"tags": pulumi.StringMap{
@@ -965,8 +986,11 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 			return nil, fmt.Errorf("creating stream invoke permission: %w", err)
 		}
 
-		// Stream read permissions on bootstrap Lambda role
-		streamReadPolicy := rolesTable.StreamArn.ApplyT(func(streamArn string) (string, error) {
+		// Stream read permissions on bootstrap Lambda role, plus GetItem and
+		// Scan on the table (record verification and scoped-role lookup).
+		streamPolicy := &awsiam.RolePolicy{}
+		streamReadPolicy := pulumi.All(rolesTable.StreamArn, rolesTable.Arn).ApplyT(func(vs []interface{}) (string, error) {
+			streamArn, tableArn := vs[0].(string), vs[1].(string)
 			type statement struct {
 				Effect   string   `json:"Effect"`
 				Action   []string `json:"Action"`
@@ -987,6 +1011,13 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 						"dynamodb:ListStreams",
 					},
 					Resource: []string{streamArn},
+				}, {
+					Effect: "Allow",
+					// GetItem verifies each record; Scan finds the roles scoped
+					// to a newly created table and the roles in code (sweep);
+					// PutItem/DeleteItem write the status items deploy waits on.
+					Action:   []string{"dynamodb:GetItem", "dynamodb:Scan", "dynamodb:PutItem", "dynamodb:DeleteItem"},
+					Resource: []string{tableArn},
 				}},
 			})
 			if err != nil {
@@ -1001,14 +1032,14 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 				"role":   bootstrapRole.Name,
 				"policy": streamReadPolicy,
 			},
-			&awsiam.RolePolicy{},
+			streamPolicy,
 			pulumi.Parent(d),
 		); err != nil {
 			return nil, fmt.Errorf("attaching stream read policy: %w", err)
 		}
 
 		// Event Source Mapping — DynamoDB Stream → Bootstrap Lambda
-		if _, err := awslambda.NewEventSourceMapping(ctx,
+		esm, err := awslambda.NewEventSourceMapping(ctx,
 			fmt.Sprintf("%s-bootstrap-esm", name),
 			&awslambda.EventSourceMappingArgs{
 				EventSourceArn:   rolesTable.StreamArn,
@@ -1025,9 +1056,20 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 				BisectBatchOnFunctionError: pulumi.Bool(true),
 			},
 			pulumi.Parent(d),
-		); err != nil {
+		)
+		if err != nil {
 			return nil, fmt.Errorf("creating bootstrap event source mapping: %w", err)
 		}
+
+		// Every item write waits for the Lambda, its permissions and its
+		// trigger. Pulumi would otherwise update them in parallel, and on an
+		// upgrade the stream records would be handled by the old code.
+		// rolesTableName waits too, since DSQLConnect's mapping items are
+		// written as soon as it resolves.
+		consumer := []pulumi.Resource{rolesTable, bootstrapLambda, streamPolicy, esm}
+		d.RolesTableName = pulumi.All(rolesTable.Name, bootstrapLambda.Arn, streamPolicy.ID(), esm.ID()).ApplyT(
+			func(vs []interface{}) string { return vs[0].(string) },
+		).(pulumi.StringOutput)
 
 		// ── 8f. Table definition items ────────────────────────────────────
 		// One DynamoDB item per table, kind="table". The bootstrap Lambda
@@ -1038,7 +1080,7 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 		// Created BEFORE role items so that table-scoped role grants
 		// (GRANT ... ON schema.table) run after the tables exist — role items
 		// DependsOn these so the stream delivers tables first.
-		tableItemResources := []pulumi.Resource{rolesTable}
+		tableItemResources := append([]pulumi.Resource{}, consumer...)
 		for _, schema := range args.Schemas {
 			for _, table := range schema.Tables {
 				table := table
@@ -1060,7 +1102,7 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 					},
 					tableItem,
 					pulumi.Parent(d),
-					pulumi.DependsOn([]pulumi.Resource{rolesTable}),
+					pulumi.DependsOn(consumer),
 				); err != nil {
 					return nil, fmt.Errorf("creating table item for %s.%s: %w", schemaName, table.Name, err)
 				}
@@ -1097,12 +1139,13 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 					}
 					item["tableScoping"] = map[string]interface{}{"L": scoping}
 				}
+				item["version"] = map[string]string{"S": dsqlgrant.ItemVersion(item)}
 				itemBytes, _ := json.Marshal(item)
 				itemJSON := string(itemBytes)
 
 				// Table-scoped roles depend on all table items (tables must exist
-				// before GRANT ON schema.table). Schema-wide roles only need the table.
-				deps := []pulumi.Resource{rolesTable}
+				// before GRANT ON schema.table). Schema-wide roles only need the Lambda and its trigger.
+				deps := consumer
 				if len(role.TableScoping) > 0 {
 					deps = tableItemResources
 				}
@@ -1123,6 +1166,35 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 					return nil, fmt.Errorf("creating role item for %s: %w", role.Name, err)
 				}
 			}
+		}
+
+		// ── 8h. Settings item ─────────────────────────────────────────────
+		// Component-level settings the bootstrap Lambda reads during its role
+		// sweep. A change to it (e.g. turning pruneUnmanagedRoles on) fires a
+		// stream event, so the sweep runs on that deploy. Its status item
+		// carries the sweep's result for `anvil deploy` to report.
+		prune := args.PruneUnmanagedRoles != nil && *args.PruneUnmanagedRoles
+		settings := map[string]interface{}{
+			"roleName":            map[string]string{"S": SettingsKey},
+			"sk":                  map[string]string{"S": "DEFINITION"},
+			"kind":                map[string]string{"S": "settings"},
+			"pruneUnmanagedRoles": map[string]bool{"BOOL": prune},
+		}
+		settings["version"] = map[string]string{"S": dsqlgrant.ItemVersion(settings)}
+		settingsJSON, _ := json.Marshal(settings)
+		if err := ctx.RegisterResource("aws:dynamodb/tableItem:TableItem",
+			fmt.Sprintf("%s-settings", name),
+			pulumi.Map{
+				"tableName": rolesTable.Name,
+				"hashKey":   pulumi.String("roleName"),
+				"rangeKey":  pulumi.String("sk"),
+				"item":      pulumi.String(string(settingsJSON)),
+			},
+			&awsdynamodb.TableItem{},
+			pulumi.Parent(d),
+			pulumi.DependsOn(consumer),
+		); err != nil {
+			return nil, fmt.Errorf("creating settings item: %w", err)
 		}
 	}
 
@@ -1149,6 +1221,13 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 	if len(args.Schemas) == 0 {
 		d.RolesTableName = pulumi.String("").ToStringOutput()
 	}
+	declaredRoles := pulumi.StringMap{}
+	for _, schema := range args.Schemas {
+		for _, role := range schema.Roles {
+			declaredRoles[role.Name] = pulumi.String(schema.Name)
+		}
+	}
+	d.DeclaredRoles = declaredRoles.ToStringMapOutput()
 
 	outputMap := pulumi.Map{
 		"endpoints":                   endpointMap,
@@ -1157,6 +1236,7 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 		"vpcEndpointIds":              vpcEndpointIds,
 		"vpcEndpointSecurityGroupIds": vpcEndpointSgIds,
 		"rolesTableName":              d.RolesTableName,
+		"declaredRoles":               d.DeclaredRoles,
 		"streamKinesisArn":            d.StreamKinesisArn,
 		"streamRoleArn":               d.StreamRoleArn,
 	}
@@ -1240,8 +1320,10 @@ func (d *DSQL) GrantConnect(
 	roles []DSQLConnectRole,
 ) error {
 	dbRoles := make([]string, len(roles))
+	schemas := make(map[string]string, len(roles))
 	for i, r := range roles {
 		dbRoles[i] = r.RoleName
+		schemas[r.RoleName] = r.Schema
 	}
 
 	grantArgs := dsqlgrant.DSQLConnectArgs{
@@ -1249,6 +1331,8 @@ func (d *DSQL) GrantConnect(
 		TargetRoleArn: target.RoleARN(),
 		TargetName:    target.Name(),
 		DbRoles:       dbRoles,
+		DeclaredRoles: d.DeclaredRoles,
+		DbRoleSchemas: schemas,
 	}
 
 	if d.RolesTableName != (pulumi.StringOutput{}) {
@@ -1336,6 +1420,7 @@ func marshalTableItem(schema string, t DSQLTableArgs) (string, error) {
 		"kind":       {"S": "table"},
 		"definition": {"S": string(defBytes)},
 	}
+	item["version"] = map[string]string{"S": dsqlgrant.ItemVersion(item)}
 	itemBytes, err := json.Marshal(item)
 	if err != nil {
 		return "", err
@@ -1382,6 +1467,11 @@ func validateSchemas(schemas []DSQLSchemaArgs) error {
 			if len(r.Grants) == 0 {
 				return fmt.Errorf("schema %q role %q: grants must not be empty", s.Name, r.Name)
 			}
+			for _, g := range r.Grants {
+				if !dsqlAllowedGrants[g] {
+					return fmt.Errorf("schema %q role %q: grant %q is not one of SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES", s.Name, r.Name, g)
+				}
+			}
 			if existing, dup := roleSchema[r.Name]; dup {
 				return fmt.Errorf("role %q is declared in both schema %q and %q — role names must be globally unique (DSQL roles are database-wide)", r.Name, existing, s.Name)
 			}
@@ -1410,6 +1500,9 @@ func validateSchemas(schemas []DSQLSchemaArgs) error {
 				}
 				if !dsqlSupportedTypes[c.Type] {
 					return fmt.Errorf("table %s.%s column %q: type %q is not supported by DSQL (no arrays/enums/serial; use uuid for ids)", s.Name, t.Name, c.Name, c.Type)
+				}
+				if c.Default != "" && !validDefault(c.Default) {
+					return fmt.Errorf("table %s.%s column %q: default %q is not allowed — use a quoted string ('pending', optionally cast like '{}'::jsonb), a number, true/false/null, or one of now(), gen_random_uuid(), current_timestamp, current_date, current_time, localtimestamp, localtime, clock_timestamp(), statement_timestamp(), transaction_timestamp()", s.Name, t.Name, c.Name, c.Default)
 				}
 				switch c.Type {
 				case "varchar":
@@ -1549,8 +1642,10 @@ func appendSchemasToManifest(name string, schemas []DSQLSchemaArgs) error {
 //
 // ADMIN CREDENTIALS — BLAST RADIUS (docs + security):
 //   The bootstrap Lambda has dsql:DbConnectAdmin scoped to the component's
-//   cluster ARNs. It cannot be invoked directly — no lambda:InvokeFunction
-//   is granted. The only trigger is the DynamoDB stream. If the CI/CD
+//   cluster ARNs. No lambda:InvokeFunction is granted; the only trigger is
+//   the DynamoDB stream. Each record is verified against the current table
+//   item before it's acted on, so a direct invoke by an account principal
+//   can only replay what's already in the table. If the CI/CD
 //   pipeline is compromised, the attacker can write items to DynamoDB
 //   (role definitions or IAM mappings) but cannot execute arbitrary SQL.
 //
@@ -1780,8 +1875,9 @@ func appendSchemasToManifest(name string, schemas []DSQLSchemaArgs) error {
 //   Pulumi (deploy) ──► DynamoDB item ──► DynamoDB Stream ──► Bootstrap Lambda ──► DSQL
 //                       (definitions)                          (dsql:DbConnectAdmin)
 //
-//   - The bootstrap Lambda is the ONLY holder of dsql:DbConnectAdmin and can
-//     ONLY be triggered by the stream (no lambda:InvokeFunction granted).
+//   - The bootstrap Lambda is the ONLY holder of dsql:DbConnectAdmin. Its only
+//     trigger is the stream (no lambda:InvokeFunction granted), and it acts
+//     only on items actually in the table.
 //   - The pipeline only writes definitions to DynamoDB — it never holds admin
 //     DB credentials. Pipeline compromise can at most alter definitions, never
 //     run arbitrary SQL.

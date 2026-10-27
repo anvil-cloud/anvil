@@ -730,7 +730,7 @@ export namespace aws {
      */
     export interface DSQLColumnArgs {
         /**
-         * Raw SQL default expression, passed through verbatim. String literals need inner quotes: "'active'". Functions: "now()".
+         * Column default. Limited to safe forms: a quoted string ("'active'", optionally cast: "'{}'::jsonb"), a number, true/false/null, or one of now(), gen_random_uuid(), current_timestamp, current_date, current_time, localtimestamp, localtime, clock_timestamp(), statement_timestamp(), transaction_timestamp().
          */
         default?: pulumi.Input<string>;
         /**

@@ -22,6 +22,16 @@
           "items": { "type": "string" },
           "description": "Postgres database role names to map this IAM identity to. One mapping is created per role; the bootstrap Lambda runs AWS IAM GRANT \"<role>\" TO 'arn:...' for each. The compute connects as whichever role it chooses at runtime."
         },
+        "declaredRoles": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Every role declared in the DSQL component's schemas, mapped to its schema: pass dsql.declaredRoles. Required with dbRoles. Each role in dbRoles must be declared there, or the deploy fails, so access is always managed in code."
+        },
+        "dbRoleSchemas": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Maps a role in dbRoles to the schema you expect it in. Optional; a role declared in a different schema fails the deploy. grantConnect fills it from its { schema, roleName } pairs."
+        },
         "rolesTableName": {
           "type": "string",
           "description": "DynamoDB table name for role bootstrap. Pass dsql.rolesTableName from the DSQL component. When set with dbRole, a TableItem is created to trigger the bootstrap Lambda. Optional — omit when roles are not configured."

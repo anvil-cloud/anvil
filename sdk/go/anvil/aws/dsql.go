@@ -17,6 +17,8 @@ type DSQL struct {
 
 	// Map of region to cluster ARN. Single-region: one entry. Multi-region: one entry per region. e.g. { "us-east-1": "arn:aws:dsql:us-east-1:..." }.
 	ClusterArns pulumi.StringMapOutput `pulumi:"clusterArns"`
+	// Map of each role declared in schemas to its schema, e.g. { "orders_writer": "shop" }. Passed to DSQLConnect (via grantConnect) so a grant can only name a declared role, in its own schema. Empty when schemas is omitted.
+	DeclaredRoles pulumi.StringMapOutput `pulumi:"declaredRoles"`
 	// The single cluster endpoint for the provider's default region. Convenience for the common single-region case — pass straight to a Lambda env var: { DSQL_ENDPOINT: dsql.endpoint }. For multi-region this is the local-region endpoint; use endpoints[region] for another.
 	Endpoint pulumi.StringOutput `pulumi:"endpoint"`
 	// Map of region to cluster endpoint. Single-region: one entry keyed by the provider region. Multi-region: one entry per region. e.g. { "us-east-1": "abc123.dsql.us-east-1.on.aws" }. Pass the relevant endpoint to your Lambda via environment variables.
@@ -55,6 +57,8 @@ type dsqlArgs struct {
 	Hatch  *DsqlHatchArgs  `pulumi:"hatch"`
 	// Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region.
 	MultiRegion *DSQLMultiRegionArgs `pulumi:"multiRegion"`
+	// Also drop database roles that aren't declared in schemas and weren't created by Anvil (made by hand in SQL, or by another tool). Roles Anvil created are always dropped once they're removed from schemas. Defaults to false: unmanaged roles are only reported when you deploy. admin and dbowner are never touched.
+	PruneUnmanagedRoles *bool `pulumi:"pruneUnmanagedRoles"`
 	// Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
 	Schemas []DSQLSchema `pulumi:"schemas"`
 	// Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
@@ -70,6 +74,8 @@ type DSQLArgs struct {
 	Hatch  DsqlHatchArgsPtrInput
 	// Opt-in multi-region configuration. When set, Anvil creates two clusters in the specified regions and links them via ClusterPeering. When omitted, a single-region cluster is created in the provider's default region.
 	MultiRegion DSQLMultiRegionArgsPtrInput
+	// Also drop database roles that aren't declared in schemas and weren't created by Anvil (made by hand in SQL, or by another tool). Roles Anvil created are always dropped once they're removed from schemas. Defaults to false: unmanaged roles are only reported when you deploy. admin and dbowner are never touched.
+	PruneUnmanagedRoles pulumi.BoolPtrInput
 	// Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
 	Schemas DSQLSchemaArrayInput
 	// Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
@@ -168,6 +174,11 @@ func (o DSQLOutput) ToDSQLOutputWithContext(ctx context.Context) DSQLOutput {
 // Map of region to cluster ARN. Single-region: one entry. Multi-region: one entry per region. e.g. { "us-east-1": "arn:aws:dsql:us-east-1:..." }.
 func (o DSQLOutput) ClusterArns() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *DSQL) pulumi.StringMapOutput { return v.ClusterArns }).(pulumi.StringMapOutput)
+}
+
+// Map of each role declared in schemas to its schema, e.g. { "orders_writer": "shop" }. Passed to DSQLConnect (via grantConnect) so a grant can only name a declared role, in its own schema. Empty when schemas is omitted.
+func (o DSQLOutput) DeclaredRoles() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *DSQL) pulumi.StringMapOutput { return v.DeclaredRoles }).(pulumi.StringMapOutput)
 }
 
 // The single cluster endpoint for the provider's default region. Convenience for the common single-region case — pass straight to a Lambda env var: { DSQL_ENDPOINT: dsql.endpoint }. For multi-region this is the local-region endpoint; use endpoints[region] for another.

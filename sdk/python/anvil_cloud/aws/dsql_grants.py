@@ -11,6 +11,8 @@ def grant_connect(self, target: "grants.GrantTarget", schemas: list = None) -> N
 
     Pass one or more {"schema", "role_name"} pairs. The compute may be mapped
     to multiple roles and connects as whichever one it chooses at runtime.
+    Each role must be declared in this component's schemas, in that schema,
+    or the deploy fails.
 
     Network access is not wired here. When the cluster has VPC endpoints,
     declare vpc_endpoint_security_group_ids in the target's vpc.vpc_endpoints;
@@ -28,6 +30,8 @@ def grant_connect(self, target: "grants.GrantTarget", schemas: list = None) -> N
         target_role_arn=target.grant_role_arn(),
         target_name=target.grant_name(),
         db_roles=db_roles,
+        declared_roles=self.declared_roles,
+        db_role_schemas={s["role_name"]: s["schema"] for s in schemas},
         roles_table_name=self.roles_table_name,
         opts=pulumi.ResourceOptions(parent=self),
     )
