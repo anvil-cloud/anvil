@@ -21,6 +21,18 @@ export {
   ComplianceRetention,
 } from "./app";
 
+// Hand-written Org class (AWS Organizations).
+export {
+  Org,
+  OrgConfig,
+  OrgTier,
+  OrgOus,
+  OrgOuConfig,
+  OrgDefaultsConfig,
+  PlannedOu,
+  planOrgOus,
+} from "./org";
+
 // Hand-written Block class
 export { Block, BlockArgs } from "./block";
 

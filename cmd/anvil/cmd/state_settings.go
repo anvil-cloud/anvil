@@ -252,7 +252,12 @@ func pruneHistoryCheckpoints(ctx context.Context, stage string, s stateSettings)
 	if bucket == "" || err != nil {
 		return err
 	}
+	return pruneHistoryInBucket(ctx, client, bucket, s.RetainVersions)
+}
 
+// pruneHistoryInBucket keeps the newest keep deploy checkpoints in bucket and
+// deletes the rest.
+func pruneHistoryInBucket(ctx context.Context, client *s3.Client, bucket string, keep int) error {
 	var keys []string
 	pages := s3.NewListObjectsV2Paginator(client, &s3.ListObjectsV2Input{
 		Bucket: aws.String(bucket),
@@ -268,7 +273,7 @@ func pruneHistoryCheckpoints(ctx context.Context, stage string, s stateSettings)
 		}
 	}
 
-	del := historyCheckpointsToDelete(keys, s.RetainVersions)
+	del := historyCheckpointsToDelete(keys, keep)
 	for start := 0; start < len(del); start += 1000 { // DeleteObjects takes at most 1000 keys
 		batch := del[start:min(start+1000, len(del))]
 		objects := make([]s3types.ObjectIdentifier, len(batch))

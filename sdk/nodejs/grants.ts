@@ -77,13 +77,18 @@ export function createGrant(
     ? `${name}-${sanitize(opts.justification)}`
     : name;
 
+  // NOT parented to the granting resource: the policy reads that resource's
+  // ARN, and depending on a component waits for all of its children, so a
+  // child policy would wait on itself and hang the program (as with
+  // DSQLConnect in dsql.grants.ts). The alias keeps policies created when
+  // grants were parented, so upgrading doesn't delete and recreate them.
   new aws.iam.RolePolicy(
     policyName,
     {
       role: roleName,
       policy: policyDocument,
     },
-    { parent }
+    { aliases: [{ parent }] }
   );
 }
 
