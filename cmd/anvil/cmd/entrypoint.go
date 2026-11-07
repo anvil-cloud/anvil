@@ -83,6 +83,9 @@ func findProjectRoot() (string, error) {
 		if _, err := os.Stat(filepath.Join(dir, "anvil.yaml")); err == nil {
 			return dir, nil
 		}
+		if _, err := os.Stat(filepath.Join(dir, orgConfigFile)); err == nil {
+			return "", fmt.Errorf("This project defines an Org. Use anvil org deploy (or anvil org preview).")
+		}
 
 		parent := filepath.Dir(dir)
 		if parent == dir {
