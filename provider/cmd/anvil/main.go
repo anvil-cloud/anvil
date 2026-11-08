@@ -26,6 +26,8 @@ import (
 	awswaf "github.com/anvil-cloud/anvil/provider/aws/waf"
 	gcpbucket "github.com/anvil-cloud/anvil/provider/gcp/bucket"
 	gcpfunction "github.com/anvil-cloud/anvil/provider/gcp/function"
+	awsorgAccount "github.com/anvil-cloud/anvil/provider/aws/orgAccount"
+	awsorgImportedAccount "github.com/anvil-cloud/anvil/provider/aws/orgImportedAccount"
 )
 
 func main() {
@@ -50,6 +52,10 @@ func main() {
 			infer.ComponentF(awswaf.NewWaf),
 			infer.ComponentF(gcpbucket.NewBucket),
 			infer.ComponentF(gcpfunction.NewFunction),
+		).
+		WithResources(
+			awsorgAccount.Resource(),
+			awsorgImportedAccount.Resource(),
 		).
 		Build()
 	if err != nil {

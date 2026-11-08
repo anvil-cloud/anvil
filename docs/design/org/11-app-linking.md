@@ -11,16 +11,15 @@ Anvil doesn't sign in or pick profiles.
 
 ```ts
 new anvil.App({
-  org: { workload: 'payments' },   // stage prod → payments-prod, dev → payments-dev
+  org: { accounts: { prod: 'payments-prod', dev: 'payments-dev' } }, // stage → account
   run(ctx) { /* … */ },
 });
 ```
 
 | `org` | Links to |
 |---|---|
-| `{ workload: 'payments' }` | `payments-<stage>`, per stage |
-| `{ account: 'data-lake' }` | One free-form account, every stage |
-| `{ sandbox: 'alice' }` | `sandbox-alice` |
+| `{ accounts: { prod: 'payments-prod', dev: 'payments-dev' } }` | One account per stage, named explicitly (Org has no stages or workloads; accounts are written by name) |
+| `{ account: 'sandbox-alice' }` | One account, every stage |
 
 Exactly one key. Without `org`, an App deploys wherever its credentials point
 (as today), still refused in the management account.
@@ -37,22 +36,22 @@ the OS username, then `"dev"`; with `org` set, only the first two count:
 | OS username or `"dev"` fallback | ✗ error |
 
 ```
-✗ No stage set. This App is linked to workload payments (stages: prod, dev).
+✗ No stage set. This App deploys to payments-prod (prod) or payments-dev (dev).
   Pass --stage <prod|dev>, or run `anvil stage set <stage>`.
-✗ Stage damien isn't a stage of workload payments (stages: prod, dev).
+✗ Stage damien isn't in org.accounts (prod, dev). Add it, or pass --stage prod or dev.
 ```
 
 | `org` | Stage does |
 |---|---|
-| `workload` | Picks the account (`prod` → `payments-prod`); must be one of the workload's stages |
-| `account`, `sandbox` | Every stage goes to the one account; stage only names the stack |
+| `accounts` | Picks the account (`prod` → `payments-prod`); must be one of the listed stages |
+| `account` | Every stage goes to the one account; stage only names the stack |
 
 Apps without `org` keep today's fallbacks.
 
 ```
-✗ Stage prod of workload payments deploys to payments-prod (222222222222),
+✗ Stage prod deploys to payments-prod (222222222222),
   but these credentials are for payments-dev (444444444444).
-✗ Workload payments has no stage perf (stages: prod, dev). Add it in Org config.
+✗ Account payments-perf isn't in the Org. Add it to its OU in the Org config.
 ```
 
 **How the App knows.** Member accounts can't call the Organizations account
@@ -65,8 +64,6 @@ each account (in every region the org allows):
   "orgId": "o-ab12cd34ef",
   "account": "payments-prod",
   "accountId": "222222222222",
-  "workload": "payments",
-  "stage": "prod",
   "ou": "Workloads/Prod",
   "guardrails": {
     "allowedRegions": ["ap-southeast-2"],
@@ -75,11 +72,11 @@ each account (in every region the org allows):
 }
 ```
 
-- The App reads it from its own account and checks workload and stage, and
+- The App reads it from its own account and checks the account name, and
   that `accountId` matches `sts:GetCallerIdentity` and `orgId` matches
   `organizations:DescribeOrganization` (any member can call it). A
   hand-made parameter in another account, or another Anvil org with the
-  same workload name, fails the check.
+  same account name, fails the check.
 - The `guardrails` summary lets App preview catch components the SCPs would
   block, since preview never calls create APIs and members can't read SCPs:
   `✗ SvelteKitSite "web": protection edge-oac needs Lambda@Edge in us-east-1,

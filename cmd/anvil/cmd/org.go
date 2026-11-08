@@ -30,6 +30,7 @@ var orgCmd = &cobra.Command{
 	Long: `Commands for Org projects: an anvil.org.yaml next to an entry point that
 exports new anvil.Org({...}). Run them with management-account credentials.
 
+  anvil org init      Create a new Org project
   anvil org preview   Check the org and show what would change
   anvil org deploy    Deploy the org`,
 }
@@ -52,6 +53,8 @@ func init() {
 		c.Flags().BoolVar(&orgVerbose, "verbose", false, "Show underlying cloud resources")
 		orgCmd.AddCommand(c)
 	}
+	orgDeployCmd.Flags().BoolVar(&orgYesCreateAccounts, "yes-create-accounts", false, "Approve creating accounts without a terminal (CI). Accounts are permanent")
+	orgDeployCmd.Flags().BoolVar(&orgYesSuspendAccounts, "yes-suspend-accounts", false, "Approve moving removed accounts to Suspended without a terminal (CI)")
 	rootCmd.AddCommand(orgCmd)
 }
 
@@ -82,6 +85,10 @@ func runOrg(ctx context.Context, deploy bool) error {
 
 	// ── Discovery: the program must define an Org ──
 	if err := discoverOrg(ctx, root, workDir); err != nil {
+		return err
+	}
+	plan, err := readOrgPlan(appSettingsPath(root))
+	if err != nil {
 		return err
 	}
 
@@ -129,9 +136,28 @@ func runOrg(ctx context.Context, deploy bool) error {
 		"anvil:orgId":               org.ID,
 		"anvil:orgRootId":           org.RootID,
 		"anvil:managementAccountId": org.ManagementAccountID,
+		"anvil:deployerArns":        fmt.Sprintf("[%q]", org.DeployerArn),
 	} {
 		if err := s.SetConfig(ctx, key, auto.ConfigValue{Value: val}); err != nil {
 			return fmt.Errorf("failed to set %s: %w", key, err)
+		}
+	}
+
+	// ── Renames: catch a renamed key without renamedFrom before Pulumi runs ──
+	st, err := reportOrgRenames(ctx, s, plan)
+	if err != nil {
+		return err
+	}
+
+	// ── Accounts: permanent changes are listed, quota-checked and confirmed ──
+	changes := planAccountChanges(plan, st)
+	printAccountChanges(changes)
+	if err := checkAccountQuota(ctx, awsCfg, len(changes.Create)); err != nil {
+		return err
+	}
+	if deploy {
+		if err := confirmAccountChanges(changes); err != nil {
+			return err
 		}
 	}
 
@@ -140,6 +166,7 @@ func runOrg(ctx context.Context, deploy bool) error {
 		command = "deploy"
 	}
 	handler := NewEventHandler(orgVerbose, command)
+	handler.showNames = true
 	eventCh := make(chan events.EngineEvent)
 	go func() {
 		for event := range eventCh {

@@ -25,7 +25,7 @@ emergency account: break-glass-1 signs in (password + hardware MFA)
 
 ### The emergency account
 
-A third core account, created by Org in every tier, in the Security OU.
+A third core account, in every starting layout, in the Security OU.
 It's used for nothing but break glass: no workloads, no Identity Center
 assignments (it must not depend on Identity Center), no Anvil Apps.
 

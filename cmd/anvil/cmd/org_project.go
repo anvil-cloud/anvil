@@ -127,7 +127,7 @@ func discoverOrg(ctx context.Context, root, workDir string) error {
 			return fmt.Errorf("the program failed before defining an Org:\n%s", mapError(previewErr.Error()))
 		}
 		return fmt.Errorf("The entry point doesn't define an Org.\n" +
-			"  Export one: export default new anvil.Org({ tier: 'minimum' });")
+			"  Export one: export default new anvil.Org({ ou: { Security: { enable: true } } }); or run anvil org init in a new directory.")
 	}
 }
 

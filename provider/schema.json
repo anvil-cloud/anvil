@@ -784,6 +784,200 @@
         "audience"
       ]
     },
+    "anvil:aws:OrgAccount": {
+      "description": "A member account created by an Anvil Org. Used by anvil.Org; deleting it never closes the account: it's moved to Suspended, tagged anvil:lifecycle=suspended and released.",
+      "inputProperties": {
+        "deployerArns": {
+          "description": "Exact IAM ARNs anvil-org-automation trusts (Org's deployers).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "email": {
+          "description": "Root email, used only at creation. AWS needs the root user to change it, so a later change here is ignored with a warning.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The account name. Changing it renames the account (account:PutAccountName).",
+          "type": "string"
+        },
+        "orgName": {
+          "description": "The Org project name, tagged on the account as anvil:org.",
+          "type": "string"
+        },
+        "ouId": {
+          "description": "The OU the account lives in.",
+          "type": "string"
+        },
+        "suspendedOuId": {
+          "description": "The Suspended OU the account moves to when removed from config.",
+          "type": "string"
+        },
+        "tags": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Extra tags on the account.",
+          "type": "object"
+        }
+      },
+      "properties": {
+        "accountId": {
+          "description": "The new account's ID.",
+          "type": "string"
+        },
+        "automationRoleArn": {
+          "description": "ARN of anvil-org-automation in the account.",
+          "type": "string"
+        },
+        "deployerArns": {
+          "description": "IAM ARNs anvil-org-automation trusts.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "email": {
+          "description": "The email in config.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The account name.",
+          "type": "string"
+        },
+        "orgName": {
+          "description": "The Org project name.",
+          "type": "string"
+        },
+        "ouId": {
+          "description": "The OU the account is in.",
+          "type": "string"
+        },
+        "rootEmail": {
+          "description": "The root email the account was created with.",
+          "type": "string"
+        },
+        "suspendedOuId": {
+          "description": "The Suspended OU.",
+          "type": "string"
+        },
+        "tags": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Extra tags on the account.",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "email",
+        "ouId",
+        "suspendedOuId",
+        "orgName",
+        "deployerArns",
+        "accountId",
+        "rootEmail",
+        "automationRoleArn"
+      ],
+      "requiredInputs": [
+        "name",
+        "email",
+        "ouId",
+        "suspendedOuId",
+        "orgName",
+        "deployerArns"
+      ]
+    },
+    "anvil:aws:OrgImportedAccount": {
+      "description": "An existing member account managed by an Anvil Org. Used by anvil.Org; deleting it only releases the account (removes Anvil's tags), never moves, removes or closes it.",
+      "inputProperties": {
+        "accountId": {
+          "description": "The existing member account's 12-digit ID.",
+          "replaceOnChanges": true,
+          "type": "string"
+        },
+        "bootstrap": {
+          "description": "Create anvil-org-automation in the account through OrganizationAccountAccessRole. Default true.",
+          "type": "boolean"
+        },
+        "deployerArns": {
+          "description": "Exact IAM ARNs anvil-org-automation trusts (Org's deployers). Required when bootstrapping.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "orgName": {
+          "description": "The Org project name, tagged on the account as anvil:org.",
+          "type": "string"
+        },
+        "ouId": {
+          "description": "The OU to move the account into.",
+          "type": "string"
+        },
+        "tags": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Extra tags on the account.",
+          "type": "object"
+        }
+      },
+      "properties": {
+        "accountId": {
+          "description": "The member account's ID.",
+          "type": "string"
+        },
+        "automationRoleArn": {
+          "description": "ARN of anvil-org-automation in the account, or empty when not bootstrapped.",
+          "type": "string"
+        },
+        "bootstrap": {
+          "description": "Whether bootstrapping was requested.",
+          "type": "boolean"
+        },
+        "bootstrapped": {
+          "description": "Whether anvil-org-automation was bootstrapped.",
+          "type": "boolean"
+        },
+        "deployerArns": {
+          "description": "IAM ARNs anvil-org-automation trusts.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "orgName": {
+          "description": "The Org project name.",
+          "type": "string"
+        },
+        "ouId": {
+          "description": "The OU the account is in.",
+          "type": "string"
+        },
+        "tags": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Extra tags on the account.",
+          "type": "object"
+        }
+      },
+      "required": [
+        "accountId",
+        "ouId",
+        "orgName",
+        "automationRoleArn",
+        "bootstrapped"
+      ],
+      "requiredInputs": [
+        "accountId",
+        "ouId",
+        "orgName"
+      ]
+    },
     "anvil:aws:Queue": {
       "description": "An Anvil-managed SQS queue. A dead letter queue is always provisioned to prevent silent message loss. SSE-SQS encryption is enabled by default at no cost.",
       "inputProperties": {
@@ -4913,5 +5107,5 @@
       "type": "object"
     }
   },
-  "version": "0.1.24"
+  "version": "0.1.26"
 }

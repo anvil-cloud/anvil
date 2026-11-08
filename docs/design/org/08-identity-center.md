@@ -211,8 +211,8 @@ identityCenter: {
   permissionSets: { /* … */ },
   groups: {
     Engineers: {
-      developer:    { stages: ['dev'] },
-      viewOnly:     { stages: ['prod'] },
+      developer:    { ou: ['Workloads/NonProd'] },
+      viewOnly:     { ou: ['Workloads/Prod'] },
     },
     'Data Team': {
       dataEngineer: { accounts: ['analytics-prod', 'analytics-dev'] },
@@ -241,19 +241,18 @@ Targets, exactly one per entry:
 | Target | Means |
 |---|---|
 | `accounts: [...]` | Named accounts |
-| `stages: [...]` | Every workload account in those stages |
 | `ou: [...]` | Every account under those OU paths, nested included |
 | `all: true` | Every member account (not management) |
 
-- Identity Center assigns to accounts only, so Anvil expands stages, OUs and
-  `all` to accounts, and adds new accounts to matching assignments when
+- Identity Center assigns to accounts only, so Anvil expands OUs and `all`
+  to accounts, and adds new accounts to matching assignments when
   they're created. Preview lists the expanded accounts.
 - Reads as an access list ("who can touch prod?"), which is what access
   reviews and auditors ask for.
 
 ```
 ✗ identityCenter.groups.Engineers: group not found in Identity Center (source: Okta)
-✗ identityCenter.groups.Engineers.developer: set exactly one of accounts, stages, ou, all
+✗ identityCenter.groups.Engineers.developer: set exactly one of accounts, ou, all
 ```
 
 ### Pinned IDs

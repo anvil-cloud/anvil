@@ -17,8 +17,12 @@ export default new Org({ ... });
 - A field is either a boolean or an object, never `boolean | {…}`.
 - No blank objects. An object that switches something on carries
   `enable: true`; one that switches a default off carries `disable: true`.
-  (`securityHubCspm: { enable: true }`, `ou: { Sandbox: { disable: true } }`,
-  `'Partners/Acme': { enable: true }`.)
+  (`securityHubCspm: { enable: true }`, `Partners: { enable: true, ou: { Acme: { enable: true } } }`.)
+- **Nothing structural is implied.** Every OU (and, once account creation
+  lands, every core account) is written in config; Org manages exactly what's
+  listed. `anvil org init` asks for a starting layout (tier) and writes it
+  out in full, with a comment on each line saying what it's for. Tiers exist
+  only in init, never in config. See [Starting layouts](05-accounts.md#starting-layouts-anvil-org-init).
 
 ## Contents
 
@@ -45,7 +49,7 @@ export default new Org({ ... });
   GitHub Enterprise on private repos; limit environments to `main`)
 - destroyUntagged deletion engine (own code or aws-nuke)
 - Control Tower mode (later): `controlTower: true` to adopt orgs already on
-  Control Tower. Touches ~9 topics (adoption, tiers/Security OU, OU
+  Control Tower. Touches ~9 topics (adoption, core accounts/Security OU, OU
   registration, Account Factory, Suspended, guardrail slots and region deny,
   forced CloudTrail/Config, collisions, destroy) and needs a separate test org
   per cycle

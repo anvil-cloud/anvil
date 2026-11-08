@@ -45,6 +45,10 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &Lambda{}
 	case "anvil:aws:OAuthAuthorizer":
 		r = &OAuthAuthorizer{}
+	case "anvil:aws:OrgAccount":
+		r = &OrgAccount{}
+	case "anvil:aws:OrgImportedAccount":
+		r = &OrgImportedAccount{}
 	case "anvil:aws:Queue":
 		r = &Queue{}
 	case "anvil:aws:SvelteKitSite":

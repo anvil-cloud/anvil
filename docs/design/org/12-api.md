@@ -22,45 +22,35 @@ type CspmStandard = 'tagging' | 'ai' | 'pci' | 'nist-800-53' | 'nist-800-171' | 
 /** Exactly one of allowed or deny. */
 type TypeRule = { allowed: string[] } | { deny: string[] };
 
-interface OrgConfig<S extends string> {
-  /** Which recommended accounts and OUs Org creates. Moving down suspends accounts (see Moving down a tier). */
-  tier: 'minimum' | 'network' | 'sra';
+/** OUs keyed by name; each OU's ou holds the OUs inside it, its accounts the accounts in it. */
+type OrgOus = Record<string, {
+  enable: true;
+  tags?: Record<string, string>;
+  renamedFrom?: string;
+  ou?: OrgOus;
+  accounts?: OrgAccounts;
+}>;
 
+/** Accounts keyed by name, unique across the org. The name is the account's identity in state. */
+type OrgAccounts = Record<string, {
+  enable: true;
+  /** Bring in an existing member account instead of creating one. */
+  import?: { accountId: string; bootstrap?: { disable: true } };
+  email?: string;                   // created accounts: overrides the org pattern
+  renamedFrom?: string;
+  tags?: Record<string, string>;
+}>;
+
+interface OrgConfig {
   /** Email pattern for every account Org creates. Must contain {account}. */
   email: string;
 
-  /** Stages, and the OU each one's accounts live in. */
-  stages: Record<S, {
-    ou: 'Prod' | 'NonProd';
-    renamedFrom?: string;
-  }>;
-
-  /** Workload accounts: one per workload per stage. */
-  workloads?: Record<string, {
-    stages: S[];                    // only stages defined above (type-checked)
-    email?: string;                 // pattern override, must contain {account}
-    tags?: Record<string, string>;
-  }>;
-
-  /** Developer sandbox accounts, in the Sandbox OU. */
-  sandboxes?: string[];
-
   /**
-   * Sandbox toggle, plus custom OUs keyed by full path
-   * ('Partners', 'Partners/Acme', 'Workloads/Prod/Data').
+   * Every OU and account Org manages, keyed by name and nested the way they
+   * sit in AWS. Nothing is implied. Elsewhere an OU is named by path
+   * ('Workloads/Prod'). anvil org init writes the starting layout.
    */
-  ou?: { Sandbox?: { disable: true }; PolicyStaging?: { enable: true } } & Record<string, {
-    enable: true;
-    tags?: Record<string, string>;
-  }>;
-
-  /** Accounts that aren't workloads or sandboxes. */
-  accounts?: Record<string, {
-    ou: string;                     // path of a built-in or custom OU
-    renamedFrom?: string;           // also on workloads, stages and custom OUs
-    email?: string;                 // overrides the org pattern
-    tags?: Record<string, string>;
-  }>;
+  ou?: OrgOus;
 
   defaults?: {
     /** Tags on every account and OU Org creates. */
@@ -137,7 +127,7 @@ interface OrgConfig<S extends string> {
     }>;
     /** group name → permission set → exactly one target */
     groups?: Record<string, Record<string,
-      | { accounts: string[] } | { stages: S[] } | { ou: string[] }
+      | { accounts: string[] } | { ou: string[] }
       | { all: true }>>;
     /** Management account: named users only (AWS). orgAdmin and billing only. */
     management?: { orgAdmin?: { users: string[] }; billing?: { users: string[] } }
@@ -163,14 +153,49 @@ interface OrgConfig<S extends string> {
 import * as anvil from '@anvil-cloud/sdk';
 
 export default new anvil.Org({
-  tier: 'network',
   email: 'aws+{account}@acme.com',
-  stages: { prod: { ou: 'Prod' }, staging: { ou: 'NonProd' }, dev: { ou: 'NonProd' } },
-  workloads: {
-    payments:  { stages: ['prod', 'staging', 'dev'], tags: { team: 'billing' } },
-    analytics: { stages: ['prod', 'dev'],            tags: { team: 'data' } },
+  ou: {
+    Security: {
+      enable: true,
+      accounts: {
+        'log-archive': { enable: true },
+        audit: { enable: true },
+        emergency: { enable: true },
+      },
+    },
+    Infrastructure: {
+      enable: true,
+      accounts: { network: { enable: true } },
+    },
+    Workloads: {
+      enable: true,
+      ou: {
+        Prod: {
+          enable: true,
+          accounts: {
+            'payments-prod': { enable: true, tags: { team: 'billing' } },
+            'analytics-prod': { enable: true, tags: { team: 'data' } },
+          },
+        },
+        NonProd: {
+          enable: true,
+          accounts: {
+            'payments-staging': { enable: true, tags: { team: 'billing' } },
+            'payments-dev': { enable: true, tags: { team: 'billing' } },
+            'analytics-dev': { enable: true, tags: { team: 'data' } },
+          },
+        },
+      },
+    },
+    Sandbox: {
+      enable: true,
+      accounts: {
+        'sandbox-alice': { enable: true },
+        'sandbox-bob': { enable: true },
+      },
+    },
+    Suspended: { enable: true },
   },
-  sandboxes: ['alice', 'bob'],
   defaults: { tags: { company: 'acme' } },
 });
 ```
@@ -178,7 +203,7 @@ export default new anvil.Org({
 Deploy preview:
 
 ```
-Org acme-org · management 111111111111 · tier network
+Org acme-org · management 111111111111
 
   OUs
   + Security
@@ -240,13 +265,13 @@ Root
 | audit | Security | aws+audit@acme.com | `anvil:role=audit` |
 | emergency | Security | aws+emergency@acme.com | `anvil:role=emergency` |
 | network | Infrastructure | aws+network@acme.com | `anvil:role=network` |
-| payments-prod | Workloads/Prod | aws+payments-prod@acme.com | `anvil:workload=payments` `anvil:stage=prod` `team=billing` |
-| analytics-prod | Workloads/Prod | aws+analytics-prod@acme.com | `anvil:workload=analytics` `anvil:stage=prod` `team=data` |
-| payments-staging | Workloads/NonProd | aws+payments-staging@acme.com | `anvil:workload=payments` `anvil:stage=staging` `team=billing` |
-| payments-dev | Workloads/NonProd | aws+payments-dev@acme.com | `anvil:workload=payments` `anvil:stage=dev` `team=billing` |
-| analytics-dev | Workloads/NonProd | aws+analytics-dev@acme.com | `anvil:workload=analytics` `anvil:stage=dev` `team=data` |
-| sandbox-alice | Sandbox | aws+sandbox-alice@acme.com | `anvil:sandbox=alice` |
-| sandbox-bob | Sandbox | aws+sandbox-bob@acme.com | `anvil:sandbox=bob` |
+| payments-prod | Workloads/Prod | aws+payments-prod@acme.com | `team=billing` |
+| analytics-prod | Workloads/Prod | aws+analytics-prod@acme.com | `team=data` |
+| payments-staging | Workloads/NonProd | aws+payments-staging@acme.com | `team=billing` |
+| payments-dev | Workloads/NonProd | aws+payments-dev@acme.com | `team=billing` |
+| analytics-dev | Workloads/NonProd | aws+analytics-dev@acme.com | `team=data` |
+| sandbox-alice | Sandbox | aws+sandbox-alice@acme.com | (none) |
+| sandbox-bob | Sandbox | aws+sandbox-bob@acme.com | (none) |
 
 Every account and OU also gets `anvil:managed=true`, `anvil:org=<project>`
 and `defaults.tags`.
@@ -321,18 +346,38 @@ import { pciControls } from './policies/pci';
 import { dataEngineerPolicy } from './policies/data-engineer';
 
 export default new anvil.Org({
-  tier: 'minimum',
   email: 'aws+{account}@acme.com',
-  stages: { prod: { ou: 'Prod' }, dev: { ou: 'NonProd' } },
-  workloads: {
-    website: { stages: ['prod', 'dev'] },
-    analytics: { stages: ['prod', 'dev'] },
-  },
-
-  ou: { 'Workloads/Prod/PCI': { enable: true, tags: { compliance: 'pci' } } },
-  accounts: {
-    'payments-ledger': { ou: 'Workloads/Prod/PCI' },
-    'payments-cards': { ou: 'Workloads/Prod/PCI' },
+  ou: {
+    // ...the rest of the layout anvil org init wrote
+    Workloads: {
+      enable: true,
+      ou: {
+        Prod: {
+          enable: true,
+          accounts: {
+            'website-prod': { enable: true },
+            'analytics-prod': { enable: true },
+          },
+          ou: {
+            PCI: {
+              enable: true,
+              tags: { compliance: 'pci' },
+              accounts: {
+                'payments-ledger': { enable: true },
+                'payments-cards': { enable: true },
+              },
+            },
+          },
+        },
+        NonProd: {
+          enable: true,
+          accounts: {
+            'website-dev': { enable: true },
+            'analytics-dev': { enable: true },
+          },
+        },
+      },
+    },
   },
 
   // config: strengthening only
@@ -369,7 +414,7 @@ export default new anvil.Org({
 
   // run: weakening built-in rules, and your own SCPs/RCPs
   run(ctx) {
-    ctx.guardrails.protectBackups.except({ stages: ['dev'], reason: 'dev tears down its own data' });
+    ctx.guardrails.protectBackups.except({ accounts: ['payments-dev', 'analytics-dev'], reason: 'dev tears down its own data' });
 
     new anvil.aws.ServiceControlPolicy('bedrockUsEast1Only', {
       description: 'Bedrock models only in us-east-1',
@@ -401,7 +446,7 @@ export default new anvil.Org({
 ```
 
 ```
-Org acme (tier minimum)
+Org acme
 
   Guardrails (config)
   + allowedRegions        Root        ap-southeast-2, ap-southeast-4 + global, acm, waf
@@ -414,8 +459,7 @@ Org acme (tier minimum)
   + denyRoute53Domains    SCP  Workloads              inline                      ✓ ValidatePolicy
 
   ⚠ Guardrails weakened in run()
-    protectBackups        except stage dev
-                            website-dev (444444444444), analytics-dev (555555555555)
+    protectBackups        except payments-dev (444444444444), analytics-dev (555555555555)
                             "dev tears down its own data"
 
   SCP slots

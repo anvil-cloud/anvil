@@ -1,0 +1,52 @@
+{
+  "resources": {
+    "anvil:aws:OrgAccount": {
+      "description": "A member account created by an Anvil Org. Used by anvil.Org; deleting it never closes the account: it's moved to Suspended, tagged anvil:lifecycle=suspended and released.",
+      "inputProperties": {
+        "name": {
+          "type": "string",
+          "description": "The account name. Changing it renames the account (account:PutAccountName)."
+        },
+        "email": {
+          "type": "string",
+          "description": "Root email, used only at creation. AWS needs the root user to change it, so a later change here is ignored with a warning."
+        },
+        "ouId": { "type": "string", "description": "The OU the account lives in." },
+        "suspendedOuId": { "type": "string", "description": "The Suspended OU the account moves to when removed from config." },
+        "orgName": { "type": "string", "description": "The Org project name, tagged on the account as anvil:org." },
+        "tags": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Extra tags on the account."
+        },
+        "deployerArns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Exact IAM ARNs anvil-org-automation trusts (Org's deployers)."
+        }
+      },
+      "requiredInputs": ["name", "email", "ouId", "suspendedOuId", "orgName", "deployerArns"],
+      "properties": {
+        "name": { "type": "string", "description": "The account name." },
+        "email": { "type": "string", "description": "The email in config." },
+        "ouId": { "type": "string", "description": "The OU the account is in." },
+        "suspendedOuId": { "type": "string", "description": "The Suspended OU." },
+        "orgName": { "type": "string", "description": "The Org project name." },
+        "tags": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Extra tags on the account."
+        },
+        "deployerArns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "IAM ARNs anvil-org-automation trusts."
+        },
+        "accountId": { "type": "string", "description": "The new account's ID." },
+        "rootEmail": { "type": "string", "description": "The root email the account was created with." },
+        "automationRoleArn": { "type": "string", "description": "ARN of anvil-org-automation in the account." }
+      },
+      "required": ["name", "email", "ouId", "suspendedOuId", "orgName", "deployerArns", "accountId", "rootEmail", "automationRoleArn"]
+    }
+  }
+}
