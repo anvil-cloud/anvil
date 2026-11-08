@@ -149,6 +149,10 @@ type trackedResource struct {
 	startTime time.Time
 	endTime   time.Time
 	failed    bool
+	// printed is set once the resource's line is shown. Pulumi reports a
+	// component's outputs twice (registration and registerOutputs), and the
+	// line must appear once.
+	printed bool
 }
 
 // ── URN parsing ──
@@ -281,6 +285,10 @@ type EventHandler struct {
 	errors    []diagError
 	spinner   *spinner
 	startTime time.Time
+
+	// showNames adds each component's name to its line (anvil org: OUs and
+	// accounts are only distinguishable by name).
+	showNames bool
 
 	// logFile is a full, unfiltered run log written to .anvil/<command>.log.
 	// Unlike stdout (which is summarised and TTY-gated), it captures every
@@ -419,7 +427,7 @@ func (h *EventHandler) handleResourcePre(e *apitype.ResourcePreEvent) {
 		return
 	}
 
-	displayName := shortTypeName(typeName)
+	displayName := h.label(typeName, resourceName)
 	indent := "  "
 	if h.verbose && !isAnvilComponent(typeName) {
 		indent = "    "
@@ -453,7 +461,7 @@ func (h *EventHandler) handleResOutputs(e *apitype.ResOutputsEvent) {
 	if isInternalResource(tr.typeName, h.verbose) {
 		return
 	}
-	if tr.op == "same" || tr.op == "read" {
+	if tr.op == "same" || tr.op == "read" || tr.printed {
 		return
 	}
 
@@ -545,8 +553,18 @@ func stripAnsi(s string) string {
 	return result.String()
 }
 
+// label is a resource's display name: its type, plus its name when showNames
+// is set.
+func (h *EventHandler) label(typeName, name string) string {
+	if h.showNames {
+		return shortTypeName(typeName) + "  " + name
+	}
+	return shortTypeName(typeName)
+}
+
 func (h *EventHandler) printResourceLine(tr *trackedResource) {
-	displayName := shortTypeName(tr.typeName)
+	tr.printed = true
+	displayName := h.label(tr.typeName, tr.name)
 	duration := tr.endTime.Sub(tr.startTime)
 
 	indent := "  "

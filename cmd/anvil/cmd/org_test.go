@@ -2,10 +2,13 @@ package cmd
 
 import (
 	"encoding/json"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 )
 
 func TestOrgStateBucketName_ValidAndStable(t *testing.T) {
@@ -144,5 +147,144 @@ func TestProgramError(t *testing.T) {
 	}
 	if got := programError("no errors here"); got != "" {
 		t.Errorf("got %q, want empty", got)
+	}
+}
+
+func TestOrgInit_ScaffoldsProject(t *testing.T) {
+	dir := t.TempDir()
+	old, _ := os.Getwd()
+	os.Chdir(dir)
+	t.Cleanup(func() {
+		os.Chdir(old)
+		orgInitName, orgInitRegion, orgInitSDKPath = "", "", ""
+		orgInitTier, orgInitSandbox, orgInitPolicyStaging = "", true, false
+	})
+	orgInitName, orgInitRegion = "acme-org", "ap-southeast-2"
+
+	if err := runOrgInit(nil, nil); err != nil {
+		t.Fatal(err)
+	}
+	for _, f := range []string{"anvil.config.ts", "package.json", "tsconfig.json", orgConfigFile, ".gitignore"} {
+		if _, err := os.Stat(f); err != nil {
+			t.Errorf("missing %s", f)
+		}
+	}
+	cfg, err := loadOrgConfig(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Project != "acme-org" || cfg.Region != "ap-southeast-2" {
+		t.Errorf("got %+v", cfg)
+	}
+	entry, _ := os.ReadFile("anvil.config.ts")
+	if !strings.Contains(string(entry), "new anvil.Org(") {
+		t.Errorf("entry point doesn't construct an Org:\n%s", entry)
+	}
+	// Default (no terminal, no flags): minimum with Sandbox, every OU written out.
+	for _, want := range []string{"    Security: { enable: true },", "    Workloads: {\n      enable: true,\n      ou: {", "        Prod: {\n          enable: true,\n", "          // accounts: {\n          //   'my-app-prod': { enable: true },\n          //   'legacy-app': { enable: true, import: { accountId: '123456789012' } },", "  // email: 'aws+{account}@example.com',", "        NonProd: { enable: true },\n      },\n    },", "    Sandbox: { enable: true },", "    Suspended: { enable: true },"} {
+		if !strings.Contains(string(entry), want) {
+			t.Errorf("entry point missing %q:\n%s", want, entry)
+		}
+	}
+	if strings.Contains(string(entry), "'Workloads/") || strings.Contains(string(entry), "ou: 'W") {
+		t.Errorf("OUs and accounts must be nested, not paths:\n%s", entry)
+	}
+	if strings.Contains(string(entry), "tier") {
+		t.Errorf("entry point must not name a tier:\n%s", entry)
+	}
+
+	if err := runOrgInit(nil, nil); err == nil || !strings.Contains(err.Error(), "already an Org project") {
+		t.Errorf("second init: got %v, want already-an-Org error", err)
+	}
+}
+
+func TestOrgInit_RefusesAppProject(t *testing.T) {
+	dir := t.TempDir()
+	old, _ := os.Getwd()
+	os.Chdir(dir)
+	t.Cleanup(func() { os.Chdir(old) })
+	os.WriteFile("anvil.yaml", []byte("project: app\n"), 0644)
+
+	if err := runOrgInit(nil, nil); err == nil || !strings.Contains(err.Error(), "App project") {
+		t.Errorf("got %v, want an App-project error", err)
+	}
+}
+
+func TestEventHandler_OrgLinesNamedAndOnce(t *testing.T) {
+	h := &EventHandler{command: "preview", resources: map[string]*trackedResource{}, showNames: true}
+	urn := "urn:pulumi:org::damien-org::anvil:org:OrganizationalUnit::Workloads/Prod"
+	if got := h.label("anvil:org:OrganizationalUnit", "Workloads/Prod"); got != "OrganizationalUnit  Workloads/Prod" {
+		t.Errorf("label: got %q", got)
+	}
+	tr := &trackedResource{urn: urn, typeName: "anvil:org:OrganizationalUnit", name: "Workloads/Prod", op: "create"}
+	h.resources[urn] = tr
+
+	out := captureStdout(t, func() {
+		h.handleResOutputs(&apitype.ResOutputsEvent{Metadata: apitype.StepEventMetadata{URN: urn, Op: "create"}})
+		h.handleResOutputs(&apitype.ResOutputsEvent{Metadata: apitype.StepEventMetadata{URN: urn, Op: "create"}})
+	})
+	if n := strings.Count(out, "Workloads/Prod"); n != 1 {
+		t.Errorf("line printed %d times, want once:\n%s", n, out)
+	}
+}
+
+// captureStdout returns what fn prints to stdout.
+func captureStdout(t *testing.T, fn func()) string {
+	t.Helper()
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	old := os.Stdout
+	os.Stdout = w
+	fn()
+	w.Close()
+	os.Stdout = old
+	data, _ := io.ReadAll(r)
+	return string(data)
+}
+
+func TestRoleNameFromAssumedRole(t *testing.T) {
+	got := roleNameFromAssumedRole("arn:aws:sts::732401079015:assumed-role/AWSReservedSSO_AdministratorAccess_abc123/damien")
+	if want := "AWSReservedSSO_AdministratorAccess_abc123"; got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}
+
+func TestOrgLayoutOus_Tiers(t *testing.T) {
+	paths := func(c orgLayoutChoice) string {
+		ous, err := orgLayoutOus(c)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var p []string
+		for _, ou := range ous {
+			p = append(p, ou.Path)
+		}
+		return strings.Join(p, ",")
+	}
+	cases := map[string]orgLayoutChoice{
+		"Security,Workloads,Workloads/Prod,Workloads/NonProd,Sandbox,Suspended":                                  {Tier: "minimum", Sandbox: true},
+		"Security,Workloads,Workloads/Prod,Workloads/NonProd,Suspended":                                          {Tier: "minimum"},
+		"Security,Infrastructure,Workloads,Workloads/Prod,Workloads/NonProd,Suspended":                           {Tier: "network"},
+		"Security,Infrastructure,Deployments,Workloads,Workloads/Prod,Workloads/NonProd,PolicyStaging,Suspended": {Tier: "SRA", PolicyStaging: true},
+	}
+	for want, c := range cases {
+		if got := paths(c); got != want {
+			t.Errorf("%+v: got %s, want %s", c, got, want)
+		}
+	}
+	if _, err := orgLayoutOus(orgLayoutChoice{Tier: "huge"}); err == nil || !strings.Contains(err.Error(), "minimum, network, sra") {
+		t.Errorf("unknown tier: got %v", err)
+	}
+}
+
+func TestOrgLayoutTree(t *testing.T) {
+	ous, _ := orgLayoutOus(orgLayoutChoice{Tier: "minimum", Sandbox: true})
+	got := strings.Join(orgLayoutTree(ous), "\n")
+	for _, want := range []string{"Root", "├── Security", "├── Workloads", "│   ├── Prod", "│   └── NonProd", "└── Suspended"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("tree missing %q:\n%s", want, got)
+		}
 	}
 }

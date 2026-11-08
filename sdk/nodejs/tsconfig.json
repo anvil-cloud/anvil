@@ -27,6 +27,8 @@
         "aws/kinesisStream.ts",
         "aws/lambda.ts",
         "aws/oauthAuthorizer.ts",
+        "aws/orgAccount.ts",
+        "aws/orgImportedAccount.ts",
         "aws/queue.ts",
         "aws/svelteKitSite.ts",
         "aws/vpc.ts",

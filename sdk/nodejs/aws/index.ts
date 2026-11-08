@@ -65,6 +65,16 @@ export type OAuthAuthorizer = import("./oauthAuthorizer").OAuthAuthorizer;
 export const OAuthAuthorizer: typeof import("./oauthAuthorizer").OAuthAuthorizer = null as any;
 utilities.lazyLoad(exports, ["OAuthAuthorizer"], () => require("./oauthAuthorizer"));
 
+export { OrgAccountArgs } from "./orgAccount";
+export type OrgAccount = import("./orgAccount").OrgAccount;
+export const OrgAccount: typeof import("./orgAccount").OrgAccount = null as any;
+utilities.lazyLoad(exports, ["OrgAccount"], () => require("./orgAccount"));
+
+export { OrgImportedAccountArgs } from "./orgImportedAccount";
+export type OrgImportedAccount = import("./orgImportedAccount").OrgImportedAccount;
+export const OrgImportedAccount: typeof import("./orgImportedAccount").OrgImportedAccount = null as any;
+utilities.lazyLoad(exports, ["OrgImportedAccount"], () => require("./orgImportedAccount"));
+
 export { QueueArgs } from "./queue";
 export type Queue = import("./queue").Queue;
 export const Queue: typeof import("./queue").Queue = null as any;
@@ -122,6 +132,10 @@ const _module = {
                 return new Lambda(name, <any>undefined, { urn })
             case "anvil:aws:OAuthAuthorizer":
                 return new OAuthAuthorizer(name, <any>undefined, { urn })
+            case "anvil:aws:OrgAccount":
+                return new OrgAccount(name, <any>undefined, { urn })
+            case "anvil:aws:OrgImportedAccount":
+                return new OrgImportedAccount(name, <any>undefined, { urn })
             case "anvil:aws:Queue":
                 return new Queue(name, <any>undefined, { urn })
             case "anvil:aws:SvelteKitSite":

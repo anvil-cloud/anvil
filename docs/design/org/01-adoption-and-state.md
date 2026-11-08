@@ -11,7 +11,7 @@ accounts are hard to undo, so they stay manual.
 ### Flow
 
 1. User creates the organization in the console (all features).
-2. `anvil init --org` scaffolds a project with `new Org({...})` and an
+2. `anvil org init` scaffolds a project with `new Org({...})` and an
    `anvil.org.yaml`.
 3. `anvil org deploy` with management-account credentials. Preflight fails fast if:
    - the caller isn't the management account
@@ -45,7 +45,8 @@ should be structurally unable to delete the org, not just configured not to.
 
 | Command | Does |
 |---|---|
-| `anvil org preview` | Preflight + plan, changes nothing |
+| `anvil org init` | Ask for a starting layout, explaining each OU, then scaffold an Org project (TypeScript): `anvil.config.ts` with every OU written out, `anvil.org.yaml`, `package.json`, `tsconfig.json`, `.gitignore`. `--tier minimum\|network\|sra`, `--sandbox=false` and `--policy-staging` skip the questions; `--region` sets the home region, `--sdk-path` links a local SDK checkout. Creates nothing in AWS |
+| `anvil org preview` | Preflight + plan, changes nothing (creates the state bucket on first use) |
 | `anvil org deploy` | Preflight + deploy |
 | `anvil org destroy` | Remove Anvil from the org, keeping the security minimum (see Destroy) |
 | `anvil org access`, `anvil org dashboard`, `anvil org upgrade` | Org-only extras |
@@ -65,11 +66,11 @@ should be structurally unable to delete the org, not just configured not to.
   stages.
 - **`anvil.org.yaml`** sits next to the code and holds what the CLI needs
   before running the program. Required for an Org project (discovery says
-  Org and it's missing → error pointing to `anvil init --org`); an
+  Org and it's missing → error pointing to `anvil org init`); an
   `anvil.org.yaml` next to an App is an error too.
 
   ```yaml
-  # anvil.org.yaml (written by anvil init --org and the first deploy; commit it)
+  # anvil.org.yaml (written by anvil org init and the first deploy; commit it)
   project: acme-org
   region: ap-southeast-2               # home region
   state:
@@ -78,7 +79,7 @@ should be structurally unable to delete the org, not just configured not to.
   ```
 
 - **Home region is whatever the user sets**, like an App stage's region:
-  `--region` on `anvil init --org` or the first deploy, else the AWS
+  `--region` on `anvil org init` or the first deploy, else the AWS
   config's region, else `ap-southeast-2`; stored in `anvil.org.yaml`. It's
   where the state bucket, Audit event bus, notification topic and other
   regional home resources live. AWS (Control Tower, LZA) recommends your
