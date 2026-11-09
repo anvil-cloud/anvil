@@ -14,9 +14,9 @@ def grant_connect(self, target: "grants.GrantTarget", schemas: list = None) -> N
     Each role must be declared in this component's schemas, in that schema,
     or the deploy fails.
 
-    Network access is not wired here. When the cluster has VPC endpoints,
-    declare vpc_endpoint_security_group_ids in the target's vpc.vpc_endpoints;
-    the endpoint SG lets its members reach the endpoint on port 5432.
+    When the cluster has a VPC endpoint (vpc set without has_nat), this also
+    adds ingress 5432 on the endpoint SG from the target's own SG, and egress
+    5432 on the target's SG to the endpoint SG. The target must be in the VPC.
 
     Args:
         target: The compute resource to grant access to (Lambda, ECS, etc.).
@@ -35,6 +35,31 @@ def grant_connect(self, target: "grants.GrantTarget", schemas: list = None) -> N
         roles_table_name=self.roles_table_name,
         opts=pulumi.ResourceOptions(parent=self),
     )
+
+    # Network: only when the cluster has a VPC endpoint. That is decided by
+    # plain constructor inputs; the endpoint SG ID itself is an output.
+    # multiRegion + endpoint is rejected by the provider, so there is one.
+    vpc = grants.ctor_input(self, "vpc")
+    if vpc is not None:
+        has_nat = grants.input_field(vpc, "has_nat")
+        if isinstance(vpc, pulumi.Output) or isinstance(has_nat, pulumi.Output):
+            raise ValueError(
+                f"Anvil grant: {grants.grant_resource_name(self)}.grant_connect needs vpc and vpc.has_nat as plain "
+                "values to know whether the cluster has a VPC endpoint."
+            )
+        if not has_nat:
+            name = grants.grant_resource_name(self)
+
+            def _single(ids):
+                values = list((ids or {}).values())
+                if len(values) != 1:
+                    raise ValueError(
+                        f"Anvil grant: {name} should have exactly one VPC endpoint, found {len(values)}."
+                    )
+                return values[0]
+
+            endpoint_sg_id = self.vpc_endpoint_security_group_ids.apply(_single)
+            grants.connect_to_endpoint(f"{grants.grant_resource_name(self)}-vpce", endpoint_sg_id, target, 5432)
 
 
 DSQL.grant_connect = grant_connect

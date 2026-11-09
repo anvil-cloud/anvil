@@ -16,7 +16,7 @@ from .types import (
     ComplianceConfig,
     ComplianceCron,
 )
-from .grants import GrantTarget, GrantOptions, create_grant, build_resource_arns
+from .grants import GrantTarget, GrantOptions, create_grant, build_resource_arns, grant_endpoint_access
 
 # Re-export core Pulumi functions so users never need to import pulumi directly.
 from pulumi import export
@@ -38,5 +38,6 @@ __all__ = [
     "GrantOptions",
     "create_grant",
     "build_resource_arns",
+    "grant_endpoint_access",
     "export",
 ]

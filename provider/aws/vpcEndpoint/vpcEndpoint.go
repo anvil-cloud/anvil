@@ -14,17 +14,6 @@ import (
 	c "github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
 
-// computePrincipals are the AWS service principals that can access endpoints
-// through the VPC. These cover all Anvil-managed compute resource types.
-// AWS managed services (SNS, EventBridge, S3) call SQS through the AWS
-// internal network and never go through the VPC endpoint — they are not
-// listed here.
-var computePrincipals = []string{
-	"lambda.amazonaws.com",
-	"ecs-tasks.amazonaws.com",
-	"ec2.amazonaws.com",
-}
-
 // VpcEndpointPermission defines a single permission statement in the endpoint policy.
 // When overridePermissions is set, these replace the default allow-all policy.
 // Effect must be "Allow" or "Deny". Action is an IAM action string, e.g. "sqs:SendMessage".
@@ -59,9 +48,9 @@ type VpcEndpointArgs struct {
 	// one per AZ.
 	PrivateSubnetIds pulumi.StringArrayInput `pulumi:"privateSubnetIds"`
 
-	// Service is the AWS service to route privately.
-	// Validated against the AwsVpcEndpointService enum in the schema.
-	// The full com.amazonaws.{region}.{service} name is constructed at deploy time.
+	// Service is the AWS service to route privately, e.g. "sqs" or
+	// "secretsmanager". The full com.amazonaws.{region}.{service} name is
+	// constructed at deploy time.
 	Service pulumi.StringInput `pulumi:"service"`
 
 	// OverridePermissions replaces the default allow-all endpoint policy with
@@ -100,32 +89,40 @@ type VpcEndpoint struct {
 	DnsName pulumi.StringOutput `pulumi:"dnsName"`
 
 	// SecurityGroupId is the ID of the dedicated security group attached to this
-	// endpoint. Access requires explicit opt-in — a compute resource must have
-	// this SG attached (via GrantEndpointAccess) to reach the endpoint at the
-	// network layer. Resources without it are blocked regardless of IAM.
+	// endpoint. It starts with zero rules. Each grant that passes this endpoint
+	// adds one ingress rule from the granted compute's own SG on 443, so only
+	// granted compute can reach the endpoint at the network layer.
 	SecurityGroupId pulumi.StringOutput `pulumi:"securityGroupId"`
 
-	name string
+	// Service is the AWS service this endpoint routes, e.g. "sqs". Grants read
+	// it to check that the endpoint matches the service being granted.
+	Service pulumi.StringOutput `pulumi:"service"`
 }
 
 func (v *VpcEndpoint) Annotate(a infer.Annotator) {
 	a.SetToken("aws", "VpcEndpoint")
-	a.Describe(&v, "An Anvil-managed AWS Interface VPC Endpoint. Creates one ENI per private subnet with private DNS enabled. The endpoint security group uses a self-referencing ingress rule on port 443 — only compute resources that have been explicitly granted access (via GrantEndpointAccess) can reach the endpoint at the network layer. Access is enforced at three layers: network (self-referencing SG), IAM role policy (scoped per compute resource), and endpoint policy (blanket ceiling on allowed actions for all compute principals).")
-}
-
-// Name returns the logical name of this endpoint, used for rule naming in grants.
-func (v *VpcEndpoint) Name() string {
-	return v.name
+	a.Describe(&v, "An Anvil-managed AWS Interface VPC Endpoint. Creates one ENI per private subnet with private DNS enabled. The endpoint security group starts with zero rules; passing this endpoint to a grant (e.g. queue.grantSendMessage(fn, { endpoint })) adds a one-way ingress rule from that compute's own security group on port 443. Access is enforced at three layers: network (one-way SG rules per grant), IAM role policy (scoped per grant, limited to this endpoint via aws:SourceVpce), and endpoint policy (ceiling on allowed actions, limited to principals in this account).")
 }
 
 // endpointPolicyStatement is a single statement in the endpoint policy JSON.
+//
+// Principal is always "*" and the Condition limits callers to principals in
+// this account. Calls from compute code are signed by the execution role
+// session, not by a service principal such as lambda.amazonaws.com, so a
+// service-principal policy would match nothing and deny every call.
 type endpointPolicyStatement struct {
-	Effect    string `json:"Effect"`
-	Principal struct {
-		Service []string `json:"Service"`
-	} `json:"Principal"`
-	Action   []string `json:"Action"`
-	Resource string   `json:"Resource"`
+	Effect    string                       `json:"Effect"`
+	Principal string                       `json:"Principal"`
+	Action    []string                     `json:"Action"`
+	Resource  string                       `json:"Resource"`
+	Condition map[string]map[string]string `json:"Condition"`
+}
+
+// accountCondition limits a statement to principals in the given account.
+func accountCondition(accountID string) map[string]map[string]string {
+	return map[string]map[string]string{
+		"StringEquals": {"aws:PrincipalAccount": accountID},
+	}
 }
 
 // endpointPolicyDocument is the full endpoint policy JSON structure.
@@ -135,14 +132,15 @@ type endpointPolicyDocument struct {
 }
 
 // buildDefaultEndpointPolicy constructs the default allow-all endpoint policy
-// scoped to Anvil compute principals. Called when no overridePermissions are set.
-func buildDefaultEndpointPolicy() (string, error) {
+// limited to principals in this account. Called when no overridePermissions are set.
+func buildDefaultEndpointPolicy(accountID string) (string, error) {
 	stmt := endpointPolicyStatement{
-		Effect:   "Allow",
-		Action:   []string{"*"},
-		Resource: "*",
+		Effect:    "Allow",
+		Principal: "*",
+		Action:    []string{"*"},
+		Resource:  "*",
+		Condition: accountCondition(accountID),
 	}
-	stmt.Principal.Service = computePrincipals
 
 	doc := endpointPolicyDocument{
 		Version:   "2012-10-17",
@@ -158,9 +156,9 @@ func buildDefaultEndpointPolicy() (string, error) {
 
 // buildOverrideEndpointPolicy constructs the endpoint policy from the user-supplied
 // overridePermissions. Groups permissions by effect into separate statements.
-// Each statement shares the same compute principals.
+// Each statement is limited to principals in this account.
 // Resource defaults to "*" when the permission entry omits it.
-func buildOverrideEndpointPolicy(perms []VpcEndpointPermission) (pulumi.StringOutput, error) {
+func buildOverrideEndpointPolicy(perms []VpcEndpointPermission, accountID string) (pulumi.StringOutput, error) {
 	// Validate all effects upfront before touching any Outputs.
 	for i, perm := range perms {
 		if perm.Effect != "Allow" && perm.Effect != "Deny" {
@@ -210,11 +208,12 @@ func buildOverrideEndpointPolicy(perms []VpcEndpointPermission) (pulumi.StringOu
 		statements := make([]endpointPolicyStatement, 0, len(keyOrder))
 		for _, key := range keyOrder {
 			stmt := endpointPolicyStatement{
-				Effect:   key.Effect,
-				Action:   stmtMap[key],
-				Resource: key.Resource,
+				Effect:    key.Effect,
+				Principal: "*",
+				Action:    stmtMap[key],
+				Resource:  key.Resource,
+				Condition: accountCondition(accountID),
 			}
-			stmt.Principal.Service = computePrincipals
 			statements = append(statements, stmt)
 		}
 
@@ -237,16 +236,18 @@ func buildOverrideEndpointPolicy(perms []VpcEndpointPermission) (pulumi.StringOu
 //
 // Access model (three layers):
 //
-//  1. Network:       Endpoint SG self-referencing ingress on port 443.
-//     Only compute resources with the endpoint SG attached can
-//     reach the endpoint ENIs — being in the VPC is not sufficient.
-//  2. IAM:           Compute resource execution roles must have explicit grants
-//     for the service (e.g. sqs:SendMessage on specific queues).
-//  3. Endpoint policy: Blanket ceiling on what actions compute principals can
+//  1. Network:       The endpoint SG starts with zero rules. Each grant that
+//     passes this endpoint adds ingress 443 from the granted
+//     compute's own SG, plus egress 443 on that compute's SG to
+//     this SG. Compute never carries this SG, so the rules only
+//     match the endpoint's ENIs and members never trust each other.
+//  2. IAM:           The grant's IAM statement is limited to this endpoint
+//     with aws:SourceVpce, so stolen credentials fail outside it.
+//  3. Endpoint policy: Ceiling on what actions principals in this account can
 //     perform through this endpoint. Defaults to allow all (*).
 //     Use overridePermissions for explicit Allow/Deny control.
 func NewVpcEndpoint(ctx *pulumi.Context, name string, args VpcEndpointArgs, opts ...pulumi.ResourceOption) (*VpcEndpoint, error) {
-	v := &VpcEndpoint{name: name}
+	v := &VpcEndpoint{}
 
 	provider.NewContext(ctx)
 
@@ -261,55 +262,36 @@ func NewVpcEndpoint(ctx *pulumi.Context, name string, args VpcEndpointArgs, opts
 	}
 
 	// 1. Dedicated security group for this endpoint.
-	//    Zero inbound and zero outbound rules by default — nothing can reach
-	//    the endpoint until the self-referencing ingress rule is added below.
+	//    Zero inbound and zero outbound rules. Ingress is added per grant,
+	//    one rule per granted compute SG (see the grants runtime in the SDKs).
 	sg, err := vpcsg.CreateSecurityGroup(ctx, name, stage, stageId, args.VpcId, v)
 	if err != nil {
 		return nil, err
 	}
 
-	// 2. Self-referencing ingress rule on port 443.
-	//
-	// The endpoint SG references itself as the ingress source. A compute resource
-	// can only reach the endpoint if it has this SG attached — being in the same
-	// VPC is not sufficient. This is the network-layer opt-in gate.
-	//
-	// GrantEndpointAccess wires the other side: an egress rule on the compute
-	// resource's SG pointing at this endpoint SG, plus attaches the endpoint SG
-	// to the compute resource's ENI. Both sides must be present for traffic to flow:
-	//   - Endpoint SG: ingress ← endpoint SG (this rule, wired once, never grows)
-	//   - Compute SG:  egress  → endpoint SG (wired per GrantEndpointAccess call)
-	//   - Compute ENI: endpoint SG attached  (wired per GrantEndpointAccess call)
-	if err := vpcsg.AddIngressRule(
-		ctx,
-		fmt.Sprintf("%s-self-ingress", name),
-		sg.ID().ToStringOutput(),
-		sg.ID().ToStringOutput(),
-		443, 443,
-		"tcp",
-		v,
-	); err != nil {
-		return nil, fmt.Errorf("failed to wire self-referencing ingress on endpoint SG: %w", err)
+	// 2. Resolve the account ID for the endpoint policy condition.
+	caller, err := aws.GetCallerIdentity(ctx, &aws.GetCallerIdentityArgs{}, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve AWS account ID: %w", err)
 	}
 
 	// 3. Build the endpoint policy.
 	//
-	// Default: allow all actions (*) for all Anvil compute principals.
+	// Default: allow all actions (*) for principals in this account.
 	// Override: explicit Allow/Deny statements from overridePermissions.
 	//
-	// The policy is scoped to Lambda, ECS, and EC2 service principals only.
 	// AWS managed services (SNS, EventBridge, S3) call services through the
-	// AWS internal network — they bypass the VPC endpoint entirely and are
-	// not listed as principals here.
+	// AWS internal network and bypass the VPC endpoint entirely, so the
+	// policy never needs to admit them.
 	var endpointPolicy pulumi.StringInput
 	if len(args.OverridePermissions) == 0 {
-		policy, err := buildDefaultEndpointPolicy()
+		policy, err := buildDefaultEndpointPolicy(caller.AccountId)
 		if err != nil {
 			return nil, err
 		}
 		endpointPolicy = pulumi.String(policy)
 	} else {
-		policyOutput, err := buildOverrideEndpointPolicy(args.OverridePermissions)
+		policyOutput, err := buildOverrideEndpointPolicy(args.OverridePermissions, caller.AccountId)
 		if err != nil {
 			return nil, err
 		}
@@ -341,8 +323,8 @@ func NewVpcEndpoint(ctx *pulumi.Context, name string, args VpcEndpointArgs, opts
 	//     so consumers use standard AWS SDK endpoints (e.g. sqs.ap-southeast-2.amazonaws.com)
 	//     and never reference vpce-xxx hostnames directly
 	//   - SubnetIds: one per private subnet, AWS places one ENI per AZ automatically
-	//   - SecurityGroupIds: dedicated SG with self-referencing ingress on 443
-	//   - Policy: endpoint policy scoped to Anvil compute principals
+	//   - SecurityGroupIds: dedicated SG, ingress added per grant
+	//   - Policy: endpoint policy limited to principals in this account
 	endpoint, err := ec2.NewVpcEndpoint(ctx, name+"-vpce", &ec2.VpcEndpointArgs{
 		VpcId:             vpcIdOutput,
 		ServiceName:       serviceNameOutput,
@@ -379,11 +361,13 @@ func NewVpcEndpoint(ctx *pulumi.Context, name string, args VpcEndpointArgs, opts
 	v.EndpointId = endpoint.ID().ToStringOutput()
 	v.DnsName = dnsName
 	v.SecurityGroupId = sg.ID().ToStringOutput()
+	v.Service = serviceOutput
 
 	ctx.RegisterResourceOutputs(v, pulumi.Map{
 		"endpointId":      endpoint.ID(),
 		"dnsName":         dnsName,
 		"securityGroupId": sg.ID(),
+		"service":         serviceOutput,
 	})
 
 	return v, nil

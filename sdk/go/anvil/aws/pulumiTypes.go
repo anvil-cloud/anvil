@@ -7124,7 +7124,7 @@ func (o DSQLTableArrayOutput) Index(i pulumi.IntInput) DSQLTableOutput {
 	}).(DSQLTableOutput)
 }
 
-// VPC configuration for DSQL. When set without hasNat, Anvil creates interface VPC endpoints per region so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
+// VPC configuration for DSQL. When set without hasNat, Anvil creates an interface VPC endpoint in the VPC's region (multiRegion requires hasNat) so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
 type DSQLVpcArgs struct {
 	// Signal that a NAT gateway already exists in this VPC. When true, Anvil skips interface endpoint creation — the Lambda routes to the public DSQL endpoint via NAT. When false (default), Anvil creates interface endpoints per region.
 	HasNat *bool `pulumi:"hasNat"`
@@ -7145,7 +7145,7 @@ type DSQLVpcArgsInput interface {
 	ToDSQLVpcArgsOutputWithContext(context.Context) DSQLVpcArgsOutput
 }
 
-// VPC configuration for DSQL. When set without hasNat, Anvil creates interface VPC endpoints per region so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
+// VPC configuration for DSQL. When set without hasNat, Anvil creates an interface VPC endpoint in the VPC's region (multiRegion requires hasNat) so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
 type DSQLVpcArgsArgs struct {
 	// Signal that a NAT gateway already exists in this VPC. When true, Anvil skips interface endpoint creation — the Lambda routes to the public DSQL endpoint via NAT. When false (default), Anvil creates interface endpoints per region.
 	HasNat pulumi.BoolPtrInput `pulumi:"hasNat"`
@@ -7208,7 +7208,7 @@ func (i *dsqlvpcArgsPtrType) ToDSQLVpcArgsPtrOutputWithContext(ctx context.Conte
 	return pulumi.ToOutputWithContext(ctx, i).(DSQLVpcArgsPtrOutput)
 }
 
-// VPC configuration for DSQL. When set without hasNat, Anvil creates interface VPC endpoints per region so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
+// VPC configuration for DSQL. When set without hasNat, Anvil creates an interface VPC endpoint in the VPC's region (multiRegion requires hasNat) so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
 type DSQLVpcArgsOutput struct{ *pulumi.OutputState }
 
 func (DSQLVpcArgsOutput) ElementType() reflect.Type {
@@ -14052,8 +14052,6 @@ type LambdaVpcArgs struct {
 	HasNat *bool `pulumi:"hasNat"`
 	// The IDs of the private subnets to attach the Lambda to. Always private - Lambda must never be placed in public subnets. Accepts Output<string[]> - pass vpc.privateSubnetIds directly.
 	PrivateSubnetIds interface{} `pulumi:"privateSubnetIds"`
-	// VPC endpoints this Lambda needs access to. Anvil wires both SG rules automatically.
-	VpcEndpoints []LambdaVpcEndpointArgs `pulumi:"vpcEndpoints"`
 	// The ID of the VPC to place the Lambda in. Accepts Output<string> - pass vpc.vpcId directly.
 	VpcId interface{} `pulumi:"vpcId"`
 }
@@ -14076,8 +14074,6 @@ type LambdaVpcArgsArgs struct {
 	HasNat pulumi.BoolPtrInput `pulumi:"hasNat"`
 	// The IDs of the private subnets to attach the Lambda to. Always private - Lambda must never be placed in public subnets. Accepts Output<string[]> - pass vpc.privateSubnetIds directly.
 	PrivateSubnetIds pulumi.Input `pulumi:"privateSubnetIds"`
-	// VPC endpoints this Lambda needs access to. Anvil wires both SG rules automatically.
-	VpcEndpoints LambdaVpcEndpointArgsArrayInput `pulumi:"vpcEndpoints"`
 	// The ID of the VPC to place the Lambda in. Accepts Output<string> - pass vpc.vpcId directly.
 	VpcId pulumi.Input `pulumi:"vpcId"`
 }
@@ -14174,11 +14170,6 @@ func (o LambdaVpcArgsOutput) PrivateSubnetIds() pulumi.AnyOutput {
 	return o.ApplyT(func(v LambdaVpcArgs) interface{} { return v.PrivateSubnetIds }).(pulumi.AnyOutput)
 }
 
-// VPC endpoints this Lambda needs access to. Anvil wires both SG rules automatically.
-func (o LambdaVpcArgsOutput) VpcEndpoints() LambdaVpcEndpointArgsArrayOutput {
-	return o.ApplyT(func(v LambdaVpcArgs) []LambdaVpcEndpointArgs { return v.VpcEndpoints }).(LambdaVpcEndpointArgsArrayOutput)
-}
-
 // The ID of the VPC to place the Lambda in. Accepts Output<string> - pass vpc.vpcId directly.
 func (o LambdaVpcArgsOutput) VpcId() pulumi.AnyOutput {
 	return o.ApplyT(func(v LambdaVpcArgs) interface{} { return v.VpcId }).(pulumi.AnyOutput)
@@ -14236,16 +14227,6 @@ func (o LambdaVpcArgsPtrOutput) PrivateSubnetIds() pulumi.AnyOutput {
 		}
 		return v.PrivateSubnetIds
 	}).(pulumi.AnyOutput)
-}
-
-// VPC endpoints this Lambda needs access to. Anvil wires both SG rules automatically.
-func (o LambdaVpcArgsPtrOutput) VpcEndpoints() LambdaVpcEndpointArgsArrayOutput {
-	return o.ApplyT(func(v *LambdaVpcArgs) []LambdaVpcEndpointArgs {
-		if v == nil {
-			return nil
-		}
-		return v.VpcEndpoints
-	}).(LambdaVpcEndpointArgsArrayOutput)
 }
 
 // The ID of the VPC to place the Lambda in. Accepts Output<string> - pass vpc.vpcId directly.
@@ -14362,115 +14343,6 @@ func (o LambdaVpcCidrArgsArrayOutput) Index(i pulumi.IntInput) LambdaVpcCidrArgs
 	return pulumi.All(o, i).ApplyT(func(vs []interface{}) LambdaVpcCidrArgs {
 		return vs[0].([]LambdaVpcCidrArgs)[vs[1].(int)]
 	}).(LambdaVpcCidrArgsOutput)
-}
-
-// A VPC endpoint to grant this Lambda access to. Both fields accept Output<string> - pass component outputs directly.
-type LambdaVpcEndpointArgs struct {
-	// The endpoint's ID. Use ep.endpointId. Accepts Output<string>.
-	EndpointId interface{} `pulumi:"endpointId"`
-	// The endpoint's security group ID. Use ep.securityGroupId. Accepts Output<string>.
-	SecurityGroupId interface{} `pulumi:"securityGroupId"`
-}
-
-// LambdaVpcEndpointArgsInput is an input type that accepts LambdaVpcEndpointArgsArgs and LambdaVpcEndpointArgsOutput values.
-// You can construct a concrete instance of `LambdaVpcEndpointArgsInput` via:
-//
-//	LambdaVpcEndpointArgsArgs{...}
-type LambdaVpcEndpointArgsInput interface {
-	pulumi.Input
-
-	ToLambdaVpcEndpointArgsOutput() LambdaVpcEndpointArgsOutput
-	ToLambdaVpcEndpointArgsOutputWithContext(context.Context) LambdaVpcEndpointArgsOutput
-}
-
-// A VPC endpoint to grant this Lambda access to. Both fields accept Output<string> - pass component outputs directly.
-type LambdaVpcEndpointArgsArgs struct {
-	// The endpoint's ID. Use ep.endpointId. Accepts Output<string>.
-	EndpointId pulumi.Input `pulumi:"endpointId"`
-	// The endpoint's security group ID. Use ep.securityGroupId. Accepts Output<string>.
-	SecurityGroupId pulumi.Input `pulumi:"securityGroupId"`
-}
-
-func (LambdaVpcEndpointArgsArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*LambdaVpcEndpointArgs)(nil)).Elem()
-}
-
-func (i LambdaVpcEndpointArgsArgs) ToLambdaVpcEndpointArgsOutput() LambdaVpcEndpointArgsOutput {
-	return i.ToLambdaVpcEndpointArgsOutputWithContext(context.Background())
-}
-
-func (i LambdaVpcEndpointArgsArgs) ToLambdaVpcEndpointArgsOutputWithContext(ctx context.Context) LambdaVpcEndpointArgsOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(LambdaVpcEndpointArgsOutput)
-}
-
-// LambdaVpcEndpointArgsArrayInput is an input type that accepts LambdaVpcEndpointArgsArray and LambdaVpcEndpointArgsArrayOutput values.
-// You can construct a concrete instance of `LambdaVpcEndpointArgsArrayInput` via:
-//
-//	LambdaVpcEndpointArgsArray{ LambdaVpcEndpointArgsArgs{...} }
-type LambdaVpcEndpointArgsArrayInput interface {
-	pulumi.Input
-
-	ToLambdaVpcEndpointArgsArrayOutput() LambdaVpcEndpointArgsArrayOutput
-	ToLambdaVpcEndpointArgsArrayOutputWithContext(context.Context) LambdaVpcEndpointArgsArrayOutput
-}
-
-type LambdaVpcEndpointArgsArray []LambdaVpcEndpointArgsInput
-
-func (LambdaVpcEndpointArgsArray) ElementType() reflect.Type {
-	return reflect.TypeOf((*[]LambdaVpcEndpointArgs)(nil)).Elem()
-}
-
-func (i LambdaVpcEndpointArgsArray) ToLambdaVpcEndpointArgsArrayOutput() LambdaVpcEndpointArgsArrayOutput {
-	return i.ToLambdaVpcEndpointArgsArrayOutputWithContext(context.Background())
-}
-
-func (i LambdaVpcEndpointArgsArray) ToLambdaVpcEndpointArgsArrayOutputWithContext(ctx context.Context) LambdaVpcEndpointArgsArrayOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(LambdaVpcEndpointArgsArrayOutput)
-}
-
-// A VPC endpoint to grant this Lambda access to. Both fields accept Output<string> - pass component outputs directly.
-type LambdaVpcEndpointArgsOutput struct{ *pulumi.OutputState }
-
-func (LambdaVpcEndpointArgsOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*LambdaVpcEndpointArgs)(nil)).Elem()
-}
-
-func (o LambdaVpcEndpointArgsOutput) ToLambdaVpcEndpointArgsOutput() LambdaVpcEndpointArgsOutput {
-	return o
-}
-
-func (o LambdaVpcEndpointArgsOutput) ToLambdaVpcEndpointArgsOutputWithContext(ctx context.Context) LambdaVpcEndpointArgsOutput {
-	return o
-}
-
-// The endpoint's ID. Use ep.endpointId. Accepts Output<string>.
-func (o LambdaVpcEndpointArgsOutput) EndpointId() pulumi.AnyOutput {
-	return o.ApplyT(func(v LambdaVpcEndpointArgs) interface{} { return v.EndpointId }).(pulumi.AnyOutput)
-}
-
-// The endpoint's security group ID. Use ep.securityGroupId. Accepts Output<string>.
-func (o LambdaVpcEndpointArgsOutput) SecurityGroupId() pulumi.AnyOutput {
-	return o.ApplyT(func(v LambdaVpcEndpointArgs) interface{} { return v.SecurityGroupId }).(pulumi.AnyOutput)
-}
-
-type LambdaVpcEndpointArgsArrayOutput struct{ *pulumi.OutputState }
-
-func (LambdaVpcEndpointArgsArrayOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*[]LambdaVpcEndpointArgs)(nil)).Elem()
-}
-
-func (o LambdaVpcEndpointArgsArrayOutput) ToLambdaVpcEndpointArgsArrayOutput() LambdaVpcEndpointArgsArrayOutput {
-	return o
-}
-
-func (o LambdaVpcEndpointArgsArrayOutput) ToLambdaVpcEndpointArgsArrayOutputWithContext(ctx context.Context) LambdaVpcEndpointArgsArrayOutput {
-	return o
-}
-
-func (o LambdaVpcEndpointArgsArrayOutput) Index(i pulumi.IntInput) LambdaVpcEndpointArgsOutput {
-	return pulumi.All(o, i).ApplyT(func(vs []interface{}) LambdaVpcEndpointArgs {
-		return vs[0].([]LambdaVpcEndpointArgs)[vs[1].(int)]
-	}).(LambdaVpcEndpointArgsOutput)
 }
 
 type PABHatch struct {
@@ -18485,8 +18357,6 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaVpcArgsPtrInput)(nil)).Elem(), LambdaVpcArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaVpcCidrArgsInput)(nil)).Elem(), LambdaVpcCidrArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LambdaVpcCidrArgsArrayInput)(nil)).Elem(), LambdaVpcCidrArgsArray{})
-	pulumi.RegisterInputType(reflect.TypeOf((*LambdaVpcEndpointArgsInput)(nil)).Elem(), LambdaVpcEndpointArgsArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*LambdaVpcEndpointArgsArrayInput)(nil)).Elem(), LambdaVpcEndpointArgsArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PABHatchInput)(nil)).Elem(), PABHatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PABHatchPtrInput)(nil)).Elem(), PABHatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*QueueConsumerArgsInput)(nil)).Elem(), QueueConsumerArgsArgs{})
@@ -18668,8 +18538,6 @@ func init() {
 	pulumi.RegisterOutputType(LambdaVpcArgsPtrOutput{})
 	pulumi.RegisterOutputType(LambdaVpcCidrArgsOutput{})
 	pulumi.RegisterOutputType(LambdaVpcCidrArgsArrayOutput{})
-	pulumi.RegisterOutputType(LambdaVpcEndpointArgsOutput{})
-	pulumi.RegisterOutputType(LambdaVpcEndpointArgsArrayOutput{})
 	pulumi.RegisterOutputType(PABHatchOutput{})
 	pulumi.RegisterOutputType(PABHatchPtrOutput{})
 	pulumi.RegisterOutputType(QueueConsumerArgsOutput{})

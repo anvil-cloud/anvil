@@ -30,7 +30,7 @@ class VpcEndpointArgs:
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] private_subnet_ids: The IDs of the private subnets to attach the endpoint to. AWS places one ENI per subnet. Pass all private subnet IDs from your VPC — typically one per AZ.
         :param pulumi.Input[_builtins.str] service: The AWS service to route privately. The full com.amazonaws.{region}.{service} name is constructed at deploy time from the resolved region — you never write it manually.
         :param pulumi.Input[_builtins.str] vpc_id: The ID of the VPC to create the endpoint in. Accepts both Anvil-managed VPC IDs and imported VPC IDs.
-        :param pulumi.Input[Sequence[pulumi.Input['VpcEndpointPermissionArgs']]] override_permissions: Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for all Anvil compute principals (Lambda, ECS, EC2). When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Resource defaults to "*" if omitted on a permission entry.
+        :param pulumi.Input[Sequence[pulumi.Input['VpcEndpointPermissionArgs']]] override_permissions: Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for principals in this account. When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Every statement is limited to principals in this account. Resource defaults to "*" if omitted on a permission entry.
         """
         pulumi.set(__self__, "private_subnet_ids", private_subnet_ids)
         pulumi.set(__self__, "service", service)
@@ -78,7 +78,7 @@ class VpcEndpointArgs:
     @pulumi.getter(name="overridePermissions")
     def override_permissions(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['VpcEndpointPermissionArgs']]]]:
         """
-        Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for all Anvil compute principals (Lambda, ECS, EC2). When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Resource defaults to "*" if omitted on a permission entry.
+        Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for principals in this account. When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Every statement is limited to principals in this account. Resource defaults to "*" if omitted on a permission entry.
         """
         return pulumi.get(self, "override_permissions")
 
@@ -99,12 +99,12 @@ class VpcEndpoint(pulumi.ComponentResource):
                  vpc_id: Optional[pulumi.Input[_builtins.str]] = None,
                  __props__=None):
         """
-        An Anvil-managed AWS Interface VPC Endpoint. Creates one ENI per private subnet with private DNS enabled. The endpoint security group uses a self-referencing ingress rule on port 443 — only compute resources that have been explicitly granted access can reach the endpoint at the network layer. Access is enforced at three layers: network (self-referencing SG), IAM role policy (scoped per compute resource), and endpoint policy (blanket ceiling on allowed actions for all compute principals — Lambda, ECS, EC2).
+        An Anvil-managed AWS Interface VPC Endpoint. Creates one ENI per private subnet with private DNS enabled. The endpoint security group starts with zero rules. Passing this endpoint to a grant (e.g. queue.grantSendMessage(fn, { endpoint: sqsEndpoint })) adds a one-way ingress rule on port 443 from that compute's own security group, so only granted compute can reach the endpoint. Access is enforced at three layers: network (one-way SG rules per grant), IAM role policy (scoped per grant and limited to this endpoint with aws:SourceVpce), and endpoint policy (ceiling on allowed actions for principals in this account).
 
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[Sequence[pulumi.Input[Union['VpcEndpointPermissionArgs', 'VpcEndpointPermissionArgsDict']]]] override_permissions: Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for all Anvil compute principals (Lambda, ECS, EC2). When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Resource defaults to "*" if omitted on a permission entry.
+        :param pulumi.Input[Sequence[pulumi.Input[Union['VpcEndpointPermissionArgs', 'VpcEndpointPermissionArgsDict']]]] override_permissions: Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for principals in this account. When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Every statement is limited to principals in this account. Resource defaults to "*" if omitted on a permission entry.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] private_subnet_ids: The IDs of the private subnets to attach the endpoint to. AWS places one ENI per subnet. Pass all private subnet IDs from your VPC — typically one per AZ.
         :param pulumi.Input[_builtins.str] service: The AWS service to route privately. The full com.amazonaws.{region}.{service} name is constructed at deploy time from the resolved region — you never write it manually.
         :param pulumi.Input[_builtins.str] vpc_id: The ID of the VPC to create the endpoint in. Accepts both Anvil-managed VPC IDs and imported VPC IDs.
@@ -116,7 +116,7 @@ class VpcEndpoint(pulumi.ComponentResource):
                  args: VpcEndpointArgs,
                  opts: Optional[pulumi.ResourceOptions] = None):
         """
-        An Anvil-managed AWS Interface VPC Endpoint. Creates one ENI per private subnet with private DNS enabled. The endpoint security group uses a self-referencing ingress rule on port 443 — only compute resources that have been explicitly granted access can reach the endpoint at the network layer. Access is enforced at three layers: network (self-referencing SG), IAM role policy (scoped per compute resource), and endpoint policy (blanket ceiling on allowed actions for all compute principals — Lambda, ECS, EC2).
+        An Anvil-managed AWS Interface VPC Endpoint. Creates one ENI per private subnet with private DNS enabled. The endpoint security group starts with zero rules. Passing this endpoint to a grant (e.g. queue.grantSendMessage(fn, { endpoint: sqsEndpoint })) adds a one-way ingress rule on port 443 from that compute's own security group, so only granted compute can reach the endpoint. Access is enforced at three layers: network (one-way SG rules per grant), IAM role policy (scoped per grant and limited to this endpoint with aws:SourceVpce), and endpoint policy (ceiling on allowed actions for principals in this account).
 
 
         :param str resource_name: The name of the resource.
@@ -189,7 +189,15 @@ class VpcEndpoint(pulumi.ComponentResource):
     @pulumi.getter(name="securityGroupId")
     def security_group_id(self) -> pulumi.Output[_builtins.str]:
         """
-        The ID of the dedicated security group attached to this endpoint. Uses a self-referencing ingress rule on port 443 — only compute resources with this SG explicitly attached can reach the endpoint at the network layer.
+        The ID of the dedicated security group attached to this endpoint. It starts with zero rules; each grant that passes this endpoint adds ingress on port 443 from the granted compute's own security group.
         """
         return pulumi.get(self, "security_group_id")
+
+    @_builtins.property
+    @pulumi.getter
+    def service(self) -> pulumi.Output[_builtins.str]:
+        """
+        The AWS service this endpoint routes, e.g. "sqs". Grants check it against the service being granted.
+        """
+        return pulumi.get(self, "service")
 

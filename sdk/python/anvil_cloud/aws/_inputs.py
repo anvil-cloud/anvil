@@ -161,8 +161,6 @@ __all__ = [
     'LambdaVpcArgsArgsDict',
     'LambdaVpcCidrArgsArgs',
     'LambdaVpcCidrArgsArgsDict',
-    'LambdaVpcEndpointArgsArgs',
-    'LambdaVpcEndpointArgsArgsDict',
     'PABHatchArgs',
     'PABHatchArgsDict',
     'QueueConsumerArgsArgs',
@@ -4159,7 +4157,7 @@ class DSQLTableArgs:
 
 class DSQLVpcArgsArgsDict(TypedDict):
     """
-    VPC configuration for DSQL. When set without hasNat, Anvil creates interface VPC endpoints per region so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
+    VPC configuration for DSQL. When set without hasNat, Anvil creates an interface VPC endpoint in the VPC's region (multiRegion requires hasNat) so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
     """
     private_subnet_ids: Any
     """
@@ -4181,7 +4179,7 @@ class DSQLVpcArgsArgs:
                  vpc_id: Any,
                  has_nat: Optional[pulumi.Input[_builtins.bool]] = None):
         """
-        VPC configuration for DSQL. When set without hasNat, Anvil creates interface VPC endpoints per region so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
+        VPC configuration for DSQL. When set without hasNat, Anvil creates an interface VPC endpoint in the VPC's region (multiRegion requires hasNat) so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
 
         :param Any private_subnet_ids: The IDs of the private subnets to attach the endpoint ENIs to. One ENI is created per subnet. Pass all private subnet IDs — typically one per AZ. Accepts Output<string[]> — pass vpc.privateSubnetIds directly.
         :param Any vpc_id: The ID of the VPC. Accepts Output<string> — pass vpc.vpcId directly.
@@ -8042,10 +8040,6 @@ class LambdaVpcArgsArgsDict(TypedDict):
     """
     Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
     """
-    vpc_endpoints: NotRequired[pulumi.Input[Sequence[pulumi.Input['LambdaVpcEndpointArgsArgsDict']]]]
-    """
-    VPC endpoints this Lambda needs access to. Anvil wires both SG rules automatically.
-    """
 
 @pulumi.input_type
 class LambdaVpcArgsArgs:
@@ -8053,14 +8047,12 @@ class LambdaVpcArgsArgs:
                  private_subnet_ids: Any,
                  vpc_id: Any,
                  cidrs: Optional[pulumi.Input[Sequence[pulumi.Input['LambdaVpcCidrArgsArgs']]]] = None,
-                 has_nat: Optional[pulumi.Input[_builtins.bool]] = None,
-                 vpc_endpoints: Optional[pulumi.Input[Sequence[pulumi.Input['LambdaVpcEndpointArgsArgs']]]] = None):
+                 has_nat: Optional[pulumi.Input[_builtins.bool]] = None):
         """
         :param Any private_subnet_ids: The IDs of the private subnets to attach the Lambda to. Always private - Lambda must never be placed in public subnets. Accepts Output<string[]> - pass vpc.privateSubnetIds directly.
         :param Any vpc_id: The ID of the VPC to place the Lambda in. Accepts Output<string> - pass vpc.vpcId directly.
         :param pulumi.Input[Sequence[pulumi.Input['LambdaVpcCidrArgsArgs']]] cidrs: CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.
         :param pulumi.Input[_builtins.bool] has_nat: Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
-        :param pulumi.Input[Sequence[pulumi.Input['LambdaVpcEndpointArgsArgs']]] vpc_endpoints: VPC endpoints this Lambda needs access to. Anvil wires both SG rules automatically.
         """
         pulumi.set(__self__, "private_subnet_ids", private_subnet_ids)
         pulumi.set(__self__, "vpc_id", vpc_id)
@@ -8068,8 +8060,6 @@ class LambdaVpcArgsArgs:
             pulumi.set(__self__, "cidrs", cidrs)
         if has_nat is not None:
             pulumi.set(__self__, "has_nat", has_nat)
-        if vpc_endpoints is not None:
-            pulumi.set(__self__, "vpc_endpoints", vpc_endpoints)
 
     @_builtins.property
     @pulumi.getter(name="privateSubnetIds")
@@ -8119,18 +8109,6 @@ class LambdaVpcArgsArgs:
     def has_nat(self, value: Optional[pulumi.Input[_builtins.bool]]):
         pulumi.set(self, "has_nat", value)
 
-    @_builtins.property
-    @pulumi.getter(name="vpcEndpoints")
-    def vpc_endpoints(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['LambdaVpcEndpointArgsArgs']]]]:
-        """
-        VPC endpoints this Lambda needs access to. Anvil wires both SG rules automatically.
-        """
-        return pulumi.get(self, "vpc_endpoints")
-
-    @vpc_endpoints.setter
-    def vpc_endpoints(self, value: Optional[pulumi.Input[Sequence[pulumi.Input['LambdaVpcEndpointArgsArgs']]]]):
-        pulumi.set(self, "vpc_endpoints", value)
-
 
 class LambdaVpcCidrArgsArgsDict(TypedDict):
     ports: pulumi.Input[Sequence[pulumi.Input[_builtins.int]]]
@@ -8177,58 +8155,6 @@ class LambdaVpcCidrArgsArgs:
     @range.setter
     def range(self, value: pulumi.Input[_builtins.str]):
         pulumi.set(self, "range", value)
-
-
-class LambdaVpcEndpointArgsArgsDict(TypedDict):
-    """
-    A VPC endpoint to grant this Lambda access to. Both fields accept Output<string> - pass component outputs directly.
-    """
-    endpoint_id: Any
-    """
-    The endpoint's ID. Use ep.endpointId. Accepts Output<string>.
-    """
-    security_group_id: Any
-    """
-    The endpoint's security group ID. Use ep.securityGroupId. Accepts Output<string>.
-    """
-
-@pulumi.input_type
-class LambdaVpcEndpointArgsArgs:
-    def __init__(__self__, *,
-                 endpoint_id: Any,
-                 security_group_id: Any):
-        """
-        A VPC endpoint to grant this Lambda access to. Both fields accept Output<string> - pass component outputs directly.
-
-        :param Any endpoint_id: The endpoint's ID. Use ep.endpointId. Accepts Output<string>.
-        :param Any security_group_id: The endpoint's security group ID. Use ep.securityGroupId. Accepts Output<string>.
-        """
-        pulumi.set(__self__, "endpoint_id", endpoint_id)
-        pulumi.set(__self__, "security_group_id", security_group_id)
-
-    @_builtins.property
-    @pulumi.getter(name="endpointId")
-    def endpoint_id(self) -> Any:
-        """
-        The endpoint's ID. Use ep.endpointId. Accepts Output<string>.
-        """
-        return pulumi.get(self, "endpoint_id")
-
-    @endpoint_id.setter
-    def endpoint_id(self, value: Any):
-        pulumi.set(self, "endpoint_id", value)
-
-    @_builtins.property
-    @pulumi.getter(name="securityGroupId")
-    def security_group_id(self) -> Any:
-        """
-        The endpoint's security group ID. Use ep.securityGroupId. Accepts Output<string>.
-        """
-        return pulumi.get(self, "security_group_id")
-
-    @security_group_id.setter
-    def security_group_id(self, value: Any):
-        pulumi.set(self, "security_group_id", value)
 
 
 class PABHatchArgsDict(TypedDict):

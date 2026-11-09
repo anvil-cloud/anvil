@@ -27,7 +27,7 @@ Every Anvil Go program uses `anvil.Run()` with an `AppConfig`. The `Context` pro
 
 ## Grants
 
-Grants are how Anvil wires permissions between resources. Instead of writing IAM policies by hand, you call `CreateGrant()` and Anvil handles both the IAM role policy and the environment variable injection automatically.
+Grants are how Anvil wires permissions between resources. In Go you call `anvil.CreateGrant` with the actions and resource ARNs, and Anvil creates a least-privilege IAM policy on the target's role. Wrap a Lambda with `anvil.LambdaTarget`, passing the name you created it with.
 
 A Lambda reading from a Bucket:
 
@@ -43,28 +43,27 @@ import (
 func main() {
     anvil.Run(anvil.AppConfig{
         Run: func(ctx *anvil.Context) error {
-            bucket, err := anvilaws.NewBucket(ctx.PulumiCtx(), "uploads", &anvilaws.BucketArgs{
-                DataClassification: pulumi.String("sensitive"),
-            })
+            pctx := ctx.PulumiCtx()
+            bucket, err := anvilaws.NewBucket(pctx, "uploads", &anvilaws.BucketArgs{})
             if err != nil {
                 return err
             }
 
-            fn, err := anvilaws.NewLambda(ctx.PulumiCtx(), "processor", &anvilaws.LambdaArgs{
-                Runtime: pulumi.String("nodejs20.x"),
+            fn, err := anvilaws.NewLambda(pctx, "processor", &anvilaws.LambdaArgs{
+                Runtime: anvilaws.LambdaRuntime_Nodejs24_x,
                 Handler: pulumi.String("src/index.handler"),
             })
             if err != nil {
                 return err
             }
 
-            // Grants the Lambda read access to the bucket and scopes down to specific paths.
-            // Anvil creates the IAM policy and injects UPLOADS_BUCKET_NAME
-            // into the Lambda's environment automatically.
-            return anvil.CreateGrant(ctx.PulumiCtx(), bucket, fn, anvil.GrantOptions{
-                Actions: []string{"read"},
-                Path:    []string{"user/*"},
-            })
+            // s3:GetObject + s3:ListBucket on the bucket, scoped to user/*
+            return anvil.CreateGrant(pctx, bucket, "uploads-processor-read",
+                anvil.LambdaTarget("processor", fn),
+                []string{"s3:GetObject", "s3:ListBucket"},
+                anvil.BuildResourceArns(bucket.Arn, []string{"user/*"}),
+                nil,
+            )
         },
     })
 }
@@ -72,9 +71,53 @@ func main() {
 
 What Anvil does under the hood:
 
-- Creates an IAM `RolePolicy` scoped to the exact actions requested
-- Injects the resource identifier as an environment variable on the target (e.g. `UPLOADS_BUCKET_NAME`)
-- No manual ARN wiring, no forgotten permissions
+- Creates an IAM `RolePolicy` on the target's role, scoped to the exact actions and resources
+- No hand-written policy JSON
+
+### Through a VPC endpoint
+
+When a Lambda runs in a VPC and reaches an AWS service through an Anvil `VpcEndpoint`, pass the endpoint in `GrantOptions`:
+
+```go
+sqsEndpoint, err := anvilaws.NewVpcEndpoint(pctx, "sqs", &anvilaws.VpcEndpointArgs{
+    VpcId:            vpc.VpcId,
+    PrivateSubnetIds: vpc.PrivateSubnetIds,
+    Service:          pulumi.String("sqs"),
+})
+// ...
+err = anvil.CreateGrant(pctx, queue, "orders-processor-send",
+    anvil.LambdaTarget("processor", fn),
+    []string{"sqs:SendMessage"},
+    []pulumi.StringInput{queue.Arn},
+    &anvil.GrantOptions{Endpoint: anvil.Endpoint("sqs", sqsEndpoint, ctx.Provider("aws"))},
+)
+```
+
+The grant then also:
+
+- adds ingress 443 on the endpoint's security group from the Lambda's own security group, and egress 443 on the Lambda's security group to the endpoint (once per Lambda and endpoint, however many grants share them);
+- limits the IAM statement to that endpoint with `aws:SourceVpce`, so the permission doesn't work if the credentials are used from anywhere else.
+
+The Lambda only ever carries its own security group, so compute sharing an endpoint can't reach each other. All actions in an endpoint grant must belong to the endpoint's service (`sqs:*` actions for an `sqs` endpoint), or the grant fails. With private DNS, every call to that service from inside the VPC resolves to the endpoint, so grant every Lambda that uses the service through it, even if the VPC also has NAT.
+
+For a DSQL cluster created with `Vpc` and without `HasNat`, call `anvil.ConnectToDSQL(pctx, "orders", cluster, target, ctx.Provider("aws"))` to open port 5432 to its endpoint. Pass the provider you created the endpoint or cluster with: security group rules are regional.
+
+### Services without an Anvil component
+
+For services like Secrets Manager, KMS, SSM, STS, ECR or CloudWatch Logs, use `anvil.GrantEndpointAccess`:
+
+```go
+err = anvil.GrantEndpointAccess(pctx,
+    anvil.Endpoint("secrets", secretsEndpoint, ctx.Provider("aws")),
+    anvil.LambdaTarget("processor", fn),
+    &anvil.EndpointAccessOptions{
+        Actions:   []string{"secretsmanager:GetSecretValue"},
+        Resources: []pulumi.StringInput{dbSecretArn},
+    },
+)
+```
+
+It opens the same security group rules as a resource grant. With `Actions` and `Resources`, it also adds an IAM statement limited to the endpoint with `aws:SourceVpce`. Every action must belong to the endpoint's service. Pass `nil` options to open the network only, when the IAM permissions come from elsewhere.
 
 ## SvelteKit deployment
 

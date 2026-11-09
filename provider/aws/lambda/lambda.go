@@ -44,25 +44,6 @@ type LambdaPermission struct {
 	Path string `pulumi:"path,optional"`
 }
 
-// LambdaVpcEndpointArgs defines a VPC endpoint to grant this Lambda access to.
-// Pass ep.securityGroupId and ep.endpointId from an Anvil VpcEndpoint.
-// Both fields accept Output<string> -- pass the component outputs directly.
-//
-// Usage:
-//
-//	vpcEndpoints: [
-//	    { securityGroupId: sns.securityGroupId, endpointId: sns.endpointId },
-//	]
-type LambdaVpcEndpointArgs struct {
-	// SecurityGroupId is the endpoint's dedicated SG ID.
-	// Use ep.securityGroupId from an Anvil VpcEndpoint.
-	SecurityGroupId pulumi.StringInput `pulumi:"securityGroupId"`
-
-	// EndpointId is the AWS VPC endpoint ID, e.g. vpce-0abc1234567890abc.
-	// Use ep.endpointId from an Anvil VpcEndpoint.
-	EndpointId pulumi.StringInput `pulumi:"endpointId"`
-}
-
 // LambdaVpcCidrArgs defines a CIDR-scoped egress rule.
 // One SecurityGroupEgressRule is created per port per CIDR.
 //
@@ -98,29 +79,9 @@ type LambdaVpcArgs struct {
 	// Only needed for imported VPCs -- omit when using an Anvil Vpc component.
 	HasNat bool `pulumi:"hasNat,optional"`
 
-	// VpcEndpoints are the VPC endpoints this Lambda needs access to.
-	// Anvil wires the egress rule from this Lambda SG to each endpoint SG at
-	// construction time. The endpoint SG's ingress is owned by the VpcEndpoint
-	// constructor and is never modified here -- this prevents duplicate ingress
-	// rule errors when multiple compute resources share the same endpoint.
-	VpcEndpoints []LambdaVpcEndpointArgs `pulumi:"vpcEndpoints,optional"`
-
 	// CIDRs defines structured CIDR-scoped egress rules.
 	// Use for peered VPCs, on-premise ranges, or any non-AWS-service destination.
 	CIDRs []LambdaVpcCidrArgs `pulumi:"cidrs,optional"`
-}
-
-// lambdaEndpointTarget adapts LambdaVpcEndpointArgs to satisfy vpcsg.EndpointTarget.
-type lambdaEndpointTarget struct {
-	args LambdaVpcEndpointArgs
-}
-
-func (t *lambdaEndpointTarget) Name() string {
-	return "endpoint"
-}
-
-func (t *lambdaEndpointTarget) SecurityGroupOutput() pulumi.StringOutput {
-	return t.args.SecurityGroupId.ToStringOutput()
 }
 
 // LambdaArgs defines the inputs for an Anvil-managed Lambda function.
@@ -192,10 +153,6 @@ func (l *Lambda) Name() string {
 
 func (l *Lambda) RoleARN() pulumi.StringOutput {
 	return l.RoleArn
-}
-
-func (l *Lambda) SecurityGroupId() pulumi.StringOutput {
-	return l.SecurityGroupID
 }
 
 func (l *Lambda) Annotate(a infer.Annotator) {
@@ -548,21 +505,11 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 		if err != nil {
 			return nil, err
 		}
+		// VPC endpoint access is not wired here. Each grant that passes an
+		// endpoint adds egress 443 on this SG to the endpoint SG, and ingress
+		// on the endpoint SG from this SG. This SG is the only one attached to
+		// the function's ENIs.
 		l.SecurityGroupID = sg.ID().ToStringOutput()
-
-		targets := make([]vpcsg.EndpointTarget, len(args.Vpc.VpcEndpoints))
-		for i, ep := range args.Vpc.VpcEndpoints {
-			targets[i] = &lambdaEndpointTarget{args: ep}
-		}
-		if err := vpcsg.GrantEndpointAccess(
-			ctx,
-			name,
-			l.SecurityGroupID,
-			targets,
-			l,
-		); err != nil {
-			return nil, fmt.Errorf("failed to wire endpoint egress: %w", err)
-		}
 
 		if args.Vpc.HasNat {
 			if err := vpcsg.AddInternetEgressRule(
@@ -624,9 +571,6 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 
 	if args.Vpc != nil {
 		sgIds := pulumi.StringArray{l.SecurityGroupID}
-		for _, ep := range args.Vpc.VpcEndpoints {
-			sgIds = append(sgIds, ep.SecurityGroupId.ToStringOutput())
-		}
 		lambdaMap["vpcConfig"] = pulumi.Map{
 			"subnetIds":        args.Vpc.PrivateSubnetIds.ToStringArrayOutput(),
 			"securityGroupIds": sgIds,

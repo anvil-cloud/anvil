@@ -31,7 +31,7 @@
         },
         "vpc": {
           "$ref": "#/types/anvil:aws:DSQLVpcArgs",
-          "description": "Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS."
+          "description": "Optional VPC configuration. When set without hasNat, Anvil creates an interface VPC endpoint (PrivateLink) in the VPC's region so traffic stays on the AWS backbone, and grantConnect wires per-grant security group rules on port 5432. Cannot be combined with multiRegion unless hasNat is set, because a VPC lives in one region. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS."
         }
       },
       "isComponent": true,
@@ -77,14 +77,14 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.",
+          "description": "Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false.",
           "type": "object"
         },
         "vpcEndpointSecurityGroupIds": {
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.",
+          "description": "Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. The SG starts with zero rules; grantConnect adds ingress on port 5432 from the granted compute's own security group.",
           "type": "object"
         }
       },
@@ -463,7 +463,7 @@
       "type": "object"
     },
     "anvil:aws:DSQLVpcArgs": {
-      "description": "VPC configuration for DSQL. When set without hasNat, Anvil creates interface VPC endpoints per region so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.",
+      "description": "VPC configuration for DSQL. When set without hasNat, Anvil creates an interface VPC endpoint in the VPC's region (multiRegion requires hasNat) so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.",
       "properties": {
         "hasNat": {
           "description": "Signal that a NAT gateway already exists in this VPC. When true, Anvil skips interface endpoint creation — the Lambda routes to the public DSQL endpoint via NAT. When false (default), Anvil creates interface endpoints per region.",

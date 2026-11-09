@@ -872,7 +872,7 @@ export namespace aws {
     }
 
     /**
-     * VPC configuration for DSQL. When set without hasNat, Anvil creates interface VPC endpoints per region so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
+     * VPC configuration for DSQL. When set without hasNat, Anvil creates an interface VPC endpoint in the VPC's region (multiRegion requires hasNat) so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
      */
     export interface DSQLVpcArgsArgs {
         /**
@@ -1753,10 +1753,6 @@ export namespace aws {
          */
         privateSubnetIds: any;
         /**
-         * VPC endpoints this Lambda needs access to. Anvil wires both SG rules automatically.
-         */
-        vpcEndpoints?: pulumi.Input<pulumi.Input<inputs.aws.LambdaVpcEndpointArgsArgs>[]>;
-        /**
          * The ID of the VPC to place the Lambda in. Accepts Output<string> - pass vpc.vpcId directly.
          */
         vpcId: any;
@@ -1771,20 +1767,6 @@ export namespace aws {
          * IPv4 CIDR block, e.g. 10.0.0.0/8
          */
         range: pulumi.Input<string>;
-    }
-
-    /**
-     * A VPC endpoint to grant this Lambda access to. Both fields accept Output<string> - pass component outputs directly.
-     */
-    export interface LambdaVpcEndpointArgsArgs {
-        /**
-         * The endpoint's ID. Use ep.endpointId. Accepts Output<string>.
-         */
-        endpointId: any;
-        /**
-         * The endpoint's security group ID. Use ep.securityGroupId. Accepts Output<string>.
-         */
-        securityGroupId: any;
     }
 
     export interface PABHatchArgs {

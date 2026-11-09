@@ -2,7 +2,7 @@
   "resources": {
     "anvil:aws:VpcEndpoint": {
       "isComponent": true,
-      "description": "An Anvil-managed AWS Interface VPC Endpoint. Creates one ENI per private subnet with private DNS enabled. The endpoint security group uses a self-referencing ingress rule on port 443 — only compute resources that have been explicitly granted access can reach the endpoint at the network layer. Access is enforced at three layers: network (self-referencing SG), IAM role policy (scoped per compute resource), and endpoint policy (blanket ceiling on allowed actions for all compute principals — Lambda, ECS, EC2).",
+      "description": "An Anvil-managed AWS Interface VPC Endpoint. Creates one ENI per private subnet with private DNS enabled. The endpoint security group starts with zero rules. Passing this endpoint to a grant (e.g. queue.grantSendMessage(fn, { endpoint: sqsEndpoint })) adds a one-way ingress rule on port 443 from that compute's own security group, so only granted compute can reach the endpoint. Access is enforced at three layers: network (one-way SG rules per grant), IAM role policy (scoped per grant and limited to this endpoint with aws:SourceVpce), and endpoint policy (ceiling on allowed actions for principals in this account).",
       "inputProperties": {
         "vpcId": {
           "type": "string",
@@ -10,7 +10,9 @@
         },
         "privateSubnetIds": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "The IDs of the private subnets to attach the endpoint to. AWS places one ENI per subnet. Pass all private subnet IDs from your VPC — typically one per AZ."
         },
         "service": {
@@ -19,11 +21,17 @@
         },
         "overridePermissions": {
           "type": "array",
-          "items": { "$ref": "#/types/anvil:aws:VpcEndpointPermission" },
-          "description": "Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for all Anvil compute principals (Lambda, ECS, EC2). When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Resource defaults to \"*\" if omitted on a permission entry."
+          "items": {
+            "$ref": "#/types/anvil:aws:VpcEndpointPermission"
+          },
+          "description": "Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for principals in this account. When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Every statement is limited to principals in this account. Resource defaults to \"*\" if omitted on a permission entry."
         }
       },
-      "requiredInputs": ["vpcId", "privateSubnetIds", "service"],
+      "requiredInputs": [
+        "vpcId",
+        "privateSubnetIds",
+        "service"
+      ],
       "properties": {
         "endpointId": {
           "type": "string",
@@ -35,10 +43,19 @@
         },
         "securityGroupId": {
           "type": "string",
-          "description": "The ID of the dedicated security group attached to this endpoint. Uses a self-referencing ingress rule on port 443 — only compute resources with this SG explicitly attached can reach the endpoint at the network layer."
+          "description": "The ID of the dedicated security group attached to this endpoint. It starts with zero rules; each grant that passes this endpoint adds ingress on port 443 from the granted compute's own security group."
+        },
+        "service": {
+          "type": "string",
+          "description": "The AWS service this endpoint routes, e.g. \"sqs\". Grants check it against the service being granted."
         }
       },
-      "required": ["endpointId", "dnsName", "securityGroupId"]
+      "required": [
+        "endpointId",
+        "dnsName",
+        "securityGroupId",
+        "service"
+      ]
     }
   },
   "types": {
@@ -59,7 +76,10 @@
           "description": "The ARN to scope this permission to. Defaults to \"*\" if omitted — applies to all resources of this service. Accepts Output<string> — pass resource ARNs directly, e.g. queue.arn, secret.arn."
         }
       },
-      "required": ["effect", "action"]
+      "required": [
+        "effect",
+        "action"
+      ]
     }
   },
   "x-upstream-provider": "aws",

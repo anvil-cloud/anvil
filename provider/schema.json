@@ -334,7 +334,7 @@
         },
         "vpc": {
           "$ref": "#/types/anvil:aws:DSQLVpcArgs",
-          "description": "Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS."
+          "description": "Optional VPC configuration. When set without hasNat, Anvil creates an interface VPC endpoint (PrivateLink) in the VPC's region so traffic stays on the AWS backbone, and grantConnect wires per-grant security group rules on port 5432. Cannot be combined with multiRegion unless hasNat is set, because a VPC lives in one region. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS."
         }
       },
       "isComponent": true,
@@ -380,14 +380,14 @@
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.",
+          "description": "Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false.",
           "type": "object"
         },
         "vpcEndpointSecurityGroupIds": {
           "additionalProperties": {
             "type": "string"
           },
-          "description": "Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.",
+          "description": "Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. The SG starts with zero rules; grantConnect adds ingress on port 5432 from the granted compute's own security group.",
           "type": "object"
         }
       },
@@ -741,7 +741,7 @@
           "type": "string"
         },
         "securityGroupId": {
-          "description": "The ID of the dedicated security group created for this Lambda. Only populated when vpc is set. Use this to grant other resources access to this Lambda via the grant system.",
+          "description": "The ID of the dedicated security group created for this Lambda. Only populated when vpc is set. It is the only security group on the function's ENIs. Grants that pass a VPC endpoint add egress rules to it.",
           "type": "string"
         }
       },
@@ -973,10 +973,10 @@
       "requiredInputs": []
     },
     "anvil:aws:VpcEndpoint": {
-      "description": "An Anvil-managed AWS Interface VPC Endpoint. Creates one ENI per private subnet with private DNS enabled. The endpoint security group uses a self-referencing ingress rule on port 443 — only compute resources that have been explicitly granted access can reach the endpoint at the network layer. Access is enforced at three layers: network (self-referencing SG), IAM role policy (scoped per compute resource), and endpoint policy (blanket ceiling on allowed actions for all compute principals — Lambda, ECS, EC2).",
+      "description": "An Anvil-managed AWS Interface VPC Endpoint. Creates one ENI per private subnet with private DNS enabled. The endpoint security group starts with zero rules. Passing this endpoint to a grant (e.g. queue.grantSendMessage(fn, { endpoint: sqsEndpoint })) adds a one-way ingress rule on port 443 from that compute's own security group, so only granted compute can reach the endpoint. Access is enforced at three layers: network (one-way SG rules per grant), IAM role policy (scoped per grant and limited to this endpoint with aws:SourceVpce), and endpoint policy (ceiling on allowed actions for principals in this account).",
       "inputProperties": {
         "overridePermissions": {
-          "description": "Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for all Anvil compute principals (Lambda, ECS, EC2). When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Resource defaults to \"*\" if omitted on a permission entry.",
+          "description": "Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for principals in this account. When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Every statement is limited to principals in this account. Resource defaults to \"*\" if omitted on a permission entry.",
           "items": {
             "$ref": "#/types/anvil:aws:VpcEndpointPermission"
           },
@@ -1009,14 +1009,19 @@
           "type": "string"
         },
         "securityGroupId": {
-          "description": "The ID of the dedicated security group attached to this endpoint. Uses a self-referencing ingress rule on port 443 — only compute resources with this SG explicitly attached can reach the endpoint at the network layer.",
+          "description": "The ID of the dedicated security group attached to this endpoint. It starts with zero rules; each grant that passes this endpoint adds ingress on port 443 from the granted compute's own security group.",
+          "type": "string"
+        },
+        "service": {
+          "description": "The AWS service this endpoint routes, e.g. \"sqs\". Grants check it against the service being granted.",
           "type": "string"
         }
       },
       "required": [
         "endpointId",
         "dnsName",
-        "securityGroupId"
+        "securityGroupId",
+        "service"
       ],
       "requiredInputs": [
         "vpcId",
@@ -2541,7 +2546,7 @@
       "type": "object"
     },
     "anvil:aws:DSQLVpcArgs": {
-      "description": "VPC configuration for DSQL. When set without hasNat, Anvil creates interface VPC endpoints per region so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.",
+      "description": "VPC configuration for DSQL. When set without hasNat, Anvil creates an interface VPC endpoint in the VPC's region (multiRegion requires hasNat) so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.",
       "properties": {
         "hasNat": {
           "description": "Signal that a NAT gateway already exists in this VPC. When true, Anvil skips interface endpoint creation — the Lambda routes to the public DSQL endpoint via NAT. When false (default), Anvil creates interface endpoints per region.",
@@ -3900,13 +3905,6 @@
           "$ref": "pulumi.json#/Any",
           "description": "The IDs of the private subnets to attach the Lambda to. Always private - Lambda must never be placed in public subnets. Accepts Output\u003cstring[]\u003e - pass vpc.privateSubnetIds directly."
         },
-        "vpcEndpoints": {
-          "description": "VPC endpoints this Lambda needs access to. Anvil wires both SG rules automatically.",
-          "items": {
-            "$ref": "#/types/anvil:aws:LambdaVpcEndpointArgs"
-          },
-          "type": "array"
-        },
         "vpcId": {
           "$ref": "pulumi.json#/Any",
           "description": "The ID of the VPC to place the Lambda in. Accepts Output\u003cstring\u003e - pass vpc.vpcId directly."
@@ -3935,24 +3933,6 @@
       "required": [
         "range",
         "ports"
-      ],
-      "type": "object"
-    },
-    "anvil:aws:LambdaVpcEndpointArgs": {
-      "description": "A VPC endpoint to grant this Lambda access to. Both fields accept Output\u003cstring\u003e - pass component outputs directly.",
-      "properties": {
-        "endpointId": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The endpoint's ID. Use ep.endpointId. Accepts Output\u003cstring\u003e."
-        },
-        "securityGroupId": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The endpoint's security group ID. Use ep.securityGroupId. Accepts Output\u003cstring\u003e."
-        }
-      },
-      "required": [
-        "securityGroupId",
-        "endpointId"
       ],
       "type": "object"
     },
@@ -4913,5 +4893,5 @@
       "type": "object"
     }
   },
-  "version": "0.1.24"
+  "version": "0.1.26"
 }

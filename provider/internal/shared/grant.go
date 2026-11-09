@@ -16,13 +16,6 @@ type GrantTarget interface {
 	// compute resource. Infra resources use this to create scoped IAM
 	// policies granting specific permissions.
 	RoleARN() pulumi.StringOutput
-
-	// SecurityGroupId returns the ID of the dedicated security group for this
-	// compute resource. Only populated when the resource is VPC-attached.
-	// Infra resources use this to create SecurityGroupIngressRule and
-	// SecurityGroupEgressRule resources via the vpcsg package.
-	// Returns an empty StringOutput for non-VPC resources.
-	SecurityGroupId() pulumi.StringOutput
 }
 
 // GrantOptions provides optional metadata for grant methods.

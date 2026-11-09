@@ -7,37 +7,37 @@ import { DynamoDB } from "./dynamoDB";
 
 declare module "./dynamoDB" {
     interface DynamoDB {
-        grantRead(target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string }): void;
-        grantWrite(target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string }): void;
-        grantReadWrite(target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string }): void;
-        grantDelete(target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string }): void;
+        grantRead(target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string; endpoint?: grants.GrantEndpoint }): void;
+        grantWrite(target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string; endpoint?: grants.GrantEndpoint }): void;
+        grantReadWrite(target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string; endpoint?: grants.GrantEndpoint }): void;
+        grantDelete(target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string; endpoint?: grants.GrantEndpoint }): void;
     }
 }
 
-DynamoDB.prototype.grantRead = function (this: DynamoDB, target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string }): void {
+DynamoDB.prototype.grantRead = function (this: DynamoDB, target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string; endpoint?: grants.GrantEndpoint }): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-read`;
     const indexPaths = opts?.indexes?.map((i) => `index/${i}`) ?? null;
     const arns = grants.buildResourceArns(this.tableArn, indexPaths);
-    grants.createGrant(this, name, target, ["dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Query", "dynamodb:Scan"], arns, { justification: opts?.justification });
+    grants.createGrant(this, name, target, ["dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Query", "dynamodb:Scan"], arns, { justification: opts?.justification, endpoint: opts?.endpoint }, "dynamodb");
 };
 
-DynamoDB.prototype.grantWrite = function (this: DynamoDB, target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string }): void {
+DynamoDB.prototype.grantWrite = function (this: DynamoDB, target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string; endpoint?: grants.GrantEndpoint }): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-write`;
     const indexPaths = opts?.indexes?.map((i) => `index/${i}`) ?? null;
     const arns = grants.buildResourceArns(this.tableArn, indexPaths);
-    grants.createGrant(this, name, target, ["dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:BatchWriteItem"], arns, { justification: opts?.justification });
+    grants.createGrant(this, name, target, ["dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:BatchWriteItem"], arns, { justification: opts?.justification, endpoint: opts?.endpoint }, "dynamodb");
 };
 
-DynamoDB.prototype.grantReadWrite = function (this: DynamoDB, target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string }): void {
+DynamoDB.prototype.grantReadWrite = function (this: DynamoDB, target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string; endpoint?: grants.GrantEndpoint }): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-readwrite`;
     const indexPaths = opts?.indexes?.map((i) => `index/${i}`) ?? null;
     const arns = grants.buildResourceArns(this.tableArn, indexPaths);
-    grants.createGrant(this, name, target, ["dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Query", "dynamodb:Scan", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:BatchWriteItem"], arns, { justification: opts?.justification });
+    grants.createGrant(this, name, target, ["dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Query", "dynamodb:Scan", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:BatchWriteItem"], arns, { justification: opts?.justification, endpoint: opts?.endpoint }, "dynamodb");
 };
 
-DynamoDB.prototype.grantDelete = function (this: DynamoDB, target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string }): void {
+DynamoDB.prototype.grantDelete = function (this: DynamoDB, target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string; endpoint?: grants.GrantEndpoint }): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-delete`;
     const indexPaths = opts?.indexes?.map((i) => `index/${i}`) ?? null;
     const arns = grants.buildResourceArns(this.tableArn, indexPaths);
-    grants.createGrant(this, name, target, ["dynamodb:DeleteItem"], arns, { justification: opts?.justification });
+    grants.createGrant(this, name, target, ["dynamodb:DeleteItem"], arns, { justification: opts?.justification, endpoint: opts?.endpoint }, "dynamodb");
 };

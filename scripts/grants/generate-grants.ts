@@ -67,10 +67,12 @@ function tsGrantMethod(
   config: GrantConfig,
   grant: GrantConfig['grants'][number]
 ): TsMethod {
-  const { className, arnProperty, supportsPaths, supportsIndexes } = config;
+  const { className, arnProperty, supportsPaths, supportsIndexes, endpointService } =
+    config;
   const { method, actions, isFullAccess } = grant;
   const suffix = grantSuffix(method);
   const acts = actionsLiteral(actions);
+  const svc = `"${endpointService}"`;
   const nameExpr =
     '`${grants.grantResourceName(this)}-${target.grantName()}-' + suffix + '`';
 
@@ -92,18 +94,18 @@ function tsGrantMethod(
     }
     const name = ${nameExpr};
     const arns = grants.buildResourceArns(this.${arnProperty}, undefined);
-    grants.createGrant(this, name, target, [${acts}], arns, opts);
+    grants.createGrant(this, name, target, [${acts}], arns, opts, ${svc});
 };`,
     };
   }
   if (supportsIndexes) {
     return {
-      signature: `${method}(target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string }): void;`,
-      impl: `${className}.prototype.${method} = function (this: ${className}, target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string }): void {
+      signature: `${method}(target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string; endpoint?: grants.GrantEndpoint }): void;`,
+      impl: `${className}.prototype.${method} = function (this: ${className}, target: grants.GrantTarget, opts?: { indexes?: string[]; justification?: string; endpoint?: grants.GrantEndpoint }): void {
     const name = ${nameExpr};
     const indexPaths = opts?.indexes?.map((i) => \`index/\${i}\`) ?? null;
     const arns = grants.buildResourceArns(this.${arnProperty}, indexPaths);
-    grants.createGrant(this, name, target, [${acts}], arns, { justification: opts?.justification });
+    grants.createGrant(this, name, target, [${acts}], arns, { justification: opts?.justification, endpoint: opts?.endpoint }, ${svc});
 };`,
     };
   }
@@ -113,7 +115,7 @@ function tsGrantMethod(
       impl: `${className}.prototype.${method} = function (this: ${className}, target: grants.GrantTarget, paths?: string[], opts?: grants.GrantOptions): void {
     const name = ${nameExpr};
     const arns = grants.buildResourceArns(this.${arnProperty}, paths);
-    grants.createGrant(this, name, target, [${acts}], arns, opts);
+    grants.createGrant(this, name, target, [${acts}], arns, opts, ${svc});
 };`,
     };
   }
@@ -122,7 +124,7 @@ function tsGrantMethod(
     impl: `${className}.prototype.${method} = function (this: ${className}, target: grants.GrantTarget, opts?: grants.GrantOptions): void {
     const name = ${nameExpr};
     const arns = grants.buildResourceArns(this.${arnProperty}, undefined);
-    grants.createGrant(this, name, target, [${acts}], arns, opts);
+    grants.createGrant(this, name, target, [${acts}], arns, opts, ${svc});
 };`,
   };
 }
@@ -139,6 +141,12 @@ function tsTargetMethods(config: GrantTargetConfig): TsMethod[] {
       signature: `grantRoleArn(): pulumi.Output<string>;`,
       impl: `${config.className}.prototype.grantRoleArn = function (this: ${config.className}): pulumi.Output<string> {
     return this.${config.roleArnProperty};
+};`,
+    },
+    {
+      signature: `grantSecurityGroupId(): pulumi.Output<string | undefined>;`,
+      impl: `${config.className}.prototype.grantSecurityGroupId = function (this: ${config.className}): pulumi.Output<string | undefined> {
+    return this.${config.securityGroupIdProperty};
 };`,
     },
   ];
@@ -280,40 +288,42 @@ function pyGrantMethod(
   config: GrantConfig,
   grant: GrantConfig['grants'][number]
 ): string {
-  const { arnProperty, supportsPaths, supportsIndexes } = config;
+  const { arnProperty, supportsPaths, supportsIndexes, endpointService } = config;
   const { method, actions, isFullAccess } = grant;
   const m = toSnakeCase(method);
   const arn = toSnakeCase(arnProperty);
   const suffix = grantSuffix(method);
   const acts = actionsLiteral(actions);
+  const svc = `"${endpointService}"`;
 
   if (isFullAccess) {
-    return `def ${m}(self, target, opts=None) -> None:
+    return `def ${m}(self, target, opts=None, endpoint=None) -> None:
+    opts = grants.merge_options(opts, endpoint=endpoint)
     if not opts or not opts.justification:
         pulumi.log.warn(f"⚠ {grants.grant_resource_name(self)} → {target.grant_name()}: full access granted with no justification.", self)
     else:
         pulumi.log.info(f"ℹ {grants.grant_resource_name(self)} → {target.grant_name()}: full access granted. Justification: \\"{opts.justification}\\"", self)
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-${suffix}"
     arns = grants.build_resource_arns(self.${arn}, None)
-    grants.create_grant(self, name, target, [${acts}], arns, opts)`;
+    grants.create_grant(self, name, target, [${acts}], arns, opts, service=${svc})`;
   }
   if (supportsIndexes) {
-    return `def ${m}(self, target, indexes=None, justification=None) -> None:
+    return `def ${m}(self, target, indexes=None, justification=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-${suffix}"
     index_paths = [f"index/{i}" for i in indexes] if indexes else None
     arns = grants.build_resource_arns(self.${arn}, index_paths)
-    grants.create_grant(self, name, target, [${acts}], arns, grants.GrantOptions(justification=justification) if justification else None)`;
+    grants.create_grant(self, name, target, [${acts}], arns, grants.merge_options(None, justification, endpoint), service=${svc})`;
   }
   if (supportsPaths) {
-    return `def ${m}(self, target, paths=None, opts=None) -> None:
+    return `def ${m}(self, target, paths=None, opts=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-${suffix}"
     arns = grants.build_resource_arns(self.${arn}, paths)
-    grants.create_grant(self, name, target, [${acts}], arns, opts)`;
+    grants.create_grant(self, name, target, [${acts}], arns, grants.merge_options(opts, endpoint=endpoint), service=${svc})`;
   }
-  return `def ${m}(self, target, opts=None) -> None:
+  return `def ${m}(self, target, opts=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-${suffix}"
     arns = grants.build_resource_arns(self.${arn}, None)
-    grants.create_grant(self, name, target, [${acts}], arns, opts)`;
+    grants.create_grant(self, name, target, [${acts}], arns, grants.merge_options(opts, endpoint=endpoint), service=${svc})`;
 }
 
 function pyTargetMethods(config: GrantTargetConfig): string {
@@ -323,7 +333,11 @@ function pyTargetMethods(config: GrantTargetConfig): string {
 
 
 def grant_role_arn(self):
-    return self.${arn}`;
+    return self.${arn}
+
+
+def grant_security_group_id(self):
+    return self.${config.pySecurityGroupIdProperty}`;
 }
 
 function pyCustomMethod(config: CustomGrantConfig): string {
@@ -379,6 +393,9 @@ function generatePython(): void {
     c.defs.push(pyTargetMethods(cfg));
     c.assigns.push(`${cfg.className}.grant_name = grant_name`);
     c.assigns.push(`${cfg.className}.grant_role_arn = grant_role_arn`);
+    c.assigns.push(
+      `${cfg.className}.grant_security_group_id = grant_security_group_id`
+    );
   }
   for (const cfg of CUSTOM_GRANT_CONFIGS) {
     const c = get(cfg.pyFile, 'DSQL');

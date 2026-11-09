@@ -193,6 +193,10 @@ def _wrap_component_class(cls: type) -> type:
             # the generated class declaring it. Read by *_grants.py companions.
             if isinstance(name, str):
                 self._anvil_name = name
+                # The constructor args, so grants can read plain inputs
+                # synchronously (e.g. a VpcEndpoint's service). Read via
+                # grants.ctor_input.
+                self._anvil_ctor = (args, kwargs)
             stack = get_active_stack()
             if stack is None or not isinstance(name, str):
                 return

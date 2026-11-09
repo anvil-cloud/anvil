@@ -14,5 +14,5 @@ declare module "./eventBus" {
 EventBus.prototype.grantPutEvents = function (this: EventBus, target: grants.GrantTarget, opts?: grants.GrantOptions): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-putevents`;
     const arns = grants.buildResourceArns(this.arn, undefined);
-    grants.createGrant(this, name, target, ["events:PutEvents"], arns, opts);
+    grants.createGrant(this, name, target, ["events:PutEvents"], arns, opts, "events");
 };

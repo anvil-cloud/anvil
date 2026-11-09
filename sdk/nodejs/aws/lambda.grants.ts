@@ -10,13 +10,14 @@ declare module "./lambda" {
         grantInvoke(target: grants.GrantTarget, opts?: grants.GrantOptions): void;
         grantName(): string;
         grantRoleArn(): pulumi.Output<string>;
+        grantSecurityGroupId(): pulumi.Output<string | undefined>;
     }
 }
 
 Lambda.prototype.grantInvoke = function (this: Lambda, target: grants.GrantTarget, opts?: grants.GrantOptions): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-invoke`;
     const arns = grants.buildResourceArns(this.arn, undefined);
-    grants.createGrant(this, name, target, ["lambda:InvokeFunction"], arns, opts);
+    grants.createGrant(this, name, target, ["lambda:InvokeFunction"], arns, opts, "lambda");
 };
 
 Lambda.prototype.grantName = function (this: Lambda): string {
@@ -25,4 +26,8 @@ Lambda.prototype.grantName = function (this: Lambda): string {
 
 Lambda.prototype.grantRoleArn = function (this: Lambda): pulumi.Output<string> {
     return this.roleArn;
+};
+
+Lambda.prototype.grantSecurityGroupId = function (this: Lambda): pulumi.Output<string | undefined> {
+    return this.securityGroupId;
 };

@@ -9,6 +9,7 @@ export const DYNAMODB_GRANT_CONFIG: GrantConfig = {
   pyFile: 'aws/dynamo_db.py',
   className: 'DynamoDB',
   arnProperty: 'tableArn',
+  endpointService: 'dynamodb',
   supportsPaths: false, // DynamoDB grants are always table + /index/* — no user-facing path scoping
   supportsIndexes: true,
   grants: [

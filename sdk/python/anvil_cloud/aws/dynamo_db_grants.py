@@ -6,32 +6,32 @@ from anvil_cloud import grants
 from .dynamo_db import DynamoDB
 
 
-def grant_read(self, target, indexes=None, justification=None) -> None:
+def grant_read(self, target, indexes=None, justification=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-read"
     index_paths = [f"index/{i}" for i in indexes] if indexes else None
     arns = grants.build_resource_arns(self.table_arn, index_paths)
-    grants.create_grant(self, name, target, ["dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Query", "dynamodb:Scan"], arns, grants.GrantOptions(justification=justification) if justification else None)
+    grants.create_grant(self, name, target, ["dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Query", "dynamodb:Scan"], arns, grants.merge_options(None, justification, endpoint), service="dynamodb")
 
 
-def grant_write(self, target, indexes=None, justification=None) -> None:
+def grant_write(self, target, indexes=None, justification=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-write"
     index_paths = [f"index/{i}" for i in indexes] if indexes else None
     arns = grants.build_resource_arns(self.table_arn, index_paths)
-    grants.create_grant(self, name, target, ["dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:BatchWriteItem"], arns, grants.GrantOptions(justification=justification) if justification else None)
+    grants.create_grant(self, name, target, ["dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:BatchWriteItem"], arns, grants.merge_options(None, justification, endpoint), service="dynamodb")
 
 
-def grant_read_write(self, target, indexes=None, justification=None) -> None:
+def grant_read_write(self, target, indexes=None, justification=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-readwrite"
     index_paths = [f"index/{i}" for i in indexes] if indexes else None
     arns = grants.build_resource_arns(self.table_arn, index_paths)
-    grants.create_grant(self, name, target, ["dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Query", "dynamodb:Scan", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:BatchWriteItem"], arns, grants.GrantOptions(justification=justification) if justification else None)
+    grants.create_grant(self, name, target, ["dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Query", "dynamodb:Scan", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:BatchWriteItem"], arns, grants.merge_options(None, justification, endpoint), service="dynamodb")
 
 
-def grant_delete(self, target, indexes=None, justification=None) -> None:
+def grant_delete(self, target, indexes=None, justification=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-delete"
     index_paths = [f"index/{i}" for i in indexes] if indexes else None
     arns = grants.build_resource_arns(self.table_arn, index_paths)
-    grants.create_grant(self, name, target, ["dynamodb:DeleteItem"], arns, grants.GrantOptions(justification=justification) if justification else None)
+    grants.create_grant(self, name, target, ["dynamodb:DeleteItem"], arns, grants.merge_options(None, justification, endpoint), service="dynamodb")
 
 
 DynamoDB.grant_read = grant_read

@@ -145,8 +145,9 @@ type DSQLSchemaArgs struct {
 }
 
 // DSQLVpcArgs configures VPC placement and network routing for DSQL.
-// When set without HasNat, Anvil creates interface VPC endpoints (PrivateLink)
-// per region so traffic stays on the AWS backbone.
+// When set without HasNat, Anvil creates an interface VPC endpoint (PrivateLink)
+// in the VPC's region so traffic stays on the AWS backbone. A VPC lives in one
+// region, so this cannot be combined with multiRegion (see validateVpc).
 // When HasNat is true, endpoint creation is skipped — traffic routes via
 // the existing NAT gateway to the public DSQL endpoint.
 // Anvil never creates the NAT gateway.
@@ -255,9 +256,9 @@ type DSQL struct {
 	VpcEndpointIds pulumi.StringMapOutput `pulumi:"vpcEndpointIds"`
 
 	// VpcEndpointSecurityGroupIds is a map of region to endpoint SG ID.
-	// Only populated when vpc is set and hasNat is false.
-	// Pass to LambdaVpcEndpointArgs.securityGroupId — membership of this SG
-	// is what lets the compute reach the endpoint on 5432.
+	// Only populated when vpc is set and hasNat is false. The SG starts with
+	// zero rules; grantConnect adds ingress 5432 from the granted compute's
+	// own SG, and egress 5432 on that compute's SG to this one.
 	VpcEndpointSecurityGroupIds pulumi.StringMapOutput `pulumi:"vpcEndpointSecurityGroupIds"`
 
 	// RolesTableName is the DynamoDB table name for role bootstrap.
@@ -376,6 +377,10 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 	isMultiRegion := args.MultiRegion != nil
 	var regions []string
 	var witnessRegion string
+
+	if err := validateVpc(args); err != nil {
+		return nil, err
+	}
 
 	if isMultiRegion {
 		regions = args.MultiRegion.Regions
@@ -523,10 +528,10 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 
 	// ── 6. VPC endpoints ───────────────────────────────────────────────────
 	// Only when vpc is set and hasNat is false.
-	// One interface endpoint per region with a dedicated SG.
-	// Self-referencing ingress and egress on port 5432 (Postgres): compute
-	// that joins the SG (vpc.vpcEndpoints) can reach the endpoint ENIs.
-	// See wireEndpointSecurityGroup for why this is not on grantConnect.
+	// One interface endpoint in the VPC's region, with a dedicated SG that
+	// starts with zero rules. grantConnect wires the network per grant:
+	// ingress 5432 on this SG from the compute's own SG, and egress 5432 on
+	// the compute's SG to this one. Compute never carries this SG.
 	//
 	// The endpoint service name is cluster-specific:
 	// com.amazonaws.{region}.dsql-{hex} — exposed as cluster.VpcEndpointServiceName.
@@ -549,10 +554,6 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 			)
 			if err != nil {
 				return nil, fmt.Errorf("creating VPC endpoint SG for %s: %w", region, err)
-			}
-
-			if err := wireEndpointSecurityGroup(ctx, name, region, sg.ID().ToStringOutput(), d); err != nil {
-				return nil, err
 			}
 
 			endpointOpts := resourceOpts(region)
@@ -1254,49 +1255,16 @@ type DSQLConnectRole struct {
 	RoleName string
 }
 
-// wireEndpointSecurityGroup adds self-referencing ingress and egress on TCP
-// 5432 to a DSQL interface endpoint's SG.
-//
-// Compute reaches the endpoint by joining this SG (Lambda vpc.vpcEndpoints
-// attaches it to the function's ENIs). Security group rules apply to every
-// ENI in the group, so the self-referencing egress lets members open 5432 to
-// the endpoint ENIs, and the self-referencing ingress lets the endpoint ENIs
-// accept it.
-//
-// The egress lives here rather than on GrantConnect so that Go, TypeScript
-// and Python all get it from one place. The SDK grantConnect cannot add a
-// per-region rule itself: the region keys of VpcEndpointSecurityGroupIds are
-// unknown to it at graph construction time, and Pulumi resources cannot be
-// created inside an apply. Membership is required either way (the endpoint
-// SG's ingress only admits members), so a member-scoped egress grants no more
-// than a per-target egress from the member's own SG to this SG would.
-func wireEndpointSecurityGroup(
-	ctx *pulumi.Context,
-	name, region string,
-	sgID pulumi.StringOutput,
-	parent pulumi.Resource,
-) error {
-	if err := vpcsg.AddIngressRule(
-		ctx,
-		fmt.Sprintf("%s-vpce-%s-self-ingress", name, region),
-		sgID,
-		sgID,
-		5432, 5432,
-		"tcp",
-		parent,
-	); err != nil {
-		return fmt.Errorf("creating self-referencing ingress for %s: %w", region, err)
-	}
-	if err := vpcsg.AddEgressRule(
-		ctx,
-		fmt.Sprintf("%s-vpce-%s-self", name, region),
-		sgID,
-		sgID,
-		5432, 5432,
-		"tcp",
-		parent,
-	); err != nil {
-		return fmt.Errorf("creating self-referencing egress for %s: %w", region, err)
+// validateVpc rejects multiRegion combined with VPC endpoints. A VPC lives in
+// one region, so an interface endpoint for the second region's cluster cannot
+// be created in it. With hasNat, no endpoints are created, so it is allowed.
+func validateVpc(args DSQLArgs) error {
+	if args.MultiRegion != nil && args.Vpc != nil && !args.Vpc.HasNat {
+		return fmt.Errorf(
+			"dsql: vpc without hasNat cannot be combined with multiRegion. " +
+				"A VPC lives in one region, so Anvil cannot create the second region's VPC endpoint in it. " +
+				"Set vpc.hasNat to route through NAT to the public endpoints, or drop multiRegion",
+		)
 	}
 	return nil
 }
@@ -1310,10 +1278,8 @@ func wireEndpointSecurityGroup(
 //  2. IAM-to-role mappings — one DynamoDB item per role, triggering the
 //     bootstrap Lambda to run: AWS IAM GRANT "<role>" TO 'arn:...'
 //
-// Network access is not wired here. When vpc endpoints were created (hasNat
-// false), the target must declare the endpoint SGs in vpc.vpcEndpoints at
-// construction time; the endpoint SG's self-referencing rules on 5432 then
-// let it reach the endpoint (see wireEndpointSecurityGroup).
+// Network access is not wired here; the SDK grantConnect methods add the
+// per-grant SG rules on 5432 when the cluster has a VPC endpoint.
 func (d *DSQL) GrantConnect(
 	ctx *pulumi.Context,
 	target provider.GrantTarget,
@@ -1705,8 +1671,8 @@ func appendSchemasToManifest(name string, schemas []DSQLSchemaArgs) error {
 //   Unlike SSM, SQS, and other standard services where the service name is
 //   fixed (com.amazonaws.{region}.sqs), DSQL's service name is cluster-specific:
 //   com.amazonaws.{region}.dsql-{hex}. It is exposed as cluster.VpcEndpointServiceName.
-//   This is why DSQL cannot use the existing AwsVpcEndpointService enum or
-//   the existing VpcEndpoint component.
+//   This is why DSQL cannot use the existing VpcEndpoint component, which
+//   builds the service name from a fixed service string.
 //
 // BACKUP CROSS-REGION COPY (docs):
 //   AWS Backup does not automatically replicate across regions. Without a
@@ -1716,15 +1682,14 @@ func appendSchemasToManifest(name string, schemas []DSQLSchemaArgs) error {
 //
 // PRIVATELINK PORT (docs):
 //   DSQL VPC endpoints use port 5432 (Postgres wire protocol), not 443 like
-//   most AWS service endpoints (SSM, SQS, Secrets Manager). The self-referencing
-//   ingress rule and Lambda egress rules are wired on 5432. Do not change to 443.
+//   most AWS service endpoints (SSM, SQS, Secrets Manager). The per-grant
+//   ingress and egress rules are wired on 5432. Do not change to 443.
 //
-// GRANTCONNECT AND VPC SG ATTACHMENT (docs):
-//   GrantConnect wires the egress rule from the target SG to the DSQL endpoint
-//   SG. However, it cannot attach the endpoint SG to the target's vpcConfig —
-//   that is set at construction time and cannot be modified post-deploy
-//   without replacing the resource. The user must declare the DSQL endpoint SGs
-//   in vpc.vpcEndpoints on the target when constructing it.
+// GRANTCONNECT AND VPC SG RULES (docs):
+//   The SDK grantConnect adds two standalone rules per grant: ingress 5432 on
+//   the endpoint SG from the target's own SG, and egress 5432 on the target's
+//   SG to the endpoint SG. The endpoint SG is never attached to the target, so
+//   targets never trust each other and Lambda's 5-SG limit is not consumed.
 //
 // DYNAMODB TABLE NAMING (frontend reference):
 //   Table name: {stage}-{componentName}-dsql-roles-{stageId}

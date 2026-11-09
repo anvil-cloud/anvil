@@ -6,26 +6,27 @@ from anvil_cloud import grants
 from .queue import Queue
 
 
-def grant_send_message(self, target, opts=None) -> None:
+def grant_send_message(self, target, opts=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-sendmessage"
     arns = grants.build_resource_arns(self.arn, None)
-    grants.create_grant(self, name, target, ["sqs:SendMessage"], arns, opts)
+    grants.create_grant(self, name, target, ["sqs:SendMessage"], arns, grants.merge_options(opts, endpoint=endpoint), service="sqs")
 
 
-def grant_consume_messages(self, target, opts=None) -> None:
+def grant_consume_messages(self, target, opts=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-consumemessages"
     arns = grants.build_resource_arns(self.arn, None)
-    grants.create_grant(self, name, target, ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"], arns, opts)
+    grants.create_grant(self, name, target, ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"], arns, grants.merge_options(opts, endpoint=endpoint), service="sqs")
 
 
-def grant_full_access(self, target, opts=None) -> None:
+def grant_full_access(self, target, opts=None, endpoint=None) -> None:
+    opts = grants.merge_options(opts, endpoint=endpoint)
     if not opts or not opts.justification:
         pulumi.log.warn(f"⚠ {grants.grant_resource_name(self)} → {target.grant_name()}: full access granted with no justification.", self)
     else:
         pulumi.log.info(f"ℹ {grants.grant_resource_name(self)} → {target.grant_name()}: full access granted. Justification: \"{opts.justification}\"", self)
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-fullaccess"
     arns = grants.build_resource_arns(self.arn, None)
-    grants.create_grant(self, name, target, ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "sqs:ChangeMessageVisibility", "sqs:PurgeQueue"], arns, opts)
+    grants.create_grant(self, name, target, ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "sqs:ChangeMessageVisibility", "sqs:PurgeQueue"], arns, opts, service="sqs")
 
 
 Queue.grant_send_message = grant_send_message

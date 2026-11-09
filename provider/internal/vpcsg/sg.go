@@ -27,7 +27,8 @@ type VpcPlacementArgs struct {
 // AWS creates a default allow-all egress rule on every new security group.
 // Pulumi removes this automatically when no inline egress rules are specified,
 // which is the behaviour we rely on here. Nothing is reachable or can reach
-// anything until explicitly granted via AddIngressRule / AddEgressRule.
+// anything until explicitly granted. SG-to-SG rules for VPC endpoints are
+// created by the SDK grants runtime (one ingress + one egress rule per grant).
 //
 // Named: ${stage}-${name}-sg-${stageId}
 func CreateSecurityGroup(
@@ -56,106 +57,11 @@ func CreateSecurityGroup(
 	return sg, nil
 }
 
-// AddIngressRule creates a SecurityGroupIngressRule allowing traffic into
-// the target security group from the source security group.
-//
-// Uses aws.vpc.SecurityGroupIngressRule (current Pulumi best practice) —
-// not inline rules, not the legacy SecurityGroupRule resource.
-// One rule resource per source SG reference.
-func AddIngressRule(
-	ctx *pulumi.Context,
-	name string,
-	securityGroupId pulumi.StringInput,
-	referencedSecurityGroupId pulumi.StringInput,
-	fromPort int,
-	toPort int,
-	protocol string,
-	parent pulumi.Resource,
-) error {
-	_, err := awsvpc.NewSecurityGroupIngressRule(ctx, name+"-ingress", &awsvpc.SecurityGroupIngressRuleArgs{
-		SecurityGroupId:           securityGroupId,
-		ReferencedSecurityGroupId: referencedSecurityGroupId,
-		FromPort:                  pulumi.Int(fromPort),
-		ToPort:                    pulumi.Int(toPort),
-		IpProtocol:                pulumi.String(protocol),
-		Tags: pulumi.StringMap{
-			"ManagedBy": pulumi.String("anvil"),
-		},
-	}, pulumi.Parent(parent))
-	if err != nil {
-		return fmt.Errorf("failed to create ingress rule %s: %w", name, err)
-	}
-	return nil
-}
-
-// AddIngressCIDRRule creates a SecurityGroupIngressRule allowing traffic into
-// the target security group from a specific CIDR range.
-//
-// Used by VpcEndpoint to scope ingress to the VPC CIDR at creation time.
-// This fires once when the endpoint is created — compute resources only
-// add egress rules pointing at the endpoint SG, never touching its ingress.
-func AddIngressCIDRRule(
-	ctx *pulumi.Context,
-	name string,
-	securityGroupId pulumi.StringInput,
-	cidr pulumi.StringInput,
-	fromPort int,
-	toPort int,
-	parent pulumi.Resource,
-) error {
-	_, err := awsvpc.NewSecurityGroupIngressRule(ctx, name+"-cidr-ingress", &awsvpc.SecurityGroupIngressRuleArgs{
-		SecurityGroupId: securityGroupId,
-		CidrIpv4:        cidr,
-		FromPort:        pulumi.Int(fromPort),
-		ToPort:          pulumi.Int(toPort),
-		IpProtocol:      pulumi.String("tcp"),
-		Tags: pulumi.StringMap{
-			"ManagedBy": pulumi.String("anvil"),
-		},
-	}, pulumi.Parent(parent))
-	if err != nil {
-		return fmt.Errorf("failed to create CIDR ingress rule %s: %w", name, err)
-	}
-	return nil
-}
-
-// AddEgressRule creates a SecurityGroupEgressRule allowing traffic out of
-// the source security group to the target security group.
-//
-// Uses aws.vpc.SecurityGroupEgressRule (current Pulumi best practice) —
-// not inline rules, not the legacy SecurityGroupRule resource.
-// One rule resource per destination SG reference.
-func AddEgressRule(
-	ctx *pulumi.Context,
-	name string,
-	securityGroupId pulumi.StringInput,
-	referencedSecurityGroupId pulumi.StringInput,
-	fromPort int,
-	toPort int,
-	protocol string,
-	parent pulumi.Resource,
-) error {
-	_, err := awsvpc.NewSecurityGroupEgressRule(ctx, name+"-egress", &awsvpc.SecurityGroupEgressRuleArgs{
-		SecurityGroupId:           securityGroupId,
-		ReferencedSecurityGroupId: referencedSecurityGroupId,
-		FromPort:                  pulumi.Int(fromPort),
-		ToPort:                    pulumi.Int(toPort),
-		IpProtocol:                pulumi.String(protocol),
-		Tags: pulumi.StringMap{
-			"ManagedBy": pulumi.String("anvil"),
-		},
-	}, pulumi.Parent(parent))
-	if err != nil {
-		return fmt.Errorf("failed to create egress rule %s: %w", name, err)
-	}
-	return nil
-}
-
 // AddInternetEgressRule creates a SecurityGroupEgressRule allowing outbound
 // internet traffic from the compute resource's security group to 0.0.0.0/0.
 //
-// Used when hasNat is true. Not used for SG-to-SG grants —
-// use AddEgressRule for those.
+// Used when hasNat is true. SG-to-SG rules for VPC endpoints are created by
+// the SDK grants runtime, not here.
 //
 // fromPort and toPort are inclusive. Pass 0 and 65535 for all ports.
 func AddInternetEgressRule(

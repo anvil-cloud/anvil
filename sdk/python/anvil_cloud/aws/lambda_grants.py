@@ -6,10 +6,10 @@ from anvil_cloud import grants
 from .lambda_ import Lambda
 
 
-def grant_invoke(self, target, opts=None) -> None:
+def grant_invoke(self, target, opts=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-invoke"
     arns = grants.build_resource_arns(self.arn, None)
-    grants.create_grant(self, name, target, ["lambda:InvokeFunction"], arns, opts)
+    grants.create_grant(self, name, target, ["lambda:InvokeFunction"], arns, grants.merge_options(opts, endpoint=endpoint), service="lambda")
 
 
 def grant_name(self) -> str:
@@ -20,6 +20,11 @@ def grant_role_arn(self):
     return self.role_arn
 
 
+def grant_security_group_id(self):
+    return self.security_group_id
+
+
 Lambda.grant_invoke = grant_invoke
 Lambda.grant_name = grant_name
 Lambda.grant_role_arn = grant_role_arn
+Lambda.grant_security_group_id = grant_security_group_id

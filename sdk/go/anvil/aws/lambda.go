@@ -23,7 +23,7 @@ type Lambda struct {
 	FunctionUrl pulumi.StringPtrOutput `pulumi:"functionUrl"`
 	// The ARN of the Lambda's IAM execution role.
 	RoleArn pulumi.StringOutput `pulumi:"roleArn"`
-	// The ID of the dedicated security group created for this Lambda. Only populated when vpc is set. Use this to grant other resources access to this Lambda via the grant system.
+	// The ID of the dedicated security group created for this Lambda. Only populated when vpc is set. It is the only security group on the function's ENIs. Grants that pass a VPC endpoint add egress rules to it.
 	SecurityGroupId pulumi.StringPtrOutput `pulumi:"securityGroupId"`
 }
 
@@ -210,7 +210,7 @@ func (o LambdaOutput) RoleArn() pulumi.StringOutput {
 	return o.ApplyT(func(v *Lambda) pulumi.StringOutput { return v.RoleArn }).(pulumi.StringOutput)
 }
 
-// The ID of the dedicated security group created for this Lambda. Only populated when vpc is set. Use this to grant other resources access to this Lambda via the grant system.
+// The ID of the dedicated security group created for this Lambda. Only populated when vpc is set. It is the only security group on the function's ENIs. Grants that pass a VPC endpoint add egress rules to it.
 func (o LambdaOutput) SecurityGroupId() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *Lambda) pulumi.StringPtrOutput { return v.SecurityGroupId }).(pulumi.StringPtrOutput)
 }

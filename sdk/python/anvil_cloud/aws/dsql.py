@@ -37,7 +37,7 @@ class DSQLArgs:
         :param pulumi.Input[_builtins.bool] prune_unmanaged_roles: Also drop database roles that aren't declared in schemas and weren't created by Anvil (made by hand in SQL, or by another tool). Roles Anvil created are always dropped once they're removed from schemas. Defaults to false: unmanaged roles are only reported when you deploy. admin and dbowner are never touched.
         :param pulumi.Input[Sequence[pulumi.Input['DSQLSchemaArgs']]] schemas: Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
         :param pulumi.Input['DSQLStreamArgsArgs'] stream: Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
-        :param pulumi.Input['DSQLVpcArgsArgs'] vpc: Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
+        :param pulumi.Input['DSQLVpcArgsArgs'] vpc: Optional VPC configuration. When set without hasNat, Anvil creates an interface VPC endpoint (PrivateLink) in the VPC's region so traffic stays on the AWS backbone, and grantConnect wires per-grant security group rules on port 5432. Cannot be combined with multiRegion unless hasNat is set, because a VPC lives in one region. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
         """
         if backup is not None:
             pulumi.set(__self__, "backup", backup)
@@ -127,7 +127,7 @@ class DSQLArgs:
     @pulumi.getter
     def vpc(self) -> Optional[pulumi.Input['DSQLVpcArgsArgs']]:
         """
-        Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
+        Optional VPC configuration. When set without hasNat, Anvil creates an interface VPC endpoint (PrivateLink) in the VPC's region so traffic stays on the AWS backbone, and grantConnect wires per-grant security group rules on port 5432. Cannot be combined with multiRegion unless hasNat is set, because a VPC lives in one region. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
         """
         return pulumi.get(self, "vpc")
 
@@ -161,7 +161,7 @@ class DSQL(pulumi.ComponentResource):
         :param pulumi.Input[_builtins.bool] prune_unmanaged_roles: Also drop database roles that aren't declared in schemas and weren't created by Anvil (made by hand in SQL, or by another tool). Roles Anvil created are always dropped once they're removed from schemas. Defaults to false: unmanaged roles are only reported when you deploy. admin and dbowner are never touched.
         :param pulumi.Input[Sequence[pulumi.Input[Union['DSQLSchemaArgs', 'DSQLSchemaArgsDict']]]] schemas: Schemas and the tables within them. Anvil creates each schema and table (additive-only — new tables/columns/indexes are applied; removals are left to humans). Omit to skip table management.
         :param pulumi.Input[Union['DSQLStreamArgsArgs', 'DSQLStreamArgsArgsDict']] stream: Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
-        :param pulumi.Input[Union['DSQLVpcArgsArgs', 'DSQLVpcArgsArgsDict']] vpc: Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
+        :param pulumi.Input[Union['DSQLVpcArgsArgs', 'DSQLVpcArgsArgsDict']] vpc: Optional VPC configuration. When set without hasNat, Anvil creates an interface VPC endpoint (PrivateLink) in the VPC's region so traffic stays on the AWS backbone, and grantConnect wires per-grant security group rules on port 5432. Cannot be combined with multiRegion unless hasNat is set, because a VPC lives in one region. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
         """
         ...
     @overload
@@ -289,7 +289,7 @@ class DSQL(pulumi.ComponentResource):
     @pulumi.getter(name="vpcEndpointIds")
     def vpc_endpoint_ids(self) -> pulumi.Output[Mapping[str, _builtins.str]]:
         """
-        Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.
+        Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false.
         """
         return pulumi.get(self, "vpc_endpoint_ids")
 
@@ -297,7 +297,7 @@ class DSQL(pulumi.ComponentResource):
     @pulumi.getter(name="vpcEndpointSecurityGroupIds")
     def vpc_endpoint_security_group_ids(self) -> pulumi.Output[Mapping[str, _builtins.str]]:
         """
-        Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.
+        Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. The SG starts with zero rules; grantConnect adds ingress on port 5432 from the granted compute's own security group.
         """
         return pulumi.get(self, "vpc_endpoint_security_group_ids")
 

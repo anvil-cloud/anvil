@@ -65,7 +65,7 @@ code references resources directly. Two things to know:
 
 ## Grants
 
-Grants are how Anvil wires permissions between resources. Instead of writing IAM policies by hand, you call `.grant()` on a resource and Anvil handles both the IAM role policy and the environment variable injection automatically.
+Grants are how Anvil wires permissions between resources. Instead of writing IAM policies by hand, you call a grant method on the resource being accessed, and Anvil creates a least-privilege IAM policy on the target's role.
 
 A Lambda reading from a Bucket:
 
@@ -75,29 +75,67 @@ import * as anvil from '@anvil-cloud/sdk';
 
 export default new App({
   run(ctx) {
-    const bucket = new anvil.aws.Bucket('uploads', {
-      dataClassification: 'sensitive',
-    });
+    const bucket = new anvil.aws.Bucket('uploads', {});
 
     const fn = new anvil.aws.Lambda('processor', {
-      runtime: 'nodejs20.x',
+      runtime: 'nodejs24.x',
       handler: 'src/index.handler',
+      environment: { BUCKET_NAME: bucket.bucketName },
     });
 
-    // Grants the Lambda read access to the bucket and scopes down to specific bucket paths
-    // Anvil creates the IAM policy and injects UPLOADS_BUCKET_NAME
-    // into the Lambda's environment automatically.
-    //
-    bucket.grant(fn, { actions: ['read'], path: ['user/*'] });
+    // s3:GetObject + s3:ListBucket on the bucket, scoped to user/*
+    bucket.grantRead(fn, ['user/*']);
   },
 });
 ```
 
 What Anvil does under the hood:
 
-- Creates an IAM `RolePolicy` scoped to the exact actions requested
-- Injects the resource identifier as an environment variable on the target (e.g. `UPLOADS_BUCKET_NAME`)
-- No manual ARN wiring, no forgotten permissions
+- Creates an IAM `RolePolicy` on the target's role, scoped to the exact actions and resources
+- No manual ARN wiring, no hand-written policy JSON
+
+### Through a VPC endpoint
+
+When a Lambda runs in a VPC and reaches an AWS service through an Anvil `VpcEndpoint`, pass the endpoint on the grant:
+
+```typescript
+const vpc = new anvil.aws.Vpc('core', {});
+const net = { vpcId: vpc.vpcId, privateSubnetIds: vpc.privateSubnetIds };
+
+const sqsEndpoint = new anvil.aws.VpcEndpoint('sqs', { ...net, service: 'sqs' });
+const queue = new anvil.aws.Queue('orders', {});
+const fn = new anvil.aws.Lambda('processor', {
+  runtime: 'nodejs24.x',
+  handler: 'src/index.handler',
+  vpc: net,
+});
+
+queue.grantSendMessage(fn, { endpoint: sqsEndpoint });
+```
+
+The grant then also:
+
+- adds ingress 443 on the endpoint's security group from the Lambda's own security group, and egress 443 on the Lambda's security group to the endpoint (once per Lambda and endpoint, however many grants share them);
+- limits the IAM statement to that endpoint with `aws:SourceVpce`, so the permission doesn't work if the credentials are used from anywhere else.
+
+The Lambda only ever carries its own security group, so compute sharing an endpoint can't reach each other. The endpoint's `service` must match the grant (`sqs` for a queue, `s3` for a bucket, and so on), or the grant fails at preview. With private DNS, every call to that service from inside the VPC resolves to the endpoint, so grant every Lambda that uses the service through it, even if the VPC also has NAT.
+
+`dsql.grantConnect(fn, ...)` does the same on port 5432 when the cluster was created with `vpc` and without `hasNat`.
+
+### Services without an Anvil component
+
+For services like Secrets Manager, KMS, SSM, STS, ECR or CloudWatch Logs, use `grantEndpointAccess`:
+
+```typescript
+const secretsEndpoint = new anvil.aws.VpcEndpoint('secrets', { ...net, service: 'secretsmanager' });
+
+anvil.grantEndpointAccess(fn, secretsEndpoint, {
+  actions: ['secretsmanager:GetSecretValue'],
+  resources: [dbSecretArn],
+});
+```
+
+It opens the same security group rules as a resource grant. With `actions` and `resources`, it also adds an IAM statement limited to the endpoint with `aws:SourceVpce`. Every action must belong to the endpoint's service. Leave both out to open the network only, when the IAM permissions come from elsewhere.
 
 ## SvelteKit deployment
 

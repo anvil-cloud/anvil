@@ -79,7 +79,7 @@
           "type": "string"
         },
         "securityGroupId": {
-          "description": "The ID of the dedicated security group created for this Lambda. Only populated when vpc is set. Use this to grant other resources access to this Lambda via the grant system.",
+          "description": "The ID of the dedicated security group created for this Lambda. Only populated when vpc is set. It is the only security group on the function's ENIs. Grants that pass a VPC endpoint add egress rules to it.",
           "type": "string"
         }
       },
@@ -464,13 +464,6 @@
           "$ref": "pulumi.json#/Any",
           "description": "The IDs of the private subnets to attach the Lambda to. Always private - Lambda must never be placed in public subnets. Accepts Output\u003cstring[]\u003e - pass vpc.privateSubnetIds directly."
         },
-        "vpcEndpoints": {
-          "description": "VPC endpoints this Lambda needs access to. Anvil wires both SG rules automatically.",
-          "items": {
-            "$ref": "#/types/anvil:aws:LambdaVpcEndpointArgs"
-          },
-          "type": "array"
-        },
         "vpcId": {
           "$ref": "pulumi.json#/Any",
           "description": "The ID of the VPC to place the Lambda in. Accepts Output\u003cstring\u003e - pass vpc.vpcId directly."
@@ -499,24 +492,6 @@
       "required": [
         "range",
         "ports"
-      ],
-      "type": "object"
-    },
-    "anvil:aws:LambdaVpcEndpointArgs": {
-      "description": "A VPC endpoint to grant this Lambda access to. Both fields accept Output\u003cstring\u003e - pass component outputs directly.",
-      "properties": {
-        "endpointId": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The endpoint's ID. Use ep.endpointId. Accepts Output\u003cstring\u003e."
-        },
-        "securityGroupId": {
-          "$ref": "pulumi.json#/Any",
-          "description": "The endpoint's security group ID. Use ep.securityGroupId. Accepts Output\u003cstring\u003e."
-        }
-      },
-      "required": [
-        "securityGroupId",
-        "endpointId"
       ],
       "type": "object"
     }
