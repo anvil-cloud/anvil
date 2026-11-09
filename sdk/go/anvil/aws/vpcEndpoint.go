@@ -52,6 +52,8 @@ func NewVpcEndpoint(ctx *pulumi.Context,
 }
 
 type vpcEndpointArgs struct {
+	// Adds, on the endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default, and an endpoint only replies so it never needs it: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+	AllowAllOutbound *bool `pulumi:"allowAllOutbound"`
 	// Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for principals in this account. When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Every statement is limited to principals in this account. Resource defaults to "*" if omitted on a permission entry.
 	OverridePermissions []VpcEndpointPermission `pulumi:"overridePermissions"`
 	// The IDs of the private subnets to attach the endpoint to. AWS places one ENI per subnet. Pass all private subnet IDs from your VPC — typically one per AZ.
@@ -64,6 +66,8 @@ type vpcEndpointArgs struct {
 
 // The set of arguments for constructing a VpcEndpoint resource.
 type VpcEndpointArgs struct {
+	// Adds, on the endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default, and an endpoint only replies so it never needs it: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+	AllowAllOutbound pulumi.BoolPtrInput
 	// Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for principals in this account. When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Every statement is limited to principals in this account. Resource defaults to "*" if omitted on a permission entry.
 	OverridePermissions VpcEndpointPermissionArrayInput
 	// The IDs of the private subnets to attach the endpoint to. AWS places one ENI per subnet. Pass all private subnet IDs from your VPC — typically one per AZ.

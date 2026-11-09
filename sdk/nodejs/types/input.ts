@@ -876,6 +876,10 @@ export namespace aws {
      */
     export interface DSQLVpcArgsArgs {
         /**
+         * Adds, on the VPC endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+         */
+        allowAllOutbound?: pulumi.Input<boolean>;
+        /**
          * Signal that a NAT gateway already exists in this VPC. When true, Anvil skips interface endpoint creation — the Lambda routes to the public DSQL endpoint via NAT. When false (default), Anvil creates interface endpoints per region.
          */
         hasNat?: pulumi.Input<boolean>;
@@ -1740,6 +1744,10 @@ export namespace aws {
     }
 
     export interface LambdaVpcArgsArgs {
+        /**
+         * Adds the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+         */
+        allowAllOutbound?: pulumi.Input<boolean>;
         /**
          * CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.
          */

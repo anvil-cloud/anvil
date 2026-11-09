@@ -7126,6 +7126,8 @@ func (o DSQLTableArrayOutput) Index(i pulumi.IntInput) DSQLTableOutput {
 
 // VPC configuration for DSQL. When set without hasNat, Anvil creates an interface VPC endpoint in the VPC's region (multiRegion requires hasNat) so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
 type DSQLVpcArgs struct {
+	// Adds, on the VPC endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+	AllowAllOutbound *bool `pulumi:"allowAllOutbound"`
 	// Signal that a NAT gateway already exists in this VPC. When true, Anvil skips interface endpoint creation — the Lambda routes to the public DSQL endpoint via NAT. When false (default), Anvil creates interface endpoints per region.
 	HasNat *bool `pulumi:"hasNat"`
 	// The IDs of the private subnets to attach the endpoint ENIs to. One ENI is created per subnet. Pass all private subnet IDs — typically one per AZ. Accepts Output<string[]> — pass vpc.privateSubnetIds directly.
@@ -7147,6 +7149,8 @@ type DSQLVpcArgsInput interface {
 
 // VPC configuration for DSQL. When set without hasNat, Anvil creates an interface VPC endpoint in the VPC's region (multiRegion requires hasNat) so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
 type DSQLVpcArgsArgs struct {
+	// Adds, on the VPC endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+	AllowAllOutbound pulumi.BoolPtrInput `pulumi:"allowAllOutbound"`
 	// Signal that a NAT gateway already exists in this VPC. When true, Anvil skips interface endpoint creation — the Lambda routes to the public DSQL endpoint via NAT. When false (default), Anvil creates interface endpoints per region.
 	HasNat pulumi.BoolPtrInput `pulumi:"hasNat"`
 	// The IDs of the private subnets to attach the endpoint ENIs to. One ENI is created per subnet. Pass all private subnet IDs — typically one per AZ. Accepts Output<string[]> — pass vpc.privateSubnetIds directly.
@@ -7233,6 +7237,11 @@ func (o DSQLVpcArgsOutput) ToDSQLVpcArgsPtrOutputWithContext(ctx context.Context
 	}).(DSQLVpcArgsPtrOutput)
 }
 
+// Adds, on the VPC endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+func (o DSQLVpcArgsOutput) AllowAllOutbound() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v DSQLVpcArgs) *bool { return v.AllowAllOutbound }).(pulumi.BoolPtrOutput)
+}
+
 // Signal that a NAT gateway already exists in this VPC. When true, Anvil skips interface endpoint creation — the Lambda routes to the public DSQL endpoint via NAT. When false (default), Anvil creates interface endpoints per region.
 func (o DSQLVpcArgsOutput) HasNat() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v DSQLVpcArgs) *bool { return v.HasNat }).(pulumi.BoolPtrOutput)
@@ -7270,6 +7279,16 @@ func (o DSQLVpcArgsPtrOutput) Elem() DSQLVpcArgsOutput {
 		var ret DSQLVpcArgs
 		return ret
 	}).(DSQLVpcArgsOutput)
+}
+
+// Adds, on the VPC endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+func (o DSQLVpcArgsPtrOutput) AllowAllOutbound() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *DSQLVpcArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.AllowAllOutbound
+	}).(pulumi.BoolPtrOutput)
 }
 
 // Signal that a NAT gateway already exists in this VPC. When true, Anvil skips interface endpoint creation — the Lambda routes to the public DSQL endpoint via NAT. When false (default), Anvil creates interface endpoints per region.
@@ -14046,6 +14065,8 @@ func (o LambdaPermissionArrayOutput) Index(i pulumi.IntInput) LambdaPermissionOu
 }
 
 type LambdaVpcArgs struct {
+	// Adds the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+	AllowAllOutbound *bool `pulumi:"allowAllOutbound"`
 	// CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.
 	Cidrs []LambdaVpcCidrArgs `pulumi:"cidrs"`
 	// Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
@@ -14068,6 +14089,8 @@ type LambdaVpcArgsInput interface {
 }
 
 type LambdaVpcArgsArgs struct {
+	// Adds the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+	AllowAllOutbound pulumi.BoolPtrInput `pulumi:"allowAllOutbound"`
 	// CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.
 	Cidrs LambdaVpcCidrArgsArrayInput `pulumi:"cidrs"`
 	// Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
@@ -14155,6 +14178,11 @@ func (o LambdaVpcArgsOutput) ToLambdaVpcArgsPtrOutputWithContext(ctx context.Con
 	}).(LambdaVpcArgsPtrOutput)
 }
 
+// Adds the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+func (o LambdaVpcArgsOutput) AllowAllOutbound() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v LambdaVpcArgs) *bool { return v.AllowAllOutbound }).(pulumi.BoolPtrOutput)
+}
+
 // CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.
 func (o LambdaVpcArgsOutput) Cidrs() LambdaVpcCidrArgsArrayOutput {
 	return o.ApplyT(func(v LambdaVpcArgs) []LambdaVpcCidrArgs { return v.Cidrs }).(LambdaVpcCidrArgsArrayOutput)
@@ -14197,6 +14225,16 @@ func (o LambdaVpcArgsPtrOutput) Elem() LambdaVpcArgsOutput {
 		var ret LambdaVpcArgs
 		return ret
 	}).(LambdaVpcArgsOutput)
+}
+
+// Adds the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+func (o LambdaVpcArgsPtrOutput) AllowAllOutbound() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *LambdaVpcArgs) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.AllowAllOutbound
+	}).(pulumi.BoolPtrOutput)
 }
 
 // CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.

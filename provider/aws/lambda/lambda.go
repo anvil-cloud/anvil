@@ -79,6 +79,12 @@ type LambdaVpcArgs struct {
 	// Only needed for imported VPCs -- omit when using an Anvil Vpc component.
 	HasNat bool `pulumi:"hasNat,optional"`
 
+	// AllowAllOutbound adds the rule AWS puts on a new security group (all
+	// traffic to 0.0.0.0/0) to this Lambda's SG. Off by default: outbound is
+	// only what grants, cidrs and hasNat open. App.defaults.vpc.allowAllOutbound
+	// sets it for every Anvil security group in the app.
+	AllowAllOutbound bool `pulumi:"allowAllOutbound,optional"`
+
 	// CIDRs defines structured CIDR-scoped egress rules.
 	// Use for peered VPCs, on-premise ranges, or any non-AWS-service destination.
 	CIDRs []LambdaVpcCidrArgs `pulumi:"cidrs,optional"`
@@ -510,6 +516,12 @@ func NewLambda(ctx *pulumi.Context, name string, args LambdaArgs, opts ...pulumi
 		// on the endpoint SG from this SG. This SG is the only one attached to
 		// the function's ENIs.
 		l.SecurityGroupID = sg.ID().ToStringOutput()
+
+		if args.Vpc.AllowAllOutbound {
+			if err := vpcsg.AllowAllOutbound(ctx, name, l.SecurityGroupID, l); err != nil {
+				return nil, err
+			}
+		}
 
 		if args.Vpc.HasNat {
 			if err := vpcsg.AddInternetEgressRule(

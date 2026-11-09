@@ -55,6 +55,15 @@ Compute used to join the endpoint's security group (`vpc.vpcEndpoints` on Lambda
 - **Service checked.** The endpoint's `service` output must match the grant (`sqs`, `s3`, `dynamodb`, `events`, `kinesis-streams`, `lambda`). TS and Python also check synchronously from the endpoint's constructor args, so a mismatch fails before anything is planned. Go derives the service from the action prefix.
 - **Constructor args are stashed.** The construction wrappers (`stack.ts`, `stack.py`) now keep the constructor args next to the name, so grants can read plain inputs: an endpoint's `service`, or whether a DSQL cluster has an endpoint (`vpc` set without `hasNat`).
 
+## Allowing all outbound (opt-in)
+
+Anvil security groups start with no outbound rules. `allowAllOutbound` puts back AWS's default rule (protocol `-1`, 0.0.0.0/0) and logs a preview warning:
+
+- per resource: Lambda and DSQL `vpc.allowAllOutbound`, VpcEndpoint `allowAllOutbound`;
+- app-wide: `defaults.vpc.allowAllOutbound`, applied by a stack transformation in each SDK's App to every Anvil component that owns a security group, unless the resource sets it itself.
+
+It covers destinations too (endpoints), by choice: one switch for every Anvil group. The VPC's default security group stays locked (CIS / Security Hub EC2.2). Grants still add their own outbound rules while it is on, so they keep working if it is turned off. It does not open an endpoint's inbound side.
+
 ## Limits and gotchas
 
 - **Private DNS takes over the service hostname for the whole VPC.** Once an SQS endpoint exists, every SQS call from that VPC goes to it. A Lambda without an endpoint grant times out even if the VPC has NAT.

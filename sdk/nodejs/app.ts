@@ -1,4 +1,5 @@
 import * as pulumi from '@pulumi/pulumi';
+import { registerVpcDefaults, VpcDefaultsConfig } from './vpc_defaults';
 import * as aws from '@pulumi/aws';
 import * as gcp from '@pulumi/gcp';
 import * as fs from 'fs';
@@ -76,6 +77,9 @@ export interface DefaultsConfig {
 
   /** The stage's Pulumi state bucket. */
   state?: StateConfig;
+
+  /** Defaults for the security groups Anvil creates. */
+  vpc?: VpcDefaultsConfig;
 }
 
 /** Settings for the stage's Pulumi state bucket. */
@@ -269,6 +273,7 @@ export class App {
 
   constructor(config: AppConfig) {
     writeStateSettings(config.defaults?.state);
+    registerVpcDefaults(config.defaults?.vpc);
 
     // ── Read config from Pulumi ────────────────────────
     const anvilConfig = new pulumi.Config('anvil');

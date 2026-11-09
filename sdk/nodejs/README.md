@@ -137,6 +137,28 @@ anvil.grantEndpointAccess(fn, secretsEndpoint, {
 
 It opens the same security group rules as a resource grant. With `actions` and `resources`, it also adds an IAM statement limited to the endpoint with `aws:SourceVpce`. Every action must belong to the endpoint's service. Leave both out to open the network only, when the IAM permissions come from elsewhere.
 
+### Allowing all outbound (opt-in)
+
+Every security group Anvil creates (Lambda, VPC endpoint, DSQL endpoint) starts with no outbound rules: outbound is only what grants, `cidrs` and `hasNat` open. To put back AWS's default rule (all traffic to 0.0.0.0/0), opt in for the whole app or per resource. A resource's own setting wins, and `anvil preview` warns for every group it applies to. The VPC's default security group always stays locked.
+
+```typescript
+export default new App({
+  defaults: {
+    vpc: { allowAllOutbound: true },   // every Anvil security group
+  },
+  run(ctx) {
+    // ...
+    new anvil.aws.Lambda('payments', {
+      runtime: 'nodejs24.x',
+      handler: 'backend/payments.handler',
+      vpc: { ...net, allowAllOutbound: false },   // this one stays locked
+    });
+  },
+});
+```
+
+`VpcEndpoint` takes `allowAllOutbound` directly, and `DSQL` takes it in `vpc`.
+
 ## SvelteKit deployment
 
 Deploy a SvelteKit app to AWS with a single component. Anvil provisions S3, CloudFront, ACM, Lambda (via Lambda Web Adapter), and Route53 — with HTTPS and a custom domain out of the box:

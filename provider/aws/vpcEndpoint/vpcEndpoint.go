@@ -74,6 +74,12 @@ type VpcEndpointArgs struct {
 	//     { effect: "Deny",  action: "sqs:DeleteQueue" },
 	//   ]
 	OverridePermissions []VpcEndpointPermission `pulumi:"overridePermissions,optional"`
+
+	// AllowAllOutbound adds the rule AWS puts on a new security group (all
+	// traffic to 0.0.0.0/0) to the endpoint's SG. An endpoint only replies, so
+	// it never needs this; it exists so App.defaults.vpc.allowAllOutbound can
+	// apply to every Anvil security group.
+	AllowAllOutbound bool `pulumi:"allowAllOutbound,optional"`
 }
 
 // VpcEndpoint is the Anvil-managed Interface VPC Endpoint component resource.
@@ -267,6 +273,11 @@ func NewVpcEndpoint(ctx *pulumi.Context, name string, args VpcEndpointArgs, opts
 	sg, err := vpcsg.CreateSecurityGroup(ctx, name, stage, stageId, args.VpcId, v)
 	if err != nil {
 		return nil, err
+	}
+	if args.AllowAllOutbound {
+		if err := vpcsg.AllowAllOutbound(ctx, name, sg.ID().ToStringOutput(), v); err != nil {
+			return nil, err
+		}
 	}
 
 	// 2. Resolve the account ID for the endpoint policy condition.

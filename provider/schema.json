@@ -975,6 +975,10 @@
     "anvil:aws:VpcEndpoint": {
       "description": "An Anvil-managed AWS Interface VPC Endpoint. Creates one ENI per private subnet with private DNS enabled. The endpoint security group starts with zero rules. Passing this endpoint to a grant (e.g. queue.grantSendMessage(fn, { endpoint: sqsEndpoint })) adds a one-way ingress rule on port 443 from that compute's own security group, so only granted compute can reach the endpoint. Access is enforced at three layers: network (one-way SG rules per grant), IAM role policy (scoped per grant and limited to this endpoint with aws:SourceVpce), and endpoint policy (ceiling on allowed actions for principals in this account).",
       "inputProperties": {
+        "allowAllOutbound": {
+          "description": "Adds, on the endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default, and an endpoint only replies so it never needs it: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.",
+          "type": "boolean"
+        },
         "overridePermissions": {
           "description": "Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for principals in this account. When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Every statement is limited to principals in this account. Resource defaults to \"*\" if omitted on a permission entry.",
           "items": {
@@ -2548,6 +2552,10 @@
     "anvil:aws:DSQLVpcArgs": {
       "description": "VPC configuration for DSQL. When set without hasNat, Anvil creates an interface VPC endpoint in the VPC's region (multiRegion requires hasNat) so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.",
       "properties": {
+        "allowAllOutbound": {
+          "description": "Adds, on the VPC endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.",
+          "type": "boolean"
+        },
         "hasNat": {
           "description": "Signal that a NAT gateway already exists in this VPC. When true, Anvil skips interface endpoint creation — the Lambda routes to the public DSQL endpoint via NAT. When false (default), Anvil creates interface endpoints per region.",
           "type": "boolean"
@@ -3890,6 +3898,10 @@
     },
     "anvil:aws:LambdaVpcArgs": {
       "properties": {
+        "allowAllOutbound": {
+          "description": "Adds the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.",
+          "type": "boolean"
+        },
         "cidrs": {
           "description": "CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.",
           "items": {

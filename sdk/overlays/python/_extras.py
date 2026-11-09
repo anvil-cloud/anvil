@@ -16,6 +16,7 @@ from .types import (
     ComplianceConfig,
     ComplianceCron,
 )
+from .vpc_defaults import VpcDefaultsConfig
 from .grants import GrantTarget, GrantOptions, create_grant, build_resource_arns, grant_endpoint_access
 
 # Re-export core Pulumi functions so users never need to import pulumi directly.
@@ -28,6 +29,7 @@ __all__ = [
     "Block",
     "AppConfig",
     "DefaultsConfig",
+    "VpcDefaultsConfig",
     "StateConfig",
     "AwsProviderConfig",
     "GcpProviderConfig",

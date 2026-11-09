@@ -81,6 +81,9 @@ type DefaultsConfig struct {
 
 	// State configures the stage's Pulumi state bucket. Optional.
 	State *StateConfig
+
+	// Vpc holds defaults for the security groups Anvil creates. Optional.
+	Vpc *VpcDefaultsConfig
 }
 
 // StateConfig holds settings for the stage's Pulumi state bucket.
@@ -208,6 +211,9 @@ type AppConfig struct {
 func Run(appConfig AppConfig) {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		if err := writeStateSettings(appConfig.Defaults); err != nil {
+			return err
+		}
+		if err := registerVpcDefaults(ctx, appConfig.Defaults); err != nil {
 			return err
 		}
 

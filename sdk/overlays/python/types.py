@@ -99,9 +99,12 @@ class DefaultsConfig:
         self,
         tags: Optional[Dict[str, str]] = None,
         state: Optional[StateConfig] = None,
+        vpc: Optional["VpcDefaultsConfig"] = None,
     ):
         self.tags = tags or {}
         self.state = state or StateConfig()
+        # Defaults for the security groups Anvil creates (VpcDefaultsConfig).
+        self.vpc = vpc
 
 
 class AssumeRoleConfig:

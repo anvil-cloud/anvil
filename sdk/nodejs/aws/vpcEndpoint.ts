@@ -62,6 +62,7 @@ export class VpcEndpoint extends pulumi.ComponentResource {
             if (args?.vpcId === undefined && !opts.urn) {
                 throw new Error("Missing required property 'vpcId'");
             }
+            resourceInputs["allowAllOutbound"] = args?.allowAllOutbound;
             resourceInputs["overridePermissions"] = args?.overridePermissions;
             resourceInputs["privateSubnetIds"] = args?.privateSubnetIds;
             resourceInputs["service"] = args?.service;
@@ -84,6 +85,10 @@ export class VpcEndpoint extends pulumi.ComponentResource {
  * The set of arguments for constructing a VpcEndpoint resource.
  */
 export interface VpcEndpointArgs {
+    /**
+     * Adds, on the endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default, and an endpoint only replies so it never needs it: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+     */
+    allowAllOutbound?: pulumi.Input<boolean>;
     /**
      * Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for principals in this account. When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Every statement is limited to principals in this account. Resource defaults to "*" if omitted on a permission entry.
      */

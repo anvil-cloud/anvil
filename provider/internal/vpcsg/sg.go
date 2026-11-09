@@ -116,3 +116,32 @@ func AddCIDREgressRule(
 	}
 	return nil
 }
+
+// AllowAllOutbound adds the rule AWS puts on a new security group: all
+// protocols and all ports to 0.0.0.0/0. Anvil strips that rule by default;
+// this is the opt-in (allowAllOutbound) that puts it back. It logs a preview
+// warning on the owning resource so the loosened egress is visible.
+func AllowAllOutbound(
+	ctx *pulumi.Context,
+	name string,
+	securityGroupId pulumi.StringInput,
+	parent pulumi.Resource,
+) error {
+	_ = ctx.Log.Warn(fmt.Sprintf(
+		"⚠ %s: all outbound traffic allowed (allowAllOutbound). "+
+			"Remove it to allow only what grants, cidrs and hasNat open.", name,
+	), &pulumi.LogArgs{Resource: parent})
+
+	_, err := awsvpc.NewSecurityGroupEgressRule(ctx, name+"-all-egress", &awsvpc.SecurityGroupEgressRuleArgs{
+		SecurityGroupId: securityGroupId,
+		CidrIpv4:        pulumi.String("0.0.0.0/0"),
+		IpProtocol:      pulumi.String("-1"),
+		Tags: pulumi.StringMap{
+			"ManagedBy": pulumi.String("anvil"),
+		},
+	}, pulumi.Parent(parent))
+	if err != nil {
+		return fmt.Errorf("failed to create all-outbound rule %s: %w", name, err)
+	}
+	return nil
+}

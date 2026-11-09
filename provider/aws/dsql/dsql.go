@@ -155,6 +155,9 @@ type DSQLVpcArgs struct {
 	VpcId            pulumi.StringInput      `pulumi:"vpcId"`
 	PrivateSubnetIds pulumi.StringArrayInput `pulumi:"privateSubnetIds"`
 	HasNat           bool                    `pulumi:"hasNat,optional"`
+	// AllowAllOutbound adds all traffic to 0.0.0.0/0 on the endpoint SG.
+	// See LambdaVpcArgs.AllowAllOutbound.
+	AllowAllOutbound bool `pulumi:"allowAllOutbound,optional"`
 }
 
 // DSQLBackupArgs configures AWS Backup for the cluster(s).
@@ -554,6 +557,11 @@ func NewDSQL(ctx *pulumi.Context, name string, args DSQLArgs, opts ...pulumi.Res
 			)
 			if err != nil {
 				return nil, fmt.Errorf("creating VPC endpoint SG for %s: %w", region, err)
+			}
+			if args.Vpc.AllowAllOutbound {
+				if err := vpcsg.AllowAllOutbound(ctx, fmt.Sprintf("%s-vpce-%s", name, region), sg.ID().ToStringOutput(), d); err != nil {
+					return nil, err
+				}
 			}
 
 			endpointOpts := resourceOpts(region)

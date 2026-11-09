@@ -23,6 +23,7 @@ class VpcEndpointArgs:
                  private_subnet_ids: pulumi.Input[Sequence[pulumi.Input[_builtins.str]]],
                  service: pulumi.Input[_builtins.str],
                  vpc_id: pulumi.Input[_builtins.str],
+                 allow_all_outbound: Optional[pulumi.Input[_builtins.bool]] = None,
                  override_permissions: Optional[pulumi.Input[Sequence[pulumi.Input['VpcEndpointPermissionArgs']]]] = None):
         """
         The set of arguments for constructing a VpcEndpoint resource.
@@ -30,11 +31,14 @@ class VpcEndpointArgs:
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] private_subnet_ids: The IDs of the private subnets to attach the endpoint to. AWS places one ENI per subnet. Pass all private subnet IDs from your VPC — typically one per AZ.
         :param pulumi.Input[_builtins.str] service: The AWS service to route privately. The full com.amazonaws.{region}.{service} name is constructed at deploy time from the resolved region — you never write it manually.
         :param pulumi.Input[_builtins.str] vpc_id: The ID of the VPC to create the endpoint in. Accepts both Anvil-managed VPC IDs and imported VPC IDs.
+        :param pulumi.Input[_builtins.bool] allow_all_outbound: Adds, on the endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default, and an endpoint only replies so it never needs it: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
         :param pulumi.Input[Sequence[pulumi.Input['VpcEndpointPermissionArgs']]] override_permissions: Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for principals in this account. When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Every statement is limited to principals in this account. Resource defaults to "*" if omitted on a permission entry.
         """
         pulumi.set(__self__, "private_subnet_ids", private_subnet_ids)
         pulumi.set(__self__, "service", service)
         pulumi.set(__self__, "vpc_id", vpc_id)
+        if allow_all_outbound is not None:
+            pulumi.set(__self__, "allow_all_outbound", allow_all_outbound)
         if override_permissions is not None:
             pulumi.set(__self__, "override_permissions", override_permissions)
 
@@ -75,6 +79,18 @@ class VpcEndpointArgs:
         pulumi.set(self, "vpc_id", value)
 
     @_builtins.property
+    @pulumi.getter(name="allowAllOutbound")
+    def allow_all_outbound(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Adds, on the endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default, and an endpoint only replies so it never needs it: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+        """
+        return pulumi.get(self, "allow_all_outbound")
+
+    @allow_all_outbound.setter
+    def allow_all_outbound(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "allow_all_outbound", value)
+
+    @_builtins.property
     @pulumi.getter(name="overridePermissions")
     def override_permissions(self) -> Optional[pulumi.Input[Sequence[pulumi.Input['VpcEndpointPermissionArgs']]]]:
         """
@@ -93,6 +109,7 @@ class VpcEndpoint(pulumi.ComponentResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 allow_all_outbound: Optional[pulumi.Input[_builtins.bool]] = None,
                  override_permissions: Optional[pulumi.Input[Sequence[pulumi.Input[Union['VpcEndpointPermissionArgs', 'VpcEndpointPermissionArgsDict']]]]] = None,
                  private_subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  service: Optional[pulumi.Input[_builtins.str]] = None,
@@ -104,6 +121,7 @@ class VpcEndpoint(pulumi.ComponentResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[_builtins.bool] allow_all_outbound: Adds, on the endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default, and an endpoint only replies so it never needs it: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
         :param pulumi.Input[Sequence[pulumi.Input[Union['VpcEndpointPermissionArgs', 'VpcEndpointPermissionArgsDict']]]] override_permissions: Explicit Allow and Deny permission statements for the endpoint policy. When omitted, the endpoint policy allows all actions (*) for principals in this account. When set, only the declared actions are permitted — the caller is responsible for declaring every action their compute resources need. Supports both Allow and Deny effects. Every statement is limited to principals in this account. Resource defaults to "*" if omitted on a permission entry.
         :param pulumi.Input[Sequence[pulumi.Input[_builtins.str]]] private_subnet_ids: The IDs of the private subnets to attach the endpoint to. AWS places one ENI per subnet. Pass all private subnet IDs from your VPC — typically one per AZ.
         :param pulumi.Input[_builtins.str] service: The AWS service to route privately. The full com.amazonaws.{region}.{service} name is constructed at deploy time from the resolved region — you never write it manually.
@@ -134,6 +152,7 @@ class VpcEndpoint(pulumi.ComponentResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 allow_all_outbound: Optional[pulumi.Input[_builtins.bool]] = None,
                  override_permissions: Optional[pulumi.Input[Sequence[pulumi.Input[Union['VpcEndpointPermissionArgs', 'VpcEndpointPermissionArgsDict']]]]] = None,
                  private_subnet_ids: Optional[pulumi.Input[Sequence[pulumi.Input[_builtins.str]]]] = None,
                  service: Optional[pulumi.Input[_builtins.str]] = None,
@@ -149,6 +168,7 @@ class VpcEndpoint(pulumi.ComponentResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = VpcEndpointArgs.__new__(VpcEndpointArgs)
 
+            __props__.__dict__["allow_all_outbound"] = allow_all_outbound
             __props__.__dict__["override_permissions"] = override_permissions
             if private_subnet_ids is None and not opts.urn:
                 raise TypeError("Missing required property 'private_subnet_ids'")
