@@ -6,10 +6,10 @@ from anvil_cloud import grants
 from .event_bus import EventBus
 
 
-def grant_put_events(self, target, opts=None) -> None:
+def grant_put_events(self, target, opts=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-putevents"
     arns = grants.build_resource_arns(self.arn, None)
-    grants.create_grant(self, name, target, ["events:PutEvents"], arns, opts)
+    grants.create_grant(self, name, target, ["events:PutEvents"], arns, grants.merge_options(opts, endpoint=endpoint), service="events")
 
 
 EventBus.grant_put_events = grant_put_events

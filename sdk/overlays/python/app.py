@@ -17,6 +17,7 @@ from typing import Dict, Optional
 
 import pulumi
 
+from .vpc_defaults import register_vpc_defaults
 from .types import (
     AppConfig,
     AwsProviderConfig,
@@ -205,6 +206,7 @@ def _run_program(app_config: AppConfig) -> None:
 
     defaults = app_config.defaults
     _write_state_settings(defaults.state if defaults else None)
+    register_vpc_defaults(defaults.vpc if defaults else None)
     merged_tags = _build_merged_tags(stage, project, defaults)
 
     # ── Create providers ───────────────────────────────

@@ -37,6 +37,9 @@ export {
   planOrgAccounts,
 } from "./org";
 
+// App-wide security group defaults
+export { VpcDefaultsConfig } from "./vpc_defaults";
+
 // Hand-written Block class
 export { Block, BlockArgs } from "./block";
 

@@ -16,13 +16,13 @@ declare module "./kinesisStream" {
 KinesisStream.prototype.grantRead = function (this: KinesisStream, target: grants.GrantTarget, opts?: grants.GrantOptions): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-read`;
     const arns = grants.buildResourceArns(this.arn, undefined);
-    grants.createGrant(this, name, target, ["kinesis:GetRecords", "kinesis:GetShardIterator", "kinesis:DescribeStream", "kinesis:DescribeStreamSummary", "kinesis:ListShards"], arns, opts);
+    grants.createGrant(this, name, target, ["kinesis:GetRecords", "kinesis:GetShardIterator", "kinesis:DescribeStream", "kinesis:DescribeStreamSummary", "kinesis:ListShards"], arns, opts, "kinesis-streams");
 };
 
 KinesisStream.prototype.grantWrite = function (this: KinesisStream, target: grants.GrantTarget, opts?: grants.GrantOptions): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-write`;
     const arns = grants.buildResourceArns(this.arn, undefined);
-    grants.createGrant(this, name, target, ["kinesis:PutRecord", "kinesis:PutRecords", "kinesis:DescribeStreamSummary", "kinesis:ListShards"], arns, opts);
+    grants.createGrant(this, name, target, ["kinesis:PutRecord", "kinesis:PutRecords", "kinesis:DescribeStreamSummary", "kinesis:ListShards"], arns, opts, "kinesis-streams");
 };
 
 KinesisStream.prototype.grantFullAccess = function (this: KinesisStream, target: grants.GrantTarget, opts?: grants.GrantOptions): void {
@@ -40,5 +40,5 @@ KinesisStream.prototype.grantFullAccess = function (this: KinesisStream, target:
     }
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-fullaccess`;
     const arns = grants.buildResourceArns(this.arn, undefined);
-    grants.createGrant(this, name, target, ["kinesis:PutRecord", "kinesis:PutRecords", "kinesis:GetRecords", "kinesis:GetShardIterator", "kinesis:DescribeStream", "kinesis:DescribeStreamSummary", "kinesis:ListShards"], arns, opts);
+    grants.createGrant(this, name, target, ["kinesis:PutRecord", "kinesis:PutRecords", "kinesis:GetRecords", "kinesis:GetShardIterator", "kinesis:DescribeStream", "kinesis:DescribeStreamSummary", "kinesis:ListShards"], arns, opts, "kinesis-streams");
 };

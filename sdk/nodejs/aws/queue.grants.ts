@@ -16,13 +16,13 @@ declare module "./queue" {
 Queue.prototype.grantSendMessage = function (this: Queue, target: grants.GrantTarget, opts?: grants.GrantOptions): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-sendmessage`;
     const arns = grants.buildResourceArns(this.arn, undefined);
-    grants.createGrant(this, name, target, ["sqs:SendMessage"], arns, opts);
+    grants.createGrant(this, name, target, ["sqs:SendMessage"], arns, opts, "sqs");
 };
 
 Queue.prototype.grantConsumeMessages = function (this: Queue, target: grants.GrantTarget, opts?: grants.GrantOptions): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-consumemessages`;
     const arns = grants.buildResourceArns(this.arn, undefined);
-    grants.createGrant(this, name, target, ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"], arns, opts);
+    grants.createGrant(this, name, target, ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"], arns, opts, "sqs");
 };
 
 Queue.prototype.grantFullAccess = function (this: Queue, target: grants.GrantTarget, opts?: grants.GrantOptions): void {
@@ -40,5 +40,5 @@ Queue.prototype.grantFullAccess = function (this: Queue, target: grants.GrantTar
     }
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-fullaccess`;
     const arns = grants.buildResourceArns(this.arn, undefined);
-    grants.createGrant(this, name, target, ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "sqs:ChangeMessageVisibility", "sqs:PurgeQueue"], arns, opts);
+    grants.createGrant(this, name, target, ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes", "sqs:ChangeMessageVisibility", "sqs:PurgeQueue"], arns, opts, "sqs");
 };

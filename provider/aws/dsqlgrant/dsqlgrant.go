@@ -39,10 +39,9 @@ import (
 // deletes the IAM policy and the DynamoDB item. The stream fires REMOVE,
 // and the bootstrap Lambda runs AWS IAM REVOKE.
 //
-// VPC network access is NOT handled here. The DSQL component gives each
-// interface endpoint SG self-referencing ingress and egress on 5432, so a
-// compute resource that declares the endpoint SG in vpc.vpcEndpoints can
-// reach the endpoint whichever language called grantConnect.
+// VPC network access is NOT handled here. The SDK grantConnect methods (and
+// anvil.ConnectToDSQL in Go) add ingress 5432 on the endpoint SG from the
+// target's own SG, and egress 5432 on the target's SG to the endpoint SG.
 //
 // Usage from user code (TypeScript):
 //

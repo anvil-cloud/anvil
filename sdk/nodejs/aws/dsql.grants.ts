@@ -20,9 +20,9 @@ declare module "./dsql" {
          * 2. One DynamoDB IAM mapping item per role — the bootstrap Lambda runs
          *    AWS IAM GRANT "<roleName>" TO 'arn:...' for each.
          *
-         * Network access is not wired here. When the cluster has VPC endpoints,
-         * declare vpcEndpointSecurityGroupIds in the target's vpc.vpcEndpoints;
-         * the endpoint SG lets its members reach the endpoint on port 5432.
+         * 3. When the cluster has a VPC endpoint (vpc set without hasNat): ingress
+         *    5432 on the endpoint SG from the target's own SG, and egress 5432 on
+         *    the target's SG to the endpoint SG. The target must be in the VPC.
          *
          * @param target - The compute resource to grant access to (Lambda, ECS, etc.).
          * @param opts.schemas - The { schema, roleName } pairs this compute may connect as.
@@ -48,9 +48,9 @@ declare module "./dsql" {
      * 2. One DynamoDB IAM mapping item per role — the bootstrap Lambda runs
      *    AWS IAM GRANT "<roleName>" TO 'arn:...' for each.
      *
-     * Network access is not wired here. When the cluster has VPC endpoints,
-     * declare vpcEndpointSecurityGroupIds in the target's vpc.vpcEndpoints;
-     * the endpoint SG lets its members reach the endpoint on port 5432.
+     * 3. When the cluster has a VPC endpoint (vpc set without hasNat): ingress
+     *    5432 on the endpoint SG from the target's own SG, and egress 5432 on
+     *    the target's SG to the endpoint SG. The target must be in the VPC.
      *
      * @param target - The compute resource to grant access to (Lambda, ECS, etc.).
      * @param opts.schemas - The { schema, roleName } pairs this compute may connect as.
@@ -79,4 +79,30 @@ declare module "./dsql" {
         // create a cycle — the parent's outputs only finalize after its
         // children complete, but this child needs those outputs to construct.
         new DSQLConnect(`${grants.grantResourceName(this)}-${target.grantName()}-connect`, args);
+
+        // Network: only when the cluster has a VPC endpoint. That is decided by
+        // plain constructor inputs, so it is known here; the endpoint SG ID
+        // itself is an output. multiRegion + endpoint is rejected by the
+        // provider, so there is exactly one endpoint.
+        const vpc = grants.grantResourceArgs(this)?.vpc;
+        if (vpc !== undefined && vpc !== null) {
+            if (pulumi.Output.isInstance(vpc) || pulumi.Output.isInstance(vpc.hasNat)) {
+                throw new Error(
+                    `Anvil grant: ${grants.grantResourceName(this)}.grantConnect needs vpc and vpc.hasNat as plain values to know whether the cluster has a VPC endpoint.`
+                );
+            }
+            if (!vpc.hasNat) {
+                const name = grants.grantResourceName(this);
+                const endpointSgId = this.vpcEndpointSecurityGroupIds.apply((ids) => {
+                    const values = Object.values(ids ?? {});
+                    if (values.length !== 1) {
+                        throw new Error(
+                            `Anvil grant: ${name} should have exactly one VPC endpoint, found ${values.length}.`
+                        );
+                    }
+                    return values[0];
+                });
+                grants.connectToEndpoint(`${grants.grantResourceName(this)}-vpce`, endpointSgId, target, 5432);
+            }
+        }
     };

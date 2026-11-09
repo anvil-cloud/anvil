@@ -226,6 +226,10 @@ function wrapComponentClass(Cls: any): any {
       // in grants.ts. Set for every construction, including reconstruction.
       if (typeof name === 'string') {
         (instance as any).__anvilName = name;
+        // The constructor args, so grants can read plain inputs synchronously
+        // (e.g. a VpcEndpoint's service, or whether a DSQL cluster has a VPC
+        // endpoint). Read via grantResourceArgs in grants.ts.
+        (instance as any).__anvilArgs = args[1];
       }
 
       // Skip Pulumi's internal resource reconstruction (deserialization from a

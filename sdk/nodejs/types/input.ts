@@ -872,9 +872,13 @@ export namespace aws {
     }
 
     /**
-     * VPC configuration for DSQL. When set without hasNat, Anvil creates interface VPC endpoints per region so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
+     * VPC configuration for DSQL. When set without hasNat, Anvil creates an interface VPC endpoint in the VPC's region (multiRegion requires hasNat) so traffic stays on the AWS backbone. When hasNat is true, endpoint creation is skipped and traffic routes via the existing NAT gateway to the public DSQL endpoint. Anvil never creates the NAT gateway.
      */
     export interface DSQLVpcArgsArgs {
+        /**
+         * Adds, on the VPC endpoint's security group, the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+         */
+        allowAllOutbound?: pulumi.Input<boolean>;
         /**
          * Signal that a NAT gateway already exists in this VPC. When true, Anvil skips interface endpoint creation — the Lambda routes to the public DSQL endpoint via NAT. When false (default), Anvil creates interface endpoints per region.
          */
@@ -1741,6 +1745,10 @@ export namespace aws {
 
     export interface LambdaVpcArgsArgs {
         /**
+         * Adds the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
+         */
+        allowAllOutbound?: pulumi.Input<boolean>;
+        /**
          * CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.
          */
         cidrs?: pulumi.Input<pulumi.Input<inputs.aws.LambdaVpcCidrArgsArgs>[]>;
@@ -1752,10 +1760,6 @@ export namespace aws {
          * The IDs of the private subnets to attach the Lambda to. Always private - Lambda must never be placed in public subnets. Accepts Output<string[]> - pass vpc.privateSubnetIds directly.
          */
         privateSubnetIds: any;
-        /**
-         * VPC endpoints this Lambda needs access to. Anvil wires both SG rules automatically.
-         */
-        vpcEndpoints?: pulumi.Input<pulumi.Input<inputs.aws.LambdaVpcEndpointArgsArgs>[]>;
         /**
          * The ID of the VPC to place the Lambda in. Accepts Output<string> - pass vpc.vpcId directly.
          */
@@ -1771,20 +1775,6 @@ export namespace aws {
          * IPv4 CIDR block, e.g. 10.0.0.0/8
          */
         range: pulumi.Input<string>;
-    }
-
-    /**
-     * A VPC endpoint to grant this Lambda access to. Both fields accept Output<string> - pass component outputs directly.
-     */
-    export interface LambdaVpcEndpointArgsArgs {
-        /**
-         * The endpoint's ID. Use ep.endpointId. Accepts Output<string>.
-         */
-        endpointId: any;
-        /**
-         * The endpoint's security group ID. Use ep.securityGroupId. Accepts Output<string>.
-         */
-        securityGroupId: any;
     }
 
     export interface PABHatchArgs {

@@ -5,6 +5,7 @@ export const QUEUE_GRANT_CONFIG: GrantConfig = {
   pyFile: 'aws/queue.py',
   className: 'Queue',
   arnProperty: 'arn',
+  endpointService: 'sqs',
   supportsPaths: false,
   grants: [
     {

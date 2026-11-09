@@ -29,9 +29,9 @@ type DSQL struct {
 	StreamKinesisArn pulumi.StringOutput `pulumi:"streamKinesisArn"`
 	// The IAM role DSQL writes CDC events with: the one Anvil created, or stream.roleArn. Empty when stream is omitted.
 	StreamRoleArn pulumi.StringOutput `pulumi:"streamRoleArn"`
-	// Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.
+	// Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false.
 	VpcEndpointIds pulumi.StringMapOutput `pulumi:"vpcEndpointIds"`
-	// Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.
+	// Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. The SG starts with zero rules; grantConnect adds ingress on port 5432 from the granted compute's own security group.
 	VpcEndpointSecurityGroupIds pulumi.StringMapOutput `pulumi:"vpcEndpointSecurityGroupIds"`
 }
 
@@ -63,7 +63,7 @@ type dsqlArgs struct {
 	Schemas []DSQLSchema `pulumi:"schemas"`
 	// Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
 	Stream *DSQLStreamArgs `pulumi:"stream"`
-	// Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
+	// Optional VPC configuration. When set without hasNat, Anvil creates an interface VPC endpoint (PrivateLink) in the VPC's region so traffic stays on the AWS backbone, and grantConnect wires per-grant security group rules on port 5432. Cannot be combined with multiRegion unless hasNat is set, because a VPC lives in one region. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
 	Vpc *DSQLVpcArgs `pulumi:"vpc"`
 }
 
@@ -80,7 +80,7 @@ type DSQLArgs struct {
 	Schemas DSQLSchemaArrayInput
 	// Sends the cluster's change data capture (CDC) events, every committed row change in every table, to a Kinesis Data Stream. Anvil creates the IAM role DSQL writes with; `anvil deploy` creates the CDC stream after the rest of the stack, and `anvil destroy` deletes it first. Removing it deletes the CDC stream, and changes made while it's gone are never captured. Omit to keep CDC off.
 	Stream DSQLStreamArgsPtrInput
-	// Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
+	// Optional VPC configuration. When set without hasNat, Anvil creates an interface VPC endpoint (PrivateLink) in the VPC's region so traffic stays on the AWS backbone, and grantConnect wires per-grant security group rules on port 5432. Cannot be combined with multiRegion unless hasNat is set, because a VPC lives in one region. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
 	Vpc DSQLVpcArgsPtrInput
 }
 
@@ -206,12 +206,12 @@ func (o DSQLOutput) StreamRoleArn() pulumi.StringOutput {
 	return o.ApplyT(func(v *DSQL) pulumi.StringOutput { return v.StreamRoleArn }).(pulumi.StringOutput)
 }
 
-// Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.
+// Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false.
 func (o DSQLOutput) VpcEndpointIds() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *DSQL) pulumi.StringMapOutput { return v.VpcEndpointIds }).(pulumi.StringMapOutput)
 }
 
-// Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.
+// Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. The SG starts with zero rules; grantConnect adds ingress on port 5432 from the granted compute's own security group.
 func (o DSQLOutput) VpcEndpointSecurityGroupIds() pulumi.StringMapOutput {
 	return o.ApplyT(func(v *DSQL) pulumi.StringMapOutput { return v.VpcEndpointSecurityGroupIds }).(pulumi.StringMapOutput)
 }

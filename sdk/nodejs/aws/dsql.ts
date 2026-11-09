@@ -56,11 +56,11 @@ export class DSQL extends pulumi.ComponentResource {
      */
     declare public /*out*/ readonly streamRoleArn: pulumi.Output<string>;
     /**
-     * Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.endpointId.
+     * Map of region to VPC endpoint ID. Only populated when vpc is set and hasNat is false.
      */
     declare public /*out*/ readonly vpcEndpointIds: pulumi.Output<{[key: string]: string}>;
     /**
-     * Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. Pass to LambdaVpcEndpointArgs.securityGroupId: the SG allows its members to reach the endpoint on port 5432, so joining it is what gives the Lambda network access.
+     * Map of region to VPC endpoint security group ID. Only populated when vpc is set and hasNat is false. The SG starts with zero rules; grantConnect adds ingress on port 5432 from the granted compute's own security group.
      */
     declare public /*out*/ readonly vpcEndpointSecurityGroupIds: pulumi.Output<{[key: string]: string}>;
 
@@ -133,7 +133,7 @@ export interface DSQLArgs {
      */
     stream?: pulumi.Input<inputs.aws.DSQLStreamArgsArgs>;
     /**
-     * Optional VPC configuration. When set without hasNat, Anvil creates interface VPC endpoints (PrivateLink) per region so traffic stays on the AWS backbone. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
+     * Optional VPC configuration. When set without hasNat, Anvil creates an interface VPC endpoint (PrivateLink) in the VPC's region so traffic stays on the AWS backbone, and grantConnect wires per-grant security group rules on port 5432. Cannot be combined with multiRegion unless hasNat is set, because a VPC lives in one region. When omitted, the Lambda connects to the public DSQL endpoint over the internet using IAM auth tokens over TLS.
      */
     vpc?: pulumi.Input<inputs.aws.DSQLVpcArgsArgs>;
 }

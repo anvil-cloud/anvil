@@ -18,25 +18,25 @@ declare module "./bucket" {
 Bucket.prototype.grantRead = function (this: Bucket, target: grants.GrantTarget, paths?: string[], opts?: grants.GrantOptions): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-read`;
     const arns = grants.buildResourceArns(this.arn, paths);
-    grants.createGrant(this, name, target, ["s3:GetObject", "s3:ListBucket"], arns, opts);
+    grants.createGrant(this, name, target, ["s3:GetObject", "s3:ListBucket"], arns, opts, "s3");
 };
 
 Bucket.prototype.grantWrite = function (this: Bucket, target: grants.GrantTarget, paths?: string[], opts?: grants.GrantOptions): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-write`;
     const arns = grants.buildResourceArns(this.arn, paths);
-    grants.createGrant(this, name, target, ["s3:PutObject"], arns, opts);
+    grants.createGrant(this, name, target, ["s3:PutObject"], arns, opts, "s3");
 };
 
 Bucket.prototype.grantReadWrite = function (this: Bucket, target: grants.GrantTarget, paths?: string[], opts?: grants.GrantOptions): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-readwrite`;
     const arns = grants.buildResourceArns(this.arn, paths);
-    grants.createGrant(this, name, target, ["s3:GetObject", "s3:ListBucket", "s3:PutObject"], arns, opts);
+    grants.createGrant(this, name, target, ["s3:GetObject", "s3:ListBucket", "s3:PutObject"], arns, opts, "s3");
 };
 
 Bucket.prototype.grantDelete = function (this: Bucket, target: grants.GrantTarget, paths?: string[], opts?: grants.GrantOptions): void {
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-delete`;
     const arns = grants.buildResourceArns(this.arn, paths);
-    grants.createGrant(this, name, target, ["s3:DeleteObject"], arns, opts);
+    grants.createGrant(this, name, target, ["s3:DeleteObject"], arns, opts, "s3");
 };
 
 Bucket.prototype.grantFullAccess = function (this: Bucket, target: grants.GrantTarget, opts?: grants.GrantOptions): void {
@@ -54,5 +54,5 @@ Bucket.prototype.grantFullAccess = function (this: Bucket, target: grants.GrantT
     }
     const name = `${grants.grantResourceName(this)}-${target.grantName()}-fullaccess`;
     const arns = grants.buildResourceArns(this.arn, undefined);
-    grants.createGrant(this, name, target, ["s3:GetObject", "s3:ListBucket", "s3:PutObject", "s3:DeleteObject"], arns, opts);
+    grants.createGrant(this, name, target, ["s3:GetObject", "s3:ListBucket", "s3:PutObject", "s3:DeleteObject"], arns, opts, "s3");
 };

@@ -380,7 +380,7 @@ class Lambda(pulumi.ComponentResource):
     @pulumi.getter(name="securityGroupId")
     def security_group_id(self) -> pulumi.Output[Optional[_builtins.str]]:
         """
-        The ID of the dedicated security group created for this Lambda. Only populated when vpc is set. Use this to grant other resources access to this Lambda via the grant system.
+        The ID of the dedicated security group created for this Lambda. Only populated when vpc is set. It is the only security group on the function's ENIs. Grants that pass a VPC endpoint add egress rules to it.
         """
         return pulumi.get(self, "security_group_id")
 

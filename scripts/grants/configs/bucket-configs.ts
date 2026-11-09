@@ -5,6 +5,7 @@ export const BUCKET_GRANT_CONFIG: GrantConfig = {
   pyFile: 'aws/bucket.py',
   className: 'Bucket',
   arnProperty: 'arn',
+  endpointService: 's3',
   supportsPaths: true,
   grants: [
     { method: 'grantRead', actions: ['s3:GetObject', 's3:ListBucket'] },

@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/iam"
-	awsvpc "github.com/pulumi/pulumi-aws/sdk/v7/go/aws/vpc"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -25,38 +24,15 @@ type GrantTarget interface {
 // GrantOptions provides optional metadata for grant methods.
 type GrantOptions struct {
 	Justification string
-}
 
-// CIDREgressRule defines a single CIDR-scoped egress rule.
-// One SecurityGroupEgressRule is created per port.
-type CIDREgressRule struct {
-	// Range is the IPv4 CIDR block, e.g. "10.0.0.0/8"
-	Range string
-
-	// Ports are the TCP ports allowed to this CIDR. Required.
-	Ports []int
-}
-
-// EgressArgs defines the internet egress configuration for a VPC-attached
-// compute resource.
-//
-// Must specify either Internet or CIDRs — not both, not neither.
-type EgressArgs struct {
-	// Internet allows outbound to 0.0.0.0/0.
-	// Defaults to port 443 if Ports is omitted.
-	Internet bool
-
-	// Ports is the list of TCP ports when Internet is true.
-	// Defaults to [443] if omitted.
-	Ports []int
-
-	// AllPorts allows all outbound TCP ports (0-65535) when Internet is true.
-	// Deliberate unrestricted egress — visible in code review.
-	AllPorts bool
-
-	// CIDRs defines structured CIDR-scoped egress rules.
-	// One rule per { Range, port } pair. Ports required per entry.
-	CIDRs []CIDREgressRule
+	// Endpoint routes the granted calls through a VPC endpoint. Anvil then
+	// adds ingress 443 on the endpoint's SG from the target's own SG and
+	// egress 443 on the target's SG to the endpoint's SG (once per pair), and
+	// limits the IAM statement to the endpoint with aws:SourceVpce. The
+	// endpoint's service must match the actions' service, and the target must
+	// be a NetworkGrantTarget (e.g. from LambdaTarget) in a VPC.
+	// Build it with Endpoint(name, ep).
+	Endpoint *GrantEndpoint
 }
 
 // CreateGrant creates a scoped IAM RolePolicy granting the specified actions
@@ -70,18 +46,50 @@ func CreateGrant(
 	resourceArns []pulumi.StringInput,
 	opts *GrantOptions,
 ) error {
-	policyJSON := pulumi.All(toOutputs(resourceArns)...).ApplyT(func(args []interface{}) (string, error) {
-		resources := make([]string, len(args))
-		for i, a := range args {
-			resources[i] = a.(string)
+	var endpoint *GrantEndpoint
+	var service string
+	if opts != nil && opts.Endpoint != nil {
+		endpoint = opts.Endpoint
+		svc, err := endpointServiceForActions(actions)
+		if err != nil {
+			return fmt.Errorf("%s: %w", name, err)
+		}
+		service = svc
+		if err := ConnectToEndpoint(ctx, endpoint.Name, endpoint.SecurityGroupId, target, 443, endpoint.Opts...); err != nil {
+			return fmt.Errorf("%s: %w", name, err)
+		}
+	}
+
+	inputs := toOutputs(resourceArns)
+	nArns := len(inputs)
+	if endpoint != nil {
+		inputs = append(inputs, endpoint.EndpointId, endpoint.Service)
+	}
+
+	policyJSON := pulumi.All(inputs...).ApplyT(func(args []interface{}) (string, error) {
+		resources := make([]string, nArns)
+		for i := 0; i < nArns; i++ {
+			resources[i] = args[i].(string)
+		}
+		statement := map[string]interface{}{
+			"Effect":   "Allow",
+			"Action":   actions,
+			"Resource": resources,
+		}
+		if endpoint != nil {
+			endpointID := args[nArns].(string)
+			if got := args[nArns+1].(string); got != service {
+				return "", fmt.Errorf("%s: actions are for %q, but endpoint %s routes %q", name, service, endpoint.Name, got)
+			}
+			// Only works through this endpoint: credentials used from anywhere
+			// else (e.g. leaked from the function's environment) are denied.
+			statement["Condition"] = map[string]interface{}{
+				"StringEquals": map[string]string{"aws:SourceVpce": endpointID},
+			}
 		}
 		doc := map[string]interface{}{
-			"Version": "2012-10-17",
-			"Statement": []map[string]interface{}{{
-				"Effect":   "Allow",
-				"Action":   actions,
-				"Resource": resources,
-			}},
+			"Version":   "2012-10-17",
+			"Statement": []map[string]interface{}{statement},
 		}
 		b, err := json.Marshal(doc)
 		if err != nil {
@@ -111,103 +119,6 @@ func CreateGrant(
 	return err
 }
 
-// CreateEgressGrant creates internet or CIDR-scoped egress SecurityGroupEgressRule(s)
-// on a compute resource's dedicated security group.
-//
-// Must specify either Internet or CIDRs — not both, not neither.
-func CreateEgressGrant(
-	ctx *pulumi.Context,
-	parent pulumi.Resource,
-	name string,
-	securityGroupId pulumi.StringOutput,
-	args EgressArgs,
-) error {
-	// Validate: internet or cidrs, not both, not neither.
-	if args.Internet && len(args.CIDRs) > 0 {
-		return fmt.Errorf(
-			"%s: CreateEgressGrant cannot specify both Internet and CIDRs — choose one",
-			name,
-		)
-	}
-	if !args.Internet && len(args.CIDRs) == 0 {
-		return fmt.Errorf(
-			"%s: CreateEgressGrant requires either Internet: true or CIDRs",
-			name,
-		)
-	}
-
-	// Validate: AllPorts only with Internet.
-	if args.AllPorts && !args.Internet {
-		return fmt.Errorf(
-			"%s: CreateEgressGrant AllPorts is only valid with Internet: true",
-			name,
-		)
-	}
-
-	// ── Internet egress ───────────────────────────────────────────────────────
-	if args.Internet {
-		if args.AllPorts {
-			_, err := awsvpc.NewSecurityGroupEgressRule(ctx, name+"-egress-all", &awsvpc.SecurityGroupEgressRuleArgs{
-				SecurityGroupId: securityGroupId,
-				CidrIpv4:        pulumi.String("0.0.0.0/0"),
-				FromPort:        pulumi.Int(0),
-				ToPort:          pulumi.Int(65535),
-				IpProtocol:      pulumi.String("tcp"),
-				Tags:            pulumi.StringMap{"ManagedBy": pulumi.String("anvil")},
-			}, pulumi.Parent(parent))
-			return err
-		}
-
-		ports := args.Ports
-		if len(ports) == 0 {
-			ports = []int{443}
-		}
-
-		for _, port := range ports {
-			_, err := awsvpc.NewSecurityGroupEgressRule(ctx,
-				fmt.Sprintf("%s-egress-%d", name, port),
-				&awsvpc.SecurityGroupEgressRuleArgs{
-					SecurityGroupId: securityGroupId,
-					CidrIpv4:        pulumi.String("0.0.0.0/0"),
-					FromPort:        pulumi.Int(port),
-					ToPort:          pulumi.Int(port),
-					IpProtocol:      pulumi.String("tcp"),
-					Tags:            pulumi.StringMap{"ManagedBy": pulumi.String("anvil")},
-				}, pulumi.Parent(parent))
-			if err != nil {
-				return fmt.Errorf("failed to create internet egress rule for port %d: %w", port, err)
-			}
-		}
-		return nil
-	}
-
-	// ── CIDR egress ───────────────────────────────────────────────────────────
-	for _, cidrRule := range args.CIDRs {
-		if len(cidrRule.Ports) == 0 {
-			return fmt.Errorf(
-				"%s: CreateEgressGrant cidr %q requires Ports — be explicit about which ports this range needs",
-				name, cidrRule.Range,
-			)
-		}
-		for _, port := range cidrRule.Ports {
-			ruleName := fmt.Sprintf("%s-egress-%s-%d", name, sanitizeCIDR(cidrRule.Range), port)
-			_, err := awsvpc.NewSecurityGroupEgressRule(ctx, ruleName, &awsvpc.SecurityGroupEgressRuleArgs{
-				SecurityGroupId: securityGroupId,
-				CidrIpv4:        pulumi.String(cidrRule.Range),
-				FromPort:        pulumi.Int(port),
-				ToPort:          pulumi.Int(port),
-				IpProtocol:      pulumi.String("tcp"),
-				Tags:            pulumi.StringMap{"ManagedBy": pulumi.String("anvil")},
-			}, pulumi.Parent(parent))
-			if err != nil {
-				return fmt.Errorf("failed to create CIDR egress rule %s port %d: %w", cidrRule.Range, port, err)
-			}
-		}
-	}
-
-	return nil
-}
-
 // sanitize cleans a string for use in resource names.
 func sanitize(s string) string {
 	s = strings.ToLower(s)
@@ -222,21 +133,6 @@ func sanitize(s string) string {
 	}
 	if len(result) > 40 {
 		result = result[:40]
-	}
-	return string(result)
-}
-
-// sanitizeCIDR converts a CIDR like "10.0.0.0/8" to "10-0-0-0-8" for use
-// in resource names.
-func sanitizeCIDR(cidr string) string {
-	result := make([]byte, len(cidr))
-	for i := 0; i < len(cidr); i++ {
-		c := cidr[i]
-		if (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') {
-			result[i] = c
-		} else {
-			result[i] = '-'
-		}
 	}
 	return string(result)
 }

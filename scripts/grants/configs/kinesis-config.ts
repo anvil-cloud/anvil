@@ -5,6 +5,7 @@ export const KINESIS_GRANT_CONFIG: GrantConfig = {
   pyFile: 'aws/kinesis_stream.py',
   className: 'KinesisStream',
   arnProperty: 'arn',
+  endpointService: 'kinesis-streams',
   supportsPaths: false,
   grants: [
     {

@@ -16,6 +16,11 @@ export interface GrantConfig {
   className: string;
   /** Property on class that holds the resource ARN, e.g. "arn" */
   arnProperty: string;
+  /**
+   * The VPC endpoint service these grants go through, e.g. "sqs". Grants that
+   * pass an `endpoint` are checked against it. Matches VpcEndpoint's `service`.
+   */
+  endpointService: string;
   /** Whether grant methods accept path scoping, e.g. ["uploads/*"] */
   supportsPaths: boolean;
   supportsIndexes?: boolean;
@@ -26,6 +31,7 @@ export interface GrantConfig {
 export interface DynamoGrantOptions {
   indexes?: string[];
   justification?: string;
+  endpoint?: unknown;
 }
 
 export interface GrantTargetConfig {
@@ -39,6 +45,10 @@ export interface GrantTargetConfig {
   roleArnProperty: string;
   /** Python property name for IAM role ARN, e.g. "role_arn" */
   pyRoleArnProperty: string;
+  /** TS property for the security group on the target's ENIs, e.g. "securityGroupId" */
+  securityGroupIdProperty: string;
+  /** Python counterpart, e.g. "security_group_id" */
+  pySecurityGroupIdProperty: string;
 }
 
 /**

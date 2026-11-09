@@ -63,7 +63,7 @@ code references resources directly. Two things to know:
 
 ## Grants
 
-Grants are how Anvil wires permissions between resources. Instead of writing IAM policies by hand, you call `.grant()` on a resource and Anvil handles both the IAM role policy and the environment variable injection automatically.
+Grants are how Anvil wires permissions between resources. Instead of writing IAM policies by hand, you call a grant method on the resource being accessed, and Anvil creates a least-privilege IAM policy on the target's role.
 
 A Lambda reading from a Bucket:
 
@@ -71,28 +71,89 @@ A Lambda reading from a Bucket:
 import anvil_cloud as anvil
 
 def infra(ctx: anvil.Context):
-    bucket = anvil.aws.Bucket("uploads",
-        data_classification="sensitive",
-    )
+    bucket = anvil.aws.Bucket("uploads")
 
     fn = anvil.aws.Lambda("processor",
-        runtime="nodejs20.x",
+        runtime="nodejs24.x",
         handler="src/index.handler",
+        environment={"BUCKET_NAME": bucket.bucket_name},
     )
 
-    # Grants the Lambda read access to the bucket and scopes down to specific bucket paths.
-    # Anvil creates the IAM policy and injects UPLOADS_BUCKET_NAME
-    # into the Lambda's environment automatically.
-    bucket.grant(fn, actions=["read"], path=["user/*"])
+    # s3:GetObject + s3:ListBucket on the bucket, scoped to user/*
+    bucket.grant_read(fn, paths=["user/*"])
 
 anvil.App(run=infra)
 ```
 
 What Anvil does under the hood:
 
-- Creates an IAM `RolePolicy` scoped to the exact actions requested
-- Injects the resource identifier as an environment variable on the target (e.g. `UPLOADS_BUCKET_NAME`)
-- No manual ARN wiring, no forgotten permissions
+- Creates an IAM `RolePolicy` on the target's role, scoped to the exact actions and resources
+- No manual ARN wiring, no hand-written policy JSON
+
+### Through a VPC endpoint
+
+When a Lambda runs in a VPC and reaches an AWS service through an Anvil `VpcEndpoint`, pass the endpoint on the grant:
+
+```python
+vpc = anvil.aws.Vpc("core")
+net = {"vpc_id": vpc.vpc_id, "private_subnet_ids": vpc.private_subnet_ids}
+
+sqs_endpoint = anvil.aws.VpcEndpoint("sqs", service="sqs", **net)
+queue = anvil.aws.Queue("orders")
+fn = anvil.aws.Lambda("processor",
+    runtime="nodejs24.x",
+    handler="src/index.handler",
+    vpc=net,
+)
+
+queue.grant_send_message(fn, endpoint=sqs_endpoint)
+```
+
+The grant then also:
+
+- adds ingress 443 on the endpoint's security group from the Lambda's own security group, and egress 443 on the Lambda's security group to the endpoint (once per Lambda and endpoint, however many grants share them);
+- limits the IAM statement to that endpoint with `aws:SourceVpce`, so the permission doesn't work if the credentials are used from anywhere else.
+
+The Lambda only ever carries its own security group, so compute sharing an endpoint can't reach each other. The endpoint's `service` must match the grant (`sqs` for a queue, `s3` for a bucket, and so on), or the grant fails at preview. With private DNS, every call to that service from inside the VPC resolves to the endpoint, so grant every Lambda that uses the service through it, even if the VPC also has NAT.
+
+`dsql.grant_connect(fn, ...)` does the same on port 5432 when the cluster was created with `vpc` and without `has_nat`.
+
+### Services without an Anvil component
+
+For services like Secrets Manager, KMS, SSM, STS, ECR or CloudWatch Logs, use `grant_endpoint_access`:
+
+```python
+secrets_endpoint = anvil.aws.VpcEndpoint("secrets", service="secretsmanager", **net)
+
+anvil.grant_endpoint_access(fn, secrets_endpoint,
+    actions=["secretsmanager:GetSecretValue"],
+    resources=[db_secret_arn],
+)
+```
+
+It opens the same security group rules as a resource grant. With `actions` and `resources`, it also adds an IAM statement limited to the endpoint with `aws:SourceVpce`. Every action must belong to the endpoint's service. Leave both out to open the network only, when the IAM permissions come from elsewhere.
+
+### Allowing all outbound (opt-in)
+
+Every security group Anvil creates (Lambda, VPC endpoint, DSQL endpoint) starts with no outbound rules: outbound is only what grants, `cidrs` and `hasNat` open. To put back AWS's default rule (all traffic to 0.0.0.0/0), opt in for the whole app or per resource. A resource's own setting wins, and `anvil preview` warns for every group it applies to. The VPC's default security group always stays locked.
+
+```python
+anvil.App(
+    run=infra,
+    defaults=anvil.DefaultsConfig(
+        vpc=anvil.VpcDefaultsConfig(allow_all_outbound=True),   # every Anvil security group
+    ),
+)
+
+# inside infra: this one stays locked
+anvil.aws.Lambda("payments",
+    runtime="nodejs24.x",
+    handler="backend/payments.handler",
+    vpc={**net, "allow_all_outbound": False},
+)
+```
+
+`VpcEndpoint` takes `allow_all_outbound` directly, and `DSQL` takes it in `vpc`.
 
 ## SvelteKit deployment
 

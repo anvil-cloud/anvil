@@ -5,6 +5,7 @@ export const EVENTBUS_GRANT_CONFIG: GrantConfig = {
   pyFile: 'aws/event_bus.py',
   className: 'EventBus',
   arnProperty: 'arn',
+  endpointService: 'events',
   supportsPaths: false,
   grants: [
     {

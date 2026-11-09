@@ -6,38 +6,39 @@ from anvil_cloud import grants
 from .bucket import Bucket
 
 
-def grant_read(self, target, paths=None, opts=None) -> None:
+def grant_read(self, target, paths=None, opts=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-read"
     arns = grants.build_resource_arns(self.arn, paths)
-    grants.create_grant(self, name, target, ["s3:GetObject", "s3:ListBucket"], arns, opts)
+    grants.create_grant(self, name, target, ["s3:GetObject", "s3:ListBucket"], arns, grants.merge_options(opts, endpoint=endpoint), service="s3")
 
 
-def grant_write(self, target, paths=None, opts=None) -> None:
+def grant_write(self, target, paths=None, opts=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-write"
     arns = grants.build_resource_arns(self.arn, paths)
-    grants.create_grant(self, name, target, ["s3:PutObject"], arns, opts)
+    grants.create_grant(self, name, target, ["s3:PutObject"], arns, grants.merge_options(opts, endpoint=endpoint), service="s3")
 
 
-def grant_read_write(self, target, paths=None, opts=None) -> None:
+def grant_read_write(self, target, paths=None, opts=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-readwrite"
     arns = grants.build_resource_arns(self.arn, paths)
-    grants.create_grant(self, name, target, ["s3:GetObject", "s3:ListBucket", "s3:PutObject"], arns, opts)
+    grants.create_grant(self, name, target, ["s3:GetObject", "s3:ListBucket", "s3:PutObject"], arns, grants.merge_options(opts, endpoint=endpoint), service="s3")
 
 
-def grant_delete(self, target, paths=None, opts=None) -> None:
+def grant_delete(self, target, paths=None, opts=None, endpoint=None) -> None:
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-delete"
     arns = grants.build_resource_arns(self.arn, paths)
-    grants.create_grant(self, name, target, ["s3:DeleteObject"], arns, opts)
+    grants.create_grant(self, name, target, ["s3:DeleteObject"], arns, grants.merge_options(opts, endpoint=endpoint), service="s3")
 
 
-def grant_full_access(self, target, opts=None) -> None:
+def grant_full_access(self, target, opts=None, endpoint=None) -> None:
+    opts = grants.merge_options(opts, endpoint=endpoint)
     if not opts or not opts.justification:
         pulumi.log.warn(f"⚠ {grants.grant_resource_name(self)} → {target.grant_name()}: full access granted with no justification.", self)
     else:
         pulumi.log.info(f"ℹ {grants.grant_resource_name(self)} → {target.grant_name()}: full access granted. Justification: \"{opts.justification}\"", self)
     name = f"{grants.grant_resource_name(self)}-{target.grant_name()}-fullaccess"
     arns = grants.build_resource_arns(self.arn, None)
-    grants.create_grant(self, name, target, ["s3:GetObject", "s3:ListBucket", "s3:PutObject", "s3:DeleteObject"], arns, opts)
+    grants.create_grant(self, name, target, ["s3:GetObject", "s3:ListBucket", "s3:PutObject", "s3:DeleteObject"], arns, opts, service="s3")
 
 
 Bucket.grant_read = grant_read

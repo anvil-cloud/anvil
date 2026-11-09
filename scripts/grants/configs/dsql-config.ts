@@ -50,9 +50,9 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
      * 2. One DynamoDB IAM mapping item per role — the bootstrap Lambda runs
      *    AWS IAM GRANT "<roleName>" TO 'arn:...' for each.
      *
-     * Network access is not wired here. When the cluster has VPC endpoints,
-     * declare vpcEndpointSecurityGroupIds in the target's vpc.vpcEndpoints;
-     * the endpoint SG lets its members reach the endpoint on port 5432.
+     * 3. When the cluster has a VPC endpoint (vpc set without hasNat): ingress
+     *    5432 on the endpoint SG from the target's own SG, and egress 5432 on
+     *    the target's SG to the endpoint SG. The target must be in the VPC.
      *
      * @param target - The compute resource to grant access to (Lambda, ECS, etc.).
      * @param opts.schemas - The { schema, roleName } pairs this compute may connect as.
@@ -81,6 +81,32 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
         // create a cycle — the parent's outputs only finalize after its
         // children complete, but this child needs those outputs to construct.
         new DSQLConnect(\`\${this.__name}-\${target.grantName()}-connect\`, args);
+
+        // Network: only when the cluster has a VPC endpoint. That is decided by
+        // plain constructor inputs, so it is known here; the endpoint SG ID
+        // itself is an output. multiRegion + endpoint is rejected by the
+        // provider, so there is exactly one endpoint.
+        const vpc = grants.grantResourceArgs(this)?.vpc;
+        if (vpc !== undefined && vpc !== null) {
+            if (pulumi.Output.isInstance(vpc) || pulumi.Output.isInstance(vpc.hasNat)) {
+                throw new Error(
+                    \`Anvil grant: \${this.__name}.grantConnect needs vpc and vpc.hasNat as plain values to know whether the cluster has a VPC endpoint.\`
+                );
+            }
+            if (!vpc.hasNat) {
+                const name = this.__name;
+                const endpointSgId = this.vpcEndpointSecurityGroupIds.apply((ids) => {
+                    const values = Object.values(ids ?? {});
+                    if (values.length !== 1) {
+                        throw new Error(
+                            \`Anvil grant: \${name} should have exactly one VPC endpoint, found \${values.length}.\`
+                        );
+                    }
+                    return values[0];
+                });
+                grants.connectToEndpoint(\`\${this.__name}-vpce\`, endpointSgId, target, 5432);
+            }
+        }
     }`,
   pyMethod: `
     def grant_connect(self, target: "grants.GrantTarget", schemas: list = None) -> None:
@@ -91,9 +117,9 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
         Each role must be declared in this component's schemas, in that schema,
         or the deploy fails.
 
-        Network access is not wired here. When the cluster has VPC endpoints,
-        declare vpc_endpoint_security_group_ids in the target's vpc.vpc_endpoints;
-        the endpoint SG lets its members reach the endpoint on port 5432.
+        When the cluster has a VPC endpoint (vpc set without has_nat), this also
+        adds ingress 5432 on the endpoint SG from the target's own SG, and egress
+        5432 on the target's SG to the endpoint SG. The target must be in the VPC.
 
         Args:
             target: The compute resource to grant access to (Lambda, ECS, etc.).
@@ -112,5 +138,30 @@ export const DSQL_CUSTOM_GRANT_CONFIG: CustomGrantConfig = {
             roles_table_name=self.roles_table_name,
             opts=pulumi.ResourceOptions(parent=self),
         )
+
+        # Network: only when the cluster has a VPC endpoint. That is decided by
+        # plain constructor inputs; the endpoint SG ID itself is an output.
+        # multiRegion + endpoint is rejected by the provider, so there is one.
+        vpc = grants.ctor_input(self, "vpc")
+        if vpc is not None:
+            has_nat = grants.input_field(vpc, "has_nat")
+            if isinstance(vpc, pulumi.Output) or isinstance(has_nat, pulumi.Output):
+                raise ValueError(
+                    f"Anvil grant: {self._name}.grant_connect needs vpc and vpc.has_nat as plain "
+                    "values to know whether the cluster has a VPC endpoint."
+                )
+            if not has_nat:
+                name = self._name
+
+                def _single(ids):
+                    values = list((ids or {}).values())
+                    if len(values) != 1:
+                        raise ValueError(
+                            f"Anvil grant: {name} should have exactly one VPC endpoint, found {len(values)}."
+                        )
+                    return values[0]
+
+                endpoint_sg_id = self.vpc_endpoint_security_group_ids.apply(_single)
+                grants.connect_to_endpoint(f"{self._name}-vpce", endpoint_sg_id, target, 5432)
 `,
 };
