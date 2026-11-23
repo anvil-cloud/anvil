@@ -85,6 +85,9 @@ jobs:
 
       - name: Install Pulumi CLI
         uses: pulumi/action-install-pulumi-cli@v2
+        with:
+          # Pinned: newer CLIs change Go codegen (e.g. *Exists helpers), failing the SDK freshness check. Keep in step with local.
+          pulumi-version: 3.225.1
 
       - name: Install root deps (ts-node/typescript for SDK patch scripts)
         run: npm install
@@ -130,6 +133,9 @@ jobs:
 
       - name: Install Pulumi CLI
         uses: pulumi/action-install-pulumi-cli@v2
+        with:
+          # Pinned: newer CLIs change Go codegen (e.g. *Exists helpers), failing the SDK freshness check. Keep in step with local.
+          pulumi-version: 3.225.1
 
       - name: Install root deps (ts-node/typescript for SDK patch scripts)
         run: npm install
@@ -167,6 +173,9 @@ jobs:
 
       - name: Install Pulumi CLI
         uses: pulumi/action-install-pulumi-cli@v2
+        with:
+          # Pinned: newer CLIs change Go codegen (e.g. *Exists helpers), failing the SDK freshness check. Keep in step with local.
+          pulumi-version: 3.225.1
 
       - name: Verify checked-in Go SDK is up to date
         run: |
