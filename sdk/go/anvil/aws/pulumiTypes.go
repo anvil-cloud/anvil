@@ -14069,7 +14069,7 @@ type LambdaVpcArgs struct {
 	AllowAllOutbound *bool `pulumi:"allowAllOutbound"`
 	// CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.
 	Cidrs []LambdaVpcCidrArgs `pulumi:"cidrs"`
-	// Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
+	// Set when the VPC routes outbound traffic through a NAT gateway or instance. Adds outbound 443 to 0.0.0.0/0 on the Lambda's security group.
 	HasNat *bool `pulumi:"hasNat"`
 	// The IDs of the private subnets to attach the Lambda to. Always private - Lambda must never be placed in public subnets. Accepts Output<string[]> - pass vpc.privateSubnetIds directly.
 	PrivateSubnetIds interface{} `pulumi:"privateSubnetIds"`
@@ -14093,7 +14093,7 @@ type LambdaVpcArgsArgs struct {
 	AllowAllOutbound pulumi.BoolPtrInput `pulumi:"allowAllOutbound"`
 	// CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.
 	Cidrs LambdaVpcCidrArgsArrayInput `pulumi:"cidrs"`
-	// Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
+	// Set when the VPC routes outbound traffic through a NAT gateway or instance. Adds outbound 443 to 0.0.0.0/0 on the Lambda's security group.
 	HasNat pulumi.BoolPtrInput `pulumi:"hasNat"`
 	// The IDs of the private subnets to attach the Lambda to. Always private - Lambda must never be placed in public subnets. Accepts Output<string[]> - pass vpc.privateSubnetIds directly.
 	PrivateSubnetIds pulumi.Input `pulumi:"privateSubnetIds"`
@@ -14188,7 +14188,7 @@ func (o LambdaVpcArgsOutput) Cidrs() LambdaVpcCidrArgsArrayOutput {
 	return o.ApplyT(func(v LambdaVpcArgs) []LambdaVpcCidrArgs { return v.Cidrs }).(LambdaVpcCidrArgsArrayOutput)
 }
 
-// Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
+// Set when the VPC routes outbound traffic through a NAT gateway or instance. Adds outbound 443 to 0.0.0.0/0 on the Lambda's security group.
 func (o LambdaVpcArgsOutput) HasNat() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v LambdaVpcArgs) *bool { return v.HasNat }).(pulumi.BoolPtrOutput)
 }
@@ -14247,7 +14247,7 @@ func (o LambdaVpcArgsPtrOutput) Cidrs() LambdaVpcCidrArgsArrayOutput {
 	}).(LambdaVpcCidrArgsArrayOutput)
 }
 
-// Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
+// Set when the VPC routes outbound traffic through a NAT gateway or instance. Adds outbound 443 to 0.0.0.0/0 on the Lambda's security group.
 func (o LambdaVpcArgsPtrOutput) HasNat() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v *LambdaVpcArgs) *bool {
 		if v == nil {
@@ -15722,6 +15722,203 @@ func (o QueueOverridesPtrOutput) VisibilityTimeoutSeconds() pulumi.IntPtrOutput 
 		}
 		return v.VisibilityTimeoutSeconds
 	}).(pulumi.IntPtrOutput)
+}
+
+// SiteDnsArgs controls where the site's DNS records are created. Only used when domain is set.
+type SiteDns struct {
+	// Provider is where Anvil creates the certificate validation and site records. "route53": the public hosted zone for the domain, in this AWS account or the account of roleArn; the deploy fails if there isn't one. "cloudflare": the Cloudflare zone for the domain, using the API token in the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too); the token needs Zone > Zone > Read and Zone > DNS > Edit on the zone, plus Zone > Transform Rules > Edit when originProtection is on. "manual": Anvil creates no DNS records and the dnsRecords output lists what to add. Default: "route53" when a matching hosted zone is found, otherwise "manual". An existing record for a name the site needs fails the deploy; Anvil never overwrites it.
+	Provider *SiteDnsProvider `pulumi:"provider"`
+	// Proxied routes traffic through Cloudflare's proxy in front of CloudFront. Cloudflare only. Default: true. The zone's SSL/TLS mode must be "Full (strict)". Cloudflare's free certificate only covers one level of subdomain, so proxied names like "www.<stage>.example.com" need Advanced Certificate Manager with Total TLS; Anvil warns about them. While proxied, CloudFront still accepts requests sent to it directly unless originProtection is on.
+	Proxied *bool `pulumi:"proxied"`
+	// RoleArn is an IAM role in the AWS account that owns the Route53 hosted zone (e.g. a network account). Anvil assumes it for the zone lookup and record changes only; the certificate and CloudFront stay in the deploy account. Route53 only.
+	RoleArn *string `pulumi:"roleArn"`
+	// Zone is the DNS zone the domain belongs to, e.g. "example.com". Default: the last two labels of domain. Set it for domains such as "www.example.co.uk".
+	Zone *string `pulumi:"zone"`
+}
+
+// SiteDnsInput is an input type that accepts SiteDnsArgs and SiteDnsOutput values.
+// You can construct a concrete instance of `SiteDnsInput` via:
+//
+//	SiteDnsArgs{...}
+type SiteDnsInput interface {
+	pulumi.Input
+
+	ToSiteDnsOutput() SiteDnsOutput
+	ToSiteDnsOutputWithContext(context.Context) SiteDnsOutput
+}
+
+// SiteDnsArgs controls where the site's DNS records are created. Only used when domain is set.
+type SiteDnsArgs struct {
+	// Provider is where Anvil creates the certificate validation and site records. "route53": the public hosted zone for the domain, in this AWS account or the account of roleArn; the deploy fails if there isn't one. "cloudflare": the Cloudflare zone for the domain, using the API token in the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too); the token needs Zone > Zone > Read and Zone > DNS > Edit on the zone, plus Zone > Transform Rules > Edit when originProtection is on. "manual": Anvil creates no DNS records and the dnsRecords output lists what to add. Default: "route53" when a matching hosted zone is found, otherwise "manual". An existing record for a name the site needs fails the deploy; Anvil never overwrites it.
+	Provider SiteDnsProviderPtrInput `pulumi:"provider"`
+	// Proxied routes traffic through Cloudflare's proxy in front of CloudFront. Cloudflare only. Default: true. The zone's SSL/TLS mode must be "Full (strict)". Cloudflare's free certificate only covers one level of subdomain, so proxied names like "www.<stage>.example.com" need Advanced Certificate Manager with Total TLS; Anvil warns about them. While proxied, CloudFront still accepts requests sent to it directly unless originProtection is on.
+	Proxied pulumi.BoolPtrInput `pulumi:"proxied"`
+	// RoleArn is an IAM role in the AWS account that owns the Route53 hosted zone (e.g. a network account). Anvil assumes it for the zone lookup and record changes only; the certificate and CloudFront stay in the deploy account. Route53 only.
+	RoleArn pulumi.StringPtrInput `pulumi:"roleArn"`
+	// Zone is the DNS zone the domain belongs to, e.g. "example.com". Default: the last two labels of domain. Set it for domains such as "www.example.co.uk".
+	Zone pulumi.StringPtrInput `pulumi:"zone"`
+}
+
+func (SiteDnsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SiteDns)(nil)).Elem()
+}
+
+func (i SiteDnsArgs) ToSiteDnsOutput() SiteDnsOutput {
+	return i.ToSiteDnsOutputWithContext(context.Background())
+}
+
+func (i SiteDnsArgs) ToSiteDnsOutputWithContext(ctx context.Context) SiteDnsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SiteDnsOutput)
+}
+
+func (i SiteDnsArgs) ToSiteDnsPtrOutput() SiteDnsPtrOutput {
+	return i.ToSiteDnsPtrOutputWithContext(context.Background())
+}
+
+func (i SiteDnsArgs) ToSiteDnsPtrOutputWithContext(ctx context.Context) SiteDnsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SiteDnsOutput).ToSiteDnsPtrOutputWithContext(ctx)
+}
+
+// SiteDnsPtrInput is an input type that accepts SiteDnsArgs, SiteDnsPtr and SiteDnsPtrOutput values.
+// You can construct a concrete instance of `SiteDnsPtrInput` via:
+//
+//	        SiteDnsArgs{...}
+//
+//	or:
+//
+//	        nil
+type SiteDnsPtrInput interface {
+	pulumi.Input
+
+	ToSiteDnsPtrOutput() SiteDnsPtrOutput
+	ToSiteDnsPtrOutputWithContext(context.Context) SiteDnsPtrOutput
+}
+
+type siteDnsPtrType SiteDnsArgs
+
+func SiteDnsPtr(v *SiteDnsArgs) SiteDnsPtrInput {
+	return (*siteDnsPtrType)(v)
+}
+
+func (*siteDnsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**SiteDns)(nil)).Elem()
+}
+
+func (i *siteDnsPtrType) ToSiteDnsPtrOutput() SiteDnsPtrOutput {
+	return i.ToSiteDnsPtrOutputWithContext(context.Background())
+}
+
+func (i *siteDnsPtrType) ToSiteDnsPtrOutputWithContext(ctx context.Context) SiteDnsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SiteDnsPtrOutput)
+}
+
+// SiteDnsArgs controls where the site's DNS records are created. Only used when domain is set.
+type SiteDnsOutput struct{ *pulumi.OutputState }
+
+func (SiteDnsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SiteDns)(nil)).Elem()
+}
+
+func (o SiteDnsOutput) ToSiteDnsOutput() SiteDnsOutput {
+	return o
+}
+
+func (o SiteDnsOutput) ToSiteDnsOutputWithContext(ctx context.Context) SiteDnsOutput {
+	return o
+}
+
+func (o SiteDnsOutput) ToSiteDnsPtrOutput() SiteDnsPtrOutput {
+	return o.ToSiteDnsPtrOutputWithContext(context.Background())
+}
+
+func (o SiteDnsOutput) ToSiteDnsPtrOutputWithContext(ctx context.Context) SiteDnsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v SiteDns) *SiteDns {
+		return &v
+	}).(SiteDnsPtrOutput)
+}
+
+// Provider is where Anvil creates the certificate validation and site records. "route53": the public hosted zone for the domain, in this AWS account or the account of roleArn; the deploy fails if there isn't one. "cloudflare": the Cloudflare zone for the domain, using the API token in the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too); the token needs Zone > Zone > Read and Zone > DNS > Edit on the zone, plus Zone > Transform Rules > Edit when originProtection is on. "manual": Anvil creates no DNS records and the dnsRecords output lists what to add. Default: "route53" when a matching hosted zone is found, otherwise "manual". An existing record for a name the site needs fails the deploy; Anvil never overwrites it.
+func (o SiteDnsOutput) Provider() SiteDnsProviderPtrOutput {
+	return o.ApplyT(func(v SiteDns) *SiteDnsProvider { return v.Provider }).(SiteDnsProviderPtrOutput)
+}
+
+// Proxied routes traffic through Cloudflare's proxy in front of CloudFront. Cloudflare only. Default: true. The zone's SSL/TLS mode must be "Full (strict)". Cloudflare's free certificate only covers one level of subdomain, so proxied names like "www.<stage>.example.com" need Advanced Certificate Manager with Total TLS; Anvil warns about them. While proxied, CloudFront still accepts requests sent to it directly unless originProtection is on.
+func (o SiteDnsOutput) Proxied() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v SiteDns) *bool { return v.Proxied }).(pulumi.BoolPtrOutput)
+}
+
+// RoleArn is an IAM role in the AWS account that owns the Route53 hosted zone (e.g. a network account). Anvil assumes it for the zone lookup and record changes only; the certificate and CloudFront stay in the deploy account. Route53 only.
+func (o SiteDnsOutput) RoleArn() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SiteDns) *string { return v.RoleArn }).(pulumi.StringPtrOutput)
+}
+
+// Zone is the DNS zone the domain belongs to, e.g. "example.com". Default: the last two labels of domain. Set it for domains such as "www.example.co.uk".
+func (o SiteDnsOutput) Zone() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SiteDns) *string { return v.Zone }).(pulumi.StringPtrOutput)
+}
+
+type SiteDnsPtrOutput struct{ *pulumi.OutputState }
+
+func (SiteDnsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**SiteDns)(nil)).Elem()
+}
+
+func (o SiteDnsPtrOutput) ToSiteDnsPtrOutput() SiteDnsPtrOutput {
+	return o
+}
+
+func (o SiteDnsPtrOutput) ToSiteDnsPtrOutputWithContext(ctx context.Context) SiteDnsPtrOutput {
+	return o
+}
+
+func (o SiteDnsPtrOutput) Elem() SiteDnsOutput {
+	return o.ApplyT(func(v *SiteDns) SiteDns {
+		if v != nil {
+			return *v
+		}
+		var ret SiteDns
+		return ret
+	}).(SiteDnsOutput)
+}
+
+// Provider is where Anvil creates the certificate validation and site records. "route53": the public hosted zone for the domain, in this AWS account or the account of roleArn; the deploy fails if there isn't one. "cloudflare": the Cloudflare zone for the domain, using the API token in the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too); the token needs Zone > Zone > Read and Zone > DNS > Edit on the zone, plus Zone > Transform Rules > Edit when originProtection is on. "manual": Anvil creates no DNS records and the dnsRecords output lists what to add. Default: "route53" when a matching hosted zone is found, otherwise "manual". An existing record for a name the site needs fails the deploy; Anvil never overwrites it.
+func (o SiteDnsPtrOutput) Provider() SiteDnsProviderPtrOutput {
+	return o.ApplyT(func(v *SiteDns) *SiteDnsProvider {
+		if v == nil {
+			return nil
+		}
+		return v.Provider
+	}).(SiteDnsProviderPtrOutput)
+}
+
+// Proxied routes traffic through Cloudflare's proxy in front of CloudFront. Cloudflare only. Default: true. The zone's SSL/TLS mode must be "Full (strict)". Cloudflare's free certificate only covers one level of subdomain, so proxied names like "www.<stage>.example.com" need Advanced Certificate Manager with Total TLS; Anvil warns about them. While proxied, CloudFront still accepts requests sent to it directly unless originProtection is on.
+func (o SiteDnsPtrOutput) Proxied() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *SiteDns) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.Proxied
+	}).(pulumi.BoolPtrOutput)
+}
+
+// RoleArn is an IAM role in the AWS account that owns the Route53 hosted zone (e.g. a network account). Anvil assumes it for the zone lookup and record changes only; the certificate and CloudFront stay in the deploy account. Route53 only.
+func (o SiteDnsPtrOutput) RoleArn() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SiteDns) *string {
+		if v == nil {
+			return nil
+		}
+		return v.RoleArn
+	}).(pulumi.StringPtrOutput)
+}
+
+// Zone is the DNS zone the domain belongs to, e.g. "example.com". Default: the last two labels of domain. Set it for domains such as "www.example.co.uk".
+func (o SiteDnsPtrOutput) Zone() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SiteDns) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Zone
+	}).(pulumi.StringPtrOutput)
 }
 
 // SiteHstsArgs configures optional Strict-Transport-Security directives. Both are hard to undo — browsers remember them for the max-age (1 year).
@@ -18407,6 +18604,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*QueueLambdaConsumerArgsPtrInput)(nil)).Elem(), QueueLambdaConsumerArgsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*QueueOverridesInput)(nil)).Elem(), QueueOverridesArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*QueueOverridesPtrInput)(nil)).Elem(), QueueOverridesArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SiteDnsInput)(nil)).Elem(), SiteDnsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SiteDnsPtrInput)(nil)).Elem(), SiteDnsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SiteHstsInput)(nil)).Elem(), SiteHstsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SiteHstsPtrInput)(nil)).Elem(), SiteHstsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SiteSecurityHeadersInput)(nil)).Elem(), SiteSecurityHeadersArgs{})
@@ -18588,6 +18787,8 @@ func init() {
 	pulumi.RegisterOutputType(QueueLambdaConsumerArgsPtrOutput{})
 	pulumi.RegisterOutputType(QueueOverridesOutput{})
 	pulumi.RegisterOutputType(QueueOverridesPtrOutput{})
+	pulumi.RegisterOutputType(SiteDnsOutput{})
+	pulumi.RegisterOutputType(SiteDnsPtrOutput{})
 	pulumi.RegisterOutputType(SiteHstsOutput{})
 	pulumi.RegisterOutputType(SiteHstsPtrOutput{})
 	pulumi.RegisterOutputType(SiteSecurityHeadersOutput{})

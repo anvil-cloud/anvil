@@ -112,6 +112,9 @@ func TestEndpointGrantWiresOneWayRulesAndSourceVpce(t *testing.T) {
 		if _, ok := in["cidrIpv4"]; ok {
 			t.Errorf("%s has cidrIpv4; must be SG-to-SG", kind)
 		}
+		if got, want := in["description"].StringValue(), "Anvil grant: proc1 to sqs1 on tcp 443"; got != want {
+			t.Errorf("%s description = %q, want %q", kind, got, want)
+		}
 	}
 	checkRule("ingress", ingress[0].Inputs, "sg-sqs1", "sg-proc1")
 	checkRule("egress", egress[0].Inputs, "sg-proc1", "sg-sqs1")
@@ -296,5 +299,16 @@ func TestShortHashMatchesOtherRuntimes(t *testing.T) {
 	// FNV-1a 32 of "secretsmanager:GetSecretValue", as computed by the TS and Python runtimes.
 	if got := shortHash("secretsmanager:GetSecretValue"); got != "df5c357c" {
 		t.Fatalf("shortHash = %q, want df5c357c (TS/Python value)", got)
+	}
+}
+
+// Logical names can hold characters AWS rejects in rule descriptions; those
+// become "-", and the result is capped at 255.
+func TestGrantRuleDescriptionSanitizes(t *testing.T) {
+	if got, want := GrantRuleDescription("api~fn", "sqs|ep", 443), "Anvil grant: api-fn to sqs-ep on tcp 443"; got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+	if got := GrantRuleDescription(strings.Repeat("a", 300), "ep", 443); len(got) != 255 {
+		t.Errorf("len = %d, want 255", len(got))
 	}
 }

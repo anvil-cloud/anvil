@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"hash/fnv"
+	"regexp"
 	"sort"
 	"strings"
 	"sync"
@@ -158,6 +159,7 @@ func ConnectToEndpoint(
 		return id, nil
 	}).(pulumi.StringOutput)
 	tags := pulumi.StringMap{"ManagedBy": pulumi.String("anvil")}
+	description := pulumi.String(GrantRuleDescription(targetName, endpointName, port))
 
 	if _, err := awsvpc.NewSecurityGroupIngressRule(ctx,
 		fmt.Sprintf("%s-from-%s-%d", endpointName, targetName, port),
@@ -167,6 +169,7 @@ func ConnectToEndpoint(
 			IpProtocol:                pulumi.String("tcp"),
 			FromPort:                  pulumi.Int(port),
 			ToPort:                    pulumi.Int(port),
+			Description:               description,
 			Tags:                      tags,
 		}, opts...); err != nil {
 		return fmt.Errorf("ingress %s → %s: %w", targetName, endpointName, err)
@@ -179,11 +182,28 @@ func ConnectToEndpoint(
 			IpProtocol:                pulumi.String("tcp"),
 			FromPort:                  pulumi.Int(port),
 			ToPort:                    pulumi.Int(port),
+			Description:               description,
 			Tags:                      tags,
 		}, opts...); err != nil {
 		return fmt.Errorf("egress %s → %s: %w", targetName, endpointName, err)
 	}
 	return nil
+}
+
+var ruleDescriptionDisallowed = regexp.MustCompile(`[^a-zA-Z0-9 ._\-:/()#,@\[\]+=&;{}!$*]`)
+
+// GrantRuleDescription is the console-readable description for a grant's SG
+// rule pair, so the rule can be traced back to the grant that created it. Both
+// rules of a pair share it. AWS only allows a-zA-Z0-9 ._-:/()#,@[]+=&;{}!$*
+// (max 255), so anything else in a logical name becomes "-". The text matches
+// the TS and Python SDKs.
+func GrantRuleDescription(targetName, endpointName string, port int) string {
+	text := fmt.Sprintf("Anvil grant: %s to %s on tcp %d", targetName, endpointName, port)
+	text = ruleDescriptionDisallowed.ReplaceAllString(text, "-")
+	if len(text) > 255 {
+		text = text[:255]
+	}
+	return text
 }
 
 // ConnectToDSQL opens network access on 5432 from a target to a DSQL cluster's

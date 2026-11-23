@@ -3492,6 +3492,177 @@ func (in *siteCrossOriginOpenerPolicyPtr) ToSiteCrossOriginOpenerPolicyPtrOutput
 	return pulumi.ToOutputWithContext(ctx, in).(SiteCrossOriginOpenerPolicyPtrOutput)
 }
 
+// Where Anvil creates the site's DNS records. Default: "route53" when a matching hosted zone exists, otherwise "manual".
+type SiteDnsProvider string
+
+const (
+	// The public Route53 hosted zone for the domain in this AWS account.
+	SiteDnsProviderRoute53 = SiteDnsProvider("route53")
+	// The Cloudflare zone for the domain, using the CLOUDFLARE_API_TOKEN environment variable or cloudflare:apiToken config.
+	SiteDnsProviderCloudflare = SiteDnsProvider("cloudflare")
+	// No DNS records are created; the dnsRecords output lists the records to add yourself.
+	SiteDnsProviderManual = SiteDnsProvider("manual")
+)
+
+func (SiteDnsProvider) ElementType() reflect.Type {
+	return reflect.TypeOf((*SiteDnsProvider)(nil)).Elem()
+}
+
+func (e SiteDnsProvider) ToSiteDnsProviderOutput() SiteDnsProviderOutput {
+	return pulumi.ToOutput(e).(SiteDnsProviderOutput)
+}
+
+func (e SiteDnsProvider) ToSiteDnsProviderOutputWithContext(ctx context.Context) SiteDnsProviderOutput {
+	return pulumi.ToOutputWithContext(ctx, e).(SiteDnsProviderOutput)
+}
+
+func (e SiteDnsProvider) ToSiteDnsProviderPtrOutput() SiteDnsProviderPtrOutput {
+	return e.ToSiteDnsProviderPtrOutputWithContext(context.Background())
+}
+
+func (e SiteDnsProvider) ToSiteDnsProviderPtrOutputWithContext(ctx context.Context) SiteDnsProviderPtrOutput {
+	return SiteDnsProvider(e).ToSiteDnsProviderOutputWithContext(ctx).ToSiteDnsProviderPtrOutputWithContext(ctx)
+}
+
+func (e SiteDnsProvider) ToStringOutput() pulumi.StringOutput {
+	return pulumi.ToOutput(pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e SiteDnsProvider) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return pulumi.ToOutputWithContext(ctx, pulumi.String(e)).(pulumi.StringOutput)
+}
+
+func (e SiteDnsProvider) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringPtrOutputWithContext(context.Background())
+}
+
+func (e SiteDnsProvider) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return pulumi.String(e).ToStringOutputWithContext(ctx).ToStringPtrOutputWithContext(ctx)
+}
+
+type SiteDnsProviderOutput struct{ *pulumi.OutputState }
+
+func (SiteDnsProviderOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SiteDnsProvider)(nil)).Elem()
+}
+
+func (o SiteDnsProviderOutput) ToSiteDnsProviderOutput() SiteDnsProviderOutput {
+	return o
+}
+
+func (o SiteDnsProviderOutput) ToSiteDnsProviderOutputWithContext(ctx context.Context) SiteDnsProviderOutput {
+	return o
+}
+
+func (o SiteDnsProviderOutput) ToSiteDnsProviderPtrOutput() SiteDnsProviderPtrOutput {
+	return o.ToSiteDnsProviderPtrOutputWithContext(context.Background())
+}
+
+func (o SiteDnsProviderOutput) ToSiteDnsProviderPtrOutputWithContext(ctx context.Context) SiteDnsProviderPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v SiteDnsProvider) *SiteDnsProvider {
+		return &v
+	}).(SiteDnsProviderPtrOutput)
+}
+
+func (o SiteDnsProviderOutput) ToStringOutput() pulumi.StringOutput {
+	return o.ToStringOutputWithContext(context.Background())
+}
+
+func (o SiteDnsProviderOutput) ToStringOutputWithContext(ctx context.Context) pulumi.StringOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e SiteDnsProvider) string {
+		return string(e)
+	}).(pulumi.StringOutput)
+}
+
+func (o SiteDnsProviderOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o SiteDnsProviderOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e SiteDnsProvider) *string {
+		v := string(e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+type SiteDnsProviderPtrOutput struct{ *pulumi.OutputState }
+
+func (SiteDnsProviderPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**SiteDnsProvider)(nil)).Elem()
+}
+
+func (o SiteDnsProviderPtrOutput) ToSiteDnsProviderPtrOutput() SiteDnsProviderPtrOutput {
+	return o
+}
+
+func (o SiteDnsProviderPtrOutput) ToSiteDnsProviderPtrOutputWithContext(ctx context.Context) SiteDnsProviderPtrOutput {
+	return o
+}
+
+func (o SiteDnsProviderPtrOutput) Elem() SiteDnsProviderOutput {
+	return o.ApplyT(func(v *SiteDnsProvider) SiteDnsProvider {
+		if v != nil {
+			return *v
+		}
+		var ret SiteDnsProvider
+		return ret
+	}).(SiteDnsProviderOutput)
+}
+
+func (o SiteDnsProviderPtrOutput) ToStringPtrOutput() pulumi.StringPtrOutput {
+	return o.ToStringPtrOutputWithContext(context.Background())
+}
+
+func (o SiteDnsProviderPtrOutput) ToStringPtrOutputWithContext(ctx context.Context) pulumi.StringPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, e *SiteDnsProvider) *string {
+		if e == nil {
+			return nil
+		}
+		v := string(*e)
+		return &v
+	}).(pulumi.StringPtrOutput)
+}
+
+// SiteDnsProviderInput is an input type that accepts values of the SiteDnsProvider enum
+// A concrete instance of `SiteDnsProviderInput` can be one of the following:
+//
+//	SiteDnsProviderRoute53
+//	SiteDnsProviderCloudflare
+//	SiteDnsProviderManual
+type SiteDnsProviderInput interface {
+	pulumi.Input
+
+	ToSiteDnsProviderOutput() SiteDnsProviderOutput
+	ToSiteDnsProviderOutputWithContext(context.Context) SiteDnsProviderOutput
+}
+
+var siteDnsProviderPtrType = reflect.TypeOf((**SiteDnsProvider)(nil)).Elem()
+
+type SiteDnsProviderPtrInput interface {
+	pulumi.Input
+
+	ToSiteDnsProviderPtrOutput() SiteDnsProviderPtrOutput
+	ToSiteDnsProviderPtrOutputWithContext(context.Context) SiteDnsProviderPtrOutput
+}
+
+type siteDnsProviderPtr string
+
+func SiteDnsProviderPtr(v string) SiteDnsProviderPtrInput {
+	return (*siteDnsProviderPtr)(&v)
+}
+
+func (*siteDnsProviderPtr) ElementType() reflect.Type {
+	return siteDnsProviderPtrType
+}
+
+func (in *siteDnsProviderPtr) ToSiteDnsProviderPtrOutput() SiteDnsProviderPtrOutput {
+	return pulumi.ToOutput(in).(SiteDnsProviderPtrOutput)
+}
+
+func (in *siteDnsProviderPtr) ToSiteDnsProviderPtrOutputWithContext(ctx context.Context) SiteDnsProviderPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, in).(SiteDnsProviderPtrOutput)
+}
+
 // Whether other sites can embed this one in a frame (X-Frame-Options). Default: "sameorigin".
 type SiteFrameOptions string
 
@@ -4380,6 +4551,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*S3FlowLogLifecyclePtrInput)(nil)).Elem(), S3FlowLogLifecycle("standard"))
 	pulumi.RegisterInputType(reflect.TypeOf((*SiteCrossOriginOpenerPolicyInput)(nil)).Elem(), SiteCrossOriginOpenerPolicy("same-origin-allow-popups"))
 	pulumi.RegisterInputType(reflect.TypeOf((*SiteCrossOriginOpenerPolicyPtrInput)(nil)).Elem(), SiteCrossOriginOpenerPolicy("same-origin-allow-popups"))
+	pulumi.RegisterInputType(reflect.TypeOf((*SiteDnsProviderInput)(nil)).Elem(), SiteDnsProvider("route53"))
+	pulumi.RegisterInputType(reflect.TypeOf((*SiteDnsProviderPtrInput)(nil)).Elem(), SiteDnsProvider("route53"))
 	pulumi.RegisterInputType(reflect.TypeOf((*SiteFrameOptionsInput)(nil)).Elem(), SiteFrameOptions("sameorigin"))
 	pulumi.RegisterInputType(reflect.TypeOf((*SiteFrameOptionsPtrInput)(nil)).Elem(), SiteFrameOptions("sameorigin"))
 	pulumi.RegisterInputType(reflect.TypeOf((*SiteProtectionInput)(nil)).Elem(), SiteProtection("none"))
@@ -4432,6 +4605,8 @@ func init() {
 	pulumi.RegisterOutputType(S3FlowLogLifecyclePtrOutput{})
 	pulumi.RegisterOutputType(SiteCrossOriginOpenerPolicyOutput{})
 	pulumi.RegisterOutputType(SiteCrossOriginOpenerPolicyPtrOutput{})
+	pulumi.RegisterOutputType(SiteDnsProviderOutput{})
+	pulumi.RegisterOutputType(SiteDnsProviderPtrOutput{})
 	pulumi.RegisterOutputType(SiteFrameOptionsOutput{})
 	pulumi.RegisterOutputType(SiteFrameOptionsPtrOutput{})
 	pulumi.RegisterOutputType(SiteProtectionOutput{})

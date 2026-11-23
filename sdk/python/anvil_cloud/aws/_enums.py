@@ -26,6 +26,7 @@ __all__ = [
     'LambdaRuntime',
     'S3FlowLogLifecycle',
     'SiteCrossOriginOpenerPolicy',
+    'SiteDnsProvider',
     'SiteFrameOptions',
     'SiteProtection',
     'VpcNatType',
@@ -431,6 +432,25 @@ class SiteCrossOriginOpenerPolicy(_builtins.str, Enum):
     NONE = "none"
     """
     No Cross-Origin-Opener-Policy header.
+    """
+
+
+@pulumi.type_token("anvil:aws:SiteDnsProvider")
+class SiteDnsProvider(_builtins.str, Enum):
+    """
+    Where Anvil creates the site's DNS records. Default: "route53" when a matching hosted zone exists, otherwise "manual".
+    """
+    ROUTE53 = "route53"
+    """
+    The public Route53 hosted zone for the domain in this AWS account.
+    """
+    CLOUDFLARE = "cloudflare"
+    """
+    The Cloudflare zone for the domain, using the CLOUDFLARE_API_TOKEN environment variable or cloudflare:apiToken config.
+    """
+    MANUAL = "manual"
+    """
+    No DNS records are created; the dnsRecords output lists the records to add yourself.
     """
 
 

@@ -173,6 +173,8 @@ __all__ = [
     'QueueLambdaConsumerArgsArgsDict',
     'QueueOverridesArgs',
     'QueueOverridesArgsDict',
+    'SiteDnsArgs',
+    'SiteDnsArgsDict',
     'SiteHstsArgs',
     'SiteHstsArgsDict',
     'SiteSecurityHeadersArgs',
@@ -8062,7 +8064,7 @@ class LambdaVpcArgsArgsDict(TypedDict):
     """
     has_nat: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
+    Set when the VPC routes outbound traffic through a NAT gateway or instance. Adds outbound 443 to 0.0.0.0/0 on the Lambda's security group.
     """
 
 @pulumi.input_type
@@ -8078,7 +8080,7 @@ class LambdaVpcArgsArgs:
         :param Any vpc_id: The ID of the VPC to place the Lambda in. Accepts Output<string> - pass vpc.vpcId directly.
         :param pulumi.Input[_builtins.bool] allow_all_outbound: Adds the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
         :param pulumi.Input[Sequence[pulumi.Input['LambdaVpcCidrArgsArgs']]] cidrs: CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.
-        :param pulumi.Input[_builtins.bool] has_nat: Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
+        :param pulumi.Input[_builtins.bool] has_nat: Set when the VPC routes outbound traffic through a NAT gateway or instance. Adds outbound 443 to 0.0.0.0/0 on the Lambda's security group.
         """
         pulumi.set(__self__, "private_subnet_ids", private_subnet_ids)
         pulumi.set(__self__, "vpc_id", vpc_id)
@@ -8141,7 +8143,7 @@ class LambdaVpcArgsArgs:
     @pulumi.getter(name="hasNat")
     def has_nat(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
+        Set when the VPC routes outbound traffic through a NAT gateway or instance. Adds outbound 443 to 0.0.0.0/0 on the Lambda's security group.
         """
         return pulumi.get(self, "has_nat")
 
@@ -8908,6 +8910,100 @@ class QueueOverridesArgs:
     @visibility_timeout_seconds.setter
     def visibility_timeout_seconds(self, value: Optional[pulumi.Input[_builtins.int]]):
         pulumi.set(self, "visibility_timeout_seconds", value)
+
+
+class SiteDnsArgsDict(TypedDict):
+    """
+    SiteDnsArgs controls where the site's DNS records are created. Only used when domain is set.
+    """
+    provider: NotRequired[pulumi.Input['SiteDnsProvider']]
+    """
+    Provider is where Anvil creates the certificate validation and site records. "route53": the public hosted zone for the domain, in this AWS account or the account of roleArn; the deploy fails if there isn't one. "cloudflare": the Cloudflare zone for the domain, using the API token in the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too); the token needs Zone > Zone > Read and Zone > DNS > Edit on the zone, plus Zone > Transform Rules > Edit when originProtection is on. "manual": Anvil creates no DNS records and the dnsRecords output lists what to add. Default: "route53" when a matching hosted zone is found, otherwise "manual". An existing record for a name the site needs fails the deploy; Anvil never overwrites it.
+    """
+    proxied: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Proxied routes traffic through Cloudflare's proxy in front of CloudFront. Cloudflare only. Default: true. The zone's SSL/TLS mode must be "Full (strict)". Cloudflare's free certificate only covers one level of subdomain, so proxied names like "www.<stage>.example.com" need Advanced Certificate Manager with Total TLS; Anvil warns about them. While proxied, CloudFront still accepts requests sent to it directly unless originProtection is on.
+    """
+    role_arn: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    RoleArn is an IAM role in the AWS account that owns the Route53 hosted zone (e.g. a network account). Anvil assumes it for the zone lookup and record changes only; the certificate and CloudFront stay in the deploy account. Route53 only.
+    """
+    zone: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Zone is the DNS zone the domain belongs to, e.g. "example.com". Default: the last two labels of domain. Set it for domains such as "www.example.co.uk".
+    """
+
+@pulumi.input_type
+class SiteDnsArgs:
+    def __init__(__self__, *,
+                 provider: Optional[pulumi.Input['SiteDnsProvider']] = None,
+                 proxied: Optional[pulumi.Input[_builtins.bool]] = None,
+                 role_arn: Optional[pulumi.Input[_builtins.str]] = None,
+                 zone: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        SiteDnsArgs controls where the site's DNS records are created. Only used when domain is set.
+
+        :param pulumi.Input['SiteDnsProvider'] provider: Provider is where Anvil creates the certificate validation and site records. "route53": the public hosted zone for the domain, in this AWS account or the account of roleArn; the deploy fails if there isn't one. "cloudflare": the Cloudflare zone for the domain, using the API token in the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too); the token needs Zone > Zone > Read and Zone > DNS > Edit on the zone, plus Zone > Transform Rules > Edit when originProtection is on. "manual": Anvil creates no DNS records and the dnsRecords output lists what to add. Default: "route53" when a matching hosted zone is found, otherwise "manual". An existing record for a name the site needs fails the deploy; Anvil never overwrites it.
+        :param pulumi.Input[_builtins.bool] proxied: Proxied routes traffic through Cloudflare's proxy in front of CloudFront. Cloudflare only. Default: true. The zone's SSL/TLS mode must be "Full (strict)". Cloudflare's free certificate only covers one level of subdomain, so proxied names like "www.<stage>.example.com" need Advanced Certificate Manager with Total TLS; Anvil warns about them. While proxied, CloudFront still accepts requests sent to it directly unless originProtection is on.
+        :param pulumi.Input[_builtins.str] role_arn: RoleArn is an IAM role in the AWS account that owns the Route53 hosted zone (e.g. a network account). Anvil assumes it for the zone lookup and record changes only; the certificate and CloudFront stay in the deploy account. Route53 only.
+        :param pulumi.Input[_builtins.str] zone: Zone is the DNS zone the domain belongs to, e.g. "example.com". Default: the last two labels of domain. Set it for domains such as "www.example.co.uk".
+        """
+        if provider is not None:
+            pulumi.set(__self__, "provider", provider)
+        if proxied is not None:
+            pulumi.set(__self__, "proxied", proxied)
+        if role_arn is not None:
+            pulumi.set(__self__, "role_arn", role_arn)
+        if zone is not None:
+            pulumi.set(__self__, "zone", zone)
+
+    @_builtins.property
+    @pulumi.getter
+    def provider(self) -> Optional[pulumi.Input['SiteDnsProvider']]:
+        """
+        Provider is where Anvil creates the certificate validation and site records. "route53": the public hosted zone for the domain, in this AWS account or the account of roleArn; the deploy fails if there isn't one. "cloudflare": the Cloudflare zone for the domain, using the API token in the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too); the token needs Zone > Zone > Read and Zone > DNS > Edit on the zone, plus Zone > Transform Rules > Edit when originProtection is on. "manual": Anvil creates no DNS records and the dnsRecords output lists what to add. Default: "route53" when a matching hosted zone is found, otherwise "manual". An existing record for a name the site needs fails the deploy; Anvil never overwrites it.
+        """
+        return pulumi.get(self, "provider")
+
+    @provider.setter
+    def provider(self, value: Optional[pulumi.Input['SiteDnsProvider']]):
+        pulumi.set(self, "provider", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def proxied(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Proxied routes traffic through Cloudflare's proxy in front of CloudFront. Cloudflare only. Default: true. The zone's SSL/TLS mode must be "Full (strict)". Cloudflare's free certificate only covers one level of subdomain, so proxied names like "www.<stage>.example.com" need Advanced Certificate Manager with Total TLS; Anvil warns about them. While proxied, CloudFront still accepts requests sent to it directly unless originProtection is on.
+        """
+        return pulumi.get(self, "proxied")
+
+    @proxied.setter
+    def proxied(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "proxied", value)
+
+    @_builtins.property
+    @pulumi.getter(name="roleArn")
+    def role_arn(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        RoleArn is an IAM role in the AWS account that owns the Route53 hosted zone (e.g. a network account). Anvil assumes it for the zone lookup and record changes only; the certificate and CloudFront stay in the deploy account. Route53 only.
+        """
+        return pulumi.get(self, "role_arn")
+
+    @role_arn.setter
+    def role_arn(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "role_arn", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def zone(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Zone is the DNS zone the domain belongs to, e.g. "example.com". Default: the last two labels of domain. Set it for domains such as "www.example.co.uk".
+        """
+        return pulumi.get(self, "zone")
+
+    @zone.setter
+    def zone(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "zone", value)
 
 
 class SiteHstsArgsDict(TypedDict):

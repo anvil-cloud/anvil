@@ -35,6 +35,7 @@ export default new Org({ ... });
 - [App ↔ account linking](11-app-linking.md)
 - [API](12-api.md)
 - [Later: billing](later-billing.md) (parked)
+- [Later: DNS roles for site domains](later-dns.md) (parked)
 - [Reviews and audits](reviews.md) (latest: Audit 3; highs settled, quick fixes applied, rest noted for the build): history of the best-practice review, pain-point research, security review and audits, with each finding's decision
 
 ## Open topics
@@ -50,6 +51,7 @@ export default new Org({ ... });
   forced CloudTrail/Config, collisions, destroy) and needs a separate test org
   per cycle
 - Org release workflow: git tags (`org-v1.3.0`), embedding previous baselines, version-bump CI check, auto-patch (see Baseline versions and upgrades)
+- DNS roles for site domains: zones in the Network account, per-environment roles limited by record name, found through `/anvil/org/account` (see [Later: DNS roles](later-dns.md))
 - Billing (budgets, freeze/stop, schedules, data exports, anomaly detection): parked, not in v1 (see [Later: billing](later-billing.md))
 - `anvil org dashboard`: page details per level
 - Hosted dashboard (later): Identity Center sign-in, private/VPN-only option, backend read role; notification listener management and chat permissions (audit A10)

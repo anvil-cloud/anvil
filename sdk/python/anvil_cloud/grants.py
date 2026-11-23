@@ -3,6 +3,7 @@
 #
 # Provides the runtime grant execution for all resource grant methods.
 
+import re
 from typing import Any, List, Optional, Protocol, Set
 
 import pulumi
@@ -81,6 +82,19 @@ def input_field(obj, name: str) -> Any:
 _wired_endpoint_pairs: Set[str] = set()
 
 
+_RULE_DESCRIPTION_DISALLOWED = re.compile(r"[^a-zA-Z0-9 ._\-:/()#,@\[\]+=&;{}!$*]")
+
+
+def grant_rule_description(target_name: str, endpoint_name: str, port: int) -> str:
+    """Console-readable description for a grant's SG rule pair, so the rule can
+    be traced back to the grant that created it. Both rules of a pair share it.
+    AWS only allows ``a-zA-Z0-9 ._-:/()#,@[]+=&;{}!$*`` (max 255), so anything
+    else in a logical name becomes ``-``.
+    """
+    text = f"Anvil grant: {target_name} to {endpoint_name} on tcp {port}"
+    return _RULE_DESCRIPTION_DISALLOWED.sub("-", text)[:255]
+
+
 def connect_to_endpoint(endpoint_name: str, endpoint_sg_id, target, port: int) -> None:
     """Open one-way network access from a target to a VPC endpoint.
 
@@ -117,6 +131,7 @@ def connect_to_endpoint(endpoint_name: str, endpoint_sg_id, target, port: int) -
 
     target_sg_id = target.grant_security_group_id().apply(_require)
     tags = {"ManagedBy": "anvil"}
+    description = grant_rule_description(target_name, endpoint_name, port)
 
     aws.vpc.SecurityGroupIngressRule(
         f"{endpoint_name}-from-{target_name}-{port}",
@@ -125,6 +140,7 @@ def connect_to_endpoint(endpoint_name: str, endpoint_sg_id, target, port: int) -
         ip_protocol="tcp",
         from_port=port,
         to_port=port,
+        description=description,
         tags=tags,
     )
     aws.vpc.SecurityGroupEgressRule(
@@ -134,6 +150,7 @@ def connect_to_endpoint(endpoint_name: str, endpoint_sg_id, target, port: int) -
         ip_protocol="tcp",
         from_port=port,
         to_port=port,
+        description=description,
         tags=tags,
     )
 

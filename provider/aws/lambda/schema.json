@@ -461,7 +461,7 @@
           "type": "array"
         },
         "hasNat": {
-          "description": "Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.",
+          "description": "Set when the VPC routes outbound traffic through a NAT gateway or instance. Adds outbound 443 to 0.0.0.0/0 on the Lambda's security group.",
           "type": "boolean"
         },
         "privateSubnetIds": {

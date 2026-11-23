@@ -128,3 +128,40 @@ type SiteHstsArgs struct {
 	// list. Requires includeSubDomains. Default: false.
 	Preload bool `pulumi:"preload,optional"`
 }
+
+// SiteDnsArgs controls where the site's DNS records are created. Only used
+// when domain is set.
+type SiteDnsArgs struct {
+	// Provider is where Anvil creates the certificate validation and site
+	// records. "route53": the public hosted zone for the domain, in this AWS
+	// account or the account of roleArn; the deploy fails if there isn't one.
+	// "cloudflare": the Cloudflare zone for the domain, using the API token in
+	// the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too);
+	// the token needs Zone > Zone > Read and Zone > DNS > Edit on the zone,
+	// plus Zone > Transform Rules > Edit when originProtection is on. "manual":
+	// Anvil creates no DNS records and the dnsRecords output lists what to
+	// add. Default: "route53" when a matching hosted zone is found, otherwise
+	// "manual". An existing record for a name the site needs fails the deploy;
+	// Anvil never overwrites it.
+	Provider string `pulumi:"provider,optional"`
+
+	// Zone is the DNS zone the domain belongs to, e.g. "example.com".
+	// Default: the last two labels of domain. Set it for domains such as
+	// "www.example.co.uk".
+	Zone string `pulumi:"zone,optional"`
+
+	// Proxied routes traffic through Cloudflare's proxy in front of
+	// CloudFront. Cloudflare only. Default: true. The zone's SSL/TLS mode must
+	// be "Full (strict)". Cloudflare's free certificate only covers one level
+	// of subdomain, so proxied names like "www.<stage>.example.com" need
+	// Advanced Certificate Manager with Total TLS; Anvil warns about them.
+	// While proxied, CloudFront still accepts requests sent to it directly
+	// unless originProtection is on.
+	Proxied *bool `pulumi:"proxied,optional"`
+
+	// RoleArn is an IAM role in the AWS account that owns the Route53 hosted
+	// zone (e.g. a network account). Anvil assumes it for the zone lookup and
+	// record changes only; the certificate and CloudFront stay in the deploy
+	// account. Route53 only.
+	RoleArn string `pulumi:"roleArn,optional"`
+}

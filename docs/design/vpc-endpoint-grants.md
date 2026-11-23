@@ -12,7 +12,7 @@ queue.grantSendMessage(fn, { endpoint: sqsEndpoint });
 
 | Layer | What the grant adds |
 |---|---|
-| Network | `endpoint-sg` ingress 443 from `fn-sg`, and `fn-sg` egress 443 to `endpoint-sg`. Once per (endpoint, target, port), at the stack root. |
+| Network | `endpoint-sg` ingress 443 from `fn-sg`, and `fn-sg` egress 443 to `endpoint-sg`. Once per (endpoint, target, port), at the stack root. Both rules are described `Anvil grant: <target> to <endpoint> on tcp <port>` so the console traces them back to the grant. |
 | IAM | The grant's statement gets `Condition: { StringEquals: { aws:SourceVpce: <endpointId> } }`. |
 | Endpoint policy | Unchanged per grant: `Principal: "*"` limited to this account with `aws:PrincipalAccount`; `overridePermissions` narrows the actions. |
 

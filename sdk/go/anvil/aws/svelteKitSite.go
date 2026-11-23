@@ -40,6 +40,9 @@ func NewSvelteKitSite(ctx *pulumi.Context,
 }
 
 type svelteKitSiteArgs struct {
+	// Dns controls where the domain's DNS records are created: Route53, Cloudflare, or manual.
+	Dns *SiteDns `pulumi:"dns"`
+	// Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records wherever dns.provider says.
 	Domain *string `pulumi:"domain"`
 	// Environment vars available at BOTH build time and runtime. Values must be string literals since they're needed before the build runs.
 	Environment map[string]string `pulumi:"environment"`
@@ -55,10 +58,15 @@ type svelteKitSiteArgs struct {
 	SecurityHeaders *SiteSecurityHeaders `pulumi:"securityHeaders"`
 	// Waf attaches a WAF WebACL to the site's CloudFront distribution. Protection defaults to "edge-oac" while it's attached.
 	Waf *SiteWaf `pulumi:"waf"`
+	// WwwRedirect pairs the zone's apex and www names on prod stages: the name in domain is served and the other one 301-redirects to it ("youlosei.win" also answers on "www.youlosei.win", and the other way round). Only for apex or www domains; other stages have no pair. Default: true.
+	WwwRedirect *bool `pulumi:"wwwRedirect"`
 }
 
 // The set of arguments for constructing a SvelteKitSite resource.
 type SvelteKitSiteArgs struct {
+	// Dns controls where the domain's DNS records are created: Route53, Cloudflare, or manual.
+	Dns SiteDnsPtrInput
+	// Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records wherever dns.provider says.
 	Domain pulumi.StringPtrInput
 	// Environment vars available at BOTH build time and runtime. Values must be string literals since they're needed before the build runs.
 	Environment pulumi.StringMapInput
@@ -74,6 +82,8 @@ type SvelteKitSiteArgs struct {
 	SecurityHeaders SiteSecurityHeadersPtrInput
 	// Waf attaches a WAF WebACL to the site's CloudFront distribution. Protection defaults to "edge-oac" while it's attached.
 	Waf SiteWafPtrInput
+	// WwwRedirect pairs the zone's apex and www names on prod stages: the name in domain is served and the other one 301-redirects to it ("youlosei.win" also answers on "www.youlosei.win", and the other way round). Only for apex or www domains; other stages have no pair. Default: true.
+	WwwRedirect pulumi.BoolPtrInput
 }
 
 func (SvelteKitSiteArgs) ElementType() reflect.Type {

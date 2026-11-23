@@ -74,9 +74,10 @@ type LambdaVpcArgs struct {
 	// Always private -- Lambda must never be placed in public subnets.
 	PrivateSubnetIds pulumi.StringArrayInput `pulumi:"privateSubnetIds"`
 
-	// HasNat indicates whether this VPC has a NAT Gateway or fck-nat instance.
-	// When true, Anvil adds an internet egress rule (port 443) automatically.
-	// Only needed for imported VPCs -- omit when using an Anvil Vpc component.
+	// HasNat indicates whether this VPC routes outbound traffic through a NAT
+	// Gateway or fck-nat instance. When true, Anvil adds an internet egress
+	// rule (port 443). Nothing detects NAT automatically, so set it for
+	// Anvil-managed VPCs with NAT too.
 	HasNat bool `pulumi:"hasNat,optional"`
 
 	// AllowAllOutbound adds the rule AWS puts on a new security group (all

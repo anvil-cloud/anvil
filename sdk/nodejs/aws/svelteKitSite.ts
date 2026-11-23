@@ -43,6 +43,7 @@ export class SvelteKitSite extends pulumi.ComponentResource {
         let resourceInputs: pulumi.Inputs = {};
         opts = opts || {};
         if (!opts.id) {
+            resourceInputs["dns"] = args?.dns;
             resourceInputs["domain"] = args?.domain;
             resourceInputs["environment"] = args?.environment;
             resourceInputs["hatch"] = args?.hatch;
@@ -52,6 +53,7 @@ export class SvelteKitSite extends pulumi.ComponentResource {
             resourceInputs["runtimeEnvironment"] = args?.runtimeEnvironment;
             resourceInputs["securityHeaders"] = args?.securityHeaders;
             resourceInputs["waf"] = args?.waf;
+            resourceInputs["wwwRedirect"] = args?.wwwRedirect;
             resourceInputs["bucketName"] = undefined /*out*/;
             resourceInputs["cloudFrontDistributionId"] = undefined /*out*/;
             resourceInputs["dnsRecords"] = undefined /*out*/;
@@ -75,6 +77,13 @@ export class SvelteKitSite extends pulumi.ComponentResource {
  * The set of arguments for constructing a SvelteKitSite resource.
  */
 export interface SvelteKitSiteArgs {
+    /**
+     * Dns controls where the domain's DNS records are created: Route53, Cloudflare, or manual.
+     */
+    dns?: pulumi.Input<inputs.aws.SiteDnsArgs>;
+    /**
+     * Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records wherever dns.provider says.
+     */
     domain?: pulumi.Input<string>;
     /**
      * Environment vars available at BOTH build time and runtime. Values must be string literals since they're needed before the build runs.
@@ -102,4 +111,8 @@ export interface SvelteKitSiteArgs {
      * Waf attaches a WAF WebACL to the site's CloudFront distribution. Protection defaults to "edge-oac" while it's attached.
      */
     waf?: pulumi.Input<inputs.aws.SiteWafArgs>;
+    /**
+     * WwwRedirect pairs the zone's apex and www names on prod stages: the name in domain is served and the other one 301-redirects to it ("youlosei.win" also answers on "www.youlosei.win", and the other way round). Only for apex or www domains; other stages have no pair. Default: true.
+     */
+    wwwRedirect?: pulumi.Input<boolean>;
 }

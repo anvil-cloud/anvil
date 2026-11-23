@@ -8,6 +8,7 @@ import (
 
 	"github.com/anvil-cloud/anvil/provider/internal/awssite"
 	"github.com/anvil-cloud/anvil/provider/internal/hatch"
+	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
 	"github.com/anvil-cloud/anvil/provider/sites"
 	"github.com/anvil-cloud/anvil/provider/sites/sveltekit"
 	p "github.com/pulumi/pulumi-go-provider"
@@ -31,8 +32,23 @@ type SvelteKitSiteArgs struct {
 	// Only available at request time, NOT during build/prerendering.
 	RuntimeEnvironment map[string]pulumi.StringInput `pulumi:"runtimeEnvironment,optional"`
 
-	Domain string                            `pulumi:"domain,optional"`
-	Hatch  map[string]map[string]interface{} `pulumi:"hatch,optional"`
+	// Domain is the site's hostname on prod stages, e.g. "youlosei.win" or
+	// "www.youlosei.win". Other stages insert the stage name just above the
+	// zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues
+	// an ACM certificate and creates the DNS records wherever dns.provider says.
+	Domain string `pulumi:"domain,optional"`
+
+	// WwwRedirect pairs the zone's apex and www names on prod stages: the name
+	// in domain is served and the other one 301-redirects to it ("youlosei.win"
+	// also answers on "www.youlosei.win", and the other way round). Only for
+	// apex or www domains; other stages have no pair. Default: true.
+	WwwRedirect *bool `pulumi:"wwwRedirect,optional"`
+
+	// Dns controls where the domain's DNS records are created: Route53,
+	// Cloudflare, or manual.
+	Dns *sites.SiteDnsArgs `pulumi:"dns,optional"`
+
+	Hatch map[string]map[string]interface{} `pulumi:"hatch,optional"`
 
 	// OriginProtection locks CloudFront to a CDN/proxy in front of it
 	// (Cloudflare, Fastly, Akamai, nginx, ...). Requests without the
@@ -216,15 +232,28 @@ func NewSvelteKitSite(ctx *pulumi.Context, name string, args SvelteKitSiteArgs, 
 	var certARN pulumi.StringOutput
 	dnsRecordsOutput := pulumi.String("").ToStringOutput()
 	var cfDependencies []pulumi.Resource
+	var domain *awssite.SiteDomain
+	hostname := ""
 
 	if args.Domain != "" {
-		dr, err := awssite.SetupCustomDomain(ctx, site, name, args.Domain)
+		anvilCtx := provider.NewContext(ctx)
+		domain, err = awssite.NewSiteDomain(ctx, site, name, awssite.DomainInputs{
+			Domain:           args.Domain,
+			Dns:              args.Dns,
+			WwwRedirect:      args.WwwRedirect,
+			Stage:            anvilCtx.Stage,
+			Environment:      anvilCtx.Environment,
+			OriginProtection: hosting.OriginProtection(),
+			WafAttached:      hosting.WafAttached(),
+		})
 		if err != nil {
 			return nil, fmt.Errorf("custom domain setup failed: %w", err)
 		}
-		certARN = dr.CertARN
-		dnsRecordsOutput = dr.DNSInstructions
-		cfDependencies = append(cfDependencies, dr.Validation)
+		hostname = domain.Hostname
+		certARN = domain.CertARN
+		cfDependencies = append(cfDependencies, domain.Validation)
+	} else if args.Dns != nil || args.WwwRedirect != nil {
+		ctx.Log.Warn("dns and wwwRedirect only apply with a domain; they have no effect here.", &pulumi.LogArgs{Resource: site})
 	}
 
 	// ── CloudFront ───────────────────────────────────────────────
@@ -254,12 +283,23 @@ func NewSvelteKitSite(ctx *pulumi.Context, name string, args SvelteKitSiteArgs, 
 		cfOpts = append(cfOpts, pulumi.DependsOn([]pulumi.Resource{dep}))
 	}
 
+	var redirect *awssite.SiteRedirect
+	redirectDomain := ""
+	if domain != nil && domain.RedirectFrom != "" {
+		redirect = &awssite.SiteRedirect{From: domain.RedirectFrom, To: domain.Hostname}
+		redirectDomain = domain.RedirectFrom
+	}
+	if err := hosting.CreateViewerRequestFunction(redirect); err != nil {
+		return nil, err
+	}
+
 	cfArgs := awssite.CloudFrontArgs{
 		Name:                  name,
 		Bucket:                bucket,
 		OAC:                   oac,
 		LambdaOriginDomain:    lambdaOriginDomain,
-		Domain:                args.Domain,
+		Domain:                hostname,
+		RedirectDomain:        redirectDomain,
 		CertARN:               certARN,
 		OrderedCacheBehaviors: sveltekitCacheBehaviors,
 	}
@@ -293,15 +333,18 @@ func NewSvelteKitSite(ctx *pulumi.Context, name string, args SvelteKitSiteArgs, 
 		return nil, err
 	}
 
-	// ── Route53 records ──────────────────────────────────────────
-	if args.Domain != "" {
-		awssite.CreateRoute53Records(ctx, site, name, args.Domain, distribution)
+	// ── DNS records ──────────────────────────────────────────────
+	if domain != nil {
+		dnsRecordsOutput, err = domain.PointAt(distribution, hosting.OriginSecret)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// ── Outputs ──────────────────────────────────────────────────
 	siteURL := distribution.DomainName.ApplyT(func(d string) string { return "https://" + d }).(pulumi.StringOutput)
-	if args.Domain != "" {
-		siteURL = pulumi.Sprintf("https://%s", args.Domain)
+	if hostname != "" {
+		siteURL = pulumi.Sprintf("https://%s", hostname)
 	}
 
 	site.URL = siteURL
