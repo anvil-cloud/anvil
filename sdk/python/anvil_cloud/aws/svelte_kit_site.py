@@ -35,8 +35,8 @@ class SvelteKitSiteArgs:
         """
         The set of arguments for constructing a SvelteKitSite resource.
 
-        :param pulumi.Input['SiteDnsArgs'] dns: Dns controls where the domain's DNS records are created: Route53, Cloudflare, or manual.
-        :param pulumi.Input[_builtins.str] domain: Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records wherever dns.provider says.
+        :param pulumi.Input['SiteDnsArgs'] dns: Dns controls where the domain's DNS records are created: set one of route53, cloudflare or manual. Default: Route53 when a matching hosted zone is found, otherwise manual.
+        :param pulumi.Input[_builtins.str] domain: Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records in Route53 or Cloudflare (see dns).
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment: Environment vars available at BOTH build time and runtime. Values must be string literals since they're needed before the build runs.
         :param pulumi.Input[_builtins.bool] origin_protection: OriginProtection locks CloudFront to a CDN/proxy in front of it (Cloudflare, Fastly, Akamai, nginx, ...). Requests without the x-origin-secret header are rejected at the edge; configure the proxy to send it on every request with the originSecret output as the value. Protection defaults to "edge-oac" while it's enabled, so the server Function URL can't be reached around the proxy.
         :param pulumi.Input['SiteProtection'] protection: Protection controls who can invoke the server Lambda's Function URL. Default: "none", or "edge-oac" while a WAF is attached or origin protection is enabled. An explicit value always wins. "none": public Function URL; anyone who learns it can call the server directly, bypassing CloudFront. "oac": locked to CloudFront via IAM; requests with a body are rejected unless they already carry an x-amz-content-sha256 header. "edge-oac": "oac" plus a Lambda@Edge function that adds the header, following AWS's guidance — nothing is needed in the app; request bodies over 1 MB are rejected. In "oac" and "edge-oac", a viewer Authorization header is replaced by CloudFront's signature.
@@ -72,7 +72,7 @@ class SvelteKitSiteArgs:
     @pulumi.getter
     def dns(self) -> Optional[pulumi.Input['SiteDnsArgs']]:
         """
-        Dns controls where the domain's DNS records are created: Route53, Cloudflare, or manual.
+        Dns controls where the domain's DNS records are created: set one of route53, cloudflare or manual. Default: Route53 when a matching hosted zone is found, otherwise manual.
         """
         return pulumi.get(self, "dns")
 
@@ -84,7 +84,7 @@ class SvelteKitSiteArgs:
     @pulumi.getter
     def domain(self) -> Optional[pulumi.Input[_builtins.str]]:
         """
-        Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records wherever dns.provider says.
+        Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records in Route53 or Cloudflare (see dns).
         """
         return pulumi.get(self, "domain")
 
@@ -218,8 +218,8 @@ class SvelteKitSite(pulumi.ComponentResource):
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[Union['SiteDnsArgs', 'SiteDnsArgsDict']] dns: Dns controls where the domain's DNS records are created: Route53, Cloudflare, or manual.
-        :param pulumi.Input[_builtins.str] domain: Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records wherever dns.provider says.
+        :param pulumi.Input[Union['SiteDnsArgs', 'SiteDnsArgsDict']] dns: Dns controls where the domain's DNS records are created: set one of route53, cloudflare or manual. Default: Route53 when a matching hosted zone is found, otherwise manual.
+        :param pulumi.Input[_builtins.str] domain: Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records in Route53 or Cloudflare (see dns).
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment: Environment vars available at BOTH build time and runtime. Values must be string literals since they're needed before the build runs.
         :param pulumi.Input[_builtins.bool] origin_protection: OriginProtection locks CloudFront to a CDN/proxy in front of it (Cloudflare, Fastly, Akamai, nginx, ...). Requests without the x-origin-secret header are rejected at the edge; configure the proxy to send it on every request with the originSecret output as the value. Protection defaults to "edge-oac" while it's enabled, so the server Function URL can't be reached around the proxy.
         :param pulumi.Input['SiteProtection'] protection: Protection controls who can invoke the server Lambda's Function URL. Default: "none", or "edge-oac" while a WAF is attached or origin protection is enabled. An explicit value always wins. "none": public Function URL; anyone who learns it can call the server directly, bypassing CloudFront. "oac": locked to CloudFront via IAM; requests with a body are rejected unless they already carry an x-amz-content-sha256 header. "edge-oac": "oac" plus a Lambda@Edge function that adds the header, following AWS's guidance — nothing is needed in the app; request bodies over 1 MB are rejected. In "oac" and "edge-oac", a viewer Authorization header is replaced by CloudFront's signature.

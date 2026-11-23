@@ -78,11 +78,11 @@ export class SvelteKitSite extends pulumi.ComponentResource {
  */
 export interface SvelteKitSiteArgs {
     /**
-     * Dns controls where the domain's DNS records are created: Route53, Cloudflare, or manual.
+     * Dns controls where the domain's DNS records are created: set one of route53, cloudflare or manual. Default: Route53 when a matching hosted zone is found, otherwise manual.
      */
     dns?: pulumi.Input<inputs.aws.SiteDnsArgs>;
     /**
-     * Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records wherever dns.provider says.
+     * Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records in Route53 or Cloudflare (see dns).
      */
     domain?: pulumi.Input<string>;
     /**

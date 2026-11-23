@@ -1,6 +1,10 @@
 package awssite
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/anvil-cloud/anvil/provider/sites"
+)
 
 func TestResolveHostname(t *testing.T) {
 	cases := []struct {
@@ -68,6 +72,51 @@ func TestPairedName(t *testing.T) {
 	for _, c := range cases {
 		if got := PairedName(c.host, "youlosei.win", c.env, c.enabled); got != c.want {
 			t.Errorf("PairedName(%q, %s, %v) = %q, want %q", c.host, c.env, c.enabled, got, c.want)
+		}
+	}
+}
+
+func TestSelectDNSProvider(t *testing.T) {
+	yes, no := true, false
+	cases := []struct {
+		name    string
+		dns     *sites.SiteDnsArgs
+		want    string
+		wantErr bool
+	}{
+		{"nil", nil, "", false},
+		{"empty", &sites.SiteDnsArgs{}, "", false},
+		{"zone only", &sites.SiteDnsArgs{Zone: "example.co.uk"}, "", false},
+		{"route53", &sites.SiteDnsArgs{Route53: &sites.SiteDnsRoute53Args{}}, "route53", false},
+		{"cloudflare", &sites.SiteDnsArgs{Cloudflare: &sites.SiteDnsCloudflareArgs{}}, "cloudflare", false},
+		{"manual", &sites.SiteDnsArgs{Manual: &yes}, "manual", false},
+		{"manual false is auto", &sites.SiteDnsArgs{Manual: &no}, "", false},
+		{"two set", &sites.SiteDnsArgs{Route53: &sites.SiteDnsRoute53Args{}, Cloudflare: &sites.SiteDnsCloudflareArgs{}}, "", true},
+		{"cloudflare and manual", &sites.SiteDnsArgs{Cloudflare: &sites.SiteDnsCloudflareArgs{}, Manual: &yes}, "", true},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			got, err := SelectDNSProvider(c.dns)
+			if (err != nil) != c.wantErr || got != c.want {
+				t.Fatalf("got (%q, %v), want (%q, err=%v)", got, err, c.want, c.wantErr)
+			}
+		})
+	}
+}
+
+// The proxied-depth warning fires above 1; the zone itself and www are covered
+// by Cloudflare's free certificate.
+func TestLevelsBelowZone(t *testing.T) {
+	cases := map[string]int{
+		"youlosei.win":            0,
+		"www.youlosei.win":        1,
+		"damien.youlosei.win":     1,
+		"www.damien.youlosei.win": 2,
+		"a.b.c.youlosei.win":      3,
+	}
+	for host, want := range cases {
+		if got := LevelsBelowZone(host, "youlosei.win"); got != want {
+			t.Errorf("LevelsBelowZone(%q) = %d, want %d", host, got, want)
 		}
 	}
 }

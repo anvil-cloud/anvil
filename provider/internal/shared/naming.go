@@ -12,6 +12,8 @@ import (
 
 var NameLimits = map[string]int{
 	"bucket":          63,  // S3: lowercase, numbers, hyphens only
+	"oac":             64,  // CloudFront origin access control (unique per account)
+	"lambda-oac":      64,  // CloudFront origin access control for a Lambda origin
 	"lambda":          64,  // Lambda function name
 	"function":        64,  // GCP Cloud Function
 	"role":            64,  // IAM Role

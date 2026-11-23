@@ -35,7 +35,7 @@ type SvelteKitSiteArgs struct {
 	// Domain is the site's hostname on prod stages, e.g. "youlosei.win" or
 	// "www.youlosei.win". Other stages insert the stage name just above the
 	// zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues
-	// an ACM certificate and creates the DNS records wherever dns.provider says.
+	// an ACM certificate and creates the DNS records in Route53 or Cloudflare (see dns).
 	Domain string `pulumi:"domain,optional"`
 
 	// WwwRedirect pairs the zone's apex and www names on prod stages: the name
@@ -44,8 +44,9 @@ type SvelteKitSiteArgs struct {
 	// apex or www domains; other stages have no pair. Default: true.
 	WwwRedirect *bool `pulumi:"wwwRedirect,optional"`
 
-	// Dns controls where the domain's DNS records are created: Route53,
-	// Cloudflare, or manual.
+	// Dns controls where the domain's DNS records are created: set one of
+	// route53, cloudflare or manual. Default: Route53 when a matching hosted
+	// zone is found, otherwise manual.
 	Dns *sites.SiteDnsArgs `pulumi:"dns,optional"`
 
 	Hatch map[string]map[string]interface{} `pulumi:"hatch,optional"`
@@ -159,7 +160,7 @@ func NewSvelteKitSite(ctx *pulumi.Context, name string, args SvelteKitSiteArgs, 
 	// ── OAC ──────────────────────────────────────────────────────
 	oac := &cloudfront.OriginAccessControl{}
 	err = ctx.RegisterResource("aws:cloudfront/originAccessControl:OriginAccessControl", name+"-oac", pulumi.Map{
-		"name":                          pulumi.Sprintf("%s-oac", name),
+		"name":                          pulumi.String(awssite.OACName(ctx, name, "oac")),
 		"originAccessControlOriginType": pulumi.String("s3"),
 		"signingBehavior":               pulumi.String("always"),
 		"signingProtocol":               pulumi.String("sigv4"),

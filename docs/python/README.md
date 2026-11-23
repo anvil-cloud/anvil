@@ -166,7 +166,7 @@ def infra(ctx: anvil.Context):
     site = anvil.aws.SvelteKitSite("web",
         path="web",  # the SvelteKit project folder — Anvil runs the build
         domain="myapp.com",  # prod; other stages get <stage>.myapp.com
-        dns={"provider": "cloudflare"},  # optional: route53 (default) | cloudflare | manual
+        dns={"cloudflare": {}},  # optional: route53 (auto-detected) | cloudflare | manual
     )
     ctx.export("url", site.url)
 
@@ -177,13 +177,13 @@ Prod stages serve `domain` as written. Every other stage inserts its stage name 
 
 Anvil creates the certificate validation and site records itself, and never overwrites a record it didn't create:
 
-| `dns.provider` | What Anvil does |
+| `dns` | What Anvil does |
 | --- | --- |
-| `route53` | Creates the records in the public hosted zone for the domain, in this account or the account of `dns.roleArn`. The default when such a zone is found. |
-| `cloudflare` | Creates the records in the Cloudflare zone, proxied by default. Reads `CLOUDFLARE_API_TOKEN` from the shell (on destroy too); the token needs Zone > Zone > Read and Zone > DNS > Edit on that zone, plus Zone > Transform Rules > Edit with `originProtection`. |
-| `manual` | Creates nothing. The `dnsRecords` output lists the records to add. The default when no Route53 zone is found. |
+| `route53: {}` | Creates the records in the public hosted zone for the domain, in this account or the account of `route53.roleArn`. Used automatically when such a zone is found. |
+| `cloudflare: {}` | Creates the records in the Cloudflare zone, proxied by default (`cloudflare.proxied`). Reads `CLOUDFLARE_API_TOKEN` from the shell (on destroy too); the token needs Zone > Zone > Read and Zone > DNS > Edit on that zone, plus Zone > Transform Rules > Edit with `originProtection`. |
+| `manual: true` | Creates nothing. The `dnsRecords` output lists the records to add. Used automatically when no Route53 zone is found. |
 
-With Cloudflare, set the zone's SSL/TLS mode to "Full (strict)". Proxied names two levels deep (`www.damien.myapp.com`) need Cloudflare's Advanced Certificate Manager, or `proxied: false`. Proxied sites can still be reached at their CloudFront URL unless `originProtection` is on; with it, Anvil adds one Cloudflare Transform Rule per site (Free plans allow 10 per zone). The deploy warns about each of these. See [docs/design/site-domains.md](https://github.com/anvil-cloud/anvil/blob/master/docs/design/site-domains.md) for the details.
+With Cloudflare, set the zone's SSL/TLS mode to "Full (strict)". Proxied names two levels deep (`www.damien.myapp.com`) need Cloudflare's Advanced Certificate Manager, or `cloudflare: { proxied: false }`. Proxied sites can still be reached at their CloudFront URL unless `originProtection` is on; with it, Anvil adds one Cloudflare Transform Rule per site (Free plans allow 10 per zone). The deploy warns about each of these. See [docs/design/site-domains.md](https://github.com/anvil-cloud/anvil/blob/master/docs/design/site-domains.md) for the details.
 
 ## Escape hatch
 

@@ -16,15 +16,29 @@ new anvil.aws.SvelteKitSite('web', {
   wwwRedirect: true,               // default; prod only
   originProtection: false,         // default; opt in
   dns: {
-    provider: 'cloudflare',        // route53 | cloudflare | manual
     zone: 'youlosei.win',          // default: last two labels of domain
-    proxied: true,                 // Cloudflare only; default true
-    roleArn: 'arn:aws:iam::…',     // Route53 only: zone in another account
+    cloudflare: { proxied: true }, // or route53: { roleArn } or manual: true
   },
 });
 ```
 
 Only `domain` is needed for the common case. Everything else has a default.
+
+`dns` takes at most one provider, each as its own key holding only its own
+options:
+
+```ts
+dns: { route53: {} }                                    // require Route53
+dns: { route53: { roleArn: 'arn:aws:iam::…' } }         // zone in another account
+dns: { cloudflare: {} }                                 // proxied by default
+dns: { cloudflare: { proxied: false } }
+dns: { manual: true }                                   // print the records to add
+```
+
+Options for one provider can't be set on another; TypeScript and Go reject it
+at compile time. Setting two providers fails the deploy. Providers with
+options are objects (`route53`, `cloudflare`); one with nothing to configure is
+a boolean (`manual`).
 
 ## Hostnames
 
@@ -65,11 +79,11 @@ On prod, an apex or `www` domain also answers on the other name, which
 
 ## DNS providers
 
-| `dns.provider` | What Anvil creates | Default when |
+| `dns` | What Anvil creates | Used without `dns` when |
 |---|---|---|
-| `route53` | ACM validation CNAMEs and A/AAAA aliases in the public hosted zone | a matching zone is found |
-| `cloudflare` | ACM validation CNAMEs (never proxied) and site CNAMEs (proxied by default) | never; set it explicitly |
-| `manual` | Nothing; the `dnsRecords` output lists what to add | no Route53 zone is found |
+| `route53: {…}` | ACM validation CNAMEs and A/AAAA aliases in the public hosted zone | a matching zone is found |
+| `cloudflare: {…}` | ACM validation CNAMEs (never proxied) and site CNAMEs (proxied by default) | never; set it explicitly |
+| `manual: true` | Nothing; the `dnsRecords` output lists what to add | no Route53 zone is found |
 
 An explicit provider must work or the deploy fails with what to fix. The
 default falls back to `manual` with a warning.
@@ -93,9 +107,9 @@ Requirements:
 
 - The domain's nameservers point at the hosted zone. Domains bought through
   Route53's registrar get the zone automatically.
-- The zone is in the deploy account, or in the account of `dns.roleArn`.
+- The zone is in the deploy account, or in the account of `dns.route53.roleArn`.
 
-#### `dns.roleArn`: zone in another account
+#### `dns.route53.roleArn`: zone in another account
 
 When the zone lives in a network account, Anvil assumes `roleArn` (session
 name `anvil-dns`, us-east-1) for the zone lookup and record changes only. The
@@ -161,7 +175,7 @@ Every record carries the comment `Managed by Anvil (<project> <site>, …)`.
 
 #### Proxy
 
-`dns.proxied` defaults to true: someone choosing Cloudflare wants it in
+`dns.cloudflare.proxied` defaults to true: someone choosing Cloudflare wants it in
 front. Things to know while proxied:
 
 - **SSL/TLS mode must be "Full (strict)"** for the zone. "Flexible" makes
@@ -190,7 +204,7 @@ front. Things to know while proxied:
 To keep prod proxied and serve deep non-prod names from CloudFront:
 
 ```ts
-dns: { provider: 'cloudflare', proxied: ctx.stage === 'prod' },
+dns: { cloudflare: { proxied: ctx.stage === 'prod' } },
 ```
 
 (In Go, `ctx.IsProduction`.)
@@ -241,21 +255,19 @@ proxy to send `x-origin-secret` with the `originSecret` output.
 
 | When | Level | Message says |
 |---|---|---|
-| No Route53 zone found and no provider set | warn | Falling back to manual; add the `dnsRecords` yourself or set `dns.provider` |
+| No Route53 zone found and no provider set | warn | Falling back to manual; add the `dnsRecords` yourself or set a provider in `dns` |
 | Cloudflare, proxied | info | SSL/TLS mode must be Full (strict) |
 | Cloudflare, proxied, name ≥ 2 levels deep | warn | Free certificate doesn't cover it; ACM + Total TLS or `proxied: false` |
 | Cloudflare, proxied, no `originProtection` | warn | CloudFront is reachable directly; set `originProtection` |
 | Cloudflare, proxied, WAF attached | warn | WAF sees Cloudflare IPs; set `clientIpHeader` on the Waf with `originProtection` |
 | Cloudflare, `originProtection` | info | Uses one Transform Rule; plan limits; token permission |
 | `originProtection` without Cloudflare | info | Configure the proxy with `originSecret`; 403 until then |
-| `dns.proxied` set, not Cloudflare | warn | Ignored |
-| `dns.roleArn` set, not Route53 | warn | Ignored |
 | `wwwRedirect: true` on a domain that isn't apex or www (prod) | warn | Nothing to redirect |
 | `dns`/`wwwRedirect` set without `domain` | warn | No effect |
 | Manual, certificate not issued yet | warn | Lists the validation records to add |
 
-Errors (the deploy stops): explicit `route53` with no zone; explicit
-`cloudflare` with no token or zone not found; unknown provider; a domain
+Errors (the deploy stops): more than one provider in `dns`; `route53` with no
+zone; `cloudflare` with no token or zone not found; a domain
 outside `dns.zone`; a stage name with no usable characters;
 `originProtection` with `proxied: false`; Cloudflare refusing the origin rule.
 
@@ -284,7 +296,8 @@ certificates still count toward ACM's 2,500.
 | Non-prod naming | Stage inserted above the zone, by environment | Per-kind templates (`devStages`, `prStages`, `stageDomain`); `<stage>-www` single-level names |
 | apex/www | Paired on prod, written name canonical | Rewriting `domain` to add `www` |
 | Cloudflare proxy | On, warn on deep names | Off for deep names automatically; off by default |
-| Zone in another account | `dns.roleArn` | Delegating subdomains (no shared label under the apex) |
+| Zone in another account | `dns.route53.roleArn` | Delegating subdomains (no shared label under the apex) |
+| Provider options | One key per provider (`route53: {}`, `cloudflare: {}`, `manual: true`) | One flat object with `provider` plus fields that only apply to some providers |
 | Origin protection | Opt-in; Anvil adds one Transform Rule per site | Proxy turns it on; one rule per environment; Cloudflare IP allow-list on the WAF |
 | Cloudflare token | `CLOUDFLARE_API_TOKEN` in the deploy shell | OIDC (Cloudflare's API doesn't support it); delegating to Route53 |
 

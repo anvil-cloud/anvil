@@ -4,12 +4,12 @@
       "isComponent": true,
       "inputProperties": {
         "dns": {
-          "description": "Dns controls where the domain's DNS records are created: Route53, Cloudflare, or manual.",
+          "description": "Dns controls where the domain's DNS records are created: set one of route53, cloudflare or manual. Default: Route53 when a matching hosted zone is found, otherwise manual.",
           "$ref": "#/types/anvil:aws:SiteDns"
         },
         "domain": {
           "type": "string",
-          "description": "Domain is the site's hostname on prod stages, e.g. \"youlosei.win\" or \"www.youlosei.win\". Other stages insert the stage name just above the zone: \"\u003cstage\u003e.youlosei.win\" or \"www.\u003cstage\u003e.youlosei.win\". Anvil issues an ACM certificate and creates the DNS records wherever dns.provider says."
+          "description": "Domain is the site's hostname on prod stages, e.g. \"youlosei.win\" or \"www.youlosei.win\". Other stages insert the stage name just above the zone: \"\u003cstage\u003e.youlosei.win\" or \"www.\u003cstage\u003e.youlosei.win\". Anvil issues an ACM certificate and creates the DNS records in Route53 or Cloudflare (see dns)."
         },
         "environment": {
           "type": "object",
@@ -99,19 +99,19 @@
     },
     "anvil:aws:SiteDns": {
       "type": "object",
-      "description": "SiteDnsArgs controls where the site's DNS records are created. Only used when domain is set.",
+      "description": "SiteDnsArgs controls where the site's DNS records are created. Only used when domain is set. Set at most one of route53, cloudflare or manual. Without any, Anvil uses Route53 when it finds a matching public hosted zone and falls back to manual otherwise. An existing record for a name the site needs fails the deploy; Anvil never overwrites it.",
       "properties": {
-        "provider": {
-          "description": "Provider is where Anvil creates the certificate validation and site records. \"route53\": the public hosted zone for the domain, in this AWS account or the account of roleArn; the deploy fails if there isn't one. \"cloudflare\": the Cloudflare zone for the domain, using the API token in the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too); the token needs Zone \u003e Zone \u003e Read and Zone \u003e DNS \u003e Edit on the zone, plus Zone \u003e Transform Rules \u003e Edit when originProtection is on. \"manual\": Anvil creates no DNS records and the dnsRecords output lists what to add. Default: \"route53\" when a matching hosted zone is found, otherwise \"manual\". An existing record for a name the site needs fails the deploy; Anvil never overwrites it.",
-          "$ref": "#/types/anvil:aws:SiteDnsProvider"
+        "cloudflare": {
+          "description": "Cloudflare creates the records in the Cloudflare zone for the domain, using the API token in the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too). The token needs Zone \u003e Zone \u003e Read and Zone \u003e DNS \u003e Edit on the zone, plus Zone \u003e Transform Rules \u003e Edit when originProtection is on.",
+          "$ref": "#/types/anvil:aws:SiteDnsCloudflare"
         },
-        "proxied": {
+        "manual": {
           "type": "boolean",
-          "description": "Proxied routes traffic through Cloudflare's proxy in front of CloudFront. Cloudflare only. Default: true. The zone's SSL/TLS mode must be \"Full (strict)\". Cloudflare's free certificate only covers one level of subdomain, so proxied names like \"www.\u003cstage\u003e.example.com\" need Advanced Certificate Manager with Total TLS; Anvil warns about them. While proxied, CloudFront still accepts requests sent to it directly unless originProtection is on."
+          "description": "Manual creates no DNS records; the dnsRecords output lists the records to add yourself, and the deploy waits until the certificate validates."
         },
-        "roleArn": {
-          "type": "string",
-          "description": "RoleArn is an IAM role in the AWS account that owns the Route53 hosted zone (e.g. a network account). Anvil assumes it for the zone lookup and record changes only; the certificate and CloudFront stay in the deploy account. Route53 only."
+        "route53": {
+          "description": "Route53 creates the records in the public hosted zone for the domain, in this AWS account or the account of roleArn. The deploy fails if there isn't one.",
+          "$ref": "#/types/anvil:aws:SiteDnsRoute53"
         },
         "zone": {
           "type": "string",
@@ -119,26 +119,25 @@
         }
       }
     },
-    "anvil:aws:SiteDnsProvider": {
-      "description": "Where Anvil creates the site's DNS records. Default: \"route53\" when a matching hosted zone exists, otherwise \"manual\".",
-      "enum": [
-        {
-          "description": "The public Route53 hosted zone for the domain in this AWS account.",
-          "name": "Route53",
-          "value": "route53"
-        },
-        {
-          "description": "The Cloudflare zone for the domain, using the CLOUDFLARE_API_TOKEN environment variable or cloudflare:apiToken config.",
-          "name": "Cloudflare",
-          "value": "cloudflare"
-        },
-        {
-          "description": "No DNS records are created; the dnsRecords output lists the records to add yourself.",
-          "name": "Manual",
-          "value": "manual"
+    "anvil:aws:SiteDnsCloudflare": {
+      "type": "object",
+      "description": "SiteDnsCloudflareArgs configures Cloudflare DNS for a site.",
+      "properties": {
+        "proxied": {
+          "type": "boolean",
+          "description": "Proxied routes traffic through Cloudflare's proxy in front of CloudFront. Default: true. The zone's SSL/TLS mode must be \"Full (strict)\". Cloudflare's free certificate only covers one level of subdomain, so proxied names like \"www.\u003cstage\u003e.example.com\" need Advanced Certificate Manager with Total TLS; Anvil warns about them. While proxied, CloudFront still accepts requests sent to it directly unless originProtection is on."
         }
-      ],
-      "type": "string"
+      }
+    },
+    "anvil:aws:SiteDnsRoute53": {
+      "type": "object",
+      "description": "SiteDnsRoute53Args configures Route53 DNS for a site.",
+      "properties": {
+        "roleArn": {
+          "type": "string",
+          "description": "RoleArn is an IAM role in the AWS account that owns the hosted zone (e.g. a network account). Anvil assumes it for the zone lookup and record changes only; the certificate and CloudFront stay in the deploy account. Default: the deploy credentials."
+        }
+      }
     },
     "anvil:aws:SiteFrameOptions": {
       "description": "Whether other sites can embed this one in a frame (X-Frame-Options). Default: \"sameorigin\".",

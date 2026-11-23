@@ -23,13 +23,13 @@ there's no shared label to delegate.
 
 See [Site domains and DNS](../site-domains.md) for the full behaviour.
 
-`dns.roleArn` on the site component: the deploy assumes that role (in the
+`dns.route53.roleArn` on the site component: the deploy assumes that role (in the
 account that owns the zone) for the zone lookup and record changes only. The
 certificate and CloudFront distribution stay in the workload account.
 Users create the role themselves.
 
 ```ts
-dns: { provider: 'route53', roleArn: 'arn:aws:iam::111111111111:role/anvil-dns' }
+dns: { route53: { roleArn: 'arn:aws:iam::111111111111:role/anvil-dns' } }
 ```
 
 ## What Org would add
@@ -71,8 +71,8 @@ dns: { provider: 'route53', roleArn: 'arn:aws:iam::111111111111:role/anvil-dns' 
    "dns": { "youlosei.win": "arn:aws:iam::111111111111:role/anvil-dns-nonprod" }
    ```
 
-   A site component with no `dns.roleArn` reads the parameter, finds the
-   zone, and assumes the role. `dns.roleArn` set explicitly always wins.
+   A site component with no `dns.route53.roleArn` reads the parameter, finds the
+   zone, and assumes the role. `roleArn` set explicitly always wins.
 
 5. **Guardrails.** The `denyRoute53Domains` SCP stays as is; the DNS roles
    only need `route53:ChangeResourceRecordSets`, `ListResourceRecordSets`,

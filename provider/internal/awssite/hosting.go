@@ -4,11 +4,21 @@ import (
 	"fmt"
 	"strings"
 
+	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
 	"github.com/anvil-cloud/anvil/provider/sites"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/cloudfront"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/lambda"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
+
+// OACName is the name for a site's CloudFront origin access control. OAC
+// names are unique per AWS account, so they carry the stage and stage ID:
+// several stages of one app can share an account.
+func OACName(ctx *pulumi.Context, site, kind string) string {
+	cfg := config.New(ctx, "anvil")
+	return provider.PhysicalName(cfg.Require("stage"), site, kind, cfg.Require("stageId"))
+}
 
 // HostingInputs are the shared hosting inputs every site component exposes
 // (see sites.HostingInputNames).
@@ -87,7 +97,7 @@ func NewHosting(ctx *pulumi.Context, parent pulumi.Resource, name string, in Hos
 	if IsIAMProtected(h.Mode) {
 		h.lambdaOAC = &cloudfront.OriginAccessControl{}
 		err = ctx.RegisterResource("aws:cloudfront/originAccessControl:OriginAccessControl", name+"-lambda-oac", pulumi.Map{
-			"name":                          pulumi.Sprintf("%s-lambda-oac", name),
+			"name":                          pulumi.String(OACName(ctx, name, "lambda-oac")),
 			"originAccessControlOriginType": pulumi.String("lambda"),
 			"signingBehavior":               pulumi.String("always"),
 			"signingProtocol":               pulumi.String("sigv4"),

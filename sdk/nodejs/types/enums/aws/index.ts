@@ -421,26 +421,6 @@ export const SiteCrossOriginOpenerPolicy = {
  */
 export type SiteCrossOriginOpenerPolicy = (typeof SiteCrossOriginOpenerPolicy)[keyof typeof SiteCrossOriginOpenerPolicy];
 
-export const SiteDnsProvider = {
-    /**
-     * The public Route53 hosted zone for the domain in this AWS account.
-     */
-    Route53: "route53",
-    /**
-     * The Cloudflare zone for the domain, using the CLOUDFLARE_API_TOKEN environment variable or cloudflare:apiToken config.
-     */
-    Cloudflare: "cloudflare",
-    /**
-     * No DNS records are created; the dnsRecords output lists the records to add yourself.
-     */
-    Manual: "manual",
-} as const;
-
-/**
- * Where Anvil creates the site's DNS records. Default: "route53" when a matching hosted zone exists, otherwise "manual".
- */
-export type SiteDnsProvider = (typeof SiteDnsProvider)[keyof typeof SiteDnsProvider];
-
 export const SiteFrameOptions = {
     /**
      * Only pages on this site can frame it. Default.

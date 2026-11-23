@@ -19,6 +19,8 @@ from .http_api import *
 from .kinesis_stream import *
 from .lambda_ import *
 from .o_auth_authorizer import *
+from .org_account import *
+from .org_imported_account import *
 from .queue import *
 from .svelte_kit_site import *
 from .vpc import *

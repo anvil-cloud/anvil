@@ -48,34 +48,12 @@ var enumFieldOverrides = map[string]string{
 	"SvelteKitSiteArgs.protection":                    "anvil:aws:SiteProtection",
 	"SiteSecurityHeadersArgs.frameOptions":            "anvil:aws:SiteFrameOptions",
 	"SiteSecurityHeadersArgs.crossOriginOpenerPolicy": "anvil:aws:SiteCrossOriginOpenerPolicy",
-	"SiteDnsArgs.provider":                            "anvil:aws:SiteDnsProvider",
 }
 
 // manualTypes holds hand-authored type definitions that are injected into the
 // schema types block alongside auto-generated nested object types.
 // Use for enum types and any other types the AST generator cannot produce.
 var manualTypes = map[string]interface{}{
-	"anvil:aws:SiteDnsProvider": map[string]interface{}{
-		"type":        "string",
-		"description": "Where Anvil creates the site's DNS records. Default: \"route53\" when a matching hosted zone exists, otherwise \"manual\".",
-		"enum": []map[string]string{
-			{
-				"name":        "Route53",
-				"value":       "route53",
-				"description": "The public Route53 hosted zone for the domain in this AWS account.",
-			},
-			{
-				"name":        "Cloudflare",
-				"value":       "cloudflare",
-				"description": "The Cloudflare zone for the domain, using the CLOUDFLARE_API_TOKEN environment variable or cloudflare:apiToken config.",
-			},
-			{
-				"name":        "Manual",
-				"value":       "manual",
-				"description": "No DNS records are created; the dnsRecords output lists the records to add yourself.",
-			},
-		},
-	},
 	"anvil:aws:SiteProtection": map[string]interface{}{
 		"type":        "string",
 		"description": "Who can invoke the site's server Lambda Function URL. Default: \"none\", or \"edge-oac\" while a WAF is attached or origin protection is enabled. An explicit value always wins.",

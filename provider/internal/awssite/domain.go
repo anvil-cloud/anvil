@@ -114,6 +114,16 @@ func ResolveHostname(domain, zone, stage, environment string) (hostname, resolve
 	return strings.TrimSuffix(domain, zone) + label + "." + zone, zone, nil
 }
 
+// LevelsBelowZone counts how many labels a hostname has below its zone: 0
+// for the zone itself, 1 for www.example.com, 2 for www.dev.example.com.
+// Cloudflare's free certificate covers up to 1.
+func LevelsBelowZone(hostname, zone string) int {
+	if hostname == zone || !strings.HasSuffix(hostname, "."+zone) {
+		return 0
+	}
+	return strings.Count(strings.TrimSuffix(hostname, "."+zone), ".") + 1
+}
+
 // PairedName returns the other half of the apex/www pair for a prod
 // hostname: www.<zone> for the apex, the apex for www.<zone>. Empty for
 // non-prod stages, other subdomains, or when the pairing is turned off.
@@ -153,7 +163,7 @@ func NewSiteDomain(ctx *pulumi.Context, parent pulumi.Resource, name string, in 
 		parent:           parent,
 		name:             name,
 		zone:             zone,
-		proxied:          dns.Proxied == nil || *dns.Proxied,
+		proxied:          dns.Cloudflare == nil || dns.Cloudflare.Proxied == nil || *dns.Cloudflare.Proxied,
 		originProtection: in.OriginProtection,
 	}
 
@@ -260,14 +270,7 @@ func (d *SiteDomain) checkOptions(in DomainInputs, dns *sites.SiteDnsArgs) error
 	if in.WwwRedirect != nil && *in.WwwRedirect && in.Environment == "prod" && d.RedirectFrom == "" {
 		ctx.Log.Warn(fmt.Sprintf("wwwRedirect only pairs a zone's apex with its www name; %s is neither, so there's nothing to redirect.", d.Hostname), log)
 	}
-	if dns.RoleArn != "" && d.Provider != DNSRoute53 {
-		ctx.Log.Warn(fmt.Sprintf("dns.roleArn only applies to Route53; ignoring it for %s.", d.Provider), log)
-	}
-
 	if d.Provider != DNSCloudflare {
-		if dns.Proxied != nil {
-			ctx.Log.Warn(fmt.Sprintf("dns.proxied only applies to Cloudflare; ignoring it for %s.", d.Provider), log)
-		}
 		if in.OriginProtection {
 			ctx.Log.Info("Origin protection enabled: CloudFront only accepts requests carrying the "+
 				OriginSecretHeader+" header. Configure your CDN/proxy to send it on every request, "+
@@ -279,7 +282,7 @@ func (d *SiteDomain) checkOptions(in DomainInputs, dns *sites.SiteDnsArgs) error
 	// Cloudflare from here on.
 	if !d.proxied {
 		if in.OriginProtection {
-			return fmt.Errorf("originProtection needs Cloudflare's proxy to add the %s header, but dns.proxied is false: "+
+			return fmt.Errorf("originProtection needs Cloudflare's proxy to add the %s header, but dns.cloudflare.proxied is false: "+
 				"visitors would reach CloudFront without it and get 403. Remove one of the two settings", OriginSecretHeader)
 		}
 		return nil
@@ -289,10 +292,10 @@ func (d *SiteDomain) checkOptions(in DomainInputs, dns *sites.SiteDnsArgs) error
 		"\"Flexible\" makes CloudFront redirect Cloudflare back to HTTPS forever.", d.Hostname), log)
 
 	for _, host := range d.names() {
-		if strings.Contains(strings.TrimSuffix(host, "."+d.zone), ".") {
+		if LevelsBelowZone(host, d.zone) > 1 {
 			ctx.Log.Warn(fmt.Sprintf("%s is more than one level below %s. Cloudflare's free certificate doesn't cover it while proxied, "+
 				"so browsers get a certificate error unless the zone has Advanced Certificate Manager with Total TLS. "+
-				"Set dns.proxied to false to serve it straight from CloudFront.", host, d.zone), log)
+				"Set dns.cloudflare.proxied to false to serve it straight from CloudFront.", host, d.zone), log)
 		}
 	}
 	if in.OriginProtection {
@@ -311,15 +314,49 @@ func (d *SiteDomain) checkOptions(in DomainInputs, dns *sites.SiteDnsArgs) error
 	return nil
 }
 
+// SelectDNSProvider returns the provider the dns block asks for: "route53",
+// "cloudflare" or "manual", or "" when none is set (auto-detect). Setting more
+// than one is an error.
+func SelectDNSProvider(dns *sites.SiteDnsArgs) (string, error) {
+	if dns == nil {
+		return "", nil
+	}
+	var set []string
+	if dns.Route53 != nil {
+		set = append(set, DNSRoute53)
+	}
+	if dns.Cloudflare != nil {
+		set = append(set, DNSCloudflare)
+	}
+	if dns.Manual != nil && *dns.Manual {
+		set = append(set, DNSManual)
+	}
+	switch len(set) {
+	case 0:
+		return "", nil
+	case 1:
+		return set[0], nil
+	}
+	return "", fmt.Errorf("dns sets %s; set only one of route53, cloudflare or manual", strings.Join(set, " and "))
+}
+
 // resolveProvider picks the DNS provider and looks up its zone. An explicit
-// provider must work or the deploy fails; the default falls back to manual
-// when no matching Route53 zone is found.
+// provider must work or the deploy fails; with none set, Anvil uses Route53
+// when it finds a matching zone and falls back to manual otherwise.
 func (d *SiteDomain) resolveProvider(dns *sites.SiteDnsArgs) error {
-	if dns.RoleArn != "" && (dns.Provider == "" || dns.Provider == DNSRoute53) {
+	requested, err := SelectDNSProvider(dns)
+	if err != nil {
+		return err
+	}
+	roleArn := ""
+	if dns.Route53 != nil {
+		roleArn = dns.Route53.RoleArn
+	}
+	if roleArn != "" {
 		p, err := aws.NewProvider(d.ctx, d.name+"-dns", &aws.ProviderArgs{
 			Region: pulumi.String(usEast1),
 			AssumeRoles: aws.ProviderAssumeRoleArray{aws.ProviderAssumeRoleArgs{
-				RoleArn:     pulumi.String(dns.RoleArn),
+				RoleArn:     pulumi.String(roleArn),
 				SessionName: pulumi.String("anvil-dns"),
 			}},
 		}, pulumi.Parent(d.parent))
@@ -329,36 +366,33 @@ func (d *SiteDomain) resolveProvider(dns *sites.SiteDnsArgs) error {
 		d.route53Provider = p
 	}
 
-	switch dns.Provider {
+	switch requested {
 	case "":
 		if id, ok := d.lookupRoute53Zone(); ok {
 			d.Provider, d.zoneID = DNSRoute53, id
 			return nil
 		}
-		where := "this account"
-		if dns.RoleArn != "" {
-			where = "the account of dns.roleArn"
-		}
-		d.ctx.Log.Warn(fmt.Sprintf("No Route53 hosted zone for %s in %s, so Anvil isn't creating DNS records. "+
-			"Add the records in the dnsRecords output yourself, or set dns.provider.", d.zone, where), &pulumi.LogArgs{Resource: d.parent})
+		d.ctx.Log.Warn(fmt.Sprintf("No Route53 hosted zone for %s in this account, so Anvil isn't creating DNS records. "+
+			"Add the records in the dnsRecords output yourself, or set dns.route53, dns.cloudflare or dns.manual.", d.zone),
+			&pulumi.LogArgs{Resource: d.parent})
 		d.Provider = DNSManual
 		return nil
 	case DNSRoute53:
 		id, ok := d.lookupRoute53Zone()
 		if !ok {
-			if dns.RoleArn != "" {
-				return fmt.Errorf("dns.provider is \"route53\" but no public hosted zone for %s was found through dns.roleArn %s; "+
-					"check the role can be assumed and allows route53:ListHostedZonesByName", d.zone, dns.RoleArn)
+			if roleArn != "" {
+				return fmt.Errorf("dns.route53 is set but no public hosted zone for %s was found through roleArn %s; "+
+					"check the role can be assumed and allows route53:ListHostedZonesByName", d.zone, roleArn)
 			}
-			return fmt.Errorf("dns.provider is \"route53\" but this account has no public hosted zone for %s; "+
-				"create one, set dns.roleArn to a role in the account that has it, set dns.zone, or set dns.provider to \"manual\"", d.zone)
+			return fmt.Errorf("dns.route53 is set but this account has no public hosted zone for %s; "+
+				"create one, set dns.route53.roleArn to a role in the account that has it, set dns.zone, or use dns.manual", d.zone)
 		}
 		d.Provider, d.zoneID = DNSRoute53, id
 		return nil
 	case DNSCloudflare:
 		if os.Getenv("CLOUDFLARE_API_TOKEN") == "" {
-			return fmt.Errorf("dns.provider is \"cloudflare\" but CLOUDFLARE_API_TOKEN isn't set; set it to a token with " +
-				"Zone > Zone > Read and Zone > DNS > Edit on the zone, or set dns.provider to \"manual\"")
+			return fmt.Errorf("dns.cloudflare is set but CLOUDFLARE_API_TOKEN isn't; set it to a token with " +
+				"Zone > Zone > Read and Zone > DNS > Edit on the zone, or use dns.manual")
 		}
 		zone, err := cloudflare.LookupZone(d.ctx, &cloudflare.LookupZoneArgs{
 			Filter: &cloudflare.GetZoneFilter{Name: pulumi.StringRef(d.zone), Match: "all"},
@@ -369,11 +403,9 @@ func (d *SiteDomain) resolveProvider(dns *sites.SiteDnsArgs) error {
 		}
 		d.Provider, d.zoneID = DNSCloudflare, zone.Id
 		return nil
-	case DNSManual:
+	default: // DNSManual
 		d.Provider = DNSManual
 		return nil
-	default:
-		return fmt.Errorf("dns.provider must be \"route53\", \"cloudflare\" or \"manual\", got %q", dns.Provider)
 	}
 }
 
