@@ -125,6 +125,7 @@ export function connectToEndpoint(
     return id;
   });
   const tags = { ManagedBy: 'anvil' };
+  const description = grantRuleDescription(target.grantName(), endpointName, port);
 
   new aws.vpc.SecurityGroupIngressRule(
     `${endpointName}-from-${target.grantName()}-${port}`,
@@ -134,6 +135,7 @@ export function connectToEndpoint(
       ipProtocol: 'tcp',
       fromPort: port,
       toPort: port,
+      description,
       tags,
     }
   );
@@ -145,9 +147,23 @@ export function connectToEndpoint(
       ipProtocol: 'tcp',
       fromPort: port,
       toPort: port,
+      description,
       tags,
     }
   );
+}
+
+/**
+ * Console-readable description for a grant's SG rule pair, so the rule can be
+ * traced back to the grant that created it. Both rules of a pair share it.
+ * AWS only allows `a-zA-Z0-9 ._-:/()#,@[]+=&;{}!$*` (max 255), so anything
+ * else in a logical name becomes `-`.
+ * @internal
+ */
+export function grantRuleDescription(targetName: string, endpointName: string, port: number): string {
+  return `Anvil grant: ${targetName} to ${endpointName} on tcp ${port}`
+    .replace(/[^a-zA-Z0-9 ._\-:/()#,@[\]+=&;{}!$*]/g, '-')
+    .slice(0, 255);
 }
 
 /**

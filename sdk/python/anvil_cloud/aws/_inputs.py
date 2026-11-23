@@ -173,6 +173,12 @@ __all__ = [
     'QueueLambdaConsumerArgsArgsDict',
     'QueueOverridesArgs',
     'QueueOverridesArgsDict',
+    'SiteDnsCloudflareArgs',
+    'SiteDnsCloudflareArgsDict',
+    'SiteDnsRoute53Args',
+    'SiteDnsRoute53ArgsDict',
+    'SiteDnsArgs',
+    'SiteDnsArgsDict',
     'SiteHstsArgs',
     'SiteHstsArgsDict',
     'SiteSecurityHeadersArgs',
@@ -8062,7 +8068,7 @@ class LambdaVpcArgsArgsDict(TypedDict):
     """
     has_nat: NotRequired[pulumi.Input[_builtins.bool]]
     """
-    Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
+    Set when the VPC routes outbound traffic through a NAT gateway or instance. Adds outbound 443 to 0.0.0.0/0 on the Lambda's security group.
     """
 
 @pulumi.input_type
@@ -8078,7 +8084,7 @@ class LambdaVpcArgsArgs:
         :param Any vpc_id: The ID of the VPC to place the Lambda in. Accepts Output<string> - pass vpc.vpcId directly.
         :param pulumi.Input[_builtins.bool] allow_all_outbound: Adds the rule AWS puts on a new security group (all traffic to 0.0.0.0/0). Off by default: Anvil security groups start with no outbound rules. Logs a preview warning when on. App.defaults.vpc.allowAllOutbound sets it for every Anvil security group in the app; an explicit value here wins.
         :param pulumi.Input[Sequence[pulumi.Input['LambdaVpcCidrArgsArgs']]] cidrs: CIDR-scoped egress rules. One SG rule per port per CIDR. Use for peered VPCs or on-premise ranges.
-        :param pulumi.Input[_builtins.bool] has_nat: Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
+        :param pulumi.Input[_builtins.bool] has_nat: Set when the VPC routes outbound traffic through a NAT gateway or instance. Adds outbound 443 to 0.0.0.0/0 on the Lambda's security group.
         """
         pulumi.set(__self__, "private_subnet_ids", private_subnet_ids)
         pulumi.set(__self__, "vpc_id", vpc_id)
@@ -8141,7 +8147,7 @@ class LambdaVpcArgsArgs:
     @pulumi.getter(name="hasNat")
     def has_nat(self) -> Optional[pulumi.Input[_builtins.bool]]:
         """
-        Only needed for imported VPCs with NAT. Omit when using an Anvil Vpc component.
+        Set when the VPC routes outbound traffic through a NAT gateway or instance. Adds outbound 443 to 0.0.0.0/0 on the Lambda's security group.
         """
         return pulumi.get(self, "has_nat")
 
@@ -8908,6 +8914,168 @@ class QueueOverridesArgs:
     @visibility_timeout_seconds.setter
     def visibility_timeout_seconds(self, value: Optional[pulumi.Input[_builtins.int]]):
         pulumi.set(self, "visibility_timeout_seconds", value)
+
+
+class SiteDnsCloudflareArgsDict(TypedDict):
+    """
+    SiteDnsCloudflareArgs configures Cloudflare DNS for a site.
+    """
+    proxied: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Proxied routes traffic through Cloudflare's proxy in front of CloudFront. Default: true. The zone's SSL/TLS mode must be "Full (strict)". Cloudflare's free certificate only covers one level of subdomain, so proxied names like "www.<stage>.example.com" need Advanced Certificate Manager with Total TLS; Anvil warns about them. While proxied, CloudFront still accepts requests sent to it directly unless originProtection is on.
+    """
+
+@pulumi.input_type
+class SiteDnsCloudflareArgs:
+    def __init__(__self__, *,
+                 proxied: Optional[pulumi.Input[_builtins.bool]] = None):
+        """
+        SiteDnsCloudflareArgs configures Cloudflare DNS for a site.
+
+        :param pulumi.Input[_builtins.bool] proxied: Proxied routes traffic through Cloudflare's proxy in front of CloudFront. Default: true. The zone's SSL/TLS mode must be "Full (strict)". Cloudflare's free certificate only covers one level of subdomain, so proxied names like "www.<stage>.example.com" need Advanced Certificate Manager with Total TLS; Anvil warns about them. While proxied, CloudFront still accepts requests sent to it directly unless originProtection is on.
+        """
+        if proxied is not None:
+            pulumi.set(__self__, "proxied", proxied)
+
+    @_builtins.property
+    @pulumi.getter
+    def proxied(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Proxied routes traffic through Cloudflare's proxy in front of CloudFront. Default: true. The zone's SSL/TLS mode must be "Full (strict)". Cloudflare's free certificate only covers one level of subdomain, so proxied names like "www.<stage>.example.com" need Advanced Certificate Manager with Total TLS; Anvil warns about them. While proxied, CloudFront still accepts requests sent to it directly unless originProtection is on.
+        """
+        return pulumi.get(self, "proxied")
+
+    @proxied.setter
+    def proxied(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "proxied", value)
+
+
+class SiteDnsRoute53ArgsDict(TypedDict):
+    """
+    SiteDnsRoute53Args configures Route53 DNS for a site.
+    """
+    role_arn: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    RoleArn is an IAM role in the AWS account that owns the hosted zone (e.g. a network account). Anvil assumes it for the zone lookup and record changes only; the certificate and CloudFront stay in the deploy account. Default: the deploy credentials.
+    """
+
+@pulumi.input_type
+class SiteDnsRoute53Args:
+    def __init__(__self__, *,
+                 role_arn: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        SiteDnsRoute53Args configures Route53 DNS for a site.
+
+        :param pulumi.Input[_builtins.str] role_arn: RoleArn is an IAM role in the AWS account that owns the hosted zone (e.g. a network account). Anvil assumes it for the zone lookup and record changes only; the certificate and CloudFront stay in the deploy account. Default: the deploy credentials.
+        """
+        if role_arn is not None:
+            pulumi.set(__self__, "role_arn", role_arn)
+
+    @_builtins.property
+    @pulumi.getter(name="roleArn")
+    def role_arn(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        RoleArn is an IAM role in the AWS account that owns the hosted zone (e.g. a network account). Anvil assumes it for the zone lookup and record changes only; the certificate and CloudFront stay in the deploy account. Default: the deploy credentials.
+        """
+        return pulumi.get(self, "role_arn")
+
+    @role_arn.setter
+    def role_arn(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "role_arn", value)
+
+
+class SiteDnsArgsDict(TypedDict):
+    """
+    SiteDnsArgs controls where the site's DNS records are created. Only used when domain is set. Set at most one of route53, cloudflare or manual. Without any, Anvil uses Route53 when it finds a matching public hosted zone and falls back to manual otherwise. An existing record for a name the site needs fails the deploy; Anvil never overwrites it.
+    """
+    cloudflare: NotRequired[pulumi.Input['SiteDnsCloudflareArgsDict']]
+    """
+    Cloudflare creates the records in the Cloudflare zone for the domain, using the API token in the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too). The token needs Zone > Zone > Read and Zone > DNS > Edit on the zone, plus Zone > Transform Rules > Edit when originProtection is on.
+    """
+    manual: NotRequired[pulumi.Input[_builtins.bool]]
+    """
+    Manual creates no DNS records; the dnsRecords output lists the records to add yourself, and the deploy waits until the certificate validates.
+    """
+    route53: NotRequired[pulumi.Input['SiteDnsRoute53ArgsDict']]
+    """
+    Route53 creates the records in the public hosted zone for the domain, in this AWS account or the account of roleArn. The deploy fails if there isn't one.
+    """
+    zone: NotRequired[pulumi.Input[_builtins.str]]
+    """
+    Zone is the DNS zone the domain belongs to, e.g. "example.com". Default: the last two labels of domain. Set it for domains such as "www.example.co.uk".
+    """
+
+@pulumi.input_type
+class SiteDnsArgs:
+    def __init__(__self__, *,
+                 cloudflare: Optional[pulumi.Input['SiteDnsCloudflareArgs']] = None,
+                 manual: Optional[pulumi.Input[_builtins.bool]] = None,
+                 route53: Optional[pulumi.Input['SiteDnsRoute53Args']] = None,
+                 zone: Optional[pulumi.Input[_builtins.str]] = None):
+        """
+        SiteDnsArgs controls where the site's DNS records are created. Only used when domain is set. Set at most one of route53, cloudflare or manual. Without any, Anvil uses Route53 when it finds a matching public hosted zone and falls back to manual otherwise. An existing record for a name the site needs fails the deploy; Anvil never overwrites it.
+
+        :param pulumi.Input['SiteDnsCloudflareArgs'] cloudflare: Cloudflare creates the records in the Cloudflare zone for the domain, using the API token in the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too). The token needs Zone > Zone > Read and Zone > DNS > Edit on the zone, plus Zone > Transform Rules > Edit when originProtection is on.
+        :param pulumi.Input[_builtins.bool] manual: Manual creates no DNS records; the dnsRecords output lists the records to add yourself, and the deploy waits until the certificate validates.
+        :param pulumi.Input['SiteDnsRoute53Args'] route53: Route53 creates the records in the public hosted zone for the domain, in this AWS account or the account of roleArn. The deploy fails if there isn't one.
+        :param pulumi.Input[_builtins.str] zone: Zone is the DNS zone the domain belongs to, e.g. "example.com". Default: the last two labels of domain. Set it for domains such as "www.example.co.uk".
+        """
+        if cloudflare is not None:
+            pulumi.set(__self__, "cloudflare", cloudflare)
+        if manual is not None:
+            pulumi.set(__self__, "manual", manual)
+        if route53 is not None:
+            pulumi.set(__self__, "route53", route53)
+        if zone is not None:
+            pulumi.set(__self__, "zone", zone)
+
+    @_builtins.property
+    @pulumi.getter
+    def cloudflare(self) -> Optional[pulumi.Input['SiteDnsCloudflareArgs']]:
+        """
+        Cloudflare creates the records in the Cloudflare zone for the domain, using the API token in the CLOUDFLARE_API_TOKEN environment variable (needed on destroy too). The token needs Zone > Zone > Read and Zone > DNS > Edit on the zone, plus Zone > Transform Rules > Edit when originProtection is on.
+        """
+        return pulumi.get(self, "cloudflare")
+
+    @cloudflare.setter
+    def cloudflare(self, value: Optional[pulumi.Input['SiteDnsCloudflareArgs']]):
+        pulumi.set(self, "cloudflare", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def manual(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        Manual creates no DNS records; the dnsRecords output lists the records to add yourself, and the deploy waits until the certificate validates.
+        """
+        return pulumi.get(self, "manual")
+
+    @manual.setter
+    def manual(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "manual", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def route53(self) -> Optional[pulumi.Input['SiteDnsRoute53Args']]:
+        """
+        Route53 creates the records in the public hosted zone for the domain, in this AWS account or the account of roleArn. The deploy fails if there isn't one.
+        """
+        return pulumi.get(self, "route53")
+
+    @route53.setter
+    def route53(self, value: Optional[pulumi.Input['SiteDnsRoute53Args']]):
+        pulumi.set(self, "route53", value)
+
+    @_builtins.property
+    @pulumi.getter
+    def zone(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Zone is the DNS zone the domain belongs to, e.g. "example.com". Default: the last two labels of domain. Set it for domains such as "www.example.co.uk".
+        """
+        return pulumi.get(self, "zone")
+
+    @zone.setter
+    def zone(self, value: Optional[pulumi.Input[_builtins.str]]):
+        pulumi.set(self, "zone", value)
 
 
 class SiteHstsArgsDict(TypedDict):

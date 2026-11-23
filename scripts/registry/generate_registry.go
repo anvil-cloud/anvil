@@ -65,6 +65,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/anvil-cloud/anvil/provider/internal/cfrule"
 	"github.com/pulumi/pulumi-go-provider/infer"
 {{- range .Components }}
 	{{ .Alias }} "{{ .ImportPath }}"
@@ -81,13 +82,13 @@ func main() {
 			infer.ComponentF({{ .Alias }}.{{ .Constructor }}),
 {{- end }}
 		).
-{{- if .Resources }}
 		WithResources(
+			// Internal resources: created by components, not exposed in the SDKs.
+			infer.Resource(&cfrule.OriginSecretRule{}),
 {{- range .Resources }}
 			{{ .Alias }}.Resource(),
 {{- end }}
 		).
-{{- end }}
 		Build()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

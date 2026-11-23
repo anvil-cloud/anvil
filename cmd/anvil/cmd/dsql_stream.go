@@ -81,6 +81,15 @@ func readStreamManifest() (wanted map[string]bool, ok bool, err error) {
 	return wanted, true, nil
 }
 
+// programHasDSQL reports whether the last discovery run found any DSQL
+// component. Build mode records every DSQL component in the stream manifest,
+// with or without a stream, and discovery deletes the manifest first, so no
+// manifest means the program has none.
+func programHasDSQL() (bool, error) {
+	wanted, ok, err := readStreamManifest()
+	return ok && len(wanted) > 0, err
+}
+
 // dsqlComponentsFromDeployment reads DSQL components out of an exported
 // Pulumi deployment. region picks the cluster for multi-region components.
 func dsqlComponentsFromDeployment(deployment json.RawMessage, region string) ([]dsqlStreamComponent, error) {

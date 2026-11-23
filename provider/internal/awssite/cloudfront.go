@@ -31,6 +31,10 @@ type CloudFrontArgs struct {
 	// Domain is the optional custom domain. Empty string means use the CloudFront default cert.
 	Domain string
 
+	// RedirectDomain is an extra alias that the viewer-request function
+	// redirects to Domain (the apex/www pair). Empty means none.
+	RedirectDomain string
+
 	// CertARN is the ACM certificate ARN. Only required when Domain is set.
 	CertARN pulumi.StringOutput
 
@@ -45,7 +49,8 @@ type CloudFrontArgs struct {
 	WebACLArn pulumi.StringOutput
 
 	// ViewerRequestFunctionArn is a CloudFront Function run on viewer-request for
-	// every cache behavior (origin protection). Zero value means none.
+	// every cache behavior (origin protection and/or the apex<->www redirect).
+	// Zero value means none.
 	ViewerRequestFunctionArn pulumi.StringOutput
 
 	// EdgeSignerArn is the qualified ARN of the Lambda@Edge signer run on
@@ -126,7 +131,11 @@ func BuildCloudFrontArgs(args CloudFrontArgs) pulumi.Map {
 	}
 
 	if args.Domain != "" {
-		cfArgs["aliases"] = pulumi.StringArray{pulumi.String(args.Domain)}
+		aliases := pulumi.StringArray{pulumi.String(args.Domain)}
+		if args.RedirectDomain != "" {
+			aliases = append(aliases, pulumi.String(args.RedirectDomain))
+		}
+		cfArgs["aliases"] = aliases
 	}
 
 	if args.WebACLArn != (pulumi.StringOutput{}) {

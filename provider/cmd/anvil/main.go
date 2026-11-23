@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/anvil-cloud/anvil/provider/internal/cfrule"
 	"github.com/pulumi/pulumi-go-provider/infer"
 	awsbucket "github.com/anvil-cloud/anvil/provider/aws/bucket"
 	awscognitoAuth "github.com/anvil-cloud/anvil/provider/aws/cognitoAuth"
@@ -54,6 +55,8 @@ func main() {
 			infer.ComponentF(gcpfunction.NewFunction),
 		).
 		WithResources(
+			// Internal resources: created by components, not exposed in the SDKs.
+			infer.Resource(&cfrule.OriginSecretRule{}),
 			awsorgAccount.Resource(),
 			awsorgImportedAccount.Resource(),
 		).
@@ -62,5 +65,5 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	p.Run(context.Background(), "anvil", "0.1.24")
+	p.Run(context.Background(), "anvil", "0.1.28")
 }

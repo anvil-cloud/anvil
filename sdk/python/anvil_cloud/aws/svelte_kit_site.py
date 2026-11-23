@@ -21,6 +21,7 @@ __all__ = ['SvelteKitSiteArgs', 'SvelteKitSite']
 @pulumi.input_type
 class SvelteKitSiteArgs:
     def __init__(__self__, *,
+                 dns: Optional[pulumi.Input['SiteDnsArgs']] = None,
                  domain: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  hatch: Optional[pulumi.Input[_builtins.str]] = None,
@@ -29,17 +30,23 @@ class SvelteKitSiteArgs:
                  protection: Optional[pulumi.Input['SiteProtection']] = None,
                  runtime_environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  security_headers: Optional[pulumi.Input['SiteSecurityHeadersArgs']] = None,
-                 waf: Optional[pulumi.Input['SiteWafArgs']] = None):
+                 waf: Optional[pulumi.Input['SiteWafArgs']] = None,
+                 www_redirect: Optional[pulumi.Input[_builtins.bool]] = None):
         """
         The set of arguments for constructing a SvelteKitSite resource.
 
+        :param pulumi.Input['SiteDnsArgs'] dns: Dns controls where the domain's DNS records are created: set one of route53, cloudflare or manual. Default: Route53 when a matching hosted zone is found, otherwise manual.
+        :param pulumi.Input[_builtins.str] domain: Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records in Route53 or Cloudflare (see dns).
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment: Environment vars available at BOTH build time and runtime. Values must be string literals since they're needed before the build runs.
         :param pulumi.Input[_builtins.bool] origin_protection: OriginProtection locks CloudFront to a CDN/proxy in front of it (Cloudflare, Fastly, Akamai, nginx, ...). Requests without the x-origin-secret header are rejected at the edge; configure the proxy to send it on every request with the originSecret output as the value. Protection defaults to "edge-oac" while it's enabled, so the server Function URL can't be reached around the proxy.
         :param pulumi.Input['SiteProtection'] protection: Protection controls who can invoke the server Lambda's Function URL. Default: "none", or "edge-oac" while a WAF is attached or origin protection is enabled. An explicit value always wins. "none": public Function URL; anyone who learns it can call the server directly, bypassing CloudFront. "oac": locked to CloudFront via IAM; requests with a body are rejected unless they already carry an x-amz-content-sha256 header. "edge-oac": "oac" plus a Lambda@Edge function that adds the header, following AWS's guidance — nothing is needed in the app; request bodies over 1 MB are rejected. In "oac" and "edge-oac", a viewer Authorization header is replaced by CloudFront's signature.
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] runtime_environment: Runtime-only environment vars set on the Lambda function. Supports Pulumi Output values (e.g. bucket.name, fn.arn). Only available at request time, NOT during build/prerendering.
         :param pulumi.Input['SiteSecurityHeadersArgs'] security_headers: SecurityHeaders configures the security headers CloudFront adds to every response. On by default: Strict-Transport-Security (1 year), X-Content-Type-Options: nosniff, X-Frame-Options: SAMEORIGIN, Referrer-Policy: strict-origin-when-cross-origin, a Permissions-Policy that turns off camera, microphone, geolocation, USB and Topics, and Cross-Origin-Opener-Policy: same-origin-allow-popups. Headers your app sets itself take priority. Content-Security-Policy is left to SvelteKit's kit.csp.
         :param pulumi.Input['SiteWafArgs'] waf: Waf attaches a WAF WebACL to the site's CloudFront distribution. Protection defaults to "edge-oac" while it's attached.
+        :param pulumi.Input[_builtins.bool] www_redirect: WwwRedirect pairs the zone's apex and www names on prod stages: the name in domain is served and the other one 301-redirects to it ("youlosei.win" also answers on "www.youlosei.win", and the other way round). Only for apex or www domains; other stages have no pair. Default: true.
         """
+        if dns is not None:
+            pulumi.set(__self__, "dns", dns)
         if domain is not None:
             pulumi.set(__self__, "domain", domain)
         if environment is not None:
@@ -58,10 +65,27 @@ class SvelteKitSiteArgs:
             pulumi.set(__self__, "security_headers", security_headers)
         if waf is not None:
             pulumi.set(__self__, "waf", waf)
+        if www_redirect is not None:
+            pulumi.set(__self__, "www_redirect", www_redirect)
+
+    @_builtins.property
+    @pulumi.getter
+    def dns(self) -> Optional[pulumi.Input['SiteDnsArgs']]:
+        """
+        Dns controls where the domain's DNS records are created: set one of route53, cloudflare or manual. Default: Route53 when a matching hosted zone is found, otherwise manual.
+        """
+        return pulumi.get(self, "dns")
+
+    @dns.setter
+    def dns(self, value: Optional[pulumi.Input['SiteDnsArgs']]):
+        pulumi.set(self, "dns", value)
 
     @_builtins.property
     @pulumi.getter
     def domain(self) -> Optional[pulumi.Input[_builtins.str]]:
+        """
+        Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records in Route53 or Cloudflare (see dns).
+        """
         return pulumi.get(self, "domain")
 
     @domain.setter
@@ -158,6 +182,18 @@ class SvelteKitSiteArgs:
     def waf(self, value: Optional[pulumi.Input['SiteWafArgs']]):
         pulumi.set(self, "waf", value)
 
+    @_builtins.property
+    @pulumi.getter(name="wwwRedirect")
+    def www_redirect(self) -> Optional[pulumi.Input[_builtins.bool]]:
+        """
+        WwwRedirect pairs the zone's apex and www names on prod stages: the name in domain is served and the other one 301-redirects to it ("youlosei.win" also answers on "www.youlosei.win", and the other way round). Only for apex or www domains; other stages have no pair. Default: true.
+        """
+        return pulumi.get(self, "www_redirect")
+
+    @www_redirect.setter
+    def www_redirect(self, value: Optional[pulumi.Input[_builtins.bool]]):
+        pulumi.set(self, "www_redirect", value)
+
 
 @pulumi.type_token("anvil:aws:SvelteKitSite")
 class SvelteKitSite(pulumi.ComponentResource):
@@ -165,6 +201,7 @@ class SvelteKitSite(pulumi.ComponentResource):
     def __init__(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 dns: Optional[pulumi.Input[Union['SiteDnsArgs', 'SiteDnsArgsDict']]] = None,
                  domain: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  hatch: Optional[pulumi.Input[_builtins.str]] = None,
@@ -174,18 +211,22 @@ class SvelteKitSite(pulumi.ComponentResource):
                  runtime_environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  security_headers: Optional[pulumi.Input[Union['SiteSecurityHeadersArgs', 'SiteSecurityHeadersArgsDict']]] = None,
                  waf: Optional[pulumi.Input[Union['SiteWafArgs', 'SiteWafArgsDict']]] = None,
+                 www_redirect: Optional[pulumi.Input[_builtins.bool]] = None,
                  __props__=None):
         """
         Create a SvelteKitSite resource with the given unique name, props, and options.
 
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
+        :param pulumi.Input[Union['SiteDnsArgs', 'SiteDnsArgsDict']] dns: Dns controls where the domain's DNS records are created: set one of route53, cloudflare or manual. Default: Route53 when a matching hosted zone is found, otherwise manual.
+        :param pulumi.Input[_builtins.str] domain: Domain is the site's hostname on prod stages, e.g. "youlosei.win" or "www.youlosei.win". Other stages insert the stage name just above the zone: "<stage>.youlosei.win" or "www.<stage>.youlosei.win". Anvil issues an ACM certificate and creates the DNS records in Route53 or Cloudflare (see dns).
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] environment: Environment vars available at BOTH build time and runtime. Values must be string literals since they're needed before the build runs.
         :param pulumi.Input[_builtins.bool] origin_protection: OriginProtection locks CloudFront to a CDN/proxy in front of it (Cloudflare, Fastly, Akamai, nginx, ...). Requests without the x-origin-secret header are rejected at the edge; configure the proxy to send it on every request with the originSecret output as the value. Protection defaults to "edge-oac" while it's enabled, so the server Function URL can't be reached around the proxy.
         :param pulumi.Input['SiteProtection'] protection: Protection controls who can invoke the server Lambda's Function URL. Default: "none", or "edge-oac" while a WAF is attached or origin protection is enabled. An explicit value always wins. "none": public Function URL; anyone who learns it can call the server directly, bypassing CloudFront. "oac": locked to CloudFront via IAM; requests with a body are rejected unless they already carry an x-amz-content-sha256 header. "edge-oac": "oac" plus a Lambda@Edge function that adds the header, following AWS's guidance — nothing is needed in the app; request bodies over 1 MB are rejected. In "oac" and "edge-oac", a viewer Authorization header is replaced by CloudFront's signature.
         :param pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]] runtime_environment: Runtime-only environment vars set on the Lambda function. Supports Pulumi Output values (e.g. bucket.name, fn.arn). Only available at request time, NOT during build/prerendering.
         :param pulumi.Input[Union['SiteSecurityHeadersArgs', 'SiteSecurityHeadersArgsDict']] security_headers: SecurityHeaders configures the security headers CloudFront adds to every response. On by default: Strict-Transport-Security (1 year), X-Content-Type-Options: nosniff, X-Frame-Options: SAMEORIGIN, Referrer-Policy: strict-origin-when-cross-origin, a Permissions-Policy that turns off camera, microphone, geolocation, USB and Topics, and Cross-Origin-Opener-Policy: same-origin-allow-popups. Headers your app sets itself take priority. Content-Security-Policy is left to SvelteKit's kit.csp.
         :param pulumi.Input[Union['SiteWafArgs', 'SiteWafArgsDict']] waf: Waf attaches a WAF WebACL to the site's CloudFront distribution. Protection defaults to "edge-oac" while it's attached.
+        :param pulumi.Input[_builtins.bool] www_redirect: WwwRedirect pairs the zone's apex and www names on prod stages: the name in domain is served and the other one 301-redirects to it ("youlosei.win" also answers on "www.youlosei.win", and the other way round). Only for apex or www domains; other stages have no pair. Default: true.
         """
         ...
     @overload
@@ -211,6 +252,7 @@ class SvelteKitSite(pulumi.ComponentResource):
     def _internal_init(__self__,
                  resource_name: str,
                  opts: Optional[pulumi.ResourceOptions] = None,
+                 dns: Optional[pulumi.Input[Union['SiteDnsArgs', 'SiteDnsArgsDict']]] = None,
                  domain: Optional[pulumi.Input[_builtins.str]] = None,
                  environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  hatch: Optional[pulumi.Input[_builtins.str]] = None,
@@ -220,6 +262,7 @@ class SvelteKitSite(pulumi.ComponentResource):
                  runtime_environment: Optional[pulumi.Input[Mapping[str, pulumi.Input[_builtins.str]]]] = None,
                  security_headers: Optional[pulumi.Input[Union['SiteSecurityHeadersArgs', 'SiteSecurityHeadersArgsDict']]] = None,
                  waf: Optional[pulumi.Input[Union['SiteWafArgs', 'SiteWafArgsDict']]] = None,
+                 www_redirect: Optional[pulumi.Input[_builtins.bool]] = None,
                  __props__=None):
         opts = pulumi.ResourceOptions.merge(_utilities.get_resource_opts_defaults(), opts)
         if not isinstance(opts, pulumi.ResourceOptions):
@@ -231,6 +274,7 @@ class SvelteKitSite(pulumi.ComponentResource):
                 raise TypeError('__props__ is only valid when passed in combination with a valid opts.id to get an existing resource')
             __props__ = SvelteKitSiteArgs.__new__(SvelteKitSiteArgs)
 
+            __props__.__dict__["dns"] = dns
             __props__.__dict__["domain"] = domain
             __props__.__dict__["environment"] = environment
             __props__.__dict__["hatch"] = hatch
@@ -240,6 +284,7 @@ class SvelteKitSite(pulumi.ComponentResource):
             __props__.__dict__["runtime_environment"] = runtime_environment
             __props__.__dict__["security_headers"] = security_headers
             __props__.__dict__["waf"] = waf
+            __props__.__dict__["www_redirect"] = www_redirect
             __props__.__dict__["bucket_name"] = None
             __props__.__dict__["cloud_front_distribution_id"] = None
             __props__.__dict__["dns_records"] = None

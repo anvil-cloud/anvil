@@ -139,3 +139,37 @@ func TestReadStreamManifest(t *testing.T) {
 		t.Errorf("got %v ok=%v err=%v", wanted, ok, err)
 	}
 }
+
+// Apps without DSQL must skip the post-deploy stream and database steps,
+// which read the whole stack state.
+func TestProgramHasDSQL(t *testing.T) {
+	t.Chdir(t.TempDir())
+
+	if got, err := programHasDSQL(); err != nil || got {
+		t.Fatalf("no manifest: got %v, %v; want false", got, err)
+	}
+
+	if err := os.MkdirAll(".anvil", 0755); err != nil {
+		t.Fatal(err)
+	}
+	write := func(body string) {
+		if err := os.WriteFile(dsqlStreamManifestPath, []byte(body), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	write(`{"components":[]}`)
+	if got, _ := programHasDSQL(); got {
+		t.Error("empty manifest: want false")
+	}
+
+	write(`{"components":[{"name":"db","stream":false}]}`)
+	if got, _ := programHasDSQL(); !got {
+		t.Error("DSQL without a stream: want true (database changes still need waiting for)")
+	}
+
+	write(`not json`)
+	if _, err := programHasDSQL(); err == nil {
+		t.Error("invalid manifest: want error")
+	}
+}

@@ -77,7 +77,11 @@ export class Org {
 
     const provider = new aws.Provider('anvil-org-provider', {
       defaultTags: {
-        tags: { ...config.defaults?.tags, 'anvil:managed': 'true', 'anvil:org': project },
+        tags: {
+          ...config.defaults?.tags,
+          'anvil:managed': 'true',
+          'anvil:org': project,
+        },
       },
     });
 

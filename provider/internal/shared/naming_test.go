@@ -171,3 +171,19 @@ func TestAllResourceTypes_RespectLimits(t *testing.T) {
 		}
 	}
 }
+
+// OAC names are unique per AWS account, so two stages of one site must differ.
+func TestOACNamesDifferPerStage(t *testing.T) {
+	prod := PhysicalName("prod", "web", "oac", "b6381e")
+	staging := PhysicalName("staging", "web", "oac", "dd763e")
+	if prod == staging {
+		t.Fatalf("both stages got %q", prod)
+	}
+	if prod != "prod-web-oac-b6381e" {
+		t.Errorf("prod = %q", prod)
+	}
+	long := PhysicalName("a-very-long-personal-stage-name", "a-very-long-site-component-name", "lambda-oac", "b6381e")
+	if len(long) > 64 {
+		t.Errorf("len = %d, want <= 64", len(long))
+	}
+}

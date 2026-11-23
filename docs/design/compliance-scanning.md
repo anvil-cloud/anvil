@@ -542,14 +542,10 @@ history from day one.
 Filters: severity, status, service, region, framework, stage (+ project with
 `--all`).
 
-> > > > > > > @{-1}
-
 ## Decisions and rejected alternatives
 
 | Decision | Rejected | Why |
 | -------- | -------- | --- |
-
-<<<<<<< HEAD
 | Prowler runs in your account | Running Prowler from the CLI (installed, Docker, managed Python) | CLI size; a Python dependency; different results on different machines |
 | CodeBuild without a VPC | Fargate in a public subnet | Needs a VPC, fails ECS.2 on itself, much more infrastructure |
 | Shared scanner managed by direct AWS calls | A Pulumi stack with an account-level state bucket | A small fixed set of resources; no state to host, lock or orphan; bootstrap already works this way |
@@ -776,4 +772,3 @@ prowler aws --resource-tags ManagedBy=anvil project=testwaf stage=damienpace \
 - [Prowler — reporting / output formats](https://docs.prowler.com/user-guide/cli/tutorials/reporting)
 - [Prowler — outputs developer guide](https://docs.prowler.com/developer-guide/outputs)
 - [DefectDojo — Prowler v3+ parser (v3 `ResourceTags`)](https://documentation.defectdojo.com/integrations/parsers/file/aws_prowler_v3plus)
-  > > > > > > > @{-1}

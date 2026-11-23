@@ -4,11 +4,21 @@ import (
 	"fmt"
 	"strings"
 
+	provider "github.com/anvil-cloud/anvil/provider/internal/shared"
 	"github.com/anvil-cloud/anvil/provider/sites"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/cloudfront"
 	"github.com/pulumi/pulumi-aws/sdk/v7/go/aws/lambda"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
+
+// OACName is the name for a site's CloudFront origin access control. OAC
+// names are unique per AWS account, so they carry the stage and stage ID:
+// several stages of one app can share an account.
+func OACName(ctx *pulumi.Context, site, kind string) string {
+	cfg := config.New(ctx, "anvil")
+	return provider.PhysicalName(cfg.Require("stage"), site, kind, cfg.Require("stageId"))
+}
 
 // HostingInputs are the shared hosting inputs every site component exposes
 // (see sites.HostingInputNames).
@@ -46,7 +56,8 @@ type Hosting struct {
 
 	lambdaOAC       *cloudfront.OriginAccessControl
 	webACLArn       pulumi.StringOutput
-	originGuardArn  pulumi.StringOutput
+	originGuard     *OriginProtectionResult
+	viewerFnArn     pulumi.StringOutput
 	edgeSignerArn   pulumi.StringOutput
 	headersPolicyID pulumi.StringOutput
 }
@@ -86,7 +97,7 @@ func NewHosting(ctx *pulumi.Context, parent pulumi.Resource, name string, in Hos
 	if IsIAMProtected(h.Mode) {
 		h.lambdaOAC = &cloudfront.OriginAccessControl{}
 		err = ctx.RegisterResource("aws:cloudfront/originAccessControl:OriginAccessControl", name+"-lambda-oac", pulumi.Map{
-			"name":                          pulumi.Sprintf("%s-lambda-oac", name),
+			"name":                          pulumi.String(OACName(ctx, name, "lambda-oac")),
 			"originAccessControlOriginType": pulumi.String("lambda"),
 			"signingBehavior":               pulumi.String("always"),
 			"signingProtocol":               pulumi.String("sigv4"),
@@ -121,11 +132,8 @@ func NewHosting(ctx *pulumi.Context, parent pulumi.Resource, name string, in Hos
 		if err != nil {
 			return nil, fmt.Errorf("origin protection setup failed: %w", err)
 		}
-		h.originGuardArn = pr.FunctionArn
+		h.originGuard = pr
 		h.OriginSecret = pr.OriginSecret
-		ctx.Log.Info("Origin protection enabled: CloudFront only accepts requests carrying the "+
-			OriginSecretHeader+" header. Configure your CDN/proxy to send it on every request, "+
-			"with the originSecret output as the value — until then the site returns 403.", logArgs)
 	}
 
 	return h, nil
@@ -137,11 +145,26 @@ func (h *Hosting) CreateFunctionURL(fn *lambda.Function) (*lambda.FunctionUrl, e
 	return CreateSiteFunctionURL(h.ctx, h.parent, h.name, fn, h.Mode)
 }
 
+// OriginProtection reports whether origin protection is on.
+func (h *Hosting) OriginProtection() bool { return h.originGuard != nil }
+
+// WafAttached reports whether a WAF is attached.
+func (h *Hosting) WafAttached() bool { return h.webACLArn != (pulumi.StringOutput{}) }
+
+// CreateViewerRequestFunction creates the viewer-request function: the origin
+// guard when origin protection is on, plus redirect when it isn't nil. Call
+// it once, before ApplyTo.
+func (h *Hosting) CreateViewerRequestFunction(redirect *SiteRedirect) error {
+	arn, err := CreateViewerRequestFunction(h.ctx, h.parent, h.name, h.originGuard, redirect)
+	h.viewerFnArn = arn
+	return err
+}
+
 // ApplyTo sets the hosting fields on the distribution's CloudFront args.
 func (h *Hosting) ApplyTo(cf *CloudFrontArgs) {
 	cf.LambdaOAC = h.lambdaOAC
 	cf.WebACLArn = h.webACLArn
-	cf.ViewerRequestFunctionArn = h.originGuardArn
+	cf.ViewerRequestFunctionArn = h.viewerFnArn
 	cf.EdgeSignerArn = h.edgeSignerArn
 	cf.ResponseHeadersPolicyID = h.headersPolicyID
 }

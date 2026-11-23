@@ -183,17 +183,27 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// ── Step 5b: DSQL CDC streams ──────────────────────
-	// After `up`: the role and the Kinesis stream they target exist now.
-	if err := reconcileStreams(ctx, s, project, stage); err != nil {
-		return fmt.Errorf("deploy succeeded, but setting up the CDC stream failed: %w", err)
-	}
-
-	// ── Step 5c: DSQL database changes ─────────────────
-	// The bootstrap Lambdas apply schemas, roles and grants from the stream
-	// after `up`; wait for their status and fail if a change didn't apply.
-	if err := waitForDatabaseChanges(ctx, s, stage, upStarted); err != nil {
+	// Steps 5b and 5c read the whole stack state, so only apps with DSQL run
+	// them. After `up` the state holds exactly the program's DSQL components,
+	// and discovery recorded those, so an app without any has nothing to do.
+	hasDSQL, err := programHasDSQL()
+	if err != nil {
 		return fmt.Errorf("deploy succeeded, but %w", err)
+	}
+	if hasDSQL {
+		// ── Step 5b: DSQL CDC streams ──────────────────
+		// After `up`: the role and the Kinesis stream they target exist now.
+		if err := reconcileStreams(ctx, s, project, stage); err != nil {
+			return fmt.Errorf("deploy succeeded, but setting up DSQL CDC streams failed: %w", err)
+		}
+
+		// ── Step 5c: DSQL database changes ─────────────
+		// The bootstrap Lambdas apply schemas, roles and grants from the
+		// stream after `up`; wait for their status and fail if a change
+		// didn't apply.
+		if err := waitForDatabaseChanges(ctx, s, stage, upStarted); err != nil {
+			return fmt.Errorf("deploy succeeded, but %w", err)
+		}
 	}
 
 	// ── Step 5d: Scan on deploy ────────────────────────

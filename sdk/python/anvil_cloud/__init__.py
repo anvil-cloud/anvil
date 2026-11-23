@@ -42,6 +42,8 @@ _utilities.register(
    "anvil:aws:KinesisStream": "KinesisStream",
    "anvil:aws:Lambda": "Lambda",
    "anvil:aws:OAuthAuthorizer": "OAuthAuthorizer",
+   "anvil:aws:OrgAccount": "OrgAccount",
+   "anvil:aws:OrgImportedAccount": "OrgImportedAccount",
    "anvil:aws:Queue": "Queue",
    "anvil:aws:SvelteKitSite": "SvelteKitSite",
    "anvil:aws:Vpc": "Vpc",

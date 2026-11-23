@@ -2,7 +2,10 @@ module github.com/anvil-cloud/anvil/provider
 
 go 1.25.8
 
-require github.com/pulumi/pulumi/sdk/v3 v3.228.0
+require (
+	github.com/pulumi/pulumi-cloudflare/sdk/v6 v6.15.0
+	github.com/pulumi/pulumi/sdk/v3 v3.228.0
+)
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.47.8 // indirect

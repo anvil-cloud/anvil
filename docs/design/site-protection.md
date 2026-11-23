@@ -159,7 +159,8 @@ What Anvil creates:
 | Resource | Purpose |
 |---|---|
 | CloudFront KeyValueStore + key `origin-secret` | Holds the secret (64 hex chars, 256 bits). Generated on first deploy; the key ignores later value changes, so it is **stable across deploys** |
-| CloudFront Function (`cloudfront-js-2.0`, viewer-request) | Reads the secret from the store, compares in constant time, **strips the header** on success, returns 403 otherwise |
+| CloudFront Function (`cloudfront-js-2.0`, viewer-request) | Reads the secret from the store, compares in constant time, **strips the header** on success, returns 403 otherwise. Shared with the apex/www redirect when that's on ([edge/viewer-request.js](../../provider/internal/awssite/edge/viewer-request.js)): the guard runs first, then the redirect, because CloudFront allows one viewer-request function per behavior |
+| Cloudflare Transform Rule (only with `dns.cloudflare`, proxied) | Anvil adds the header itself: one rule per site, managed through Cloudflare's per-rule API so hand-made rules are untouched. Uses one of the zone's Transform Rules (Free 10). See [Site domains and DNS](site-domains.md#origin-protection) |
 | Function association on **every** cache behavior | Static asset paths can't bypass the check |
 
 Design choices:
@@ -418,7 +419,9 @@ and [AWS Compute Blog: Protecting a Lambda function URL with CloudFront and Lamb
 - **Works behind Cloudflare (or any proxy).** `originProtection: true` locks
   CloudFront to the proxy and `edge-oac` locks the Lambda to CloudFront, so the
   proxy is the only way in.
-- **Proxy setup is one header rule, not a WAF change.** Cloudflare: Rules →
+- **Proxy setup is one header rule, not a WAF change.** Cloudflare with
+  `dns: { cloudflare: {} }`: Anvil adds the rule (token needs Zone >
+  Transform Rules > Edit). Cloudflare otherwise: Rules →
   Transform Rules → Modify Request Header → *Set static* (free plan). Fastly:
   Headers (Request, Set) or VCL `set req.http.x-origin-secret`. Akamai: Modify
   Outgoing Request Header. nginx: `proxy_set_header x-origin-secret …;`.
