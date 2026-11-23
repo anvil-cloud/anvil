@@ -7,9 +7,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/iam"
 	"github.com/aws/aws-sdk-go-v2/service/organizations"
 	orgtypes "github.com/aws/aws-sdk-go-v2/service/organizations/types"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
@@ -24,6 +26,10 @@ type orgInfo struct {
 	ID                  string
 	RootID              string
 	ManagementAccountID string
+	// DeployerArn is the exact IAM ARN of whoever is deploying: the role
+	// behind an assumed-role (SSO) session, or an IAM user. anvil-org-automation
+	// trusts it.
+	DeployerArn string
 }
 
 // orgAWSConfig loads AWS config for the home region: anvil.org.yaml, then
@@ -58,6 +64,10 @@ func orgPreflight(ctx context.Context, cfg aws.Config) (*orgInfo, error) {
 		return nil, fmt.Errorf("AWS credentials not found or expired.\n  Sign in to the management account (e.g. aws sso login) and try again.")
 	}
 	caller := aws.ToString(ident.Account)
+	deployer, err := deployerArn(ctx, cfg, aws.ToString(ident.Arn))
+	if err != nil {
+		return nil, err
+	}
 
 	client := organizations.NewFromConfig(cfg)
 	out, err := client.DescribeOrganization(ctx, &organizations.DescribeOrganizationInput{})
@@ -103,6 +113,7 @@ func orgPreflight(ctx context.Context, cfg aws.Config) (*orgInfo, error) {
 		ID:                  aws.ToString(o.Id),
 		RootID:              aws.ToString(roots.Roots[0].Id),
 		ManagementAccountID: management,
+		DeployerArn:         deployer,
 	}, nil
 }
 
@@ -122,4 +133,34 @@ func orgUsesControlTower(ctx context.Context, client *organizations.Client) (boo
 		}
 	}
 	return false, nil
+}
+
+// deployerArn turns the caller's STS ARN into the exact IAM ARN a trust policy
+// can name: the role (with its path, e.g. aws-reserved/sso.amazonaws.com/…)
+// behind an assumed-role session, or the IAM user itself.
+func deployerArn(ctx context.Context, cfg aws.Config, callerArn string) (string, error) {
+	switch {
+	case strings.Contains(callerArn, ":assumed-role/"):
+		roleName := roleNameFromAssumedRole(callerArn)
+		out, err := iam.NewFromConfig(cfg).GetRole(ctx, &iam.GetRoleInput{RoleName: aws.String(roleName)})
+		if err != nil {
+			return "", fmt.Errorf("failed to read your role %s: %s", roleName, mapError(err.Error()))
+		}
+		return aws.ToString(out.Role.Arn), nil
+	case strings.Contains(callerArn, ":user/"):
+		return callerArn, nil
+	case strings.HasSuffix(callerArn, ":root"):
+		return "", fmt.Errorf("Org can't deploy as the root user (root can't assume roles).\n" +
+			"  Sign in as an admin through IAM Identity Center (or an IAM role) and try again.")
+	default:
+		return "", fmt.Errorf("unrecognised caller %s; sign in as an IAM Identity Center user, IAM role or IAM user", callerArn)
+	}
+}
+
+// roleNameFromAssumedRole returns the role name in
+// arn:aws:sts::<acct>:assumed-role/<role>/<session>.
+func roleNameFromAssumedRole(arn string) string {
+	_, rest, _ := strings.Cut(arn, ":assumed-role/")
+	name, _, _ := strings.Cut(rest, "/")
+	return name
 }

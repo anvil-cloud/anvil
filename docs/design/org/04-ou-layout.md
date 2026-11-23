@@ -4,17 +4,37 @@ Part of the [Org design](README.md).
 
 ## OU layout
 
-Org creates the AWS-recommended OU tree, and users add their own OUs on top,
-at the top level or under any recommended OU:
+**Org creates exactly the OUs written in `ou`, nothing more.** There are no
+built-in OUs: `anvil org init` writes the AWS-recommended tree into
+`anvil.config.ts` as a starting point, one entry per OU with a comment saying
+what it's for, and from then on the file is the whole truth. Users add,
+remove and nest OUs by editing it.
+
+**OUs nest the way they sit in AWS.** Each OU is keyed by its name, and its
+own `ou` holds the OUs inside it, so the file reads like the tree:
 
 ```ts
 new Org({
   ou: {
-    'Workloads/Data': { enable: true }, // adds Workloads/Data
-    'Partners':       { enable: true }, // new top-level OU
+    Security: { enable: true },
+    Workloads: {
+      enable: true,
+      ou: {
+        Prod:    { enable: true },
+        NonProd: { enable: true },
+        Data:    { enable: true }, // added by the user
+      },
+    },
+    Partners:  { enable: true }, // new top-level OU
+    Suspended: { enable: true },
   },
 });
 ```
+
+Everywhere else (an account's `ou`, guardrail attachments, `ctx.ou`) an OU is
+named by its **path**: `'Workloads/Prod'`, `'Workloads/Data'`. The path is
+also its name in state, so moving an OU block under a different parent is a
+replace (preview shows it), while reformatting the file changes nothing.
 
 Recommended tree (AWS SRA / *Organizing Your AWS Environment*):
 
@@ -30,37 +50,50 @@ Root
 └── Suspended         deny-all; accounts awaiting closure
 ```
 
-OUs **grow with the [tier](05-accounts.md#tiers)**: Infrastructure and Deployments appear
-only once a tier puts accounts in them. Workloads/Prod, Workloads/NonProd and
-Sandbox come with `minimum` but start empty, because they're where the user's
-own accounts go. Suspended is empty until a downgrade.
+`anvil org init` offers this tree in [tiers](05-accounts.md#starting-layouts-anvil-org-init):
+Infrastructure and Deployments are only written for tiers that put accounts
+in them. Workloads/Prod, Workloads/NonProd and Sandbox start empty, because
+they're where the user's own accounts go. Suspended is empty until an account
+is removed.
 
 Nested OUs inherit their parent's policies: anything on Workloads applies to
 Prod and NonProd, which add their own stricter ones. AWS allows 5 levels
 below Root.
 
-| Tier | OUs added |
+| Tier (init only) | OUs written |
 |---|---|
-| `minimum` | Security, Workloads/Prod, Workloads/NonProd, Sandbox, Suspended |
+| `minimum` | Security, Workloads (with Prod and NonProd inside), Suspended |
 | `network` | + Infrastructure |
-| `sra` | + Deployments |
+| `sra` | + Infrastructure, Deployments |
+| every tier | Sandbox (asked, default yes), PolicyStaging (asked, default no) |
 
-- **Sandbox is the only recommended OU users can turn off**
-  (`ou: { Sandbox: { disable: true } }`), since not every org gives developers their own
-  accounts. All others stay once their tier creates them.
-- **Security** holds the required accounts; **Suspended** is where tier
-  downgrades move accounts.
-- Users can always add their own OUs, at the top level or under any
-  recommended OU.
+- **Every OU is just an entry in config.** Removing its block removes the
+  OU and everything nested in it (AWS refuses while any of them still holds
+  accounts, so preview fails first, naming them). There is no `disable`:
+  delete the block.
+- **Keys are names, not paths.** `'Workloads/Prod': {...}` as a key fails
+  preview, showing the nested form to write instead.
+- **Security** holds the core accounts and **Suspended** is where removed
+  accounts go, so the features that need them (account creation, removal)
+  fail preview with a clear message if they're missing. Nothing else
+  depends on a particular OU.
 
-Example: a `minimum` org with no sandboxes and an extra `Data` OU.
+Example: a `minimum` org with no sandboxes and an extra `Data` OU. Init
+wrote the tree with Sandbox off; the user added `Workloads/Data`.
 
 ```ts
 new Org({
-  tier: 'minimum',
   ou: {
-    Sandbox: { disable: true },
-    'Workloads/Data': { enable: true },
+    Security: { enable: true },
+    Workloads: {
+      enable: true,
+      ou: {
+        Prod:    { enable: true },
+        NonProd: { enable: true },
+        Data:    { enable: true },
+      },
+    },
+    Suspended: { enable: true },
   },
 });
 ```
@@ -75,12 +108,13 @@ Root
 └── Suspended
 ```
 
-Moving to `tier: 'network'` then adds Infrastructure with the Network account.
+Adding a Network account later means adding `Infrastructure` and the
+account to config; there's no tier to change.
 
 ### Custom OUs
 
 Users can create their own OUs **anywhere**: at the top level or under any
-recommended OU. It's their org.
+other listed OU. It's their org.
 
 AWS's guidance is soft (nothing in AWS, Control Tower or LZA enforces it), so
 Anvil doesn't block anything. The docs repeat it next to the feature:
@@ -96,31 +130,59 @@ guardrail, the 5-level depth limit used up faster, and reorganisations that
 move accounts between guardrails. Preview may hint when a custom OU has no
 policies of its own; it never blocks.
 
-### Custom OU and free-form account syntax
+### Custom OU and account syntax
 
-Custom OUs are **flat, keyed by full path**, in the same `ou` map that turns
-Sandbox off. Accounts that aren't workloads or sandboxes go in `accounts`,
-naming their OU by path.
+Custom OUs are written **nested, the same way as the recommended ones**
+(there's no difference once they're written), and **every account is
+written inside its OU** (see [Writing accounts](05-accounts.md#writing-accounts)).
 
 ```ts
 new Org({
-  tier: 'minimum',
   email: 'aws+{account}@acme.com',
-  stages: { prod: { ou: 'Prod' }, dev: { ou: 'NonProd' } },
-  workloads: { payments: { stages: ['prod', 'dev'] } },
 
   ou: {
-    Sandbox: { disable: true },
-    'Partners':            { enable: true, tags: { kind: 'partner' } },
-    'Partners/Acme':       { enable: true },
-    'Workloads/Prod/Data': { enable: true },
-    'Exceptions':          { enable: true },
-  },
-
-  accounts: {
-    'data-lake':        { ou: 'Workloads/Prod/Data', tags: { team: 'data' } },
-    'acme-integration': { ou: 'Partners/Acme',       tags: { partner: 'acme' } },
-    'legacy-app':       { ou: 'Exceptions',          tags: { owner: 'ops' } },
+    Security: {
+      enable: true,
+      accounts: {
+        'log-archive': { enable: true },
+        audit: { enable: true },
+        emergency: { enable: true },
+      },
+    },
+    Workloads: {
+      enable: true,
+      ou: {
+        Prod: {
+          enable: true,
+          accounts: { 'payments-prod': { enable: true } },
+          ou: {
+            Data: {
+              enable: true,
+              accounts: { 'data-lake': { enable: true, tags: { team: 'data' } } },
+            },
+          },
+        },
+        NonProd: {
+          enable: true,
+          accounts: { 'payments-dev': { enable: true } },
+        },
+      },
+    },
+    Suspended: { enable: true },
+    Partners: {
+      enable: true,
+      tags: { kind: 'partner' },
+      ou: {
+        Acme: {
+          enable: true,
+          accounts: { 'acme-integration': { enable: true, tags: { partner: 'acme' } } },
+        },
+      },
+    },
+    Exceptions: {
+      enable: true,
+      accounts: { 'legacy-app': { enable: true, tags: { owner: 'ops' } } },
+    },
   },
 });
 ```
@@ -147,19 +209,17 @@ Root
     └── legacy-app
 ```
 
-- Each OU value is an object (`enable`, `tags`, `renamedFrom`), so adding
-  fields is never a breaking change. Policies attach from `run` (`attach`).
-- Every path segment's parent must exist: a recommended OU (in the current
-  tier) or another declared custom OU. Preview fails otherwise, with a
-  "did you mean" suggestion. In TypeScript, `accounts[].ou` is typed from the
-  `ou` keys plus the built-in OUs, so typos are editor errors.
-- Free-form accounts keep their exact name (no `-<stage>` suffix), get the
-  org email pattern, and get no `anvil:workload` / `anvil:stage` tags.
-- Account names are unique across workloads, sandboxes and `accounts`
-  (`payments-prod` can't also be declared in `accounts`).
-- Removing a free-form account follows the downgrade rule (moved to
-  Suspended, released from state). Removing a custom OU that still holds
-  accounts is a preview error.
+- Each OU value is an object (`enable`, `tags`, `ou`, `accounts`,
+  `renamedFrom`), so adding fields is never a breaking change. Policies
+  attach from `run` (`attach`).
+- An account has no `ou` field: it lives where it's written. Moving its
+  block moves it.
+- Account names are unique across the whole org (`payments-prod` can't be
+  written in two OUs).
+- Removing an account follows the removal rule (moved to Suspended,
+  released from state). Removing an OU block also removes the accounts
+  written in it, so preview shows each of them as moved to Suspended
+  before the OU goes.
 - Security is open like every other OU (see below).
 
 ### The Security OU

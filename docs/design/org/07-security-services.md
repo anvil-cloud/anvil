@@ -378,13 +378,19 @@ Detective; everything else stays in Audit.
 
 ```ts
 export default new Org({
-  tier: 'minimum',
   email: 'aws+{account}@acme.com',
-  stages: { prod: { ou: 'Prod' }, dev: { ou: 'NonProd' } },
-  workloads: { payments: { stages: ['prod', 'dev'] } },
 
-  accounts: {
-    secops: { ou: 'Security', tags: { team: 'security-operations' } },
+  ou: {
+    // ...the rest of the layout anvil org init wrote
+    Security: {
+      enable: true,
+      accounts: {
+        'log-archive': { enable: true },
+        audit: { enable: true },
+        emergency: { enable: true },
+        secops: { enable: true, tags: { team: 'security-operations' } },
+      },
+    },
   },
 
   guardrails: { allowedRegions: { regions: ['ap-southeast-2'] } },

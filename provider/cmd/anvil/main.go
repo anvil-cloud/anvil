@@ -27,6 +27,8 @@ import (
 	awswaf "github.com/anvil-cloud/anvil/provider/aws/waf"
 	gcpbucket "github.com/anvil-cloud/anvil/provider/gcp/bucket"
 	gcpfunction "github.com/anvil-cloud/anvil/provider/gcp/function"
+	awsorgAccount "github.com/anvil-cloud/anvil/provider/aws/orgAccount"
+	awsorgImportedAccount "github.com/anvil-cloud/anvil/provider/aws/orgImportedAccount"
 )
 
 func main() {
@@ -52,14 +54,16 @@ func main() {
 			infer.ComponentF(gcpbucket.NewBucket),
 			infer.ComponentF(gcpfunction.NewFunction),
 		).
-		// Internal resources: created by components, not exposed in the SDKs.
 		WithResources(
+			// Internal resources: created by components, not exposed in the SDKs.
 			infer.Resource(&cfrule.OriginSecretRule{}),
+			awsorgAccount.Resource(),
+			awsorgImportedAccount.Resource(),
 		).
 		Build()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	p.Run(context.Background(), "anvil", "0.1.26")
+	p.Run(context.Background(), "anvil", "0.1.28")
 }

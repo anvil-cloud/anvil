@@ -1,0 +1,62 @@
+{
+  "resources": {
+    "anvil:aws:OrgImportedAccount": {
+      "description": "An existing member account managed by an Anvil Org. Used by anvil.Org; deleting it only releases the account (removes Anvil's tags), never moves, removes or closes it.",
+      "inputProperties": {
+        "accountId": {
+          "type": "string",
+          "description": "The existing member account's 12-digit ID.",
+          "replaceOnChanges": true
+        },
+        "ouId": {
+          "type": "string",
+          "description": "The OU to move the account into."
+        },
+        "orgName": {
+          "type": "string",
+          "description": "The Org project name, tagged on the account as anvil:org."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Extra tags on the account."
+        },
+        "bootstrap": {
+          "type": "boolean",
+          "description": "Create anvil-org-automation in the account through OrganizationAccountAccessRole. Default true."
+        },
+        "deployerArns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Exact IAM ARNs anvil-org-automation trusts (Org's deployers). Required when bootstrapping."
+        }
+      },
+      "requiredInputs": ["accountId", "ouId", "orgName"],
+      "properties": {
+        "accountId": { "type": "string", "description": "The member account's ID." },
+        "ouId": { "type": "string", "description": "The OU the account is in." },
+        "orgName": { "type": "string", "description": "The Org project name." },
+        "tags": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Extra tags on the account."
+        },
+        "bootstrap": { "type": "boolean", "description": "Whether bootstrapping was requested." },
+        "deployerArns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "IAM ARNs anvil-org-automation trusts."
+        },
+        "automationRoleArn": {
+          "type": "string",
+          "description": "ARN of anvil-org-automation in the account, or empty when not bootstrapped."
+        },
+        "bootstrapped": {
+          "type": "boolean",
+          "description": "Whether anvil-org-automation was bootstrapped."
+        }
+      },
+      "required": ["accountId", "ouId", "orgName", "automationRoleArn", "bootstrapped"]
+    }
+  }
+}

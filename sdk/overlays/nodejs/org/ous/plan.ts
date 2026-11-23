@@ -1,11 +1,10 @@
-// planOrgOus: validates `tier` and `ou` and returns every OU to create,
-// parents before children. Pure: no AWS calls.
-import { OrgConfig, OrgTier } from '../config';
-import { OrgOuConfig } from './config';
+// planOrgOus: validates `ou` and returns every OU to create, parents before
+// children. Pure: no AWS calls. Nothing is implied: only written OUs exist.
+import { OrgConfig } from '../config';
 
 /** One OU Org will create. */
 export interface PlannedOu {
-  /** Full path, e.g. "Workloads/Prod". */
+  /** Full path, e.g. "Workloads/Prod". Names the OU in state, accounts and guardrails. */
   path: string;
   /** The OU's name, the last path segment. */
   name: string;
@@ -13,23 +12,31 @@ export interface PlannedOu {
   parent?: string;
   /** Tags for this OU only (merged over the org-wide tags). */
   tags: Record<string, string>;
-  /** True for OUs Org recommends, false for the user's own. */
-  recommended: boolean;
+  /** Its path before this deploy's renames (its own or a parent's), when different. */
+  previousPath?: string;
+  /** The OU's `accounts` as written; planOrgAccounts validates them. */
+  accounts: Record<string, unknown>;
 }
 
 /** AWS allows five levels of OUs below Root. */
 const maxOuDepth = 5;
 
-/** Recommended OUs per tier, parents before children. */
-const recommendedOus: Record<OrgTier, string[]> = {
-  minimum: ['Security', 'Workloads', 'Workloads/Prod', 'Workloads/NonProd', 'Sandbox', 'Suspended'],
-};
-
-/** Keys in `ou` that switch a recommended OU instead of adding one. */
-const switchKeys = new Set(['Sandbox', 'PolicyStaging']);
-
 /** AWS: OU names are 1-128 characters. Org also rules out "/", the path separator. */
 const ouNamePattern = /^[^/]{1,128}$/;
+
+/** What `anvil org init` writes for the minimum layout, for the `tier` migration error. */
+const minimumLayout = `ou: {
+    Security: { enable: true },
+    Workloads: {
+      enable: true,
+      ou: {
+        Prod: { enable: true },
+        NonProd: { enable: true },
+      },
+    },
+    Sandbox: { enable: true },
+    Suspended: { enable: true },
+  }`;
 
 /**
  * Validates the config and returns every OU Org will create, parents before
@@ -39,137 +46,113 @@ export function planOrgOus(config: OrgConfig): PlannedOu[] {
   if (!config || typeof config !== 'object') {
     throw new Error('new Org({...}) needs a config object.');
   }
-  const tiers = Object.keys(recommendedOus);
-  if (!tiers.includes(config.tier)) {
+  if ((config as any).tier !== undefined) {
     throw new Error(
-      `tier must be one of: ${tiers.map((t) => `'${t}'`).join(', ')} (got ${JSON.stringify(config.tier)}).`
+      `tier was removed: Org now lists every OU in anvil.config.ts, so nothing is hidden. ` +
+        `Replace tier: ${JSON.stringify((config as any).tier)} with the OUs you want, e.g.\n  ${minimumLayout}\n` +
+        `Keeping the same OUs means no changes on the next deploy.`
     );
   }
 
-  const ou = config.ou ?? {};
-
-  const sandbox = ou.Sandbox;
-  if (sandbox !== undefined && !isDisable(sandbox)) {
-    throw new Error("ou.Sandbox only accepts { disable: true }. Sandbox is on by default.");
-  }
-  const staging = ou.PolicyStaging;
-  if (staging !== undefined && !isEnable(staging)) {
-    throw new Error('ou.PolicyStaging only accepts { enable: true }. Policy Staging is off by default.');
-  }
-
-  const recommended = recommendedOus[config.tier].filter((p) => !(p === 'Sandbox' && sandbox));
-  if (staging) recommended.push('PolicyStaging');
-
-  const known = new Set(recommended);
-  const planned: PlannedOu[] = recommended.map((path) => ({
-    ...split(path),
-    path,
-    tags: {},
-    recommended: true,
-  }));
-
-  // Custom OUs: sort by depth so parents are planned before children.
-  const custom = Object.keys(ou)
-    .filter((k) => !switchKeys.has(k))
-    .sort((a, b) => depth(a) - depth(b) || a.localeCompare(b));
-
-  for (const path of custom) {
-    const value = ou[path];
-    if (!isEnable(value)) {
-      throw new Error(
-        `ou['${path}'] must be { enable: true } (optionally with tags). ` +
-          `Only Sandbox can be { disable: true }.`
-      );
-    }
-    const segments = path.split('/');
-    if (segments.some((s) => !ouNamePattern.test(s) || s.trim() !== s)) {
-      throw new Error(`ou['${path}']: each part of an OU path must be 1-128 characters with no leading or trailing spaces.`);
-    }
-    if (segments.length > maxOuDepth) {
-      throw new Error(`ou['${path}'] is ${segments.length} levels deep; AWS allows ${maxOuDepth} below Root.`);
-    }
-    if (known.has(path)) {
-      throw new Error(`ou['${path}'] is already a recommended OU for tier '${config.tier}'; remove it from ou.`);
-    }
-    const { name, parent } = split(path);
-    if (parent !== undefined && !known.has(parent)) {
-      if (parent === 'Sandbox' && sandbox) {
-        throw new Error(
-          `ou['${path}']: Sandbox is turned off (ou.Sandbox: { disable: true }). ` +
-            `Remove that to keep Sandbox, or put this OU somewhere else.`
-        );
-      }
-      if (parent === 'PolicyStaging' && !staging) {
-        throw new Error(`ou['${path}']: Policy Staging is off. Add ou.PolicyStaging: { enable: true } first.`);
-      }
-      const hint = suggest(parent, [...known]);
-      throw new Error(
-        `ou['${path}']: parent OU '${parent}' doesn't exist. Add it to ou as { enable: true }` +
-          (hint ? `, or did you mean '${hint}/${name}'?` : '.')
-      );
-    }
-    known.add(path);
-    planned.push({ path, name, parent, tags: { ...(value as OrgOuConfig).tags }, recommended: false });
-  }
-
-  // OU names must be unique under the same parent (AWS rejects duplicates).
-  const seen = new Map<string, string>();
-  for (const p of planned) {
-    const key = `${p.parent ?? ''}\u0000${p.name.toLowerCase()}`;
-    const other = seen.get(key);
-    if (other) {
-      throw new Error(`ou['${p.path}'] and '${other}' have the same name under the same parent.`);
-    }
-    seen.set(key, p.path);
-  }
-
+  const planned: PlannedOu[] = [];
+  walk(config.ou, undefined, undefined, planned);
   return planned;
 }
 
-function isEnable(v: unknown): boolean {
-  return typeof v === 'object' && v !== null && (v as any).enable === true && (v as any).disable === undefined;
-}
+/** Plans one `ou` map (Root's or an OU's), depth-first so parents come first. */
+function walk(ous: unknown, parent: string | undefined, parentPrevious: string | undefined, planned: PlannedOu[]): void {
+  if (ous === undefined) return;
+  const where = parent === undefined ? 'ou' : `OU '${parent}': ou`;
+  if (typeof ous !== 'object' || ous === null || Array.isArray(ous)) {
+    throw new Error(`${where} must be an object keyed by OU name, e.g. { Prod: { enable: true } }.`);
+  }
 
-function isDisable(v: unknown): boolean {
-  return typeof v === 'object' && v !== null && (v as any).disable === true && (v as any).enable === undefined;
-}
+  const seen = new Map<string, string>();
+  const renames = new Map<string, string>();
+  for (const [name, value] of Object.entries(ous as Record<string, unknown>)) {
+    const path = parent === undefined ? name : `${parent}/${name}`;
 
-function depth(path: string): number {
-  return path.split('/').length;
-}
+    if (name.includes('/')) {
+      const [head, ...rest] = name.split('/');
+      throw new Error(
+        `OU '${name}': write nested OUs inside their parent, not as a path. ` +
+          `Put ${rest.join('/')} in ${head}'s ou: ${head}: { enable: true, ou: { ${rest[0]}: { enable: true } } }.`
+      );
+    }
+    if (!ouNamePattern.test(name) || name.trim() !== name) {
+      throw new Error(`OU '${path}': OU names must be 1-128 characters with no leading or trailing spaces.`);
+    }
+    const lower = name.toLowerCase();
+    const other = seen.get(lower);
+    if (other !== undefined) {
+      throw new Error(`OUs '${other}' and '${name}' ${parent === undefined ? 'under Root' : `in '${parent}'`} differ only by case; give them names that differ by more than case.`);
+    }
+    seen.set(lower, name);
 
-function split(path: string): { name: string; parent?: string } {
-  const i = path.lastIndexOf('/');
-  return i === -1 ? { name: path } : { name: path.slice(i + 1), parent: path.slice(0, i) };
-}
+    if (typeof value === 'object' && value !== null && (value as any).disable !== undefined) {
+      throw new Error(`OU '${path}': delete its block to remove the OU. Only written OUs exist.`);
+    }
+    if (typeof value !== 'object' || value === null || Array.isArray(value) || (value as any).enable !== true) {
+      throw new Error(`OU '${path}' must be { enable: true } (optionally with tags and ou).`);
+    }
+    const unknownKeys = Object.keys(value).filter((k) => !['enable', 'renamedFrom', 'tags', 'ou', 'accounts'].includes(k));
+    if (unknownKeys.length > 0) {
+      throw new Error(`OU '${path}': unknown option ${unknownKeys.map((k) => `'${k}'`).join(', ')}. OUs take enable, renamedFrom, tags, ou and accounts.`);
+    }
+    const depth = path.split('/').length;
+    if (depth > maxOuDepth) {
+      throw new Error(`OU '${path}' is ${depth} levels deep; AWS allows ${maxOuDepth} below Root.`);
+    }
 
-/** Closest known path by case-insensitive match or edit distance ≤ 2. */
-function suggest(target: string, candidates: string[]): string | undefined {
-  const lower = target.toLowerCase();
-  const exact = candidates.find((c) => c.toLowerCase() === lower);
-  if (exact) return exact;
-  let best: string | undefined;
-  let bestDistance = 3;
-  for (const c of candidates) {
-    const d = editDistance(lower, c.toLowerCase());
-    if (d < bestDistance) {
-      best = c;
-      bestDistance = d;
+    const v = value as { renamedFrom?: unknown; tags?: Record<string, string>; ou?: unknown; accounts?: unknown };
+    const oldName = v.renamedFrom === undefined ? name : checkOuRename(path, name, v.renamedFrom, renames);
+    const base = parentPrevious ?? parent;
+    const previous = base === undefined ? oldName : `${base}/${oldName}`;
+    if (v.accounts !== undefined && (typeof v.accounts !== 'object' || v.accounts === null || Array.isArray(v.accounts))) {
+      throw new Error(`OU '${path}': accounts must be an object keyed by account name, e.g. { 'my-app-prod': {...} }.`);
+    }
+    planned.push({
+      path,
+      name,
+      parent,
+      tags: { ...v.tags },
+      ...(previous !== path ? { previousPath: previous } : {}),
+      accounts: { ...(v.accounts as Record<string, unknown>) },
+    });
+    walk(v.ou, path, previous !== path ? previous : undefined, planned);
+  }
+
+  // The old name can't still be written next to the new one.
+  for (const [oldLower, renamed] of renames) {
+    const still = seen.get(oldLower);
+    if (still !== undefined && still !== renamed) {
+      const at = parent === undefined ? 'under Root' : `in '${parent}'`;
+      throw new Error(`OU '${renamed}' is renamedFrom '${still}', but '${still}' is still written ${at}. Delete the '${still}' block, or drop renamedFrom.`);
     }
   }
-  return best;
 }
 
-function editDistance(a: string, b: string): number {
-  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
-  for (let i = 1; i <= a.length; i++) {
-    let prev = row[0];
-    row[0] = i;
-    for (let j = 1; j <= b.length; j++) {
-      const tmp = row[j];
-      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
-      prev = tmp;
-    }
+/** Validates an OU's renamedFrom and returns the old name. */
+function checkOuRename(path: string, name: string, from: unknown, renames: Map<string, string>): string {
+  if (typeof from !== 'string') {
+    throw new Error(`OU '${path}': renamedFrom must be the OU's old name, e.g. renamedFrom: 'Data'.`);
   }
-  return row[b.length];
+  if (from.includes('/')) {
+    throw new Error(
+      `OU '${path}': renamedFrom is the old name under the same parent, not a path ('${from}'). ` +
+        `AWS can't move an OU to another parent: write the new OU, move its accounts into it, then delete the old one.`
+    );
+  }
+  if (!ouNamePattern.test(from) || from.trim() !== from) {
+    throw new Error(`OU '${path}': renamedFrom '${from}' isn't a valid OU name (1-128 characters, no leading or trailing spaces).`);
+  }
+  if (from === name) {
+    throw new Error(`OU '${path}': renamedFrom is the same as its name. Drop renamedFrom.`);
+  }
+  const other = renames.get(from.toLowerCase());
+  if (other !== undefined) {
+    throw new Error(`OUs '${other}' and '${name}' are both renamedFrom '${from}'. Keep it on one.`);
+  }
+  renames.set(from.toLowerCase(), name);
+  return from;
 }

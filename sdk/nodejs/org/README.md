@@ -18,7 +18,7 @@ org/
 │   ├── policy.ts     policyDocument(), policyFile(), minify, size checks
 │   └── providers.ts  management and per-account providers
 ├── ous/              04-ou-layout
-├── accounts/         05-accounts (tiers, workloads, automation role, readiness, setup)
+├── accounts/         05-accounts (import today; core accounts, workloads, automation role, readiness, setup next)
 ├── guardrails/       06-guardrails
 │   └── rules/        one file per baseline rule (denyLeaveOrg.ts, allowedRegions.ts, …)
 ├── breakGlass/       02-break-glass (emergency account, OrganizationAccountAccessRole, alerts)
@@ -27,7 +27,12 @@ org/
 └── notifications/    09-notifications (topic.ts, watch.ts)
 ```
 
-Only `ous/` exists so far; the rest are added as each feature is built.
+`ous/` and `accounts/` exist so far; the rest are added as each feature is built.
+
+Custom resources with their own create/update/delete logic (like
+`OrgImportedAccount`) live in the Go provider (`provider/aws/org*/`), so all
+three SDKs share one implementation; `create.ts` files use them like any
+other Anvil resource.
 
 ## Rules
 

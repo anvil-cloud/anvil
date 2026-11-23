@@ -4,18 +4,46 @@ Part of the [Org design](README.md).
 
 ## Accounts
 
-### Tiers
+**Built so far** (TypeScript SDK, `anvil:aws:OrgAccount` and
+`anvil:aws:OrgImportedAccount` in the provider):
+
+| Piece | Status |
+|---|---|
+| Creating accounts (`CreateAccount` with `RoleName: anvil-org-automation`, wait, move to OU, narrow trust) | built |
+| Email pattern and per-account `email`, validated in preview | built |
+| Hard stop: type `yes`, or `--yes-create-accounts` / `--yes-suspend-accounts` in CI | built |
+| Account quota check | built |
+| Readiness | partial: assume `anvil-org-automation` with backoff; no per-region checks, no separate `AccountReady` resource yet |
+| Removing a created account | partial: moved to Suspended, tagged `anvil:lifecycle=suspended`, released. `anvil-org-automation` is **not** disabled yet: until break glass exists it's the only way back in |
+| `OrganizationAccountAccessRole` (break glass) in created accounts | not built (break glass isn't) |
+| Core accounts written by init, and how Audit/Log Archive are marked | not built (open) |
+
+### Starting layouts (anvil org init)
 
 AWS treats Log Archive and Audit as required everywhere (Control Tower and
 LZA force them), and Well-Architected recommends a dedicated emergency
-access account; the rest depend on need. Org exposes this as tiers so
-users start small and step up when ready:
+access account; the rest depend on need. **`anvil org init` asks which tier
+to start from and writes its OUs (and, once account creation lands, its
+accounts) into `anvil.config.ts` in full**, each line commented with what it's
+for. Tiers exist only in init: config never names one, and nothing is
+created that isn't written in the file. Growing later means adding lines.
 
-```ts
-new Org({ tier: 'minimum' }) // Log Archive, Audit, Emergency
-new Org({ tier: 'network' }) // + Network
-new Org({ tier: 'sra' })     // + Shared Services, Deployments, Backup
 ```
+? Tier
+  ▸ minimum  Security, Workloads (Prod, NonProd) and Suspended. Right for most orgs
+    network  minimum + Infrastructure, for shared networking (Transit Gateway, egress, DNS)
+    sra      network + Deployments, AWS's full Security Reference Architecture layout
+
+  Personal accounts for developers to experiment in, away from production.
+  Sandbox OU? (Y/n)
+
+  A throwaway account for testing guardrail changes before they reach real OUs.
+  Policy Staging OU? (y/N)
+```
+
+Init then prints the tree it wrote. `--tier`, `--sandbox=false` and
+`--policy-staging` answer the questions for scripts; without a terminal the
+defaults are `minimum`, Sandbox on, Policy Staging off.
 
 | Account | OU | Tier | Purpose |
 |---|---|---|---|
@@ -27,87 +55,108 @@ new Org({ tier: 'sra' })     // + Shared Services, Deployments, Backup
 | Deployments | Deployments | sra | CI/CD into workload accounts |
 | Backup | Infrastructure | sra | Central AWS Backup vault |
 
-Tiers create both OUs and accounts: `minimum` creates 3 accounts, `network`
-4, `sra` 7. Org also fills its own accounts (the log bucket in Log Archive,
-security services in Audit, shared networking in Network).
+`minimum` writes 3 accounts, `network` 4, `sra` 7. Org also fills its own
+accounts (the log bucket in Log Archive, security services in Audit, shared
+networking in Network).
 
-### Workload accounts
+- *Today* init writes OUs only, plus a commented example of a created and an
+  imported account. Account creation is built, but init doesn't write the
+  core accounts yet: how a core account is marked (so Org knows `audit` is
+  the delegated admin) is still open. Log Archive, Audit and Emergency
+  stay required: preview fails, saying what to add, if account creation is
+  in use without them.
+- Removing a written account follows the removal rule (see Removing an
+  account); there's no tier to step down.
 
-Workload accounts (one per workload per environment, as AWS recommends) and
-sandboxes are **declared by the user**. Tiers never create them. They arrive
-empty apart from org-wide guardrails and security services; what runs inside
-them comes from an `App`.
+### Writing accounts
 
-**Stages** (environments) and the OU each one lives in are **defined once at
-the org level**; workloads pick from that list. Placement decides which
-guardrails apply, so it is never inferred. Accounts are added rarely, so the
-extra edit for a new stage is acceptable.
-
-The name `stages` matches App's stage concept, so App linking later reads
-naturally: the `payments` App's `prod` stage deploys to `payments-prod`. Org
-itself still has no stages of its own (one Org per organization).
+**Every account is written inside the OU it lives in**, keyed by a name
+unique across the org. Nothing is generated: no `workloads × stages`, no
+`sandboxes` list. What's in the file is the org, the same way the console
+tree shows it. Accounts are added rarely, so writing each one is a small
+cost for never having to work out what exists.
 
 ```ts
 new Org({
-  tier: 'minimum',
   email: 'aws+{account}@acme.com',
 
-  stages: {
-    prod:    { ou: 'Prod' },
-    perf:    { ou: 'Prod' },
-    staging: { ou: 'NonProd' },
-    dev:     { ou: 'NonProd' },
+  ou: {
+    Security: {
+      enable: true,
+      accounts: {
+        // Org CloudTrail, Config history and immutable logs. Required.
+        'log-archive': { enable: true },
+        // Runs every security service, plus break-glass alerts and notifications. Required.
+        audit: { enable: true },
+        // Break-glass IAM users only; nothing else runs here. Required.
+        emergency: { enable: true },
+      },
+    },
+    Workloads: {
+      enable: true,
+      ou: {
+        Prod: {
+          enable: true,
+          accounts: {
+            'payments-prod': { enable: true, tags: { team: 'billing' } },
+            'analytics-prod': { enable: true, tags: { team: 'data' } },
+            'curiosity-unlocked': { enable: true, import: { accountId: '669591255121' } },
+          },
+        },
+        NonProd: {
+          enable: true,
+          accounts: {
+            'payments-dev': { enable: true, tags: { team: 'billing' } },
+            'analytics-dev': { enable: true, tags: { team: 'data' } },
+          },
+        },
+      },
+    },
+    Sandbox: {
+      enable: true,
+      accounts: { 'sandbox-alice': { enable: true } },
+    },
+    Suspended: { enable: true },
   },
-
-  workloads: {
-    payments:  { stages: ['prod', 'perf', 'staging', 'dev'] },
-    analytics: { stages: ['prod', 'dev'] },
-  },
-
-  sandboxes: ['alice'],
 });
 ```
 
-- Account names are `<workload>-<stage>` (`payments-prod`) and
-  `sandbox-<name>`. Emails come from the org-wide `email` pattern.
-- A stage that isn't defined is a type error in TypeScript and a
-  preview error in Python and Go, so nothing is created until someone decides
-  its OU.
-- Removing a stage or workload follows the downgrade rule: its
-  accounts move to Suspended for closing in the console.
-- Accounts that aren't workloads or sandboxes (e.g. a partner integration)
-  go in `accounts` (see Custom OU and free-form account syntax).
-- *Future:* preset tiers for common shapes, e.g. a single SaaS product tier
-  that adds the recommended accounts plus `prod` and `dev` workload accounts.
+- **The name is the account's identity in state**, not its OU or its
+  position. Adding an account never touches the others; reordering or
+  reformatting changes nothing; **moving its block to another OU moves the
+  account** (`MoveAccount`, preview shows the guardrail change).
+- **Names are unique across the whole org**, not just within an OU. The same
+  name in two OUs fails preview, naming both.
+- **Removing an account's block never closes it**: it follows the removal
+  rule (see Removing an account). Renames use `renamedFrom` (see Renames).
+- **Naming is the user's.** Docs recommend `<workload>-<environment>`
+  (`payments-prod`) and `sandbox-<name>`, which App linking then names
+  directly; nothing enforces it.
+- **Core accounts** (Log Archive, Audit, Emergency) are written by init and
+  are ordinary entries in Security. How Org knows which one is Audit (a
+  marker field, fixed names, or a separate block) is decided when account
+  creation is built; preview fails with the line to add if one is missing.
+- **Every entry carries `enable: true`**, created or imported, so every OU
+  and account looks the same. Imports add `import: { accountId }` instead of
+  being created (see Importing existing accounts).
+- *Future:* more init layouts for common shapes, e.g. a single SaaS product
+  that writes the core accounts plus `prod` and `dev` accounts.
 
-### Grouping workloads
+### Grouping accounts
 
 Follows AWS guidance (*Organizing Your AWS Environment Using Multiple AWS
 Accounts*): **OUs group accounts by the controls they need, not by ownership
 or org structure; everything else is tags.**
 
 1. **Workloads → Prod / NonProd** is the primary split.
-2. **Tags** for tidiness (owner, team, cost centre). Workloads accept `tags`,
-   and every workload account gets `anvil:workload=<name>` and
-   `anvil:stage=<stage>` automatically. The dashboard groups and filters by
-   these.
-
-   ```ts
-   workloads: {
-     payments:  { stages: ['prod', 'dev'], tags: { team: 'billing' } },
-     analytics: { stages: ['prod', 'dev'], tags: { team: 'data' } },
-   }
-   ```
-
+2. **Tags** for tidiness (owner, team, cost centre), on each account. The
+   dashboard groups and filters by them.
 3. **Group OUs under Prod and NonProd** (e.g. `Prod/Data`, `NonProd/Data`)
    are what AWS recommends when a set of accounts needs its own guardrails.
 
-`workloads` always places accounts directly in the stage's OU (Prod or
-NonProd). Anything else, including group OUs or an OU per workload, is built
-with [custom OUs](04-ou-layout.md#custom-ous) and free-form `accounts`. That is allowed but
-not recommended; the docs carry AWS's guidance rather than Anvil enforcing it
-(an OU per workload spreads prod across many OUs and repeats prod guardrails
-per workload).
+An OU per workload is allowed but not recommended; the docs carry AWS's
+guidance rather than Anvil enforcing it (it spreads prod across many OUs and
+repeats prod guardrails per workload).
 
 ### Account emails
 
@@ -119,10 +168,8 @@ shared mailbox.
 
 - **Org-wide pattern**, `email: 'aws+{account}@acme.com'`. `{account}` is
   required and replaced by the account name.
-- **Overrides:** a free-form account can set its own `email`; a workload can
-  set its own pattern (`email: 'payments+{account}@acme.com'`). Covers mail
-  servers without plus addressing and inboxes owned elsewhere (e.g. a
-  partner).
+- **Override:** an account can set its own `email`. Covers mail servers
+  without plus addressing and inboxes owned elsewhere (e.g. a partner).
 - **Preview validates every address** before anything is created: AWS's
   64-character limit, valid format, and uniqueness within the config.
 - **Docs recommend a shared group mailbox** (e.g. `aws@acme.com`), never one
@@ -130,14 +177,16 @@ shared mailbox.
 
 ### Renames
 
-Accounts, workloads, stages and custom OUs are keyed by name, so renaming a
-key would otherwise look like a removal (account suspended) plus a new
-account. Renames are explicit with `renamedFrom`, mapped to Pulumi aliases so
+Accounts and OUs are keyed by name, so renaming a key would otherwise look
+like a removal (account suspended) plus a new account. Renames are explicit with `renamedFrom`, mapped to Pulumi aliases so
 state moves and nothing is recreated:
 
 ```ts
-accounts: {
-  'analytics-lake': { ou: 'Workloads/Prod/Data', renamedFrom: 'data-lake' },
+Data: {
+  enable: true,
+  accounts: {
+    'analytics-lake': { enable: true, renamedFrom: 'data-lake' },
+  },
 },
 ```
 
@@ -149,24 +198,40 @@ accounts: {
 
 | Rename | Where `renamedFrom` goes | Effect |
 |---|---|---|
-| Free-form account | the account | Account name updated (`account:PutAccountName`) |
-| Workload | the workload | All its accounts renamed (`payments-prod` → `billing-prod`) |
-| Stage | the stage (`uat: { ou: 'NonProd', renamedFrom: 'staging' }`) | That stage's account renamed in every workload |
-| Custom OU | the OU path | OU renamed (`UpdateOrganizationalUnit`); accounts stay |
+| Account (created by Org) | the account | Account name updated (`account:PutAccountName`, called inside the account through `anvil-org-automation`, so the org needs no Account Management trusted access) |
+| Account (imported) | the account | Renamed in config and state only; the account keeps its AWS name (Org doesn't manage an imported account's name) |
+| OU | the OU (`renamedFrom: 'Data'`, the old name under the same parent) | OU renamed (`UpdateOrganizationalUnit`); accounts stay. Child OUs follow without their own `renamedFrom` |
+
+- **`renamedFrom` is checked in config**: it can't equal the name, two
+  entries can't share one, and the old name can't still be written. An OU's
+  `renamedFrom` is a name, never a path: AWS can't move an OU to another
+  parent (write the new OU, move its accounts, delete the old one).
+- **The CLI checks it against state** before Pulumi runs: renamedFrom
+  pointing at a different account ID is an error; one that matches nothing
+  in state is a warning (imported as new); one already applied gets a
+  "remove renamedFrom" note.
 
 - **Email is fixed at creation.** Changing a root email needs a code sent to
   the new address, so it's a console task; the email pattern only applies to
   new accounts.
-- Moving an account to another OU (changing its `ou`) is a move, not a
-  rename: `MoveAccount`, and preview shows the guardrail change.
-- **Missing `renamedFrom` is caught**: a removal and an addition of the same
-  kind in the same OU in one deploy is a preview error:
+- Moving an account's block to another OU is a move, not a rename:
+  `MoveAccount`, and preview shows the guardrail change. Moving and renaming
+  in one deploy is fine (`renamedFrom` finds it anywhere in the tree).
+- **Missing `renamedFrom` is caught** before Pulumi runs, by comparing
+  config with state:
+  - an imported account whose ID is in state under another name is an error
+    (built):
 
-  ```
-  ✗ data-lake removed and analytics-lake added in the same OU.
-    If this is a rename, add renamedFrom: 'data-lake' to analytics-lake.
-    If you really mean to suspend data-lake and create a new account, pass --allow-replace.
-  ```
+    ```
+    ✗ Account 222222222222 is in state as 'data-lake' but written as 'analytics-lake'.
+      Without renamedFrom it would be released and imported again.
+      If this is a rename, add renamedFrom: 'data-lake' to 'analytics-lake'.
+    ```
+  - an OU removed and another added under the same parent is a warning, since
+    both can be intended (built);
+  - for created accounts (not built yet), an account removed and another
+    added in the same OU will be an error, with `--allow-replace` to really
+    suspend one and create the other.
 
 ### Confirming account creation
 
@@ -185,7 +250,8 @@ Accounts are permanent, so creating one is a **hard stop**:
   ```
 
 - **Non-interactive (CI):** the deploy stops unless `--yes-create-accounts`
-  is passed. Plain `--yes` approves everything else but **not** account
+  is passed (and `--yes-suspend-accounts` when a created account is being
+  moved to Suspended). Plain `--yes` approves everything else but **not** account
   creation, so a config change alone never creates accounts in a pipeline.
 
 Approval gates in CI are the user's choice. This is stricter than AFT or
@@ -417,6 +483,14 @@ Accounts   in org 8 (incl. management, 1 suspended, 0 invitations) + 4 new = 12
 
 ### New-account readiness
 
+**Lost state:** if a create succeeds but setup fails, the resource is kept
+in state (Pulumi's partial create) and the next deploy finishes setup. If
+state was lost entirely, the next create finds the account in the org by
+email, tagged `anvil:org=<this org>`, and adopts it instead of failing on
+`EMAIL_ALREADY_EXISTS`. The same path takes back a removed account from
+Suspended when its block is written again. An email used by an account Org
+doesn't manage fails, with the `import` line to use instead.
+
 `CreateAccount` reports success before an account is usable: the access role
 takes time to become assumable, and services activate per region. Org never
 touches a new account before it's ready.
@@ -494,7 +568,54 @@ recommended but not required; local deploys by a person are allowed.
 - If the role is deleted or changed, the SCP blocks it; on drift Org errors
   in preview (it can't get back in without break glass).
 
-**Accounts Org didn't create** (future work, with account adoption) lack
+### Importing existing accounts
+
+*Implemented (first pass, 2026-11-07).* Existing member accounts are
+imported **by account ID** (never by email, so no PII in config), written
+inside their OU like any other account:
+
+```ts
+Prod: {
+  enable: true,
+  accounts: {
+    'curiosity-unlocked': { enable: true, import: { accountId: '669591255121' } },
+  },
+},
+Sandbox: {
+  enable: true,
+  accounts: {
+    'legacy-billing': { enable: true, import: { accountId: '111122223333', bootstrap: { disable: true } } },
+  },
+},
+```
+
+| Step | What happens | Needs access into the account? |
+|---|---|---|
+| Check | Preview and deploy check the account is an active member of this org and not the management account | No |
+| Place | Moved into its OU, so that OU's guardrails apply straight away | No |
+| Tag | `anvil:managed`, `anvil:org`, plus `defaults.tags` and the account's `tags` | No |
+| Bootstrap | `anvil-org-automation` created (or updated) inside it, trusting Org's deployers by exact ARN; AdministratorAccess | Yes, once, through `OrganizationAccountAccessRole` |
+
+- **`bootstrap: { disable: true }`** imports without going inside the
+  account: placement and tags only. For accounts where touching IAM is
+  risky, or an existing SCP would break it. Org then can't configure
+  anything inside the account; remove the `disable` later to bootstrap.
+- **Removing an imported account from config releases it:** Anvil's tags
+  are removed; it isn't moved, removed from the org or closed, and
+  `anvil-org-automation` stays.
+- Implemented as the provider's custom resource `anvil:aws:OrgImportedAccount`
+  (`provider/aws/orgImportedAccount`), not Pulumi's `aws.organizations.Account`,
+  which removes the account from the org when deleted.
+- **Today the role trusts the person deploying** (the bootstrap deployer),
+  resolved by the CLI from the caller's session; CI roles and `orgAdmin` join
+  the trust when they're built.
+- Accounts invited from outside the org may have no
+  `OrganizationAccountAccessRole`; the error says to create it or set
+  `bootstrap: { disable: true }`.
+- *Later:* preview shows the guardrail change when an account moves OU (the
+  impact check), and creating accounts.
+
+**How the bootstrap uses break glass.** Accounts Org didn't create lack
 the role. Org bootstraps it once through `OrganizationAccountAccessRole`
 with session name `anvil-bootstrap-<accountId>`. The alert is **labelled,
 not suppressed** (session names are caller-chosen, and filtering on the
@@ -626,10 +747,10 @@ numbers don't belong in a repo or in state.
 - *Future:* the dashboard shows missing contacts per account and could set
   them directly through the API, so they never pass through code or state.
 
-### Moving down a tier
+### Removing an account
 
-Accounts are permanent, so a downgrade never closes anything. Instead the
-accounts leaving the tier are:
+Accounts are permanent, so removing one from config never closes anything.
+Instead accounts Org created that leave config are:
 
 1. cleaned of Anvil's per-account access first, while Anvil can still
    reach them: the scan role and the SSM parameter are deleted, and

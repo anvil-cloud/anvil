@@ -25,12 +25,16 @@ export {
 export {
   Org,
   OrgConfig,
-  OrgTier,
   OrgOus,
   OrgOuConfig,
   OrgDefaultsConfig,
+  OrgAccounts,
+  OrgAccountConfig,
+  OrgAccountImport,
   PlannedOu,
   planOrgOus,
+  PlannedAccount,
+  planOrgAccounts,
 } from "./org";
 
 // App-wide security group defaults

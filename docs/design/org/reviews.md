@@ -790,3 +790,87 @@ Security OU, every tier):
 - `minimum` tier now creates 3 accounts.
 
 See [Break glass](02-break-glass.md).
+
+## Decision: tiers move to init; config lists everything (2026-11-08)
+
+`tier: 'minimum'` in config hid what Org creates: six OUs (and later three
+accounts) appeared from one word. Now:
+
+- **Config implies nothing.** `ou` lists every OU, each `{ enable: true }`,
+  parents included; Org manages exactly what's listed. No built-in OUs, no
+  `Sandbox: { disable: true }` switch (delete the line instead).
+- **Tiers live in `anvil org init`.** It asks for `minimum`, `network` or
+  `sra`, then Sandbox and Policy Staging, explaining each OU, writes them out
+  with a comment per line, and prints the tree. Flags (`--tier`,
+  `--sandbox=false`, `--policy-staging`) answer for scripts.
+- **No state migration.** OUs are named by path in state, so writing the
+  same paths out explicitly previews with no changes. An old `tier:` field
+  fails with the replacement `ou` block to paste.
+- Core accounts follow the same rule when account creation lands: init
+  writes them; how a core account is marked is decided then.
+- "Moving down a tier" becomes "Removing an account" (same steps).
+- **Nested OUs (same day).** `ou` nests the way OUs sit in AWS: keys are
+  names, each OU's own `ou` holds its children
+  (`Workloads: { enable: true, ou: { Prod: {...}, NonProd: {...} } }`).
+  Flat `'Workloads/Prod'` keys were hard to read and needed a "parent isn't
+  listed" rule; a path key now fails with the nested form to write. Paths
+  stay the way everything else names an OU (accounts, guardrails, state),
+  so deployed OUs see no change.
+
+## Decision: accounts written inside their OU (2026-11-08)
+
+Same reasoning as dropping `tier`: nothing generated, the file is the org.
+
+- **Every account is written inside the OU it lives in** (`Prod: { enable:
+  true, accounts: { 'payments-prod': {...} } }`). No top-level `accounts`,
+  no `ou` field on an account.
+- **`workloads`, `stages` and `sandboxes` are dropped.** They generated
+  accounts (`payments` × `prod` → `payments-prod`) that never appeared by
+  name. Naming `<workload>-<environment>` is now a docs recommendation.
+- **The account name is its identity in state.** Adding accounts never
+  touches others; reordering changes nothing; moving a block is
+  `MoveAccount`; removing one suspends and releases it (never closes);
+  renames need `renamedFrom`. Names are unique across the org.
+- **App linking names accounts directly:** `org: { accounts: { prod:
+  'payments-prod', dev: 'payments-dev' } }` or `org: { account: '…' }`.
+  The SSM parameter drops `workload` and `stage`.
+- Identity Center loses the `stages` target (accounts, OUs, `all` remain).
+- Import is implemented in the new shape; a top-level `accounts` fails with
+  the nested form to write.
+- Every account entry carries `enable: true`, imports included (decided
+  same day), so OUs and accounts all look the same.
+- Open: core-account marking.
+
+## Decision: names stay the keys, renames use renamedFrom (2026-11-08)
+
+Considered a list with a `name` field, and a handle key with a separate
+`name`. Kept the name as the key: it's what shows in the console, preview and
+errors, and a `Record` maps directly to a dict or map in Python and Go.
+
+- **`renamedFrom` on accounts and OUs** is built (TypeScript), mapped to
+  Pulumi aliases. An OU rename moves its children's state too, without their
+  own `renamedFrom`.
+- **Imported accounts keep their AWS name**: the rename is config and state
+  only. Created accounts will be renamed with `PutAccountName`.
+- **The CLI checks renames against state before Pulumi runs**: an imported
+  account ID under a new name without `renamedFrom` is an error; an OU
+  removed and one added under the same parent is a warning.
+
+## Decision: account creation built, removal is conservative for now (2026-11-08)
+
+- **`import` is optional**: an entry without it is created. Created accounts
+  need `email` (org-wide pattern with `{account}`, or per account), and a
+  top-level `Suspended` OU, since removed accounts move there.
+- **Hard stop** on deploy: type `yes`; in CI `--yes-create-accounts`, and
+  `--yes-suspend-accounts` for removals. Preview lists both and checks the
+  account quota (found by name in Service Quotas; tell only).
+- **Removal doesn't disable `anvil-org-automation` yet.** The spec disables
+  it and relies on break glass (`OrganizationAccountAccessRole`) to get back
+  in, but break glass isn't built, and created accounts don't get
+  `OrganizationAccountAccessRole` (CreateAccount makes Anvil's role
+  instead). Disabling it now would leave a suspended account reachable only
+  by root recovery. Revisit when break glass lands.
+- **Removed accounts keep `anvil:org`** and lose `anvil:managed`, so writing
+  the block back adopts the account from Suspended instead of failing on its
+  email.
+- **Still open:** core-account marking, and init writing the core accounts.

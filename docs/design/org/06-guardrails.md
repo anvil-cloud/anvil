@@ -278,9 +278,9 @@ requireTags: {
 },
 ```
 
-**Where it's allowed.** Sandbox accounts, and workload or free-form accounts
-outside Prod. Preview errors for any account in a Prod OU (a stage mapped to
-`Prod`, or a custom OU under `Workloads/Prod`), the Security OU (Log Archive,
+**Where it's allowed.** Sandbox accounts, and other accounts outside Prod.
+Preview errors for any account in a Prod OU (`Workloads/Prod` or any OU
+nested under it), the Security OU (Log Archive,
 Audit, and custom accounts there), Infrastructure, or the management account:
 
 ```
@@ -321,9 +321,9 @@ Two levels:
 ```ts
 run(ctx) {
   // 1. tweak a built-in rule
-  ctx.guardrails.protectBackups.except({ stages: ['dev'], reason: 'dev tears down its own data' });
-  ctx.guardrails.protectKmsKeys.except({ stages: ['dev'], reason: 'dev tears down its own data' });
-  ctx.guardrails.protectEncryptionDefaults.except({ stages: ['dev', 'perf'], reason: 'unencrypted volume benchmarks' });
+  ctx.guardrails.protectBackups.except({ accounts: ['payments-dev', 'analytics-dev'], reason: 'dev tears down its own data' });
+  ctx.guardrails.protectKmsKeys.except({ accounts: ['payments-dev', 'analytics-dev'], reason: 'dev tears down its own data' });
+  ctx.guardrails.protectEncryptionDefaults.except({ accounts: ['payments-dev', 'payments-perf'], reason: 'unencrypted volume benchmarks' });
   ctx.guardrails.denyIamUsers.except({ accounts: ['legacy-app'], reason: 'vendor tool needs access keys (TICKET-123)' });
   ctx.guardrails.imdsV2.disable({ reason: 'no EC2 in this org' });
 
@@ -339,10 +339,10 @@ run(ctx) {
 
 ```
 ⚠ Guardrails weakened in run()
-  protectBackups, protectKmsKeys        except stage dev
-                                          payments-dev (444444444444)
+  protectBackups, protectKmsKeys        except payments-dev (444444444444),
+                                          analytics-dev (555555555555)
                                           "dev tears down its own data"
-  protectEncryptionDefaults             except stages dev, perf
+  protectEncryptionDefaults             except payments-dev, payments-perf
                                           "unencrypted volume benchmarks"
   denyIamUsers                          except legacy-app (666666666666)
                                           "vendor tool needs access keys (TICKET-123)"
@@ -352,7 +352,7 @@ run(ctx) {
                                           "Bedrock models only in us-east-1"
 ```
 
-- `except({ accounts?, stages?, resources?, reason })` (plus
+- `except({ accounts?, ou?, resources?, reason })` (plus
   `sourceAccounts` on `denyOutsideOrg`) and `disable({ reason })` on
   `ctx.guardrails.<rule>`. **`reason` is required** on every weakening,
   including replacement components; it's shown in preview and written into
@@ -360,7 +360,7 @@ run(ctx) {
   a guardrail was loosened.
   AWS caps policy descriptions at 512 characters, so preview errors if a
   rule's combined reasons don't fit; the full text also stays in state.
-  Account and stage names are typed; unknown names are compile errors in
+  Account names and OU paths are typed; unknown names are compile errors in
   TypeScript and preview errors in Python and Go.
 - **Exceptions are explicit and as narrow as AWS allows.** `resources`
   scopes an exception to named ARNs inside the excepted accounts, on rules
@@ -398,8 +398,8 @@ run(ctx) {
 
 - Exceptions can never be made from inside an account (SCPs beat IAM):
   always a reviewed change in the Org project.
-- Stage exceptions resolve to account IDs at deploy, so new accounts in that
-  stage are covered automatically, and preview shows the change.
+- OU exceptions resolve to account IDs at deploy, so new accounts written in
+  that OU are covered automatically, and preview shows the change.
 - Exceptions keep the rule attached and exclude accounts with a condition,
   so there is still one policy and the exemption is visible in it:
 
@@ -716,13 +716,13 @@ customer-managed KMS key (~$1/key/month) because `aws/ebs` can't be shared.
 ### NonProd strictness
 
 **NonProd gets Prod's data protections by default**, so staging behaves like
-prod. Loosening them (typically for `dev`) is a stage exception in `run`:
+prod. Loosening them (typically for dev accounts) is an account exception in `run`:
 
 ```ts
-ctx.guardrails.protectBackups.except({ stages: ['dev'], reason: 'dev tears down its own data' });
+ctx.guardrails.protectBackups.except({ accounts: ['payments-dev', 'analytics-dev'], reason: 'dev tears down its own data' });
 ```
 
-(Earlier options, stage exceptions in the config `guardrails` block or a
+(Earlier options, exceptions in the config `guardrails` block or a
 `relax` / `protection` field on each stage, are superseded by moving all
 weakening into `run`.)
 
@@ -734,19 +734,39 @@ model as `App`. Attachments are declared on the policy (`attach`).
 
 ```ts
 export default new Org({
-  tier: 'network',
   email: 'aws+{account}@acme.com',
-  stages: { prod: { ou: 'Prod' }, staging: { ou: 'NonProd' }, dev: { ou: 'NonProd' } },
-  workloads: {
-    website:   { stages: ['prod', 'dev'] },
-    analytics: { stages: ['prod', 'dev'] },
-  },
-
   // Card-handling accounts share PCI controls, so they share an OU.
-  ou: { 'Workloads/Prod/PCI': { enable: true, tags: { compliance: 'pci' } } },
-  accounts: {
-    'payments-ledger': { ou: 'Workloads/Prod/PCI' },
-    'payments-cards':  { ou: 'Workloads/Prod/PCI' },
+  ou: {
+    // ...the rest of the layout anvil org init wrote
+    Workloads: {
+      enable: true,
+      ou: {
+        Prod: {
+          enable: true,
+          accounts: {
+            'website-prod': { enable: true },
+            'analytics-prod': { enable: true },
+          },
+          ou: {
+            PCI: {
+              enable: true,
+              tags: { compliance: 'pci' },
+              accounts: {
+                'payments-ledger': { enable: true },
+                'payments-cards': { enable: true },
+              },
+            },
+          },
+        },
+        NonProd: {
+          enable: true,
+          accounts: {
+            'website-dev': { enable: true },
+            'analytics-dev': { enable: true },
+          },
+        },
+      },
+    },
   },
 
   run(ctx) {
@@ -797,7 +817,7 @@ export default new Org({
   it on deploy; editing the source updates the policy on the next deploy.
 - `attach` takes typed handles: `ctx.ou.root` / `.workloads` / `.prod` /
   `.nonProd` / `.sandbox` / ..., `ctx.ou['<custom path>']` (keys from
-  config), `ctx.accounts['<name>']`, and `ctx.accountsInStage('<stage>')`.
+  config), and `ctx.accounts['<name>']`.
   Typos are compile errors in TypeScript. `ctx.ref` and `ctx.export` work as
   in `App`.
 - Preview validates before deploy: IAM Access Analyzer `ValidatePolicy`, the
@@ -814,7 +834,7 @@ export default new Org({
 - **Anvil ships no compliance-named policies** (e.g. "PCI"): no SCP alone
   makes an account compliant, and the name would imply it does. Compliance
   checking is Prowler's job.
-- *Future:* `anvil init --org` scaffolds a `policies/` folder with a
+- *Future:* `anvil org init` scaffolds a `policies/` folder with a
   commented example; a small library of building blocks
   (`anvil.aws.policies.denyRegions([...])`) for common SCPs.
 
@@ -823,12 +843,17 @@ export default new Org({
 AWS strongly recommends testing SCPs before attaching them to Root. Two
 pieces work together.
 
-**Policy Staging OU (opt-in).** A top-level OU directly under Root, created
-only when enabled, holding test accounts:
+**Policy Staging OU (opt-in).** A top-level OU directly under Root, holding
+test accounts. `anvil org init` asks whether to write it (default no), or add
+the line later:
 
 ```ts
-ou: { PolicyStaging: { enable: true } },
-accounts: { 'policy-test': { ou: 'PolicyStaging' } },
+ou: {
+  PolicyStaging: {
+    enable: true,
+    accounts: { 'policy-test': { enable: true } },
+  },
+},
 
 run(ctx) {
   new anvil.aws.ServiceControlPolicy('denyRoute53Domains', {
